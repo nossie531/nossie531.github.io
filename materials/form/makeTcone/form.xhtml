@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Corn maker.</title>
+		<link rel="stylesheet" href="style.css"/>
+		<script src="script.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1>SVG 円錐台作成ツール。</h1>
+		</header> 
+		<form>
+			<table id="data">
+				<thead>
+					<tr>
+						<td></td>
+						<th>cx</th>
+						<th>cy</th>
+						<th>rx</th>
+						<th>ry</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th>断面①</th>
+						<td><input id="e1cx" type="number" readonly="readonly" value="0"/></td>
+						<td><input id="e1cy" type="number" readonly="readonly" value="0"/></td>
+						<td><input id="e1rx" type="number" min="0"/></td>
+						<td><input id="e1ry" type="number" min="0"/></td>
+					</tr> <tr>
+						<th>断面②</th>
+						<td><input id="e2cx" type="number"/></td>
+						<td><input id="e2cy" type="number"/></td>
+						<td><input id="e2rx" type="number" min="0"/></td>
+						<td><input id="e2ry" type="number" min="0"/></td>
+					</tr>
+				</tbody>
+			</table>
+			<label>absolute: <input id="chkAbsolute" type="checkbox"/></label>
+		</form>
+		<div id="out">
+			<textarea id="dText" readonly="readonly"></textarea>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="-250 -250 500 500">
+				<style> path { stroke:black; stroke-width: 1; fill: transparent; } </style>
+				<g id="sample"/>
+			</svg>
+		</div>
+	</body>
+</html>

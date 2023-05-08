@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="250" height="150"
+	viewBox="0 0 250 150" >
+	<style>
+text { font-size:13px; font-family:"Arial", sans-serif; }
+#commonBar { fill:#040; filter:url(#dropLight); }
+#exit { fill:#FFF; }
+#background { fill:url(#backMaterial); }
+#capture { fill:black; fill-opacity:0.6; }
+#dialog { fill:#EEE; filter:url(#dropShadow); }
+#dialog > #border { fill:none; stroke:blue; }
+#dialog > #titleBar { fill:#88E; }
+#dialog > #titleText { fill:white; }
+#dialog > #body { fill:#EEE; }
+#dialog > #bodyText { fill:orange; font:italic 20px/normal "Comic Sans MS", cursive; }
+#dialog > .button > rect { fill:#AAA; filter:url(#ridge); }
+#dialog > .button > text { fill:#000; fill-opacity:0.5; }
+#dialog > .button#buy > rect { fill:#FAA; }
+	</style>
+	<defs>
+		<linearGradient id="backMaterial" spreadMethod="reflect" gradientUnits="userSpaceOnUse" x2="2" y2="2">
+			<stop offset="0.0" stop-color="#DFD"/>
+			<stop offset="1.0" stop-color="#CEC"/>
+		</linearGradient>
+		<filter id="dropShadow">
+			<feDropShadow dx="3" dy="3" stdDeviation="1" flood-opacity="0.5"/>
+		</filter>
+		<filter id="dropLight">
+			<feDropShadow dy="20" flood-color="#FF8" flood-opacity="0.5"/>
+		</filter>
+		<filter id="ridge">
+			<feGaussianBlur stdDeviation="1"/>
+            <feDiffuseLighting surfaceScale="2">
+                <feDistantLight azimuth="225" elevation="45"/>
+            </feDiffuseLighting>
+			<feBlend mode="screen" in2="SourceGraphic"/>
+			<feComposite operator="in" in2="SourceGraphic"/>
+		</filter>
+	</defs>
+	<rect id="background" width="250" height="150"/>
+	<rect id="commonBar" width="250" height="40"/>
+	<path id="exit" d="m 225,6 16.251525,0 c 0.76123,0 1.373846,0.6318 1.373846,1.4151 l 0,25.0847 c 0,0.7832 -0.612616,1.4126 -1.373846,1.4126 l -16.251525,0 c -0.761224,0 -1.373845,-0.6294 -1.373845,-1.4126 l 0,-25.0847 c 0,-0.7833 0.612621,-1.4151 1.373845,-1.4151 z 
+	m -26.178042,0.5854 c 0.659424,-0.014 1.340367,0.2178 1.90597,0.6845 1.206621,0.9958 1.432677,2.7151 0.505519,3.8385 -0.927164,1.1235 -2.65853,1.2257 -3.865149,0.2299 -1.206627,-0.9959 -1.432683,-2.7152 -0.505519,-3.8385 0.492552,-0.5969 1.211839,-0.9051 1.959179,-0.9144 z 
+	m 27.005251,0.5177 c -0.390487,0.02 -0.638544,0.3334 -0.638544,0.728 l 0,24.0955 c 0,0.4509 0.364212,0.9495 0.815112,0.8127 l 6.112162,-1.4852 c 0.548636,-0.1759 0.815118,-0.3617 0.815118,-0.8126 l 0,-20.8714 c 0,-0.4509 -0.403307,-0.6978 -0.815118,-0.815 l -6.112162,-1.6425 c -0.06124,-0.014 -0.120778,-0.014 -0.176568,-0.014 z 
+	m -31.586348,4.6197 c 0.421594,0 0.892634,0.034 1.356917,0.1765 l 3.045197,1.1151 c 0.641411,0.2298 1.164226,0.5227 1.668931,1.0184 l 3.323353,3.5337 3.81919,0.1136 c 1.680183,0.041 1.988681,2.3337 0.336208,2.8178 -0.197188,0.029 -1.499761,0.038 -2.892819,0.02 -3.139769,-0.042 -2.945704,0.02 -3.966738,-1.2698 l -1.966435,-2.3607 -0.897353,3.2991 c -0.128574,0.4438 -0.05018,0.5697 0.08223,0.7547 l 3.11534,3.2701 c 0.475855,0.6217 0.409272,1.3786 0.181409,2.085 l -2.334089,7.3844 c -0.688273,2.5212 -4.078495,1.5628 -3.161294,-1.2263 l 1.915642,-6.6782 -2.123656,-1.8527 -2.496138,3.0912 c -0.436525,0.6052 -0.905669,1.0513 -2.667871,1.2044 l -5.582459,0.5516 c -1.813939,0.2378 -2.060576,-2.6043 -0.452303,-2.934 l 5.253506,-0.762 3.299164,-4.9002 0.169313,-4.8376 -2.084953,1.1054 c -1.026116,0.5274 -1.029495,0.5314 -1.129555,1.0788 l -0.47891,2.6727 c -0.568896,2.5292 -3.359665,1.5156 -2.907331,-0.9216 l 0.665154,-4.0392 c 0.108271,-0.4302 -0.03309,-0.3264 1.760847,-1.3232 0.489553,-0.2718 1.578325,-0.8544 2.527586,-1.3205 0.95686,-0.4698 1.603549,-0.8523 2.621912,-0.8659 z 
+	m 22.34434,5.2874 5.258843,4.0974 -5.258843,4.0295 0,-2.3219 -4.489184,0 0,-3.483 4.489184,0 z"/>
+	<rect id="capture" width="250" height="150"/>
+	<g id="dialog">
+		<rect id="titleBar" x="50" y="25" width="150" height="25"/>
+		<text id="titleText" x="55" y="43">Discount !</text>
+		<rect id="body" x="50" y="50" width="150" height="75"/>
+		<text id="bodyText" x="60" y="80">30% OFF !!!</text>
+		<g id="buy" class="button" transform="translate(110,100)">
+			<rect width="35" height="20" rx="4"/>
+			<text x="5" y="14">Buy.</text>
+		</g>
+		<g id="close" class="button" transform="translate(150,100)">
+			<rect width="45" height="20" rx="4"/>
+			<text x="5" y="14">Close.</text>
+		</g>
+		<rect id="border" x="50" y="25" width="150" height="100"/>
+	</g>
+</svg>

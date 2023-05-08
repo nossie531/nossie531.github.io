@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+#water { fill: url(#waterVolumeGrad); }
+#waterShade { fill: hsla(0, 0%, 0%, 0.05); }
+#waterGlaze { fill: hsla(0, 0%, 100%); stroke: hsla(0, 0%, 100%, 0.4); stroke-width: 5; opacity: 0.3; }
+#waterEdge { fill: none; stroke: hsla(200, 60%, 50%, 0.2); stroke-width: 20; }
+#waterStroke { fill: none; stroke: hsla(0, 0%, 0%, 0.3); stroke-width: 5; }
+#target { filter: url(#shadow); }
+	</style>
+	<defs>
+		<!-- 水滴のパス。-->
+		<path id="waterPath"
+			d="M 160,20 
+			c -4,0 -9,2 -12,6 
+			s -53,89 -73,144 
+			s 15,130 85,130 
+			s 105,-75 85,-130 
+			s -70,-140 -73,-144 
+			s -8,-6 -12,-6 Z"/>
+		<!-- 水滴の光沢のパス。-->
+		<path id="waterGlazePath"
+			d="m 141,84 c -5,8 -32,68 -42,98 c -10,30 26,47 33,13 c 7,-34 20,-97 21,-106 c 1,-9 -7,-13 -12,-5 z"/>
+		<!-- 水滴の陰のパス。-->
+		<path id="waterShadePath"
+			d="m 0,320 h 320 v-110 h-70
+			c -20,60 -160,60 -180,0 h-70 z"/>
+		<!-- 水滴の外形。-->
+		<clipPath id="waterClip">
+			<use id="water" href="#waterPath"/>
+		</clipPath>
+		<!-- 水滴の厚み。-->
+		<radialGradient id="waterVolumeGrad" gradientUnits="userSpaceOnUse" cx="160" cy="210" r="120">
+			<stop offset="0.0" stop-color="hsl(180, 50%, 60%)"/>
+			<stop offset="0.9" stop-color="hsl(180, 50%, 80%)"/>
+		</radialGradient>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-0.25" y="-0.25" width="1.5" height="1.5">
+			<feDropShadow dx="10" dy="10" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target">
+		<use id="water" href="#waterPath"/>
+		<g clip-path="url(#waterClip)">
+			<use id="waterGlaze" href="#waterGlazePath"/>
+			<use id="waterShade" href="#waterShadePath"/>
+			<use id="waterEdge" href="#waterPath"/>
+		</g>
+		<use id="waterStroke" href="#waterPath"/>
+	</g>
+</svg>

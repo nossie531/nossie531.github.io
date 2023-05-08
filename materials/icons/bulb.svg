@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 320 320" >
+	<style>
+#light { fill: url(#rgLight); }
+#filament { fill: none; stroke:black; }
+#glass { fill: hsla(60, 100%, 87%, 80%); }
+#bottom { fill: hsl(0, 0%, 66%); }
+#capSkrew > * { fill: url(#lgSkrew); }
+.pEdge { stroke: black; stroke-width: 5; }
+.noFill { fill: none; }
+.capFill { fill: url(#capShade); }
+	</style>
+	<defs>
+		<path id="glass" class="pEdge"
+			d="M -42,0 h 84 
+			a 8,8,0,0,0,8,-8
+			q 0,-19 14,-38
+			a 80,80,0,1,0,-128,0 
+			q 14,19,14,38
+			a 8,8,0,0,0,8,8 z"/>
+		<path id="filament" class="pEdge"
+			d="M -24,0 l -16,-96
+			c 3,-32,22,-32,25,0 c 3,32,-10,32,-6,0
+			c 3,-32,22,-32,25,0 c 3,32,-10,32,-6,0
+			c 3,-32,22,-32,25,0 c 3,32,-10,32,-6,0
+			c 3,-32,22,-32,25,0 l -16,96"/>
+		<path id="cap"
+			d="M -42,0 v +3
+			c 0,+3,+3,+3,+3,+6
+			v +3 q -6,+6,0,+13
+			v +3 q -6,+6,0,+13
+			v +3 q -6,+6,0,+13
+			a 8,8,0,0,0,8,8 h 62 a 8,8,0,0,0,8,-8 
+			v -3 q +6,-6,0,-13
+			v -3 q +6,-6,0,-13
+			v -3 q +6,-6,0,-13
+			c 0,-3,+3,-3,+3,-6 v -3"/>
+		<clipPath id="clipCap"> <use href="#cap"/> </clipPath>
+		<g id="capSkrew" clip-path="url(#cpCap)" transform="translate(0, 11)">
+			<rect x="-42" y="0" width="84" height="13" transform="matrix(1,-0.05,0,1,0,0)"/>
+			<rect x="-42" y="16" width="84" height="13" transform="matrix(1,-0.05,0,1,0,0)"/>
+			<rect x="-42" y="32" width="84" height="13" transform="matrix(1,-0.05,0,1,0,0)"/>
+		</g>
+		<radialGradient id="rgLight" cx="0.5" cy="0.5" r="0.5">
+			<stop offset="0.0" stop-color="hsla(0, 0%, 100%, 50%)"/>
+			<stop offset="0.5" stop-color="hsla(60, 100%, 50%, 50%)"/>
+			<stop offset="1.0" stop-color="hsla(30, 100%, 50%, 0%)"/>
+		</radialGradient>
+		<linearGradient id="capShade">
+			<stop offset="0.0" stop-color="hsl(0, 0%, 65%)"/>
+			<stop offset="0.2" stop-color="hsl(0, 0%, 90%)"/>
+			<stop offset="0.5" stop-color="hsl(0, 0%, 85%)"/>
+			<stop offset="1.0" stop-color="hsl(0, 0%, 65%)"/>
+		</linearGradient>
+		<linearGradient id="lgSkrew" x2="0" y2="1">
+			<stop offset="0.0" stop-color="white" stop-opacity="0.0"/>
+			<stop offset="0.3" stop-color="white" stop-opacity="0.5"/>
+			<stop offset="0.4" stop-color="white" stop-opacity="0.5"/>
+			<stop offset="0.8" stop-color="black" stop-opacity="0.2"/>
+			<stop offset="1.0" stop-color="black" stop-opacity="0.0"/>
+		</linearGradient>
+	</defs>
+	<g transform="translate(160, 220) rotate(-10)">
+		<!-- ソケット。-->
+		<g>
+			<rect id="bottom" class="pEdge" rx="20" ry="10"
+				x="-23" y="53" width="46" height="30" />
+			<use href="#cap" class="capFill"/>
+			<use href="#capSkrew" clip-path="url(#clipCap)"/>
+			<use href="#cap" class="pEdge noFill"/>
+		</g>
+		<!-- 電球。-->
+		<g>
+			<use href="#glass" y="0"/>
+			<use href="#filament" y="0"/>
+			<circle id="light" cy="-104" r="120"/>
+		</g>
+	</g>
+</svg>

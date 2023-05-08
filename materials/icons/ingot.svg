@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+g.ingot .sideT { fill: hsla(0, 0%, 100%, 0.5); }
+g.ingot .sideF { fill: hsla(0, 0%, 100%, 0.4); }
+g#ingotA .sideR { fill: hsla(0, 0%, 100%, 0.2); }
+g#ingotB .sideR { fill: hsla(0, 0%, 0%, 0.2); }
+
+g.ingot .fill {
+	fill: hsl(45, 100%, 50%);
+}
+
+g.ingot .stroke {
+	fill: none;
+	stroke: hsla(50, 100%, 15%, 0.5);
+	stroke-width: 5;
+	stroke-linejoin: round;
+}
+
+g.ingot .ridge {
+	fill: none;
+	stroke: white;
+	stroke-width: 15;
+	stroke-linejoin: round;
+	filter: url(#glaze);
+	clip-path: url(#ingotClip);
+	opacity: 0.25;
+}
+
+#ingotShadow {
+	fill: hsla(0, 0%, 0%, 0.125);
+	filter: url(#blur);
+}
+
+#target {
+	filter: url(#shadow);
+}
+	</style>
+	<defs>
+		<!-- インゴットの輪郭。-->
+		<clipPath id="ingotClip">
+			<use href="#ingotPath"/>
+		</clipPath>
+		<!-- インゴットのパス。-->
+		<path id="ingotPath"
+			d="M0,0 h100 l90,-90 l-15,-55 h-80 l-80,80 Z
+			m95,-65 h-80 m80,0 l80,-80 m-80,80 l5,65"/>
+		<!-- インゴット前面のパス。-->
+		<path id="sideF" d="M0,0 h100 l-5,-65 h-80 Z"/>
+		<!-- インゴット上面のパス。-->
+		<path id="sideT" d="M35,-65 h60 l80,-80 h-80 l-80,80 Z"/>
+		<!-- インゴット右面のパス。-->
+		<path id="sideR" d="M100,0 l90,-90 l-15,-55 l-80,80 Z"/>
+		<!-- インゴットＡ。-->
+		<g id="ingotA" class="ingot">
+			<use class="fill" href="#ingotPath"/>
+			<use class="sideF" href="#sideF"/>
+			<use class="sideT" href="#sideT"/>
+			<use class="sideR" href="#sideR"/>
+			<use class="ridge" href="#ingotPath"/>
+			<use class="stroke" href="#ingotPath"/>
+		</g>
+		<!-- インゴットＢ。-->
+		<g id="ingotB" class="ingot">
+			<use class="fill" href="#ingotPath"/>
+			<use class="sideF" href="#sideF"/>
+			<use class="sideT" href="#sideT"/>
+			<use class="sideR" href="#sideR"/>
+			<use class="ridge" href="#ingotPath"/>
+			<use class="stroke" href="#ingotPath"/>
+		</g>
+		<!-- ぼかしの適用。-->
+		<filter id="blur" x="-25%" y="-25%" width="150%" height="150%">
+			<feGaussianBlur stdDeviation="3"/>
+		</filter>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+			<feDropShadow dx="5" dy="5" stdDeviation="5" flood-opacity="0.5"/>
+		</filter>
+		<!-- 光沢の適用。-->
+		<filter id="glaze" x="-25%" y="-25%" width="150%" height="150%">
+			<feGaussianBlur stdDeviation="5"/>
+			<feComponentTransfer>
+				<feFuncA type="discrete" tableValues="0,1,1"/>
+			</feComponentTransfer>
+			<feGaussianBlur stdDeviation="1"/>
+		</filter>
+	</defs>
+	<g id="target" transform="translate(12.5, 270)">
+		<use href="#ingotB" x="0"/>
+		<use href="#ingotA" x="100"/>
+		<path id="ingotShadow" d="M55,-65 a15,15,0,0,0,15,15 h80 a20,15,0,0,0,20,-15 l80,-80 h-100 z"/>
+		<use href="#ingotA" x="50" y="-60"/>
+	</g>
+</svg>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+#body { fill: url(#bodyGrad); stroke: hsla(0, 0%, 0%, 0.25); stroke-width: 5; stroke-linejoin: round; }
+#axis { fill:none; stroke: url(#axisGrad); stroke-width: 6; stroke-linecap: round; filter: url(#blur); }
+g#shadow { opacity: 0.3; filter: url(#blur); }
+g#shadow #coreShadow { fill: hsl(200, 100%, 40%); }
+g#shadow #fatShadow { stroke: hsl(200, 100%, 40%); stroke-width: 20; stroke-linejoin: round; }
+	</style>
+	<defs>
+		<!-- 本体のパス。-->
+		<path id="bodyPath"
+			d="M 0,-145 l 17.32,15 v 25 l 17.32,-10 l 17.32,5 l -4.33,17.5 l -30.31,17.5 v 20
+			l 21.65,12.5 l 17.32,-10 v -35 l 12.99,-12.5 l 12.99,12.5 v 20 l 21.65,-12.5 l 21.65,7.5
+			l -4.33,22.5 l -21.65,12.5 l 17.32,10 l 4.33,17.5 l -17.32,5 l -30.31,-17.5 l -17.32,10
+			v 25 l 17.32,10 l 30.31,-17.5 l 17.32,5 l -4.33,17.5 l -17.32,10 l 21.65,12.5 l 4.33,22.5
+			l -21.65,7.5 l -21.65,-12.5 v 15 l -12.99,14.03 l -12.99,-14.03 v -30 l -17.32,-10
+			l -21.65,12.5 v 20 l 25.98,15 l 4.33,17.5 l -17.32,5 l -12.99,-7.5 v 25 l -17.32,15
+			l -17.32,-15 v -25 l -12.99,7.5 l -17.32,-5 l 4.33,-17.5 l 25.98,-15 v -20
+			l -21.65,-12.5 l -17.32,10 v 30 l -12.99,14.03 l -12.99,-14.03 v -15 l -21.65,12.5 l -21.65,-7.5
+			l 4.33,-22.5 l 21.65,-12.5 l -17.32,-10 l -4.33,-17.5 l 17.32,-5 l 30.31,17.5 l 17.32,-10
+			v -25 l -17.32,-10 l -30.31,17.5 l -17.32,-5 l 4.33,-17.5 l 17.32,-10 l -21.65,-12.5 l -4.33,-22.5
+			l 21.65,-7.5 l 21.65,12.5 v -20 l 12.99,-12.5 l 12.99,12.5 v 35 l 17.32,10
+			l 21.65,-12.5 v -20 l -30.31,-17.5 l -4.33,-17.5 l 17.32,-5 l 17.32,10 v -25 Z"/>
+		<!-- 結晶軸のパス。-->
+		<path id="axis"
+			d="M 0,-135 v 265
+			M 116.91,-67.5 l -233.83,135
+			M -116.91,-67.5 l 233.83,135
+			M 69.28,85 v -45 l 43.30,-25
+			M -38.97,102.5 l 38.97,-22.5 l 38.97,22.5
+			M -112.58,15 l 43.30,25 v 45
+			M 69.28,-90 v 50 l 43.30,25
+			M -43.3,-105 l 43.30,25 l 43.30,-25
+			M -112.58,-15 l 43.30,-25 v -50
+			M -38.97,-22.5 l 38.97,-22.5 l 38.97,22.5 v 45 l -38.97,22.5 l -38.97,-22.5 Z"/>
+		<!-- 本体のグラデーション。 -->
+		<radialGradient id="bodyGrad">
+			<stop offset="0.05" stop-color="hsl(180, 90%, 90%)"/>
+			<stop offset="0.5" stop-color="hsl(200, 90%, 70%)"/>
+			<stop offset="0.95" stop-color="hsl(0, 0%, 100%)"/>
+		</radialGradient>
+		<!-- 結晶軸のグラデーション。 -->
+		<radialGradient id="axisGrad">
+			<stop offset="0.10" stop-color="hsla(0, 0%, 100%, 0.0)"/>
+			<stop offset="0.30" stop-color="hsla(0, 0%, 100%, 0.3)"/>
+			<stop offset="0.70" stop-color="hsla(0, 0%, 100%, 0.3)"/>
+			<stop offset="0.90" stop-color="hsla(0, 0%, 100%, 0.0)"/>
+		</radialGradient>
+		<!-- ぼかしの適用。 -->
+		<filter id="blur" x="-0.2" y="-0.2" width="1.4" height="1.4">
+			<feGaussianBlur stdDeviation="1.5"/>
+		</filter>
+	</defs>
+	<g transform="translate(160, 160)">
+		<g id="shadow">
+			<circle id="coreShadow" r="110"/>
+			<use id="fatShadow" href="#bodyPath"/>
+		</g>
+		<g>
+			<use id="body" href="#bodyPath"/>
+			<use href="#axis"/>
+		</g>
+	</g>
+</svg>

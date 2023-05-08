@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 320 320">
+	<style>
+.stroke { fill: none; stroke: hsla(0, 0%, 0%, 0.5); stroke-width: 5; }
+#body { fill: hsl(30, 50%, 95%); filter: url(#shadow); }
+#shade { fill: hsla(0, 0%, 0%, 0.1); }
+	</style>
+	<defs>
+		<!-- 本体のクリップ。-->
+		<clipPath id="bodyClip">
+			<use href="#body"/>
+		</clipPath>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+			<feDropShadow dx="5" dy="5" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target" transform="rotate(-45, 160, 160) translate(160,160)">
+		<path id="body" class="stroke"
+			d="M -100,-22 h 200
+			c 10,0 30,-38 50,-28 s 0,30 0,50
+			s 20,40 0,50 s -40,-28 -50,-28 h -200
+			c -10,0 -30,38 -50,28 s 0,-30 0,-50 
+			s -20,-40 0,-50 s 40,28 50,28 Z"/>
+		<path id="shade"
+			clip-path="url(#bodyClip)"
+			d="M -105,10 h 210
+			c 10,0 20,40 45,40
+			l -20,10 h -260 l -20,-10
+			c 25,0 35,-40 45,-40 Z"/>
+	</g>
+</svg>

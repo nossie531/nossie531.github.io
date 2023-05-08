@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>SVG Gallary</title>
+		<style id="myStyle">
+@media(prefers-color-scheme: dark) { body { color: white; background: black; } }
+form { margin: 1em 0; }
+img.icon { border:thin solid transparent; float: left; }
+img.icon:nth-child(5n+1) { clear: both; }
+#sample { padding: 1em; width: max-content; }
+		</style>
+		<script>//<![CDATA[
+document.addEventListener("DOMContentLoaded", _ => new Main(new View));
+
+class Main {
+
+	#view;
+	
+	constructor(view) {
+		this.#view = view;
+		this.#bindSize();
+		this.#bindBackground();
+		this.#bindBorder();
+	}
+
+	#bindSize() {
+		const [styleRule, selElm] = [this.#view.iconStyle, this.#view.elm.selSize];
+		const action = _ => styleRule.width = selElm.selectedOptions[0].innerText;
+		selElm.addEventListener("change", action);
+		action();
+	}
+
+	#bindBorder() {
+		const [styleRule, chkElm] = [this.#view.iconStyle, this.#view.elm.chkBorder];
+		const action = _ => styleRule.borderColor = chkElm.checked ? "silver" : "transparent";
+		chkElm.addEventListener("change", action);
+		action();
+	}
+
+	#bindBackground() {
+		const [styleRule, inpElm] = [this.#view.rootStyle, this.#view.elm.inputBackground];
+		const action = _ => styleRule.background = inpElm.value;
+		inpElm.addEventListener("change", action);
+		action();
+	}
+}
+
+class View {
+
+	get elm() {
+		return {
+			selSize: document.getElementById("selSize"),
+			inputBackground: document.getElementById("inputBackground"),
+			chkBorder: document.getElementById("chkBorder")
+		};
+	}
+
+	get iconStyle() {
+		const styleSheet = document.getElementById("myStyle").sheet;
+		const rule = [...styleSheet.cssRules].find(x => x.selectorText === "img.icon");
+		return rule.style;
+	}
+
+	set iconWidth(value) {
+		this.getIconStyle().width = value;
+	}
+
+	get rootStyle() {
+		const styleSheet = document.getElementById("myStyle").sheet;
+		const rule = [...styleSheet.cssRules].find(x => x.selectorText === "#sample");
+		return rule.style;
+	}
+
+}
+		//]]></script>
+	</head>
+	<body>
+		<form>
+			<label>
+				width:
+				<select id="selSize">
+					<option>auto</option>
+					<option>16px</option>
+					<option>24px</option>
+					<option>32px</option>
+					<option>48px</option>
+					<option>64px</option>
+					<option>96px</option>
+					<option>128px</option>
+					<option>160px</option>
+				</select>
+			</label>,
+			<label>
+				background: 
+				<input id="inputBackground" type="color" value="#FFFFFF"/>
+			</label>
+			<label>
+				border: 
+				<input id="chkBorder" type="checkbox"/>
+			</label>
+		</form>
+		<div id="sample">
+			<img class="icon" src="smile.svg"/>
+			<img class="icon" src="angry.svg"/>
+			<img class="icon" src="unhappy.svg"/>
+			<img class="icon" src="eye.svg"/>
+			<img class="icon" src="bulb.svg"/>
+			<img class="icon" src="egg.svg"/>
+			<img class="icon" src="lunch.svg"/>
+			<img class="icon" src="book_light.svg"/>
+			<img class="icon" src="book_dark.svg"/>
+			<img class="icon" src="pencil.svg"/>
+			<img class="icon" src="brush.svg"/>
+			<img class="icon" src="tag.svg"/>
+			<img class="icon" src="magnifier_light.svg"/>
+			<img class="icon" src="magnifier_dark.svg"/>
+			<img class="icon" src="floppy.svg"/>
+			<img class="icon" src="moon.svg"/>
+			<img class="icon" src="drug.svg"/>
+			<img class="icon" src="balloon_exclamation.svg"/>
+			<img class="icon" src="balloon_question.svg"/>
+			<img class="icon" src="alert.svg"/>
+			<img class="icon" src="ingot.svg"/>
+			<img class="icon" src="clover.svg"/>
+			<img class="icon" src="bomb.svg"/>
+			<img class="icon" src="speaker.svg"/>
+			<img class="icon" src="born.svg"/>
+			<img class="icon" src="pow.svg"/>
+			<img class="icon" src="fire.svg"/>
+			<img class="icon" src="water.svg"/>
+			<img class="icon" src="snow.svg"/>
+			<img class="icon" src="thunder.svg"/>
+			<img class="icon" src="sword.svg"/>
+			<img class="icon" src="arrow.svg"/>
+			<hr style="clear: both;"/>
+			<img src="trafficLight.svg"/>
+			<hr/>
+			<img src="dialog.svg"/>
+		</div>
+	</body>
+</html>

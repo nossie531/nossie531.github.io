@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 320 320">
+	<style>
+.stroke { fill: none; stroke: hsla(0, 0%, 0%, 0.5); stroke-width: 5; }
+.band { fill: none; stroke: hsla(0, 0%, 0%, 0.1); stroke-width: 8; }
+.shade { fill: hsla(0, 0%, 0%, 0.1); }
+#end { fill: hsl(0, 0%, 80%); }
+#blade { fill: hsl(0, 0%, 85%); }
+#guard, #pommel { fill: hsl(50, 90%, 55%); }
+#glip { fill: hsl(25, 60%, 40%); }
+#target { filter: url(#shadow); }
+	</style>
+	<defs>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+			<feDropShadow dx="2" dy="8" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target" transform="translate(30, 30) rotate(45)">
+		<!-- 刃。-->
+		<path id="blade" class="stroke"
+			d="M 0,0 l40,-30 h 200 v60 h -200 Z
+			M 75,0 h 155 M 75,0 l -30,-20 M 75,0 l -30,20"/>
+		<!-- ガード。-->
+		<rect id="guard" class="stroke" x="240" y="-50" width="20" height="100"/>
+		<!-- グリップ。-->
+		<g transform="translate(260, 0)">
+			<rect id="glip" class="stroke" y="-25" width="70" height="50"/>
+			<path class="band" d="M 17.5,-25 v 50 m 17.5,-50 v 50 m 17.5,-50 v 50"/>
+			<rect class="shade" y="10" width="70" height="15"/>
+		</g>
+		<!-- 柄頭。-->
+		<g transform="translate(330, 0)">
+			<rect id="end" class="stroke" y="-20" rx="15" width="35" height="40"/>
+			<rect id="pommel" class="stroke" y="-30" rx="5" width="20" height="60"/>
+		</g>
+	</g>
+</svg>

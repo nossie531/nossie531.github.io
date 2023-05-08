@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 320 320">
+	<style>
+:root {
+	--glip-color: hsl(30, 30%, 80%);
+	--joint-color: hsl(50, 30%, 60%);
+	--brush-color: hsl(0, 0%, 97%);
+	--paint-color: hsl(15, 70%, 60%);
+	--stroke-color: hsla(0, 0%, 0%, 0.5);
+	--fiber-color: hsla(0, 0%, 0%, 0.1);
+	--groove-color: hsla(0, 0%, 0%, 0.25);
+	--shade1-color: hsla(0, 0%, 0%, 0.1);
+	--shade2-color: hsla(0, 0%, 0%, 0.25);
+}
+
+#target { filter: url(#shadow); }
+#glipFill { fill: var(--glip-color); }
+#glipStroke { fill: none; stroke: var(--stroke-color); stroke-width: 5; }
+#glipShade { fill: none; stroke: var(--shade2-color); filter:url(#blur); }
+#jointFill { fill: var(--joint-color); }
+#jointStroke { fill: none; stroke: var(--stroke-color); stroke-width: 5; }
+#jointShade { fill: var(--shade1-color); filter:url(#blur); }
+#brushFill { fill: var(--brush-color); }
+#brushStroke { fill: none; stroke: var(--stroke-color); stroke-width: 5; }
+#brushPaint { fill: var(--paint-color); }
+.groove { fill: none; stroke: var(--groove-color); stroke-width: 5; }
+.brushFiber { fill: none; stroke: var(--fiber-color); stroke-width: 5; }
+	</style>
+	<defs>
+		<!-- 接続部の外形。-->
+		<rect id="jointRect" x="-73" width="146" height="60"/>
+		<!-- グリップの外形。-->
+		<path id="glipPath" 
+			d="M-70,0 h140 v-10 c0,-20,-45,-20,-45,-40 v-110
+			a25,25,0,0,0,-50,0 v110 c0,20,-45,20,-45,40 Z
+			M-10,-160 a10,10,0,0,1,20,0 a10,10,0,0,1,-20,0 Z"/>
+		<!-- ブラシの外形。-->
+		<path id="brushPath"
+			d="M-70,0 q0,40,-20,82 q16,8,150,8
+			 q10,-30,10,-60 v-30 Z"/>
+		<!-- 接続部の切り取り。-->
+		<clipPath id="jointClip">
+			<use href="#jointRect"/>
+		</clipPath>
+		<!-- グリップの切り取り。-->
+		<clipPath id="glipClip">
+			<use href="#glipPath"/>
+		</clipPath>
+		<!-- ブラシの切り取り。-->
+		<clipPath id="brushClip">
+			<use href="#brushPath"/>
+		</clipPath>
+		<!-- ぼかしの適用。-->
+		<filter id="blur" x="-0.2" y="-0.2" width="1.4" height="1.4">
+			<feGaussianBlur stdDeviation="1.5" />
+		</filter>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+			<feDropShadow dx="5" dy="5" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target">
+		<g transform="translate(160, 5) rotate(45, 0, 160)">
+			<!-- グリップ。-->
+			<g transform="translate(0, 155)">
+				<use id="glipFill" href="#glipPath"/>
+				<path id="glipShade" clip-path="url(#glipClip)" stroke-width="14" stroke-linecap="round" 
+					d="M70,0 v-10 c0,-20,-45,-20,-45,-40 v-110 a25,25,0,0,0,-7.32,-17.68"/>
+				<use id="glipStroke" href="#glipPath"/>
+			</g>
+			<!-- ブラシ。-->
+			<g transform="translate(0, 200)">
+				<use id="brushFill" href="#brushPath"/>
+				<g clip-path="url(#brushClip)">
+					<path id="brushPaint" 
+						d="M-90,90 h160 v-40 
+						q-5,-10,-10,-10
+						c-20,0,-20,20,-30,20
+						s-10,-5,-20,-5 s-10,15,-20,15
+						s-10,-10,-20,-10 s-10,10,-20,10
+						s-20,-20,-40,-20 Z"/>
+					<path class="brushFiber"
+						d="M-77,88 q13,-25,16,-50
+						M-58,90 q11,-20,14,-40
+						M-38,91 q12,-25,15,-50
+						M-18,92 q8,-20,11,-40
+						M2,92 q9,-25,13,-50
+						M22,92 q7,-20,10,-40
+						M42,93 q8,-25,12,-50"/>
+				</g>
+				<use id="brushStroke" href="#brushPath"/>
+			</g>
+			<!-- 接続部。-->
+			<g transform="translate(0, 150)">
+				<use id="jointFill" href="#jointRect"/>
+				<g clip-path="url(#jointClip)">
+					<path class="groove" d="M-60,15 h120"/>
+					<path class="groove" d="M-60,45 h120"/>
+					<path id="jointShade" d="M55,0 v5 q0,10,5,10 q-5,0,-5,10 v10 q0,10,5,10 q-5,0,-5,10 v5 h18 v-60 Z"/>
+				</g>
+				<use id="jointStroke" href="#jointRect"/>
+			</g>
+		</g>
+	</g>
+</svg>

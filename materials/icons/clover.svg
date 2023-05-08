@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+#target { filter: url(#shadow); }
+#stem { fill: hsl(120, 50%, 50%); stroke: hsl(120, 100%, 30%); stroke-width: 5; }
+#leaf { fill: url(#leafPattern); stroke: hsl(120, 100%, 25%); stroke-width: 5; }
+#leafBase { fill: hsl(120, 50%, 55%); }
+#leafMark { fill: hsl(110, 60%, 65%); stroke: hsl(115, 55%, 60%); stroke-opacity: 0.5; stroke-width: 5; }
+	</style>
+	<defs>
+		<!-- １枚の葉。 -->
+		<path id="leaf" d="M0,0
+		   c-15,-15,-60,-65,-60,-90
+		   a30,30,0,0,1,60,0
+		   a30,30,0,0,1,60,0
+		   c0,25,-45,75,-60,90 z"/>
+		<!-- 葉の模様。 -->
+		<pattern id="leafPattern" width="100%" height="100%">
+			<rect id="leafBase" width="200" height="200"/>
+			<path id="leafMark" d="M45,95
+				c-21,-28 5,-40 15,-30
+				c10,-10 36,-3 15,30
+				c6,-10,-5,-25,-15,-15
+				c-10,-10,-21,5,-15,15"/>
+		</pattern>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+			<feDropShadow dx="10" dy="10" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target" transform="rotate(25,160,145), translate(160, 145)">
+		<!-- 葉を支える茎。-->
+		<path id="stem"
+			d="M-13,0 c20,120,-20,140,-40,160 
+			   l20,15 c25,-25,60,-60,40,-175"/>
+		<!-- 葉①。-->
+		<g transform="rotate(-135)">
+			<use x="0" y="0" href="#leaf"/>
+		</g>
+		<!-- 葉②。-->
+		<g transform="rotate(-45)">
+			<use x="0" y="0" href="#leaf"/>
+		</g>
+		<!-- 葉③。-->
+		<g transform="rotate(45)">
+			<use x="0" y="0" href="#leaf"/>
+		</g>
+		<!-- 葉④。-->
+		<g transform="rotate(135)">
+			<use x="0" y="0" href="#leaf"/>
+		</g>
+	</g>
+</svg>

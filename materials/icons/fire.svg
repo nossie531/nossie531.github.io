@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+g#inner { filter: url(#blur); clip-path: url(#outerClip); }
+g#inner path:nth-child(1) { fill: hsl(20, 100%, 50%); }
+g#inner path:nth-child(2) { fill: hsl(30, 100%, 50%); }
+g#inner path:nth-child(3) { fill: hsl(40, 100%, 50%); }
+#outer { fill: hsl(20, 100%, 45%); stroke: hsla(0, 0%, 0%, 0.5); stroke-width: 5; stroke-linejoin: round; }
+.sparks { fill: hsl(20, 100%, 45%); stroke: hsla(0, 0%, 0%, 0.5); stroke-width: 5; stroke-linejoin: round; }
+	</style>
+	<defs>
+		<clipPath id="outerClip">
+			<use href="#outer"/>
+		</clipPath>
+		<filter id="blur">
+			<feGaussianBlur stdDeviation="5"/>
+		</filter>
+	</defs>
+	<!-- 火花左。-->
+	<path class="sparks"
+		d="M 120,20
+		c 5,15 -5,45 -30,80
+		c -10,-25 -10,-50 30,-80 Z" />
+	<!-- 火花右。-->
+	<path class="sparks"
+		d="M 275,45
+		c 5,20 5,50 -20,65
+		c -10,-20 -5,-50 20,-65 Z"/>
+	<!-- 外炎。-->
+	<path id="outer" 
+		d="M 65,125
+		c 10,15 20,20 20,20
+		c 0,0 50,-80 110,-110
+		c 10,45 55,110 55,110
+		c 0,0 10,-10 25,-15
+		c 5,45 10,70 -5,110
+		s -50,60 -110,60
+		s -90,-30 -100,-65
+		s -10,-75 5,-110 Z"/>
+	<!-- 内炎。-->
+	<g id="inner">
+		<path d="m 175,85
+			c 40,45 85,100 80,145
+			s -40,70 -95,70
+			s -80,-30 -85,-70
+			s 30,-95 100,-145 Z"/>
+		<path d="M 145,135
+			c 10,20 20,30 20,30
+			c 0,0 10,-20 25,-35
+			c 10,20 50,65 45,105
+			s -40,55 -70,55
+			s -65,-15 -70,-55
+			s 20,-70 50,-100 Z"/>
+		<path d="M 140,170
+			c 10,20 20,25 20,25
+			c 0,0 10,-15 25,-30
+			c 10,15 30,35 30,65 
+			s -20,50 -50,50 
+			s -50,-20 -50,-50
+			s 15,-45 25,-60 Z"/>
+	</g>
+</svg>

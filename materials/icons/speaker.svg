@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+g#speaker { filter: url(#shadow); stroke-width: 5; }
+g#speaker #cone { fill: url(#coneGrad); stroke: none; }
+g#speaker #base { fill: url(#baseGrad); stroke: hsla(0, 0%, 0%, 0.5); }
+g#speaker #frame { fill: url(#frameGrad); stroke: hsla(0, 0%, 0%, 0.5); }
+g#speaker #centerCap { fill: url(#centerCapGrad); stroke: hsla(0, 0%, 0%, 0.5); }
+g#speaker #coneDeco { fill: none; stroke: hsla(0, 0%, 0%, 0.25); stroke-width: 15; }
+g#soundWave { filter: url(#blur); }
+g#soundWave * { fill: none; stroke: #48C8; stroke-linecap: round; }
+	</style>
+	<defs>
+		<!-- 円錐台の領域。-->
+		<clipPath id="clipInCone">
+			<use href="#cone"/>
+		</clipPath>
+		<!-- 線形グラデーション用ソース。-->
+		<linearGradient id="linearSource">
+			<stop offset="0.0" stop-color="hsl(0, 0%, 50%)"/>
+			<stop offset="0.3" stop-color="hsl(0, 0%, 80%)"/>
+			<stop offset="0.4" stop-color="hsl(0, 0%, 80%)"/>
+			<stop offset="1.0" stop-color="hsl(0, 0%, 0%)"/>
+		</linearGradient>
+		<!-- 放射グラデーション用ソース。-->
+		<linearGradient id="radialSource">
+			<stop offset="0" stop-color="hsl(0, 0%, 100%)"/>
+			<stop offset="1" stop-color="hsl(0, 0%, 0%)"/>
+		</linearGradient>
+		<!-- 土台用グラデーション。-->
+		<linearGradient id="baseGrad" href="#linearSource"
+			gradientUnits="userSpaceOnUse" x1="0" y1="-64" x2="0" y2="64"/>
+		<!-- フレーム用グラデーション。-->
+		<linearGradient id="frameGrad" href="#linearSource" 
+			gradientUnits="userSpaceOnUse" x1="0" y1="-64" x2="60" y2="64"/>
+		<!-- コーン用グラデーション１。-->
+		<radialGradient id="coneGrad" href="#radialSource" spreadMethod="pad"
+			gradientUnits="userSpaceOnUse" r="160" cx="110" cy="0" fx="120" fy="30"/>
+		<!-- 中心キャップ用グラデーション２。-->
+		<radialGradient id="centerCapGrad" href="#radialSource" spreadMethod="pad"
+			gradientUnits="userSpaceOnUse" r="80" cy="0" cx="70" fx="90" fy="-10"/>
+		<!-- ぼかしの適用。-->
+		<filter id="blur" x="-0.5" y="-0.5" width="2" height="2">
+			<feGaussianBlur stdDeviation="3"/>
+		</filter>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+			<feDropShadow dx="3" dy="8" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<!-- スピーカー -->
+	<g id="speaker" transform="translate(40, 160)">
+		<!-- 土台 -->
+		<path id="base" d="M0,60 a30,60 0,0,1,0,-120 h48 v120 Z"/>
+		<!-- コーン -->
+		<ellipse id="cone" cx="110" cy="0" rx="50" ry="100" />
+		<!-- コーンの装飾 -->
+		<ellipse id="coneDeco" cx="92" cy="0" rx="46.91" ry="83.86"  clip-path="url(#clipInCone)"/>
+		<!-- 中心キャップ -->
+		<path id="centerCap"
+			d="M110,0 
+			c0,-25,-15,-50,-40,-50
+			s-30,25,-30,50
+			s5,50,30,50
+			s40,-25,40,-50 z"/>
+		<!-- フレーム -->
+		<path id="frame"
+			d="M40,-56.57
+			a30,60,0,0,0,0,113.14 l53.33,37.71
+			a50,100,0,1,0,0,-188.56 Z
+			m53.33,-37.71
+			a50,100,0,1,1,0,188.56
+			a50,100,0,0,1,0,-188.56 Z"/>
+	</g>
+	<!-- 音波 -->
+	<g id="soundWave" transform="translate(216, 160)">
+		<path stroke-width="3" d="m0,-83.2 a64,128,0,0,1,0,166.4"/>
+		<path stroke-width="3" d="m35,-92.8 a96,192,0,0,1,0,185.6"/>
+		<path stroke-width="3" d="m70,-102.4 a128,256,0,0,1,0,204.8"/>
+	</g>
+</svg>

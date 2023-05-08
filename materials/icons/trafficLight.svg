@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="135" height="50"
+	viewBox="0 0 270 100" >
+	<style>
+#body { fill:url(#bodyGradient); }
+#roof { fill:#333; }
+#downLight { fill:black; opacity:0.1; }
+#upLight { fill:white; opacity:0.5; }
+#green  { fill:#0FA; }
+#yellow { fill:#FE0; }
+#red    { fill:#F41; }
+.drop { display:none; fill:black; opacity:0.4; }
+.off .drop { display:block; }
+#body, #roof, #edge, #green, #yellow, #red, .drop { stroke-width:3; stroke:gray; }
+	</style>
+	<defs>
+		<path id="roof" d="M-36,0 a36,36 0 0 1 72,0 Z"/>
+		<path id="downLight" d="M-24,-10 a26,26 0 0 1 48,0 c 2,10 -12,-5 -24,-5 s -26,15 -24,5 Z"/>
+		<path id="upLight" d="M-24,10 a26,26 0 0 0 48,0 c 6,-15 -52,-15, -48,0 Z"/>
+		<linearGradient id="bodyGradient" x1="0" x2="0" y1="0.0" y2="1.0">
+			<stop offset="0.00" stop-color="#111"/>
+			<stop offset="0.20" stop-color="#444"/>
+			<stop offset="0.80" stop-color="#333"/>
+			<stop offset="1.00" stop-color="#111"/>
+		</linearGradient>
+	</defs>
+	<path id="body" d="M50,5 a45,45 0 0 0 0,90 h170 a45,45 0 0 0 0,-90 Z"/>
+	<g transform="translate(55,50)">
+		<use xlink:href="#roof"/>
+		<use xlink:href="#edge"/>
+		<circle id="green" r="30"/>
+		<use xlink:href="#downLight"/>
+		<use xlink:href="#upLight"/>
+		<circle class="drop" r="30"/>
+	</g>
+	<g transform="translate(135,50)" class="off">
+		<use xlink:href="#roof"/>
+		<use xlink:href="#edge"/>
+		<circle id="yellow" r="30"/>
+		<use xlink:href="#downLight"/>
+		<use xlink:href="#upLight"/>
+		<circle class="drop" r="30"/>
+	</g>
+	<g transform="translate(215,50)" class="off">
+		<use xlink:href="#roof"/>
+		<use xlink:href="#edge"/>
+		<circle id="red" r="30"/>
+		<use xlink:href="#downLight"/>
+		<use xlink:href="#upLight"/>
+		<circle class="drop" r="30"/>
+	</g>
+</svg>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 320 320">
+	<style>
+#eggFill { fill: url(#eggGlowGradient); }
+#eggStroke { fill: none; stroke: hsla(0, 0%, 0%, 0.5); stroke-width: 5; }
+#eggShade { fill: url(#eggShadeGradient); }
+#shadow { fill: url(#shadowGradient); }
+	</style>
+	<defs>
+		<path id="eggPath" d="M0,-140 
+			c-50,0,-90,70,-90,140
+			s50,100,90,100
+			s90,-30,90,-100
+			s-50,-140,-90,-140 Z"/>
+		<linearGradient id="eggShadeGradient" x2="0.225" y2="1">
+			<stop offset="0%" stop-color="hsla(0, 0%, 0%, 0)"/>
+			<stop offset="60%" stop-color="hsla(0, 0%, 0%, 0)"/>
+			<stop offset="85%" stop-color="hsla(0, 0%, 0%, 0.06)"/>
+			<stop offset="100%" stop-color="hsla(0, 0%, 0%, 0.12)"/>
+		</linearGradient>
+		<radialGradient id="eggGlowGradient" fy="0.55">
+			<stop offset="0%" stop-color="hsl(0, 0%, 100%)"/>
+			<stop offset="100%" stop-color="hsl(47, 100%, 92%)"/>
+		</radialGradient>
+		<radialGradient id="shadowGradient" fx="0.33">
+			<stop offset="0%" stop-color="hsla(0, 0%, 0%, 0.25)"/>
+			<stop offset="33%" stop-color="hsla(0, 0%, 0%, 0.125)"/>
+			<stop offset="100%" stop-color="hsla(0, 0%, 0%, 0)"/>
+		</radialGradient>
+	</defs>
+	<g transform="translate(150, 170)">
+		<ellipse id="shadow" cx="25" cy="100" rx="100" ry="45"/>
+		<g transform="rotate(20)">
+			<use id="eggFill" href="#eggPath"/>
+			<use id="eggShade" href="#eggPath"/>
+			<use id="eggStroke" href="#eggPath"/>
+		</g>
+	</g>
+</svg>

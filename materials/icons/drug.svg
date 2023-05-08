@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+#capEdge { fill: none; stroke: black; stroke-width: 5; stroke-opacity: 0.5; }
+#target { filter: url(#shadow); }
+#capL { fill: hsl(60, 100%, 93%); }
+#capR { fill: hsl(220, 100%, 75%); }
+#capRoundL { stroke: hsl(45, 50%, 90%); stroke-width: 30; fill: none; filter: url(#blurL); clip-path: url(#clipBase); }
+#capRoundR { stroke: hsl(220, 100%, 65%); stroke-width: 40; fill: none; filter: url(#blurL); clip-path: url(#clipBase); }
+.shade { fill: hsl(0, 0%, 0%); opacity: 0.1; filter: url(#blurL); clip-path: url(#clipBase); }
+.highlight { fill: hsl(220, 100%, 85%); opacity: 0.5; filter: url(#blurL); }
+	</style>
+	<defs>
+		<path id="pathL" d="M0,-70 h-80 a70,70,0,0,0,0,140 h80"/>
+		<path id="pathR" d="M0,-70 h80 a70,70,0,0,1,0,140 h-80"/>
+		<path id="pathCap" d="M-80,-70 a70,70,0,0,0,0,140 h160 a70,70,0,0,0,0,-140 Z m80,0 v140"/>
+		<!-- 対称範囲。-->
+		<clipPath id="clipBase">
+			<use href="#pathCap"/>
+		</clipPath>
+		<!-- 中規模のぼかし。-->
+		<filter id="blurL">
+			<feGaussianBlur stdDeviation="4"/>
+		</filter>
+		<!-- 小規模のぼかし。-->
+		<filter id="blurS">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+			<feDropShadow dx="0" dy="10" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target" transform="translate(160, 160), rotate(-45)">
+		<!-- 左キャップ。-->
+		<use id="capL" href="#pathL"/>
+		<!-- 右キャップ。-->
+		<use id="capR" href="#pathR"/>
+		<!-- 左キャップ丸み。-->
+		<use id="capRoundL" href="#pathL"/>
+		<!-- キャップ丸み。-->
+		<use id="capRoundR" href="#pathR"/>
+		<!-- キャップ輪郭。-->
+		<use id="capEdge" href="#pathCap"/>
+		<!-- 陰影。-->
+		<path class="shade" d="M-160,0 v160 h320 v-160 h-10 a70,30,0,0,1,-70,30 h-160 a70,30,0,0,1,-70,-30 Z"/>
+		<!-- 光沢。-->
+		<path class="highlight" d="M20,-60 a10,10,0,0,0,-10,10 v40 a10,10,0,0,0,10,10 h60 a45,30,0,0,0,0,-60 Z"/>
+	</g>
+</svg>

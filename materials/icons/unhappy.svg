@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 160 160">
+	<style>
+.line { fill: none; stroke: black; stroke-width: 10; }
+.fill { fill: black; }
+	</style>
+	<g id="target">
+		<!-- 顔。-->
+		<circle class="line" cx="80" cy="80" r="70"/>
+		<!-- 左眉。-->
+		<path class="line" d="M60,45 l-25,10"/>
+		<!-- 左目。-->
+		<circle class="fill" cx="55" cy="75" r="10"/>
+		<!-- 右眉。-->
+		<path class="line" d="M100,45 l25,10"/>
+		<!-- 右目。-->
+		<circle class="fill" cx="105" cy="75" r="10"/>
+		<!-- ゆがんだ口元。 -->
+		<path class="line" d="M50,120 q30,-20,60,0"/>
+	</g>
+</svg>

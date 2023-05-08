@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg  xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+.stroke { stroke: hsla(0, 0%, 0%, 0.5); stroke-width: 5; }
+#glip { fill: url(#glipTape); }
+#glipTape > rect.base { fill: hsl(30, 50%, 95%); }
+#glipTape > rect.shade { fill: hsla(0, 0%, 0%, 0.1); }
+#glipTape > path.stroke { stroke: hsla(0, 0%, 0%, 0.1); }
+#limb { fill: hsl(30, 50%, 50%); }
+#string { fill: none; stroke-linecap: square; }
+#stringJoint { fill: hsla(0, 0%, 0%, 0.5); }
+#head { fill: hsl(0, 0%, 60%); stroke-linejoin: round; }
+#headJoint { fill: hsl(0, 0%, 60%); stroke-linejoin: round; }
+#headShine { fill: hsla(0, 0%, 100%, 0.3); filter: url(#blur); }
+#fether { fill: url(#fetherShade); }
+#noch { fill: hsl(60, 30%, 60%); }
+use[href="#shaftPath"].fill { fill: hsl(30, 20%, 70%); }
+use[href="#shaftPath"].stroke { fill: none; }
+#target { filter: url(#shadow); }
+	</style>
+	<defs>
+		<!-- 矢軸のパス。-->
+		<path id="shaftPath" d="M 0,5 v -10 h 280 v 10 Z m 12.5,-10 v 10"/>
+		<!-- 矢羽。-->
+		<path id="fether" class="stroke"
+			d="M 27.5,0 h 60 l -25,-35 h -60 Z
+			M 47.5,0 l -25,-35
+			M 67.5,0 l -25,-35"/>
+		<!-- リム。-->
+		<path id="limb" class="stroke"
+			d="M 245,-30 c 0,-10 7.5,-32.5 7.5,-60
+			s -25,-47.5 -47.5,-60 s -30,-20 -35,-30
+			l -5,-10 c -7.5,-15 -25,-7.5 -15,12.5 l 5,10
+			c 2.5,5 17.5,27.5 35,37.5 s 32.5,22.5 32.5,42.5 s -10,35 -10,52.5 v 5"/>
+		<!-- リムと弦の接続部。-->
+		<path id="stringJoint"
+			d="M 170,-180 l -5,-10 l -15,12.5 l 5,10 Z"/>
+		<!-- グリップテープ。-->
+		<pattern id="glipTape" patternUnits="userSpaceOnUse"
+			x="0" y="-8.75" width="60" height="17.5">
+			<rect class="base" width="60" height="17.5"/>
+			<path class="stroke" d="M 0,8.75 h 100"/>
+			<rect class="shade" x="0" width="7.5" height="17.5"/>
+			<rect class="shade" x="30" width="7.5" height="17.5"/>
+		</pattern>
+		<!-- 矢羽の陰。-->
+		<linearGradient id="fetherShade" x1="0" x2="0" y1="0" y2="1">
+			<stop offset="0.0" stop-color="hsl(60, 40%, 90%)"/>
+			<stop offset="0.6" stop-color="hsl(60, 40%, 90%)"/>
+			<stop offset="0.6" stop-color="hsl(60, 40%, 80%)"/>
+			<stop offset="1.0" stop-color="hsl(60, 40%, 80%)"/>
+		</linearGradient>
+		<!-- ぼかしの適用。-->
+		<filter id="blur">
+			<feGaussianBlur stdDeviation="0.5"/>
+		</filter>
+		<!-- 影の適用。-->
+		<filter id="shadow">
+			<feDropShadow dx="2" dy="8" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target" transform="translate(0, 160) rotate(-45,160,0)">
+		<!-- 弓。-->
+		<g>
+			<!-- 弦。-->
+			<path id="string" class="stroke" d="M 152.5,-172.5 l -135,172.5 l 135,172.5"/>
+			<!-- リム。-->
+			<use href="#limb" transform="scale(1,1)"/>
+			<use href="#limb" transform="scale(1,-1)"/>
+			<!-- リムと弦の接続部。-->
+			<use href="#stringJoint" transform="scale(1,1)"/>
+			<use href="#stringJoint" transform="scale(1,-1)"/>
+			<!-- グリップ。-->
+			<rect id="glip" class="stroke" transform="translate(210, 0)" x="0" y="-30" width="37.5" height="60"/>
+		</g>
+		<!-- 矢。-->
+		<g transform="translate(12.5, 0)">
+			<!-- 矢羽。-->
+			<use href="#fether" transform="scale(1,1)"/>
+			<use href="#fether" transform="scale(1,-1)"/>
+			<!-- 矢軸。-->
+			<g>
+				<use class="fill" href="#shaftPath"/>
+				<rect id="noch" y="-5" width="12.5" height="10"/>
+				<use class="stroke" href="#shaftPath"/>
+			</g>
+			<!-- 先端。-->
+			<g transform="translate(260, 0)">
+				<rect id="headJoint" class="stroke" y="-7.25" width="30" height="14.5"/>
+				<path id="head" class="stroke" d="M 10,-30 l 60,30 l -60,30 q 7.5,-15 7.5,-30 t -7.5,-30 Z"/>
+				<path id="headShine" d="M 21,-18 l 36,18 l -33,0 q 0,-9 -3,-18 Z"/>
+			</g>
+		</g>
+	</g>
+</svg>

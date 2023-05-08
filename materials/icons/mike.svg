@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+#michroPhone { fill:url(#ptMesh); stroke:black; stroke-width:5; }
+#ring { fill:none; stroke:black; stroke-width:5; stroke-linecap:round; }
+#grip { fill:#eee; stroke:black; stroke-width:5; stroke-linejoin:round; stroke-miterlimit:4;  }
+.todo { fill:none; stroke:red; stroke-width:5; stroke-linejoin:round; stroke-miterlimit:4;  }
+.mesh { fill:none; stroke:#c0c0c0; stroke-width:5;  }
+	</style>
+	<defs>
+		<pattern id="ptMesh" 
+			patternUnits="userSpaceOnUse" width="15" height="15"
+			patternContentUnits="userSpaceOnUse">
+			<rect width="15" height="15" fill="#EEE"/>
+			<path class="mesh" d="M 0, 0 L 15,15"/>
+			<path class="mesh" d="M 15,0 L  0,15"/>
+		</pattern>
+	</defs>
+	<g transform="translate(160, 0)">
+		<g transform="translate(0, 70)">
+			<circle id="michroPhone" r="50" />
+			<rect id="ring" x="-55" y="-10" width="110" height="20" rx="5"/>
+		</g>
+	</g>
+</svg>

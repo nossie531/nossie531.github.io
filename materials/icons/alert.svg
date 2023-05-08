@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+g#target { filter: url(#shadow); }
+path.rJoin { stroke-miterlimit: 0; stroke-linejoin: round; }
+path.yellow { fill: #FBC30A; stroke: #FBC30A; }
+path.black { fill: black; stroke: black; }
+path#highlight { fill: #F2E700; fill-opacity: 0.4; filter: url(#blur); }
+	</style>
+	<defs>
+		<!-- 加工範囲。-->
+		<mask id="objectMask">
+			<use href="#base"/>
+		</mask>
+		<!-- ぼかしの適用。-->
+		<filter id="blur">
+			<feGaussianBlur stdDeviation="10"/>
+		</filter>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+			<feDropShadow dx="5" dy="5" stdDeviation="5" flood-opacity="0.5"/>
+		</filter>
+	</defs>
+	<g id="target" transform="translate(155, 25)">
+		<!--外側の三角。-->
+		<path id="base" class="yellow rJoin" stroke-width="60" d="M0,40 l-120,207.85 h240 Z"/>
+		<!--中側の三角。-->
+		<path class="black rJoin" stroke-width="30" d="M0,40 l-120,207.85 h240 Z"/>
+		<!--内側の三角。-->
+		<path class="yellow rJoin" stroke-width="0" d="M0,40 l-120,207.85 h240 Z"/>
+		<!-- エクスクラメーション文字。-->
+		<path class="black" d="M12.97,100.93 a13,13,0,1,0,-25.93,0 l4.99,69.64 a8,8,0,0,0,15.96,0 Z"/>
+		<circle class="black" cx="0" cy="210" r="13"/>
+		<!-- 上方向からの薄いハイライト。-->
+		<path id="highlight" mask="url(#objectMask)" d="M-160,0 L-160,130 Q0,340,160,130 V0 Z"/>
+	</g>
+</svg>

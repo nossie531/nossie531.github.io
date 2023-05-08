@@ -1,0 +1,73 @@
+@namespace url(http://www.w3.org/1999/xhtml);
+@namespace svg url(http://www.w3.org/2000/svg);
+
+:root > body {
+	margin: 2ex 1.5em; 
+}
+
+header, form {
+	margin: 2ex 0; 
+}
+
+header h1 {
+	font-size: medium; font-weight: bold; 
+}
+
+textarea {
+	font-size: small; resize: none; 
+}
+
+input:read-only {
+	color: gray; 
+}
+
+input[type="number"] {
+	text-overflow: ellipsis; 
+}
+
+textarea:read-only {
+	background-color: silver; border-color: gray;
+}
+
+table > thead > tr > td:empty {
+	border: none !important; 
+}
+
+table#data {
+	border-collapse: collapse;
+}
+
+table#data > * > tr > * {
+	width: 4em; padding: 0; border: thin solid gray; 
+}
+
+table#data > * > tr > th {
+	font-weight: normal; background: silver; 
+}
+
+table#data > * > tr > td > input[type="number"] {
+	box-sizing: border-box; width: 100%; border: none; 
+}
+
+div#out {
+	width: 30rem;
+}
+
+div#out > * {
+	display: block;
+	margin: 0.5rem 0;
+}
+
+div#out > textarea#dText {
+	box-sizing: border-box;
+	border: thin solid;
+	width: 100%;
+	height: 8em;
+}
+
+div#out > svg|svg {
+	box-sizing: border-box;
+	width: 100%;
+	border: thin solid;
+	background-color: silver;  border-color: gray;
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 200 200">
+	<style>
+		g.face circle { fill:url(#rgFace); stroke:#bb7d1b;stroke-width:4; }
+		g.face .mayu { fill:none; stroke:black; stroke-width:10; }
+	</style>
+	<defs>
+		<radialGradient id="rgFace" cx="0.5" cy="0.5" r="0.5">
+			<stop stop-color="#fff6a8" offset="0" />
+			<stop stop-color="#fff6a8" offset="0.5" />
+			<stop stop-color="#f7cc47" offset="0.87" />
+			<stop stop-color="#ffa200" offset="1" />
+		</radialGradient>
+	</defs>
+	<g class="face">
+		<circle cx="100" cy="100" r="98"/>
+		<path class="mayu" d="M 115,73 c 0,0 2,4 9,4 7,0 31,-19 31,-19"/>
+		<path class="mayu" d="M 85,73 c 0,0 -2,4 -9,4 -7,0 -31,-19 -31,-19"/>
+		<path d="M 121,80 A 10,20,0,1,0,140,74"/>
+		<path d="M 79,80 A 10,20,0,1,1,60,74"/>
+		<path d="M 45,147 l 10,12 c 0,0 4,-9 15,-15 s 22,-12 30,-12 19,5 30,12 15,13 15,13 l 10,-10 c 0,0 -11,-3 -22,-9 s -23,-14 -32,-14 -22,6 -32,12 -23,11 -23,11 Z"/>
+	</g>
+</svg>

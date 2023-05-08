@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="0 0 320 320">
+	<style>
+path.balloon { fill:url(#rgBalloon); stroke:#ed4d00; stroke-width:5; }
+path.exclamation { fill:#c00000; }
+#target { filter: url(#shadow); }
+	</style>
+	<defs>
+		<!-- 吹き出しの丸み。-->
+		<radialGradient id="rgBalloon" cx="0.5" cy="0.45" r="0.45">
+			<stop offset="0.0" stop-color="#ffffc7" />
+			<stop offset="0.8" stop-color="#FBE8A4"  />
+			<stop offset="1.0" stop-color="#F5C477"/>
+		</radialGradient>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+			<feDropShadow dx="5" dy="5" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target" transform="translate(5,30)">
+		<!-- 楕円にチョボをつける。-->
+		<path class="balloon"
+			d="M 270,180
+			a 145,113,0,1,0,-70,42
+			q 30,18,90,24 
+			Q264,210 270,180 Z"/>
+		<!-- 少し傾けた感嘆符。-->
+		<path class="exclamation"
+			transform="translate(143, 145) rotate(10)"
+			d="M-15,35 a 15,15,0,0,1,30,0 a15,15,0,0,1,-30,0 z
+			M-12,0 h24 l6,-105 h-36 z"/>
+	</g>
+</svg>
