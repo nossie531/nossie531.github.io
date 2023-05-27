@@ -1,0 +1,337 @@
+@charset "utf-8";
+
+@layer
+	import_color,
+	lang,
+	root,
+	default,
+	normal,
+	semantic,
+	ui,
+	util,
+	import_nav,
+	import_syntax_highlight,
+	import_console_rustc,
+	custom_nav,
+	custom_prism;
+
+@import url("color.css") layer(import_color);
+@import url("../lib/nav/nav.css") layer(import_nav);
+@import url("prism/light.css") layer(import_syntax_highlight) screen and (prefers-color-scheme: light);
+@import url("prism/dark.css") layer(import_syntax_highlight) screen and (prefers-color-scheme: dark);
+@import url("console_rustc.css") layer(import_console_rustc);
+
+@layer lang {
+	:root:lang(ja) {
+		line-height: 1.7;
+	}
+}
+
+@layer root {
+	:root {
+		font-size: 0.93em;
+		font-family: "Meiryo", serif;
+		color: var(--fg-color);
+		background-color: var(--bg-color);
+	}
+
+	@media screen and (width <= 55rem) {
+		:root > body {
+			margin: 1rem 1rem 2rem;
+		}
+	}
+
+	@media screen and (width > 55rem) {
+		:root > body {
+			margin: 2rem 1rem 4rem 2rem;
+		}
+	}
+}
+
+@layer default {
+	body, section {
+		max-width: calc(42rem + 1px);
+	}
+
+	section {
+		margin: 2rem 0 1rem;
+	}
+
+	h1 {
+		font-size: 1.05em;
+		margin: 1rem -0.5rem;
+		padding: 0.5ex 0.5em;
+		background-color: var(--header-color);
+	}
+
+	h2 {
+		font-size: 1rem;
+		font-weight: initial;
+	}
+
+	h2::before {
+		content: "[";
+	}
+
+	h2::after {
+		content: "]";
+	}
+
+	p {
+		margin: 0.5em 0;
+		text-align: justify;
+	}
+
+	ul, ol {
+		padding-left: 1.5em;
+	}
+
+	samp, code, *.monospace {
+		font-family: "Consolas", monospace;
+		hyphens: none;
+		tab-size: 4;
+	}
+
+	:not(pre) code {
+		background-color: var(--shadow-color);
+		margin: 0 -0.25ch;
+		padding: 0 0.25ch;
+		border-radius: 0.25ch;
+	}
+
+	pre {
+		/* TODO: FireFox の対応待ち (単位 lh)。
+		 * - code-lh の使用箇所を削除。
+		 * - line-height: initial へ変更予定。*/
+		--code-lh: 1.2em;
+		line-height: var(--code-lh);
+	}
+
+	pre > code:only-child,
+	pre > samp:only-child {
+		display: block;
+		padding: 0.5rem;
+		overflow: auto;
+		scrollbar-width: thin;
+		background-color: var(--code-bg-color);
+	}
+
+	pre > code:only-child {
+		border: thin solid;
+		border-radius: 0.5rem;
+		border-color: var(--edge-color);
+	}
+
+	pre > samp:only-child {
+		border: thin solid;
+		border-color: var(--edge-color);
+	}
+
+	pre > code:only-child::before,
+	pre > samp:only-child::before {
+		content: "";
+		display: block;
+		margin-bottom: calc(var(--code-lh) * -1);
+		margin-bottom: -1lh;
+	}
+
+	a:link, a:visited {
+		color: var(--link-color);
+		text-decoration: none;
+	}
+
+	*.mt {
+		font-family: "Consolas", monospace;
+	}
+
+	*.nw {
+		white-space: nowrap;
+	}
+
+	@media screen and (width > 55rem) {
+		section section {
+			margin-left: 1.5rem;
+			margin-right: -1.5rem;
+		}
+
+		pre > code:only-child,
+		pre > samp:only-child {
+			width: 90ch;
+		}
+	}
+
+	@media screen and (width <= 55rem) {
+		section > section > h1::before {
+			content: "> ";
+		}
+
+		section > section > section > h1::before {
+			content: ">> ";
+		}
+
+		pre > code:only-child,
+		pre > samp:only-child {
+			width: auto;
+		}
+	}
+}
+
+@layer normal {
+	@layer dl {
+		dl.normal > dt::before {
+			content: "≫";
+			margin-right: 0.5ch;
+		}
+
+		dl.normal > dd {
+			margin-left: 1.5ch;
+		}
+
+		dl.normal.lowProfile {
+			display: grid;
+			grid-template-columns: auto minmax(0, 1fr);
+		}
+
+		dl.normal.lowProfile > dt {
+			align-self: baseline;
+		}
+
+		dl.normal.lowProfile > dd {
+			display: list-item;
+			margin-left: 1.5em;
+			padding-left: 0.5em;
+			align-self: baseline;
+		}
+
+		dl.normal.lowProfile > dd::marker {
+			content: "…";
+		}
+
+		dl.normal.highProfile > dt {
+			margin-top: 2em;
+		}
+
+		dl.normal.highProfile > dd {
+			margin: 1em 0 2em 2em;
+		}
+	}
+
+	@layer aside {
+		aside.normal {
+			box-sizing: border-box;
+			margin: 1rem -0.5rem;
+			padding: 0 0.5rem;
+			border-width: thick ;
+			border-style: solid none;
+			border-color: var(--thick-color);
+			background-color: var(--fill-color);
+		}
+
+		aside.normal::before {
+			content: "";
+			float: left;
+			width: 2.2em;
+			height: 2.2em;
+			margin: 0.1em 0.5ch 0 0;
+			background-size: 2.2em;
+			background-image: url("img/book_light.svg");
+		}
+
+		@media screen and (prefers-color-scheme: dark) {
+			aside.normal::before { 
+				background-image: url("img/book_dark.svg");
+			}
+		}
+	}
+
+	@layer table {
+
+		table.normal {
+			margin: 1em 0;
+			border-collapse: collapse;
+		}
+
+		table.normal > tr > *,
+		table.normal > * > tr > * {
+			padding: 0.5ex 0.5ch;
+			border: thin solid var(--edge-color);
+		}
+	}
+}
+
+@layer semantic {
+	div.title {
+		display: table;
+		margin-bottom: 2rem;
+		border: thin dashed red;
+		padding: 1ex 1em;
+	}
+
+	div.sub {
+		margin: 1rem 0;
+	}
+
+	div.sub:not(h1+*) {
+		border-top: thin dashed;
+	}
+}
+
+@layer ui {
+	:root {
+		scrollbar-gutter: stable;
+		scroll-behavior: smooth;
+	}
+
+	*:target {
+		animation: firstHighlight 1.5s linear;
+	}
+
+	@keyframes firstHighlight {
+		0% { background-color: #F84; }
+	}
+
+	@media screen {
+		::selection {
+			background-color: var(--selection-color);
+		}
+	}
+}
+
+@layer util {
+	*.none {
+		display: none !important;
+	}
+}
+
+@layer custom_nav {
+	nav.forPage {
+		--nav-bg-color: var(--bg-em-color);
+		--nav-bd-color: var(--edge-color);
+	}
+}
+
+@layer custom_prism {
+	pre[class*="language-"] {
+		padding: unset;
+		border-style: unset;
+		border-radius: unset;
+		box-shadow: unset;
+		background-color: unset;
+	}
+
+	pre > code[class|="language"] {
+		/* TODO: FireFox の対応待ち (単位 lh)。
+		 * - code-lh の使用箇所を削除。
+		 * - line-height: initial へ変更予定。*/
+		line-height: var(--code-lh);
+		background-color: var(--code-bg-color);
+	}
+
+	pre > code[class|="language"] mark.error {
+		color: inherit;
+		background-color: transparent;
+		text-decoration: wavy underline rgba(255, 0, 0, 0.5);
+		text-decoration-skip-ink: none;
+	}
+}
+

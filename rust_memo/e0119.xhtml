@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust エラーメモ: E0119 - トレイトの実装の競合。</title>
+		<link rel="_up" href="index.xhtml"/>
+		<link rel="_next" href="e0502.xhtml"/>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `SomeTrait`
+</samp></pre>
+		<p>
+指定した条件に適合する型に対して、あるトレイトを実装しようとした。ところが、その条件の一部または全てに重複する条件に対して、すでにそのトレイトが実装されていた。そのため、コンパイラはどちらの実装を使えば良いか分からなかった。
+		</p> <p>
+これにはエラーの原因となる指定が自明なものから、順を追って各指定を見ていく必要があるものまで、様々なパターンが存在する。
+		</p>
+		<dl class="normal lowProfile">
+			<dt><a href="#ptnA">パターン A</a></dt> <dd>自明なパターン。</dd>
+			<dt><a href="#ptnB">パターン B</a></dt> <dd>構造体へのブランケット実装が関連。</dd>
+			<dt><a href="#ptnC">パターン C</a></dt> <dd>共存するブランケット実装が関連 <span class="nw">(通常トレイト版)</span>。 </dd>
+			<dt><a href="#ptnD">パターン D</a></dt> <dd>共存するブランケット実装が関連 <span class="nw">(マーカートレイト版)</span>。 </dd>
+			<dt><a href="#ptnE">パターン E</a></dt> <dd>型パラメタが関連 <span class="nw">(境界側の型パラメタ)</span>。 </dd>
+			<dt><a href="#ptnF">パターン F</a></dt> <dd>型パラメタが関連 <span class="nw">(トレイト側の型パラメタ)</span>。 </dd>
+			<dt><a href="#ptnG">パターン G</a></dt> <dd>型パラメタが関連 <span class="nw">(パターン E と F の合成)</span>。 </dd>
+		</dl>
+		<section>
+			<h1 id="ptnA">パターン A.</h1>
+			<p>
+自明なパターン。全く同じ条件を指定している。
+			</p>
+<pre><code class="language-rust">
+struct SomeStruct {}
+trait TargetTrait { fn f(&amp;self); }
+
+impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
+<mark class="error">impl TargetTrait for SomeStruct</mark> { fn f(&amp;self) { /* ... */ } }
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `SomeStruct`
+<mark class="info"> --&gt;</mark> src\main.rs:5:1
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark> impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
+<mark class="info">  |</mark> <mark class="info">------------------------------- first implementation here</mark>
+<mark class="info">5 |</mark> impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SomeStruct`</mark>
+</samp></pre>
+		</section> <section>
+			<h1 id="ptnB">パターン B.</h1>
+			<p>
+構造体とブランケット実装が同じトレイトを実装している。<br/>
+そして、その構造体はそのブランケット実装にも適合している。
+			</p>
+<pre><code class="language-rust">
+struct SomeStruct {}
+trait TargetTrait { fn f(&amp;self); }
+
+impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
+<mark class="error">impl&lt;T&gt; TargetTrait for T</mark> { fn f(&amp;self) { /* ... */ } }
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `SomeStruct`
+<mark class="info"> --&gt;</mark> src\main.rs:5:1
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark> impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
+<mark class="info">  |</mark> <mark class="info">------------------------------- first implementation here</mark>
+<mark class="info">5 |</mark> impl&lt;T&gt; TargetTrait for T { fn f(&amp;self) { /* ... */ } }
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SomeStruct`</mark>
+</samp></pre>
+		</section> <section>
+			<h1 id="ptnC">パターン C.</h1>
+			<p>
+あるトレイトについてのブランケット実装が複数あり、それら複数に適合する型が作成可能になっている。以下の例では、<code>SomeTraitX</code> と <code>SomeTraitY</code> を共に実装した型が作成可能になっている。
+			</p>
+<pre><code class="language-rust">
+trait SomeTraitX {}
+trait SomeTraitY {}
+trait TargetTrait { fn f(&amp;self); }
+
+impl&lt;T&gt; TargetTrait for T where T: SomeTraitX { fn f(&amp;self) { /* ... */ } }
+<mark class="error">impl&lt;T&gt; TargetTrait for T</mark> where T: SomeTraitY { fn f(&amp;self) { /* ... */ } }
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait`
+<mark class="info"> --&gt;</mark> src\main.rs:6:1
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> impl&lt;T&gt; TargetTrait for T where T: SomeTraitX { fn f(&amp;self) { /* ... */ } }
+<mark class="info">  |</mark> <mark class="info">------------------------- first implementation here</mark>
+<mark class="info">6 |</mark> impl&lt;T&gt; TargetTrait for T where T: SomeTraitY { fn f(&amp;self) { /* ... */ } }
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
+</samp></pre>
+		</section> <section>
+			<h1 id="ptnD">パターン D.</h1>
+			<p>
+前のパターンの変種。トレイトがマーカになっていて実装がない。<br/>
+たとえ、実装が空でも、実装がある場合と同様、競合は発生する。
+			</p>
+<pre><code class="language-rust">
+trait SomeTraitX {}
+trait SomeTraitY {}
+trait TargetTrait {}
+
+impl&lt;T&gt; TargetTrait for T where T: SomeTraitX {}
+<mark class="error">impl&lt;T&gt; TargetTrait for T</mark> where T: SomeTraitY {}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait`
+<mark class="info"> --&gt;</mark> src\main.rs:6:1
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> impl&lt;T&gt; TargetTrait for T where T: SomeTraitX {}
+<mark class="info">  |</mark> <mark class="info">------------------------- first implementation here</mark>
+<mark class="info">6 |</mark> impl&lt;T&gt; TargetTrait for T where T: SomeTraitY {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
+</samp></pre>
+		</section> <section>
+			<h1 id="ptnE">パターン E.</h1>
+			<p>
+型パラメタがあるため、条件の重複に気付きにくいパターン。
+			</p> <p>
+以下の例の場合、条件 <code>X</code> と <code>i32</code> は重複している。なぜなら、<code>X</code> には <code>SomeTrait</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>SomeTrait</code> が実装されている。
+			</p>
+<pre><code class="language-rust">
+trait TargetTrait {}
+trait SomeTrait {}
+impl&lt;T&gt; SomeTrait for T {}
+
+impl&lt;X: SomeTrait&gt; TargetTrait for X {}
+<mark class="error">impl TargetTrait for i32</mark> {}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `i32`
+<mark class="info"> --&gt;</mark> src\main.rs:6:1
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> impl&lt;X: SomeTrait&gt; TargetTrait for X {}
+<mark class="info">  |</mark> <mark class="error">------------------------------------ first implementation here</mark>
+<mark class="info">6 |</mark> impl TargetTrait for i32 {}
+<mark class="info">  |</mark> <mark class="info">^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `i32`</mark>
+</samp></pre>
+		</section> <section>
+			<h1 id="ptnF">パターン F.</h1>
+			<p>
+型パラメタがあるため、トレイトの重複に気付きにくいパターン。
+			</p> <p>
+以下の例の場合、トレイト <code>TargetTrait&lt;X&gt;</code> と <code>TargetTrait&lt;i32&gt;</code> は重複している。なぜなら、<code>X</code> には <code>SomeTrait</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>SomeTrait</code> が実装されている。
+			</p>
+<pre><code class="language-rust">
+trait TargetTrait&lt;T&gt; {}
+trait SomeTrait {}
+impl&lt;T&gt; SomeTrait for T {}
+
+impl&lt;T, X: SomeTrait&gt; TargetTrait&lt;X&gt; for T {}
+<mark class="error">impl&lt;T&gt; TargetTrait&lt;i32&gt; for T</mark> {}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait&lt;i32&gt;`
+<mark class="info"> --&gt;</mark> src\main.rs:6:1
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> impl&lt;T, X: SomeTrait&gt; TargetTrait&lt;X&gt; for T {}
+<mark class="info">  |</mark> <mark class="info">------------------------------------------ first implementation here</mark>
+<mark class="info">6 |</mark> impl&lt;T&gt; TargetTrait&lt;i32&gt; for T {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
+</samp></pre>
+		</section> <section>
+			<h1 id="ptnG">パターン G.</h1>
+			<p>
+パターン E と F の合成。条件とトレイトの両方に型パラメタがあるパターン。
+			</p> <p>
+以下の例の場合、<code>Box&lt;dyn TargetTrait&gt;</code> について、<code>TargetTrait</code> から生成できるよう、<code>From</code> トレイトを実装しようとしている。しかし、重複する実装がすでに定義済のため、コンパイルエラーになる。
+			</p>
+<pre><code class="language-rust">
+trait TargetTrait {}
+impl&lt;T&gt; TargetTrait for T {}
+
+<mark class="error">impl&lt;T: TargetTrait&gt; From&lt;T&gt; for Box&lt;dyn TargetTrait&gt;</mark> {
+    fn from(value: T) -&gt; Self {
+        Box::new(value)
+    }
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `From&lt;Box&lt;(dyn TargetTrait + 'static)&gt;&gt;` for type `Box&lt;(dyn TargetTrait + 'static)&gt;`
+<mark class="info"> --&gt;</mark> src\main.rs:4:1
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark> impl&lt;T: TargetTrait&gt; From&lt;T&gt; for Box&lt;dyn TargetTrait&gt; {
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> note: conflicting implementation in crate `core`:
+          - impl&lt;T&gt; From&lt;T&gt; for T;
+</samp></pre>
+			<p>
+このエラーメッセージで競合が指摘されているのは、以下の二つの実装である。なお、前者は上記のソースコード内にはないが、これは Rust に組込の <code>core</code> クレート内で定義されているためである。
+			</p>
+			<ul>
+				<li>
+<code>impl&lt;T&gt; From&lt;T&gt; for T</code>
+				</li> <li>
+<code>impl&lt;T: TargetTrait&gt; From&lt;T&gt; for Box&lt;dyn TargetTrait&gt;</code>
+				</li>
+			</ul>
+			<p>
+まず、条件の重複について。前者の条件 <code>T</code> は全ての型が適合するので、後者の条件が何であれ重複する。
+			</p> <p>
+次に、トレイトの重複について。前者と後者の <code>From&lt;T&gt;</code> の型パラメタ <code>T</code> は重複している。前者の <code>T</code> には条件と同じ型である事が、後者の <code>T</code> には <code>TargetTrait</code> の実装が求められるが、全ての型は <code>TargetTrait</code> を実装するため、ここは <code>Box&lt;dyn TargetTrait&gt;</code> でも良い。そのため、後者も前者と同様、<code>T</code> には条件と同じ型が指定できてしまう。
+			</p>
+		</section>
+	</body>
+</html>

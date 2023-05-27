@@ -1,0 +1,40 @@
+code[class|="language"] {
+	color: hsla(0, 0%, 100%, 0.8);
+}
+
+code[class|="language"] .token.keyword,
+code[class|="language"] .token.url {
+	color: hsla(240, 80%, 75%, 0.8);
+}
+
+code[class|="language"] .token.comment {
+	color: hsla(120, 80%, 40%, 0.8);
+}
+
+code[class|="language"] .token.operator,
+code[class|="language"] .token.symbol {
+	color: hsla(40, 100%, 70%, 0.8);
+}
+
+code[class|="language"] .token.punctuation {
+	color: hsla(0, 0%, 50%, 0.8);
+}
+
+code[class|="language"] .token.namespace,
+code[class|="language"] .token.class-name,
+code[class|="language"] .token.function {
+	color: inherit;
+}
+
+code[class|="language"] .token.macro {
+	color: hsla(330, 90%, 65%, 0.8);
+}
+
+code[class|="language"] .token.constant,
+code[class|="language"] .token.number,
+code[class|="language"] .token.boolean,
+code[class|="language"] .token.string,
+code[class|="language"] .token.char {
+	color: hsla(20, 90%, 60%, 0.8);
+}
+

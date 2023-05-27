@@ -1,0 +1,95 @@
+@charset "utf-8";
+
+nav.forPage { 
+	position: fixed;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	top: 0.5rem;
+	right: 0.5rem;
+	max-width: 20rem;
+	max-height: calc(100% - 1rem);
+	border: thin solid;
+	z-index: 1;
+	background-color: var(--nav-bg-color);
+	border-color: var(--nav-bd-color);
+}
+
+nav.forPage > div.head { 
+	text-align: right;
+	border-bottom: thin dotted;
+	padding: 0.5ex 0.5em;
+}
+
+nav.forPage > div.head > a { 
+	margin-left: 0.5ch;
+	user-select: none;
+	font-family: ui-monospace;
+}
+
+nav.forPage > div.head > a:not([href]) { 
+	color: hsla(0, 0%, 50%, 0.5);
+	cursor: default;
+}
+
+nav.forPage > ul {
+	margin: 0;
+	padding: 0.5ex 0.5em 1ex;
+	overflow-y: auto;
+	scrollbar-gutter: stable;
+	scrollbar-width: thin;
+}
+
+nav.forPage > ul ul {
+	margin: 0 0 0 1.25em;
+	padding: 0;
+}
+
+nav.forPage li {
+	margin: 0.5ex 0 0 0;
+	list-style-type: none;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+nav.forPage li::before {
+	content: "\2022";
+	text-align: center;
+	display: inline-block;
+	margin-right: 0.25ch;
+	width: 1em;
+}
+
+nav.forPage li li::before {
+	content: "\25E6";
+}
+
+@media screen and (width <= 65rem) {
+
+	nav.forPage:not(.open) > div.head {
+		visibility: hidden;
+	}
+
+	nav.forPage:not(.open) > div.head > *,
+	nav.forPage:not(.open) > ul {
+		display: none;
+	}
+
+	nav.forPage:not(.open) > div.head > a.toggle {
+		display: block;
+		visibility: visible;
+		margin-left: 0;
+	}
+}
+
+@media screen and (width > 65rem) {
+	nav.forPage > div.head > a.toggle {
+		display: none;
+	}
+}
+
+@media print {
+	nav.forPage { position: static; }
+	nav.forPage > div.head { display: none; }
+}

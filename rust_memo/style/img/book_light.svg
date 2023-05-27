@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	 xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 width="100" height="100" viewBox="0 0 320 320">
+	<style>
+g#target { filter: url(#shadow); }
+rect#cover { fill: hsl(240, 100%, 75%); stroke: url(#coverShade); stroke-width: 5; stroke-opacity: 0.8; }
+rect#pages { fill: hsl(0, 0%, 75%); stroke: hsl(0, 0%, 75%); stroke-width: 5; }
+path.page { fill: url(#pageGradient); stroke: hsl(0, 0%, 80%); stroke-width: 5; stroke-opacity: 0.8; }
+path#line { fill: none; stroke: black; stroke-width: 10; stroke-opacity:0.1; }
+path#bookmark { fill: hsl(20, 70%, 60%); stroke: hsl(20, 70%, 40%); stroke-width: 5; stroke-opacity: 0.6; }
+	</style>
+	<defs>
+		<!-- 行 -->
+		<path id="line" d="M0,0 q55,-10,115,15 q55,-25,115,-15"/>
+		<!-- ページの立体感。-->
+		<linearGradient id="pageGradient" x1="0" x2="1">
+			<stop offset="0%" stop-color="hsl(60, 10%, 95%)"/>
+			<stop offset="10%" stop-color="hsl(60, 10%, 100%)"/>
+			<stop offset="20%" stop-color="hsl(60, 10%, 100%)"/>
+			<stop offset="50%" stop-color="hsl(60, 10%, 90%)"/>
+			<stop offset="75%" stop-color="hsl(60, 10%, 100%)"/>
+			<stop offset="85%" stop-color="hsl(60, 10%, 100%)"/>
+			<stop offset="100%" stop-color="hsl(60, 10%, 95%)"/>
+		</linearGradient>
+		<!-- カバーのサイドの陰。-->
+		<linearGradient id="coverShade" x1="0" x2="1">
+			<stop offset="0%" stop-color="hsl(240, 50%, 50%)"/>
+			<stop offset="10%" stop-color="hsl(240, 50%, 50%)"/>
+			<stop offset="15%" stop-color="hsl(240, 50%, 40%)"/>
+			<stop offset="85%" stop-color="hsl(240, 50%, 40%)"/>
+			<stop offset="90%" stop-color="hsl(240, 50%, 30%)"/>
+			<stop offset="100%" stop-color="hsl(240, 50%, 30%)"/>
+		</linearGradient>
+		<!-- 内容クリップ。-->
+		<clipPath id="contentClip">
+			<rect x="55" y="0" width="75" height="320"/>
+			<rect x="170" y="0" width="75" height="320"/>
+		</clipPath>
+		<!-- 影の適用。-->
+		<filter id="shadow" x="-20%" y="-20%" width="150%" height="150%">
+			<feDropShadow dx="10" dy="10" stdDeviation="5" flood-opacity="0.25"/>
+		</filter>
+	</defs>
+	<g id="target" transform="translate(0, 90)">
+		<!-- 本のカバー -->
+		<rect id="cover" x="5" y="5" width="290" height="200" rx="15"/>
+		<!-- ページの束 -->
+		<rect id="pages" x="20" y="170" width="260" height="20"/>
+		<!-- 奥のページ -->
+		<path class="page" 
+			d="M20,-10 v190 q60,-10,120,0 h20 q60,-10,120,0
+			v-190 q-60,-10,-120,0 h-20 q-60,-10,-120,0 Z"/>
+		<!-- 手前のページ -->
+		<path class="page" 
+			d="M35,-25 v190 q55,-10,115,15 q55,-25,115,-15
+			v-190 q-55,-10,-115,15 q-50,-25,-115,-15 Z
+			M150,-10 v190"/>
+		<!-- 行 -->
+		<g clip-path="url(#contentClip)">
+			<use href="#line" x="35" y="10"/>
+			<use href="#line" x="35" y="40"/>
+			<use href="#line" x="35" y="70"/>
+			<use href="#line" x="35" y="100"/>
+			<use href="#line" x="35" y="130"/>
+		</g>
+		<!-- ブックマーク -->
+		<path id="bookmark" d="M210,-40 v60 l18,-12,18,12 v-62 q-18,-5,-36,2 Z"/>
+	</g>
+</svg>

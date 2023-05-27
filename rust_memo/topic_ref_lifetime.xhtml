@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: 参照のライフタイム。</title>
+		<link rel="_up" href="index.xhtml"/>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+参照のライフタイムとそれに関連するエラーについて。
+		</p>
+		<section>
+			<h1>関連エラー</h1>
+			<p>
+Rust のコンパイルエラーには、参照のライフタイム中 (借用期間中) に、参照先への特定の操作を禁じるものが多い。
+			</p> <p>
+以下は代表的なそうしたエラー。
+			</p>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
+</samp></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
+</samp></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0503]</mark>: cannot use `data` because it was mutably borrowed
+</samp></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0506]</mark>: cannot assign to `target.something` because it is borrowed
+</samp></pre>
+			<p>
+これらのメッセージはそのままの意味なので、簡単に理解できる場合が多い。しかし、状況によっては初見殺しとなるパターンも幾つかあるため、ここではそれらを紹介する。
+			</p>
+		</section> <section>
+			<h1>補足: よくある誤解</h1>
+			<p>
+ライフタイム注釈のよくある誤解について。
+			</p> <p>
+ライフタイム注釈が直接的に指定するのは、参照のライフタイムであって、参照先のライフタイムではない。そして、以降の話題においてはどれも複数の参照のライフタイムが絡むため、この違いは重要になる。
+			</p>
+			<aside class="normal">
+				<p>
+誤解の背景。
+				</p> <p>
+まず、参照のライフタイムは参照先のライフタイムに必ず包含されるため、前者を指定すれば後者も間接的に指定できる。つまり、参照先への指定についてのみ言えば、誤解の有無に関係なく解釈は一致する。
+				</p> <p>
+また、ライフタイム注釈は参照に対してのみ使えるため、それが "参照先" という参照に固有の概念と結び付くのも、全く妥当な推論である。
+				</p>
+			</aside>
+		</section> <section>
+			<h1>初見殺しのパターン</h1>
+			<section>
+				<h1 id="ref_to_ref">不変参照からの再借用</h1>
+				<p>
+不変参照から新たな参照を、同じライフタイム注釈で (ライフタイム省略への考慮も必要) 再借用した場合について。たとえ、再借用後に再借用元に一切アクセスしなくても、ライフタイムが同じため、再借用先が生存する限り、再借用元も生存するようになる。
+				</p> 
+				<aside class="normal">
+					<p>
+よくある疑問。
+					</p> <p>
+参照のライフタイムが無駄に伸びることで、それによる制限が増えるのでは？と思われるかもしれない。そして実際、これはよくあるコンパイルエラーとして表れる。そのため、こうしたエラーは過剰な取締だと嫌われるかもしれない。
+					</p> <p>
+しかし、これらのエラーはコーディングスタイルのガイドラインにもなる。まず、再借用はデータ構造における全体と部分の関係とで表れる場合が多い。そして、これらのエラーは全体から部分への再借用の以降、全体側への操作をうまく制限してくれる。つまり、全体側の操作と部分側の操作とを分けて記述するコーディングが強制されるようになる。
+					</p>
+				</aside>
+				<div class="sub">
+					<h2>コンパイルエラーになる例</h2>
+					<p>
+以下では <code>&amp;data</code> のライフタイムは <code>'a</code> (省略可能) の影響で、<code>sub_ref</code> と同じになる。そのため、<code>sub_ref</code> がある間、<code>&amp;data</code> と衝突する操作は行えなくなる。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut data = Data { sub: 0 };
+    let sub_ref = ref_to_ref(&amp;data);
+	<mark class="error">&amp;mut data</mark>;
+    println!("{}", sub_ref);
+}
+
+fn ref_to_ref&lt;'a&gt;(data: &amp;'a Data) -&gt; &amp;'a i32 {
+    &amp;data.sub
+}
+
+struct Data {
+    sub: i32,
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
+<mark class="info"> --&gt;</mark> src\main.rs:4:2
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let sub_ref = ref_to_ref(&amp;data);
+<mark class="info">  |</mark>                              <mark class="info">----- immutable borrow occurs here</mark>
+<mark class="info">4 |</mark>     &amp;mut data;
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^ mutable borrow occurs here</mark>
+<mark class="info">5 |</mark>     println!("{}", sub_ref);
+<mark class="info">  |</mark>                    <mark class="info">------- immutable borrow later used here</mark>
+</samp></pre>
+				</div>
+			</section> <section>
+				<h1>可変参照からの再借用</h1>
+				<p>
+可変参照から新たな参照を、同じライフタイム注釈で (ライフタイム省略への考慮も必要) 再借用した場合について。
+				</p> <p> 
+まず、ライフタイムのルールは『<a href="#ref_to_ref">不変参照からの再借用</a>』の場合と変わらない。つまり、たとえ再借用語に再借用元に一切アクセスしなくても、ライフタイムが同じため、再借用先が生存する限り、再借用元も生存するようになる。
+				</p> <p> 
+さらに、再借用中は再借用元からの操作は全て禁止される。そのため、この再借用は再借用元からのアクセスを再借用先からのアクセスへと切り替えるための手段として機能する。
+				</p>
+				<aside class="normal">
+					<p>
+よくある疑問。
+					</p> <p> 
+可変参照から不変参照を再借用する場合でもルールは変わらない。再借用中は再借用元からの操作は全面的に禁止される。この場合、再借用は可変から不変へのダウングレード操作としても解釈できるため、読取系の操作ならば許しても良いのでは？と思われるかもしれない。そして実際、これは多くの場合はその通りである。
+					</p> <p> 
+しかし、これは一部のケースで『<a href="#with_interior_mutable_type">内部可変型との関係</a>』のためうまくいかなくなる。そして、データ構造に内部可変型が含まれるかは動的に変わりうるため、静的解析により特例を設けることもできない。そのため、この仕様は全てのケースで一貫して適用される。
+				</p> 
+				</aside>
+				<div class="sub">
+					<h2>コンパイルエラーになる例</h2>
+					<p>
+以下では <code>&amp;mut data</code> のライフタイムは <code>'a</code> (省略可能) の影響で、<code>sub_ref</code> と同じになる。そのため、<code>sub_ref</code> がある間、<code>&amp;mut data</code> と衝突する操作は行えなくなる。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut data = Data { sub: 0 };
+    let sub_ref = mut_to_ref(&amp;mut data);
+	<mark class="error">&amp;data</mark>;
+    println!("{}", sub_ref);
+}
+
+fn mut_to_ref&lt;'a&gt;(data: &amp;'a mut Data) -&gt; &amp;'a i32 {
+    &amp;data.sub
+}
+
+struct Data {
+    sub: i32,
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
+<mark class="info"> --&gt;</mark> src\main.rs:4:2
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let sub_ref = mut_to_ref(&amp;mut data);
+<mark class="info">  |</mark>                              <mark class="info">--------- mutable borrow occurs here</mark>
+<mark class="info">4 |</mark>     &amp;data;
+<mark class="info">  |</mark>     <mark class="error">^^^^^ immutable borrow occurs here</mark>
+<mark class="info">5 |</mark>     println!("{}", sub_ref);
+<mark class="info">  |</mark>                    <mark class="info">------- mutable borrow later used here</mark>
+</samp></pre>
+				</div>
+				<div class="sub">
+					<h2 id="with_interior_mutable_type">内部可変型との関係</h2>
+					<p>
+内部可変型への参照には、それが格納する型への参照とで、相互に読替できるものがある。この時、読替先へのアクセスの代わりに、読替元へのアクセスを禁止しなければならない。そうしないと、読替元か読替先のどちらかは内部可変型のため、一方からの読込と他方からの書込がともに許される区間ができてしまう。
+					</p> <p>
+そこで、可変参照からの再借用の制限が役に立つ。
+					</p> 
+					<p>
+以下は <code>std</code> クレートでのそうした関数 (他にもあるかも…)。
+					</p>
+					<table class="normal" style="width: 0;">
+						<tr>
+							<td style="padding-right: 2ch; white-space: nowrap;">
+<code style="background: initial;"><a href="https://doc.rust-lang.org/std/cell/struct.Cell.html">Cell</a>&lt;T&gt;</code>
+							</td> <td style="padding-right: 2ch; white-space: nowrap;">
+<code style="background: initial;">fn <a href="https://doc.rust-lang.org/std/cell/struct.Cell.html#method.from_mut">from_mut</a>(t: &amp;mut T) -&gt; &amp;Cell&lt;T&gt;</code>
+							</td>
+						</tr> <tr>
+							<td style="padding-right: 2ch; white-space: nowrap;">
+<code style="background: initial;"><a href="https://doc.rust-lang.org/std/cell/struct.Cell.html">Cell</a>&lt;T&gt;</code>
+							</td> <td style="padding-right: 2ch; white-space: nowrap;">
+<code style="background: initial;">fn <a href="https://doc.rust-lang.org/std/cell/struct.Cell.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; &amp;mut T</code>
+							</td>
+						</tr> <tr>
+							<td style="padding-right: 2ch; white-space: nowrap;">
+<code style="background: initial;"><a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html">RefCell</a>&lt;T&gt;</code>
+							</td> <td style="padding-right: 2ch; white-space: nowrap;">
+<code style="background: initial;">fn <a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; &amp;mut T</code>
+							</td>
+						</tr>
+					</table>
+					<p>
+以下は <code>RefCell</code> による例。不変参照中の値の更新をコンパイルエラーで予防している。
+					</p> 
+<pre><code class="language-rust">
+use std::cell::RefCell;
+
+fn main() {
+    let mut target = RefCell::new(0);
+    let immutable_ref = get_ref_cell_value(&amp;mut target);
+
+    assert_eq!(*immutable_ref, 0);
+    set_ref_cell_value(<mark class="error">&amp;target</mark>, 1);
+    assert_eq!(*immutable_ref, 0);
+}
+
+fn get_ref_cell_value(mutable_ref: &amp;mut RefCell&lt;i32&gt;) -&gt; &amp;i32 {
+    &amp;*mutable_ref.get_mut()
+}
+
+fn set_ref_cell_value(immutable_ref: &amp;RefCell&lt;i32&gt;, value: i32) {
+    *immutable_ref.borrow_mut() = value;
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0502]</mark>: cannot borrow `target` as immutable because it is also borrowed as mutable
+<mark class="info"> --&gt;</mark> src\main.rs:8:24
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark>     let immutable_ref = get_ref_cell_value(&amp;mut target);
+<mark class="info">  |</mark>                                            <mark class="info">----------- mutable borrow occurs here</mark>
+<mark class="info">...</mark>
+<mark class="info">8 |</mark>     set_ref_cell_value(&amp;target, 1);
+<mark class="info">  |</mark>                        <mark class="error">^^^^^^^ immutable borrow occurs here</mark>
+<mark class="info">9 |</mark>     assert_eq!(*immutable_ref, 0);
+<mark class="info">  |</mark>     <mark class="info">----------------------------- mutable borrow later used here</mark>
+</samp></pre>
+				</div>
+			</section> <section>
+				<h1>構造体への参照</h1>
+				<p>
+参照つき構造体から新たな参照を、同じライフタイム注釈で借用した場合について。たとえ、借用後に後者の参照に一切アクセスしなくても、参照のライフタイムが同じため、前者の参照つき構造体が生存する限り、後者の参照も生存するようになる。これはつまり、以降その構造体が死ぬまで、借用されたままになる事を意味する。
+				</p> <p>
+これは例えば、<code>&amp;'a A&lt;'a&gt;</code> のような指定で起こる。
+				</p> <p>
+このパターンが役に立つ状況は少ないが、全くないわけではない。特に、アリーナ等によって同じタイミングで確保された構造体どうしが相互参照しあうようなケースでは、構造体への参照と構造体中の参照とで有効期間が一致するため、それらの参照の取扱いにはこのパターンが利用される事になる。
+				</p>
+				<aside class="normal">
+					<p>
+気付きにくい例。
+					</p> <p>
+<code>self</code> や <code>Self</code> などの型指定により、このパターンになっている事に気付きにくい場合がある。例えば、<code>SomeStruct&lt;'a&gt;</code> のような構造体で <code>&amp;'a self</code> のような引数型のメソッドがあれば、それはこのパターンに該当する。
+					</p>
+				</aside>
+				<div class="sub">
+					<h2>コンパイルエラーになる例</h2>
+					<p>
+以下では <code>&amp;mut data</code> のライフタイムは <code>'a</code> の影響で、<code>data</code> と同じになる。そのため、<code>data</code> がある間、<code>&amp;mut data</code> と衝突する操作は行えなくなる。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let context = 0;
+    let mut data = Data { context: &amp;context };
+    use_data_mut(&amp;mut data);
+    <mark class="error">&amp;data</mark>;
+}
+
+fn use_data_mut&lt;'a&gt;(_data: &amp;'a mut Data&lt;'a&gt;) {
+    /* ... */
+}
+
+struct Data&lt;'a&gt; {
+    context: &amp;'a i32,
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
+<mark class="info"> --&gt;</mark> src\main.rs:5:5
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     use_data_mut(&amp;mut data);
+<mark class="info">  |</mark>                  <mark class="info">--------- mutable borrow occurs here</mark>
+<mark class="info">5 |</mark>     &amp;data;
+<mark class="info">  |</mark>     <mark class="error">^^^^^</mark>
+<mark class="info">  |</mark>     <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="error">immutable borrow occurs here</mark>
+<mark class="info">  |</mark>     <mark class="error">mutable borrow later used here</mark>
+</samp></pre>
+				</div>
+			</section> 
+		</section>
+	</body>
+</html>
