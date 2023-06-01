@@ -20,6 +20,7 @@ class Nav {
 	setup() {
 		this.#setupHeaderIds(document.body, "header");
 		this.#buildElements();
+		this.#setupScrollBehavior();
 
 		const fstSection = document.getElementsByTagName("section")[0];
 		if (fstSection) {
@@ -27,6 +28,74 @@ class Nav {
 		} else {
 			document.body.appendChild(this.#elements.root);
 		}
+	}
+
+	// 全セクションのヘッダ要素に ID を設定。
+	#setupHeaderIds(element, contextId) {
+		let sectionId = 0;
+		for (const section of this.#getTargetSections(element)) {
+			const secHeader = section.firstElementChild;
+			secHeader.id = secHeader.id || contextId + "-" + sectionId++;
+			this.#setupHeaderIds(section, secHeader.id);
+		}
+	}
+
+	// スクロールへの動作を設定。
+	#setupScrollBehavior() {
+		const baseElm = this.#elements.root.querySelector("ul.index");
+		const sections = Array.from(document.getElementsByTagName("section"));
+		window.addEventListener("scroll", scrollCallback);
+
+		function isInView(elm) {
+			const bcr = elm.getBoundingClientRect();
+			return bcr.bottom >= 0 && bcr.top <= window.innerHeight;
+		}
+
+		function isFirstView(elm) {
+			const prev = elm.previousElementSibling;
+			if (prev?.tagName === "section") {
+				return !isInView(prev) && isInView(elm);
+			} else {
+				const bcr = elm.getBoundingClientRect();
+				return bcr.top <= 0 && bcr.bottom >= 0;
+			}
+		}
+
+		function getSectionRange() {
+			const maxIndex = sections.findLastIndex(isInView);
+			const fstIndex = sections.slice(0, maxIndex + 1).findLastIndex(isFirstView);
+			const minIndex = maxIndex < 0 ? - 1 : Math.max(0, fstIndex);
+			return { isEmpty: maxIndex < 0, min: sections[minIndex], max: sections[maxIndex] };
+		}
+
+		function getAnchorElmFromSectionElm(sectionElm) {
+			const headerElm = sectionElm.querySelector("h1");
+			return baseElm.querySelector(`a[href=\"#${headerElm.id}\"]`);
+		}
+
+		function scrollCallback() {
+			const sectionRange = getSectionRange();
+			if (sectionRange.isEmpty) {
+				baseElm.style.backgroundImage = "transparent";
+			} else {
+				const anchorMin = getAnchorElmFromSectionElm(sectionRange.min);
+				const anchorMax = getAnchorElmFromSectionElm(sectionRange.max);
+				const baseTop = baseElm.getBoundingClientRect().top;
+				const hlMin = anchorMin.getBoundingClientRect().top - baseTop;
+				const hlMax = anchorMax.getBoundingClientRect().bottom - baseTop;
+				const colors = { st: "transparent", hl: "var(--nav-hl-color)" };
+				const stops = [
+					{ color: colors.st, position: `0%` },
+					{ color: colors.st, position: `calc(${Math.round(hlMin)}px - 0.2em)` },
+					{ color: colors.hl, position: `calc(${Math.round(hlMin)}px)` },
+					{ color: colors.hl, position: `calc(${Math.round(hlMax)}px)` },
+					{ color: colors.st, position: `calc(${Math.round(hlMax)}px + 0.2em)` },
+					{ color: colors.st, position: `100%` },
+				];
+				const grad = stops.map((x) => `${x.color} ${x.position}`).join(",");
+				baseElm.style.backgroundImage = `linear-gradient(${grad})`;
+			}
+		};
 	}
 
 	// 要素を組み立て。
@@ -125,16 +194,6 @@ class Nav {
 		return [...element.children].filter(x => {
 			return x.tagName === "section" && x.firstElementChild?.tagName === "h1";
 		});
-	}
-	
-	// 全セクションのヘッダ要素に ID を設定。
-	#setupHeaderIds(element, contextId) {
-		let sectionId = 0;
-		for (const section of this.#getTargetSections(element)) {
-			const secHeader = section.firstElementChild;
-			secHeader.id = secHeader.id || contextId + "-" + sectionId++;
-			this.#setupHeaderIds(section, secHeader.id);
-		}
 	}
 
 	// トグルボタン押下時の動作を設定。

@@ -313,6 +313,18 @@
 		--nav-bg-color: var(--bg-em-color);
 		--nav-bd-color: var(--edge-color);
 	}
+
+	@media screen and (prefers-color-scheme: light) {
+		nav.forPage {
+			--nav-hl-color: hsla(0, 0%, 0%, 0.05);
+		}
+	}
+
+	@media screen and (prefers-color-scheme: dark) {
+		nav.forPage {
+			--nav-hl-color: hsla(0, 0%, 100%, 0.05);
+		}
+	}
 }
 
 @layer custom_prism {
