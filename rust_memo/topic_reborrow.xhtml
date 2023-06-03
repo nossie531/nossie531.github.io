@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: 再借用。</title>
+		<link rel="_up" href="index.xhtml"/>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+既存の参照から新しい参照を生成する事を再借用という。
+		</p>
+		<aside class="normal">
+			<p>
+用語の出所について。
+			</p> <p>
+この用語が公式のものかどうかは不明。ネット上でたまに見かける程度。<br/>
+ただ、この用語がないとしっくりと説明できない挙動が多い。
+			</p>
+		</aside>
+		<section>
+			<h1>単純な例</h1>
+			<p>
+以下は単純な再借用の例。
+			</p> <p>
+- 既存の参照の別名を得るパターン。
+			</p>
+<pre><code class="language-rust">
+let data = 0;
+let data_ref = &amp;data;
+let _data_ref2 = data_ref as &amp;i32;
+</code></pre>
+			<p>
+- 可変参照を不変参照化するパターン。
+			</p>
+<pre><code class="language-rust">
+let mut data = 0;
+let data_mut = &amp;mut data;
+let _data_ref = data_mut as &amp;i32;
+</code></pre>
+			<p>
+- 構造体への参照からメンバの参照を得るパターン。
+			</p>
+<pre><code class="language-rust">
+let data = Data { sub: 0 };
+let data_ref = &amp;data;
+let _sub_ref = &amp;data_ref.sub;
+</code></pre>
+		</section> <section>
+			<h1>型推論との関係</h1>
+			<p>
+型推論と再借用の奇妙な関係について。
+			</p> <p>
+型推論による型の省略は、それを実装する多くの言語において、ただの糖衣構文であり、型を明示した場合とで動作に違いはない。ところが、Rust では型を省略するかどうかで動作が変わる場合がある。
+			</p> <p>
+具体的には、可変参照を利用する場合において、(<code>let</code> での宣言やキャストなどで) 型を明示すると再借用による別名の取得と見なされ、型を省略すると所有権の移動とみなされる。
+			</p>
+<pre><code class="language-rust">
+fn test1() {
+    let x = &amp;mut 0;
+    let _y = x as &amp;mut _;
+    dbg!(*x);
+}
+
+fn test2() {
+    let x = &amp;mut 0;
+    let _x = x;
+	dbg!(<mark class="error">*x</mark>);
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0382]</mark>: use of moved value: `x`
+<mark class="info">  --&gt;</mark> src\main.rs:10:10
+<mark class="info">   |</mark>
+<mark class="info">8  |</mark>     let x = &amp;mut 0;
+<mark class="info">   |</mark>         <mark class="info">- move occurs because `x` has type `&amp;mut i32`, which does not implement the `Copy` trait</mark>
+<mark class="info">9  |</mark>     let _x = x;
+<mark class="info">   |</mark>              <mark class="info">- value moved here</mark>
+<mark class="info">10 |</mark>     dbg!(*x);
+<mark class="info">   |</mark>          <mark class="error">^^ value used here after move</mark>
+</samp></pre>
+		</section>
+	</body>
+</html>
