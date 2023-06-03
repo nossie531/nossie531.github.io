@@ -68,7 +68,7 @@ fn test1() {
 
 fn test2() {
     let x = &amp;mut 0;
-    let _x = x;
+    let _y = x;
 	dbg!(<mark class="error">*x</mark>);
 }
 </code></pre>
@@ -78,7 +78,7 @@ fn test2() {
 <mark class="info">   |</mark>
 <mark class="info">8  |</mark>     let x = &amp;mut 0;
 <mark class="info">   |</mark>         <mark class="info">- move occurs because `x` has type `&amp;mut i32`, which does not implement the `Copy` trait</mark>
-<mark class="info">9  |</mark>     let _x = x;
+<mark class="info">9  |</mark>     let _y = x;
 <mark class="info">   |</mark>              <mark class="info">- value moved here</mark>
 <mark class="info">10 |</mark>     dbg!(*x);
 <mark class="info">   |</mark>          <mark class="error">^^ value used here after move</mark>
