@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: Sized トレイト。</title>
+		<link rel="_up" href="index.xhtml"/>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+<code>Sized</code> トレイトについて。
+		</p>
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+<code>Sized</code> トレイトはマーカートレイトであり、スタック上でのメモリサイズが固定値になる型に自動的に実装される。また、そうでない型は <code>!Sized</code> としてマークされる。
+			</p>
+			<aside class="normal">
+				<p>
+<abbr>DST</abbr> (Dynamically Sized Type)。
+				</p>
+				<p>
+<code>Sized</code> を実装しない型は DST やサイズなし型などと呼ばれる。
+				</p>
+			</aside>
+			<div class="sub">
+				<h2>代表的な型について</h2>
+				<p>
+以下の型は <code>Sized</code> になる。
+				</p>
+				<ul>
+					<li>
+一般的な型 (<code>u32</code> や <code>Vec&lt;u32&gt;</code> など)
+					</li> <li>
+参照型 (<code>&amp;u32</code> や <code>&amp;str</code> など)
+					</li> <li>
+配列型 (<code>[u32; 256]</code> など)
+					</li> <li>
+構造体型かつ全てのフィールドが <code>Sized</code>
+					</li>
+				</ul>
+				<p>
+以下の型は <code>!Sized</code> になる。
+				</p>
+				<ul>
+					<li>
+スライス型 (<code>[u32]</code> や <code>[i32]</code> など)
+					</li> <li>
+文字列スライス型 (<code>str</code> のこと)
+					</li> <li>
+トレイトオブジェクト (<code>dyn Display</code> など)
+					</li> <li>
+構造体型かつ一部のフィールドが <code>!Sized</code>
+					</li>
+				</ul>
+				<aside class="normal">
+					<p>
+<code>Sized</code> トレイトと構造体について。
+					</p> <p>
+構造体は最後のフィールドのみ <code>!Sized</code> にできる。そして、その場合に限って構造体は <code>!Sized</code> になる。ただし、こうした構造体の初期化にはアンセーフな機能が必要になるなど、取扱いがやや難しい。
+					</p>
+				</aside>
+			</div>
+		</section>
+		<section>
+			<h1>関係各所でのルール</h1>
+			<p>
+関係各所で <code>Sized</code> に関する独特のルールがある。
+			</p>
+			<section>
+				<h1>API 文書</h1>
+				<p>
+rustdoc により出力される API 文書には、型ごとに <q>Auto Trait Implementations</q> の項目があり、自動実装されたトレイトが一覧できるようになっている。ところが、<code>Sized</code> トレイトはそこに文書化されない。一方、<code>!Sized</code> の場合は文書化される。
+				</p>
+			</section> <section>
+				<h1>型パラメタ</h1>
+				<p>
+型パラメタは暗黙で <code>Sized</code> 境界を持つ (ただし、後述の通り <code>Self</code> は例外)。
+				</p> <p>
+暗黙の境界が不要な場合、<code>?Sized</code> を指定すればよい。
+				</p> 
+				<div class="sub">
+					<h2>型パラメタへの適用例</h2>
+					<p>
+以下は <code>HashMap</code> 構造体の <code>get</code> メソッドでの実例。
+					</p> <p>
+<code>?Sized</code> が指定されているため、キーの型に任意のサイズの型が使える。
+					</p>
+<pre><code class="language-rust">
+pub fn get&lt;Q: ?Sized&gt;(&amp;self, k: &amp;Q) -&gt; Option&lt;&amp;V&gt;
+where
+	K: Borrow&lt;Q&gt;,
+	Q: Hash + Eq,
+{
+	// ...
+}
+</code></pre>
+				</div>
+			</section> <section>
+				<h1>Self</h1>
+				<p>
+<code>Self</code> は型パラメタの一種だが、暗黙の <code>Sized</code> 境界を持たない。
+				</p> <p>
+<code>Sized</code> 境界が必要な場合、それを明示的に指定すればよい。
+				</p> <p>
+この指定はトレイトやそのメソッドにのみ有効で、それらから動的型を扱う機能を失わせる。つまり、トレイトに指定した場合はトレイトオブジェクトが作れなくなり、メソッドに指定した場合はトレイトオブジェクトからそのメソッドが呼べなくなる。また、<code>Self</code> をメソッドの引数や戻り値として値渡しする場合にも <code>Sized</code> 境界が必要になる。
+				</p>
+				<div class="sub">
+					<h2>トレイト単位での適用例</h2>
+					<p>
+以下は <code>Into</code> トレイトでの実例。
+					</p> <p>
+補足: トレイトには糖衣構文が使用できる (下記は <code>where Self: Sized</code> と等価)。
+					</p>
+<pre><code class="language-rust">
+pub trait Into&lt;T&gt;: Sized {
+	// ...
+}
+</code></pre>
+				</div>
+				<div class="sub">
+					<h2>メソッド単位での適用例</h2>
+					<p>
+以下は <code>Iterator</code> トレイトの <code>count</code> メソッドでの実例。
+					</p>
+<pre><code class="language-rust">
+fn count(self) -&gt; usize
+where
+	Self: Sized,
+{
+	// ...
+}
+</code></pre>
+				</div>
+			</section>
+		</section>
+	</body>
+</html>
