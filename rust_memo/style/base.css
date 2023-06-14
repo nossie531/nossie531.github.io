@@ -91,6 +91,10 @@
 		padding-left: 1.5em;
 	}
 
+	q {
+		quotes: "\201C" "\201D" "\2018" "\2019";
+	}
+
 	samp, code, *.monospace {
 		font-family: "Consolas", monospace;
 		hyphens: none;
