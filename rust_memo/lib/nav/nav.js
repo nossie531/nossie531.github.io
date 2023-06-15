@@ -11,16 +11,28 @@ class Nav {
 		head: this.#createHead(),
 		toggleLink: this.#createToggleLink(Nav.#openText),
 		pageTopLink: this.#createPageTopLink("[▲]"),
-		upLink: this.#createRelatedLink("_up", "[↑]"),
-		prevLink: this.#createRelatedLink("_prev", "[←]"),
-		nextLink: this.#createRelatedLink("_next", "[→]"),
+		upLink: this.#createRelatedLink("up", "[↑]"),
+		prevLink: this.#createRelatedLink("prev", "[←]"),
+		nextLink: this.#createRelatedLink("next", "[→]"),
 	};
 
-	// 効果を適用。
-	setup() {
+	// 起動。
+	static exec() {
+		const nav = new Nav;
+		if (document.readyState !== "loading") {
+			nav.#setup();
+		} else {
+			document.addEventListener("DOMContentLoaded", () => nav.setup());
+		}
+	}
+
+	// 各要素を設定。
+	#setup() {
 		this.#setupHeaderIds(document.body, "header");
 		this.#buildElements();
-		this.#setupScrollBehavior();
+		this.#setupToggleAction();
+		this.#setupRelatedLinks();
+		this.#setupScrollAction();
 
 		const fstSection = document.getElementsByTagName("section")[0];
 		if (fstSection) {
@@ -40,11 +52,28 @@ class Nav {
 		}
 	}
 
-	// スクロールへの動作を設定。
-	#setupScrollBehavior() {
-		const baseElm = this.#elements.root.querySelector("ul.index");
+	// トグルボタン押下時の動作を設定。
+	#setupToggleAction() {
+		this.#elements.toggleLink.addEventListener("click", () => {
+			const isOpened = this.#elements.root.classList.contains("open");
+			this.#elements.root.classList.toggle("open");
+			this.#elements.toggleLink.textContent = !isOpened ? Nav.#closeText : Nav.#openText;
+		});
+	}
+
+	// スクロール時の動作を設定。
+	#setupScrollAction() {
+		const indexElm = this.#elements.root.querySelector("ul.index");
 		const sections = Array.from(document.getElementsByTagName("section"));
-		window.addEventListener("scroll", scrollCallback);
+		window.addEventListener("scroll", () => scrollCallback.call(this));
+		scrollCallback.call(this);
+
+		function scrollCallback() {
+			updateUpOrTopLink.call(this);
+			if (indexElm) {
+				updateIndexHighlight();
+			}
+		}
 
 		function isInView(elm) {
 			const bcr = elm.getBoundingClientRect();
@@ -70,17 +99,23 @@ class Nav {
 
 		function getAnchorElmFromSectionElm(sectionElm) {
 			const headerElm = sectionElm.querySelector("h1");
-			return baseElm.querySelector(`a[href=\"#${headerElm.id}\"]`);
+			return indexElm.querySelector(`a[href=\"#${headerElm.id}\"]`);
 		}
 
-		function scrollCallback() {
+		function updateUpOrTopLink() {
+			const atPageTop = document.documentElement.scrollTop === 0;
+			this.#elements.upLink.classList.toggle("none", !atPageTop);
+			this.#elements.pageTopLink.classList.toggle("none", atPageTop);
+		}
+
+		function updateIndexHighlight() {
 			const sectionRange = getSectionRange();
 			if (sectionRange.isEmpty) {
-				baseElm.style.backgroundImage = "transparent";
+				indexElm.style.backgroundImage = "transparent";
 			} else {
 				const anchorMin = getAnchorElmFromSectionElm(sectionRange.min);
 				const anchorMax = getAnchorElmFromSectionElm(sectionRange.max);
-				const baseTop = baseElm.getBoundingClientRect().top;
+				const baseTop = indexElm.getBoundingClientRect().top;
 				const hlMin = anchorMin.getBoundingClientRect().top - baseTop;
 				const hlMax = anchorMax.getBoundingClientRect().bottom - baseTop;
 				const colors = { st: "transparent", hl: "var(--nav-hl-color)" };
@@ -93,7 +128,7 @@ class Nav {
 					{ color: colors.st, position: `100%` },
 				];
 				const grad = stops.map((x) => `${x.color} ${x.position}`).join(",");
-				baseElm.style.backgroundImage = `linear-gradient(${grad})`;
+				indexElm.style.backgroundImage = `linear-gradient(${grad})`;
 			}
 		};
 	}
@@ -104,8 +139,6 @@ class Nav {
 		e.root.append(e.head);
 		e.head.append(e.prevLink, e.nextLink, e.upLink, e.pageTopLink, e.toggleLink);
 		e.root.append(this.#createIndex(document.body));
-		this.#setupToggleAction();
-		this.#setupScrollAction();
 	}
 
 	// ルート要素を生成。
@@ -147,14 +180,9 @@ class Nav {
 	}
 
 	// 関連ページへのリンク要素を生成。
-	#createRelatedLink(rel, text) {
-
+	#createRelatedLink(className, text) {
 		const result = document.createElement("a");
-		const href = document.head.querySelector(`link[rel="${rel}"]`)?.href || "";
-		if (href) {
-			result.href = href;
-		}
-
+		result.classList.add(className);
 		result.append(text);
 		return result;
 	}
@@ -196,25 +224,39 @@ class Nav {
 		});
 	}
 
-	// トグルボタン押下時の動作を設定。
-	#setupToggleAction() {
-		this.#elements.toggleLink.addEventListener("click", () => {
-			const isOpened = this.#elements.root.classList.contains("open");
-			this.#elements.root.classList.toggle("open");
-			this.#elements.toggleLink.textContent = !isOpened ? Nav.#closeText : Nav.#openText;
-		});
+	// 関連リンクを設定。
+	async #setupRelatedLinks() {
+		const indexUrl = new URL("index.xhtml", document.URL);
+		const indexDoc = await Nav.#fetchXhtml(indexUrl.toString());
+		if (indexUrl.toString() !== (new URL(document.URL).toString())) {
+			this.#elements.upLink.href = indexUrl.toString();
+			setAnchorHref(this.#elements.prevLink, findOffsetUrl(document.URL, -1));
+			setAnchorHref(this.#elements.nextLink, findOffsetUrl(document.URL, +1));
+		}
+
+		function setAnchorHref(anchor, url) {
+			if (url) {
+				anchor.href = url.toString();
+			}
+		}
+
+		function findOffsetUrl(href, offset) {
+			if (!indexDoc || !href) {
+				return null;
+			}
+
+			const anchors = Array.from(indexDoc.getElementsByTagName("a"));
+			const currIndex = anchors.findIndex(x => x.href === document.URL);
+			return anchors[currIndex + offset]?.href || null;
+		}
 	}
 
-	// 文書スクロール時の動作を設定。
-	#setupScrollAction() {
-		onscroll.call(this);
-		document.addEventListener("scroll", () => onscroll.call(this));
-		function onscroll() {
-			const atPageTop = document.documentElement.scrollTop === 0;
-			this.#elements.upLink.classList.toggle("none", !atPageTop);
-			this.#elements.pageTopLink.classList.toggle("none", atPageTop);
-		}
+	// XHTML 文書のロード。
+	static async #fetchXhtml(url) {
+		const response = await fetch(url);
+		const text = await response.text();
+		return (new DOMParser()).parseFromString(text, "application/xhtml+xml");
 	}
 }
 
-(new Nav).setup();
+Nav.exec();
