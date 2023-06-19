@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: 拡張トレイト。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+拡張トレイトは Rust でよく使われるデザインパターン。新しくトレイトを作る事で、既存の型やトレイトに後付けでメソッドを追加する。外部クレートが提供する型やトレイトに対し、その利用者が「こんなメソッドもあれば良かったのに…」と思うような補助目的のメソッドを追加するのによく使われる。
+		</p>
+		<aside class="normal">
+			<p>
+名前の慣習について。
+			</p> <p>
+拡張トレイトの名前には、元の型やトレイトの名前に <code>Ext</code> の接尾辞をつける事が多い。
+			</p>
+		</aside>
+		<section>
+			<h1>パターン</h1>
+			<p>
+型の拡張とトレイトの拡張とでベストプラクティスとなる書き方がやや異なるので注意 (型の拡張では拡張トレイトの他への流用を制限する手段がないのが少し残念…)。
+			</p>
+			<section>
+				<h1>型の拡張</h1>
+				<p>
+以下は <code>f32</code> 型の拡張例 (NaN を指定した値へ変換するメソッドを追加)。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let x = f32::NAN;
+    assert_eq!(x.map_nan(0.0), 0.0);
+}
+
+pub trait F32Ext {
+    fn map_nan(self, substitute: f32) -&gt; f32;
+}
+
+impl F32Ext for f32 {
+    fn map_nan(self, substitute: f32) -&gt; f32 {
+        if self.is_nan() { substitute } else { self }
+    }
+}
+</code></pre>
+			</section> <section>
+				<h1>トレイトの拡張</h1>
+				<p>
+以下は <code>ToString</code> トレイトの拡張例 (値を大文字で出力するメソッドを追加)。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let x = "test";
+    assert_eq!(x.to_upper_string(), "TEST");
+}
+
+pub trait ToStringExt: ToString {
+    fn to_upper_string(&amp;self) -&gt; String {
+        self.to_string().to_uppercase()
+    }
+}
+
+impl&lt;T: ToString&gt; ToStringExt for T {
+    // NOP.
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
