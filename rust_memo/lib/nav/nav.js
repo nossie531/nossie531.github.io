@@ -22,7 +22,7 @@ class Nav {
 		if (document.readyState !== "loading") {
 			nav.#setup();
 		} else {
-			document.addEventListener("DOMContentLoaded", () => nav.setup());
+			document.addEventListener("DOMContentLoaded", () => nav.#setup());
 		}
 	}
 
