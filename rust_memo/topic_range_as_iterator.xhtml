@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: Range 構造体のイテレータとしての機能。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+<code>Range</code> 構造体は、範囲境界のための型パラメタが <code>Step</code> トレイトに適合する場合、イテレータとして機能する。そして、その <code>next</code> メソッドを呼ぶと、開始端がステップサイズだけインクリメントされ、直前の開始端が結果として戻される。
+		</p> 
+		<aside class="normal">
+			<p>
+メモした理由について。
+			</p> <p>
+これは <code>for <var>pat</var> in <var>iter</var></code> 式におけるイテレータに <code>0..10</code> などと記載できることから、当然と言えば当然なのだが、筆者個人としてはややトリッキーに感じたので…。
+			</p>
+		</aside>
+		<section>
+			<h1>簡単な例</h1>
+			<p>
+以下では <code>Range</code> 構造体をイテレータとして直接操作している。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut range = 3..6;
+    assert_eq!(range.next(), Some(3));
+    assert_eq!(range, 4..6);
+}
+</code></pre>
+		</section>
+	</body>
+</html>
