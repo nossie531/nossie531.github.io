@@ -11,13 +11,13 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-<code>Range</code> 構造体は、範囲境界のための型パラメタが <code>Step</code> トレイトに適合する場合、イテレータとして機能する。そして、その <code>next</code> メソッドを呼ぶと、開始端がステップサイズだけインクリメントされ、直前の開始端が結果として戻される。
+<code>Range</code> 構造体はその範囲端のための型が <code>Step</code> トレイトに適合する場合、イテレータとして機能する。そして、その <code>next</code> メソッドを呼ぶと、開始端がステップサイズだけインクリメントされ、直前の開始端が結果として戻される。
 		</p> 
 		<aside class="normal">
 			<p>
-メモした理由について。
+このメモの背景。
 			</p> <p>
-これは <code>for <var>pat</var> in <var>iter</var></code> 式におけるイテレータに <code>0..10</code> などと記載できることから、当然と言えば当然なのだが、筆者個人としてはややトリッキーに感じたので…。
+これは <code>for <var>pat</var> in <var>iter</var></code> 式におけるイテレータに <code>0..10</code> などと記載できることから、よく考えると当然なのだが、筆者個人としてはややトリッキーに感じたので…。
 			</p>
 		</aside>
 		<section>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust 構文メモ: Range 構造体による配列からのスライスの切り出し。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+<code>Range</code> 構造体で配列からスライスを切り出す方法について。
+		</p>
+		<aside class="normal">
+			<p>
+このメモの背景。
+			</p> <p>
+他の言語ではあまり見ない書き方のため、筆者はたまに忘れる…。
+			</p>
+		</aside>
+		<section>
+			<h1>簡単な例</h1>
+			<p>
+以下はどれも配列からスライスを切り出す式になっている。
+			</p>
+<pre><code class="language-rust">
+let arr = [1, 2, 3, 4, 5, 6];
+let slice = &amp;arr[..];
+let slice = &amp;arr[..3];
+let slice = &amp;arr[4..];
+let slice = &amp;arr[2..4];
+</code></pre>
+			<p>
+補足: 上記で <code>arr</code> は <code>[i32;6]</code> の配列型、<code>slice</code> は <code>&amp;[i32]</code> のスライス型への参照型 (動的サイズ型への参照となるのでファットポインタで管理される)。
+			</p>
+		</section>
+	</body>
+</html>
