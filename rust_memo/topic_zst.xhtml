@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: ZST (Zero Sized Type) について。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+サイズがゼロの型は ZST (Zero Sized Types) と呼ばれる。
+		</p>
+		<aside class="normal">
+			<p>
+このメモの背景。
+			</p> <p>
+筆者は ZST の利用方法の一つ『<a href="#addressReservation">アドレスの確保</a>』を知らなかった。
+			</p>
+		</aside>
+		<section>
+			<h1>ZST になる型</h1>
+			<p>
+以下の型は ZST として扱われる。
+			</p>
+			<ul>
+				<li>
+空のタプル
+				</li> <li>
+フィールドのない構造体
+				</li> <li>
+長さ 0 の配列
+				</li> <li>
+その他: フィールド全てが ZST の構造体など
+				</li>
+			</ul>
+なお、とりあえず ZST を利用したい場合、空のタプル <code>()</code> が使われる事が多い。
+		</section> <section>
+			<h1>主な利用方法</h1>
+			<p>
+ZST では何も記憶できないが、利用方法はある。
+			</p>
+			<section>
+				<h1>型パラメタへの指定</h1>
+				<p>
+型パラメタに ZST を指定する事で、その型パラメタに関する全ての読書操作をスキップできる。これにより例えば、キーバリューマップを管理する <code>Dict&lt;K, V&gt;</code> 型から、キーのみを管理するキーセット型を <code>type KeySet&lt;K&gt; = Dict&lt;K, ()&gt;</code> のように実装できる。
+				</p>
+			</section> <section>
+				<h1 id="addressReservation">アドレスの確保</h1>
+				<p>
+ZST の読書時のサイズはゼロだが、それ単独で使用した場合に限り、アドレスを識別するための最低限度のメモリ領域は確保される。そのため、このアドレスを利用してメモリ上で一意となる ID 構造体を作成できる。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let zst1 = Zst {};
+    let zst2 = Zst {};
+    dbg!(&amp;zst1 as *const _);
+    dbg!(&amp;zst2 as *const _);
+}
+
+pub struct Zst;
+</code></pre>
+<pre><samp>
+0x5c9a0ffaa8
+0x5c9a0ffab0
+</samp></pre>
+			</section>
+		</section>
+	</body>
+</html>
