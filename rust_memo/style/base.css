@@ -310,6 +310,10 @@
 	*.none {
 		display: none !important;
 	}
+
+	*.todo {
+		color: var(--x-color);
+	}
 }
 
 @layer custom_nav {
