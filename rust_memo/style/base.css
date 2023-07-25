@@ -30,7 +30,7 @@
 @layer root {
 	:root {
 		font-size: 0.93em;
-		font-family: "Meiryo", serif;
+		font-family: "Meiryo", sans-serif;
 		color: var(--fg-color);
 	}
 
