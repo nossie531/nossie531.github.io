@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
-	width="100" height="100" viewBox="0 0 160 160">
+	width="100" height="100" viewBox="-160 -160 320 320">
 	<style>
-.line { fill: none; stroke: black; stroke-width: 10; }
+#face { fill:url(#rgFace); stroke: #bb7d1b; stroke-width: 6; }
+#tension { fill: url(#lgTension); }
 .fill { fill: black; }
+.edge { fill: none; stroke: black; stroke-width: 17; }
 	</style>
-	<g id="target">
+	<defs>
+		<radialGradient id="rgFace" cx="0.5" cy="0.5" r="0.5">
+			<stop stop-color="hsl(60, 100%, 80%)" offset="0.00" />
+			<stop stop-color="hsl(60, 100%, 80%)" offset="0.50" />
+			<stop stop-color="hsl(55, 100%, 60%)" offset="0.85" />
+			<stop stop-color="hsl(45, 100%, 50%)" offset="1.00" />
+		</radialGradient>
+		<linearGradient id="lgTension" x1="0%" x2="0%" y1="0%" y2="100%">
+			<stop stop-color="hsla(40, 50%, 50%, 0.50)" offset="0.00" />
+			<stop stop-color="hsla(40, 50%, 50%, 0.30)" offset="0.30" />
+			<stop stop-color="hsla(40, 50%, 50%, 0.00)" offset="0.60" />
+			<stop stop-color="hsla(40, 50%, 50%, 0.00)" offset="1.00" />
+		</linearGradient>
+	</defs>
+	<g>
 		<!-- 顔。-->
-		<circle class="line" cx="80" cy="80" r="70"/>
+		<circle id="face" cx="0" cy="0" r="157"/>
+		<!-- 気分。-->
+		<circle id="tension" cx="0" cy="0" r="154"/>
 		<!-- 左眉。-->
-		<path class="line" d="M60,45 l-25,10"/>
-		<!-- 左目。-->
-		<circle class="fill" cx="55" cy="75" r="10"/>
+		<path class="edge" d="M -42,-74 l -53,21"/>
 		<!-- 右眉。-->
-		<path class="line" d="M100,45 l25,10"/>
+		<path class="edge" d="M 42,-74 l 53,21"/>
+		<!-- 左目。-->
+		<circle class="fill" cx="-53" cy="-10" r="18"/>
 		<!-- 右目。-->
-		<circle class="fill" cx="105" cy="75" r="10"/>
+		<circle class="fill" cx="53" cy="-10" r="18"/>
 		<!-- ゆがんだ口元。 -->
-		<path class="line" d="M50,120 q30,-20,60,0"/>
+		<path class="edge" d="M -64,85 q 64,-42,128,0"/>
 	</g>
 </svg>

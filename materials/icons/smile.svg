@@ -1,20 +1,28 @@
 <?xml version="1.0"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 200 200">
+<svg xmlns="http://www.w3.org/2000/svg"
+	width="100" height="100" viewBox="-160 -160 320 320">
 	<style>
-		g.face circle { fill:url(#rgFace); stroke:#bb7d1b;stroke-width:4; }
+#face { fill: url(#rgFace); stroke: #bb7d1b; stroke-width: 6; }
+.fill { fill: black; }
 	</style>
 	<defs>
 		<radialGradient id="rgFace" cx="0.5" cy="0.5" r="0.5">
-			<stop stop-color="#ffffa8" offset="0" />
-			<stop stop-color="#ffffa8" offset="0.5" />
-			<stop stop-color="#f7e647" offset="0.87" />
-			<stop stop-color="#ffbf00" offset="1" />
+			<stop stop-color="hsl(60, 100%, 80%)" offset="0.00" />
+			<stop stop-color="hsl(60, 100%, 80%)" offset="0.50" />
+			<stop stop-color="hsl(55, 100%, 60%)" offset="0.85" />
+			<stop stop-color="hsl(45, 100%, 50%)" offset="1.00" />
 		</radialGradient>
 	</defs>
-	<g class="face">
-		<circle cx="100" cy="100" r="98"/>
-		<ellipse cx="70" cy="70" rx="10" ry="20"/>
-		<ellipse cx="130" cy="70" rx="10" ry="20"/>
-		<path d="M 32,100 a 68,68,0,0,0,136,0 v -2 c -20,-27 37,3 9,3 a 76,76,0,0,1,-154,0 c -28,0 29,-30 9,-3 v 2 Z"/>
+	<g>
+		<!-- 顔。-->
+		<circle id="face" cx="0" cy="0" r="157"/>
+		<!-- 左目。-->
+		<ellipse class="fill" cx="-48" cy="-48" rx="16" ry="32"/>
+		<!-- 右目。-->
+		<ellipse class="fill" cx="48" cy="-48" rx="16" ry="32"/>
+		<!-- にっこり口元。 -->
+		<path class="fill" 
+			d="M -109,0 a 109,109,0,0,0,218,0 v -3 c -32,-43 59,5 14,5
+			a 122,122,0,0,1,-246,0 c -45,0 46,-48 14,-5 v 3 Z"/>
 	</g>
 </svg>
