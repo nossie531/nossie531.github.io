@@ -77,67 +77,93 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 			</section> <section>
 				<h1>型パラメタ</h1>
 				<p>
-型パラメタは暗黙で <code>Sized</code> 境界を持つ (ただし、後述の通りトレイトの <code>Self</code> は例外)。
+型パラメタは暗黙で <code>Sized</code> 境界を持つ。
 				</p> <p>
 暗黙の境界が不要な場合、<code>?Sized</code> を指定すればよい。
+				</p> <p>
+(後述の通り、トレイトの <code>Self</code> は例外。)
 				</p> 
 			</section> <section>
-				<h1>Self</h1>
+				<h1>トレイトとその Self</h1>
 				<p>
-<code>Self</code> は型パラメタの一種だが、トレイトの <code>Self</code> は暗黙の <code>Sized</code> 境界を持たない。
-				</p> <p>
-必要な場合、明示的に指定しなければならない。 
-				</p> <p>
-なお、指定した場合の扱いも他とかなり異なる。
-				</p> 
-				<dl class="normal">
-					<dt>他と共通する扱い</dt>
-					<dd>
-						<ul>
-							<li>
-								<p>
-引数や戻り値の値渡しが可能になる。
-								</p>
-							</li>
-						</ul>
-					</dd>
-					<dt>他と異なる扱い</dt>
-					<dd>
-						<ul>
-							<li>
-								<p>
-本来の意味での <code>Sized</code> 境界が機能しない。
-								</p> <p>
-つまり、<code>Self</code> が <code>!Sized</code> でもトレイトやトレイトメソッドの対象になる。 
-								</p>
-							</li> <li>
-								<p>
-トレイトの本体において、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
-								</p> <p>
-そのトレイトのトレイトオブジェクトが作れなくなる。
-								</p>
-							</li> <li>
-								<p>
-トレイトのメソッドにおいて、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
-								</p> <p>
-そのメソッドをトレイトオブジェクトから呼べなくなる。
-								</p>
-							</li>
-						</ul>
-					</dd>
-				</dl>
+トレイトについてはいくつか特殊なルールがある。
+				</p>
 				<aside class="normal moan">
 					<p>
-このあたりは個人的にかなりの初見殺し…。
+個人的にかなりの初見殺しだった…。
 					</p>
 				</aside>
-				<aside class="normal">
+				<div class="sub">
+					<h2><code>Sized</code> を指定する方法</h2>
 					<p>
-コードリーディング時の注意点。
+<code>Self</code> は型パラメタの一種だが、トレイトの <code>Self</code> は暗黙の <code>Sized</code> 境界を持たない。
 					</p> <p>
-<code>Self</code> に <code>Sized</code> 境界を指定するパターンには、<code>where</code> キーワードで <code>Self: Sized</code> とする以外にも幾つかある。トレイト宣言時に <code><var>TraitName</var>: Sized</code> とする糖衣構文のパターン、ブランケット実装の型パラメタを経由して指定するパターン、さらに <code>Sized</code> を実装した他トレイトを介するパターン、これらを考慮する必要がある。
+必要な場合、明示的に指定しなければならない。
+					</p> <p>
+指定方法には幾つかある。
 					</p>
-				</aside>
+					<ul>
+						<li>
+							<p>
+<code>where</code> キーワードで <code>Self: Sized</code> とする方法。
+							</p>
+						</li> <li>
+							<p>
+その糖衣構文でトレイト宣言時に <code><var>TraitName</var>: Sized</code> とする方法。
+							</p>
+						</li> <li>
+							<p>
+ブランケット実装の <code>for</code> キーワードで制限する方法。<br/>
+(ここで使われる型パラメタは通常のものなのでデフォルトで <code>Sized</code>)
+							</p>
+						</li>
+					</ul>
+					<p>
+<code>Sized</code> の代わりに、<code>Sized</code> を実装したトレイトを使ってもよい。
+					</p>
+				</div>
+				<div class="sub">
+					<h2><code>Sized</code> を指定した場合の仕様</h2>
+					<p>
+トレイトにおける <code>Sized</code> の意味は他とは異なり、以下のような仕様になる。
+					</p> 
+					<dl class="normal">
+						<dt>他と共通する仕様</dt>
+						<dd>
+							<ul>
+								<li>
+									<p>
+引数や戻り値にて値渡しが可能になる。
+									</p>
+								</li>
+							</ul>
+						</dd>
+						<dt>他と異なる仕様</dt>
+						<dd>
+							<ul>
+								<li>
+									<p>
+本来の意味での <code>Sized</code> 境界が機能しない。
+									</p> <p>
+つまり、<code>Self</code> が <code>!Sized</code> でもトレイトやトレイトメソッドの対象になる。 
+									</p>
+								</li> <li>
+									<p>
+トレイトの本体において、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
+									</p> <p>
+そのトレイトのトレイトオブジェクトが作れなくなる。
+									</p>
+								</li> <li>
+									<p>
+トレイトのメソッドにおいて、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
+									</p> <p>
+そのメソッドをトレイトオブジェクトから呼べなくなる。
+									</p>
+								</li>
+							</ul>
+						</dd>
+					</dl>
+				</div>
 			</section>
 		</section>
 	</body>
