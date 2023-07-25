@@ -246,9 +246,19 @@
 			background-image: url("img/book_light.svg");
 		}
 
+		aside.normal.moan::before {
+			background-image: url("img/unhappy.svg");
+			filter: saturate(30%);
+		}
+
 		@media screen and (prefers-color-scheme: dark) {
 			aside.normal::before { 
 				background-image: url("img/book_dark.svg");
+			}
+
+			aside.normal.moan::before {
+				background-image: url("img/unhappy.svg");
+				filter: saturate(20%) brightness(85%);
 			}
 		}
 	}
