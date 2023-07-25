@@ -88,6 +88,7 @@
 	}
 
 	ul, ol {
+		margin: 0.5em 0;
 		padding-left: 1.5em;
 	}
 
@@ -264,7 +265,6 @@
 	}
 
 	@layer table {
-
 		table.normal {
 			margin: 1em 0;
 			border-collapse: collapse;
