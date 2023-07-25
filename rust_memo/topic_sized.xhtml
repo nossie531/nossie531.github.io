@@ -64,16 +64,15 @@
 					</p>
 				</aside>
 			</div>
-		</section>
-		<section>
+		</section> <section>
 			<h1>関係各所でのルール</h1>
 			<p>
 関係各所で <code>Sized</code> に関する独特のルールがある。
 			</p>
 			<section>
-				<h1>API 文書</h1>
+				<h1>API ドキュメント</h1>
 				<p>
-rustdoc により出力される API 文書には、型ごとに <q>Auto Trait Implementations</q> の項目があり、自動実装されたトレイトが一覧できるようになっている。ところが、<code>Sized</code> トレイトはそこに文書化されない。一方、<code>!Sized</code> の場合は文書化される。
+rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Implementations</q> の項目があり、自動実装されたトレイトが一覧できる。しかし、<code>Sized</code> は文書化されず、<code>!Sized</code> のみが文書化される。そのため、<code>Sized</code> かどうかは <code>!Sized</code> を探すことになる。
 				</p>
 			</section> <section>
 				<h1>型パラメタ</h1>
@@ -82,57 +81,63 @@ rustdoc により出力される API 文書には、型ごとに <q>Auto Trait I
 				</p> <p>
 暗黙の境界が不要な場合、<code>?Sized</code> を指定すればよい。
 				</p> 
-				<div class="sub">
-					<h2>型パラメタへの適用例</h2>
-					<p>
-以下は <code>HashMap</code> 構造体の <code>get</code> メソッドでの実例。
-					</p> <p>
-<code>?Sized</code> が指定されているため、キーの型に任意のサイズの型が使える。
-					</p>
-<pre><code class="language-rust">
-pub fn get&lt;Q: ?Sized&gt;(&amp;self, k: &amp;Q) -&gt; Option&lt;&amp;V&gt;
-where
-	K: Borrow&lt;Q&gt;,
-	Q: Hash + Eq,
-{
-	// ...
-}
-</code></pre>
-				</div>
 			</section> <section>
 				<h1>Self</h1>
 				<p>
 <code>Self</code> は型パラメタの一種だが、トレイトの <code>Self</code> は暗黙の <code>Sized</code> 境界を持たない。
 				</p> <p>
-<code>Sized</code> 境界が必要な場合、明示的に指定しなければならない。
+必要な場合、明示的に指定しなければならない。 
 				</p> <p>
-<code>Self</code> に <code>Sized</code> 境界が指定された場合、<code>Self</code> はトレイトオブジェクトとして使えなくなる。つまり、トレイトに指定した場合はそのトレイトのトレイトオブジェクトが作れなくなり、メソッドに指定した場合はトレイトオブジェクトからそのメソッドが呼べなくなる。また、<code>Self</code> による引数や戻り値の受け渡しを値渡しで行えるようになる。
-				</p>
-				<div class="sub">
-					<h2>トレイト単位での適用例</h2>
+なお、指定した場合の扱いも他とかなり異なる。
+				</p> 
+				<dl class="normal">
+					<dt>他と共通する扱い</dt>
+					<dd>
+						<ul>
+							<li>
+								<p>
+引数や戻り値の値渡しが可能になる。
+								</p>
+							</li>
+						</ul>
+					</dd>
+					<dt>他と異なる扱い</dt>
+					<dd>
+						<ul>
+							<li>
+								<p>
+本来の意味での <code>Sized</code> 境界が機能しない。
+								</p> <p>
+つまり、<code>Self</code> が <code>!Sized</code> でもトレイトやトレイトメソッドの対象になる。 
+								</p>
+							</li> <li>
+								<p>
+トレイトの本体において、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
+								</p> <p>
+そのトレイトのトレイトオブジェクトが作れなくなる。
+								</p>
+							</li> <li>
+								<p>
+トレイトのメソッドにおいて、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
+								</p> <p>
+そのメソッドをトレイトオブジェクトから呼べなくなる。
+								</p>
+							</li>
+						</ul>
+					</dd>
+				</dl>
+				<aside class="normal moan">
 					<p>
-以下は <code>Into</code> トレイトでの実例。
+このあたりは個人的にかなりの初見殺し…。
 					</p>
-<pre><code class="language-rust">
-pub trait Into&lt;T&gt;: Sized {
-	// ...
-}
-</code></pre>
-				</div>
-				<div class="sub">
-					<h2>メソッド単位での適用例</h2>
+				</aside>
+				<aside class="normal">
 					<p>
-以下は <code>Iterator</code> トレイトの <code>count</code> メソッドでの実例。
+コードリーディング時の注意点。
+					</p> <p>
+<code>Self</code> に <code>Sized</code> 境界を指定するパターンには、<code>where</code> キーワードで <code>Self: Sized</code> とする以外にも幾つかある。トレイト宣言時に <code><var>TraitName</var>: Sized</code> とする糖衣構文のパターン、ブランケット実装の型パラメタを経由して指定するパターン、さらに <code>Sized</code> を実装した他トレイトを介するパターン、これらを考慮する必要がある。
 					</p>
-<pre><code class="language-rust">
-fn count(self) -&gt; usize
-where
-	Self: Sized,
-{
-	// ...
-}
-</code></pre>
-				</div>
+				</aside>
 			</section>
 		</section>
 	</body>
