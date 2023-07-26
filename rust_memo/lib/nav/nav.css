@@ -53,6 +53,11 @@ nav.forPage li {
 	overflow: hidden;
 }
 
+nav.forPage li a code {
+	color: unset;
+	background-color: unset;
+}
+
 nav.forPage li a:focus-visible {
 	outline: none;
 	text-decoration: underline;
