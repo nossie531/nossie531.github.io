@@ -13,13 +13,6 @@
 		<p>
 サイズがゼロの型は ZST (Zero Sized Types) と呼ばれる。
 		</p>
-		<aside class="normal">
-			<p>
-このメモの背景。
-			</p> <p>
-筆者は ZST の利用方法の一つ『<a href="#addressReservation">アドレスの確保</a>』を知らなかった。
-			</p>
-		</aside>
 		<section>
 			<h1>ZST になる型</h1>
 			<p>
@@ -38,19 +31,23 @@
 			</ul>
 なお、とりあえず ZST を利用したい場合、空のタプル <code>()</code> が使われる事が多い。
 		</section> <section>
-			<h1>主な利用方法</h1>
+			<h1>利用方法</h1>
 			<p>
-ZST では何も記憶できないが、利用方法はある。
+ZST では何も記憶できないが、状況によっては役に立つ場合もある。
 			</p>
 			<section>
 				<h1>型パラメタへの指定</h1>
 				<p>
+これが ZST の主な利用方法となる。
+				</p> <p>
 型パラメタに ZST を指定する事で、その型パラメタに関する全ての読書操作をスキップできる。これにより例えば、キーバリューマップを管理する <code>Dict&lt;K, V&gt;</code> 型から、キーのみを管理するキーセット型を <code>type KeySet&lt;K&gt; = Dict&lt;K, ()&gt;</code> のように実装できる。
 				</p>
 			</section> <section>
-				<h1 id="addressReservation">アドレスの確保</h1>
+				<h1>アドレスの確保 (通常編)</h1>
 				<p>
-ZST の読書時のサイズはゼロだが、それ単独で使用した場合に限り、アドレスを識別するための最低限度のメモリ領域は確保される。そのため、このアドレスを利用してメモリ上で一意となる ID 構造体を作成できる。
+おそらくこれは滅多に使われない機能だと思われる。
+				</p> <p>
+ZST の読書時のサイズはゼロだが、通常の変数として用意した場合、アドレスを識別するための最低限度のメモリ領域は確保される。
 				</p>
 <pre><code class="language-rust">
 fn main() {
@@ -63,8 +60,66 @@ fn main() {
 pub struct Zst;
 </code></pre>
 <pre><samp>
-0x5c9a0ffaa8
-0x5c9a0ffab0
+[src\main.rs:4] &amp;zst1 as *const _ = 0x000000c08ecfeb70
+[src\main.rs:5] &amp;zst2 as *const _ = 0x000000c08ecfeb78
+</samp></pre>
+				<p>
+なお、配列では要素ごとのアドレスが重複する。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let arr = [Zst, Zst];
+    dbg!(&amp;arr[0] as *const _);
+    dbg!(&amp;arr[1] as *const _);
+}
+
+pub struct Zst;
+</code></pre>
+<pre><samp>
+[src\main.rs:3] &amp;arr[0] as *const _ = 0x00000089702fec08
+[src\main.rs:4] &amp;arr[1] as *const _ = 0x00000089702fec08
+</samp></pre>
+			</section> <section>
+				<h1>アドレスの確保 (<code>Box</code> 編)</h1>
+				<p>
+<code>Box</code> と ZST の組合せは何の役にも立たない。
+				</p> <p>
+アドレスを識別するためのメモリすら用意されない。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let zst1 = Box::new(Zst {});
+    let zst2 = Box::new(Zst {});
+    dbg!(Box::into_raw(zst1));
+    dbg!(Box::into_raw(zst2));
+}
+
+pub struct Zst;
+</code></pre>
+<pre><samp>
+[src\main.rs:4] Box::into_raw(zst1) = 0x0000000000000001
+[src\main.rs:5] Box::into_raw(zst2) = 0x0000000000000001
+</samp></pre>
+			</section> <section>
+				<h1>アドレスの確保 (<code>Vec</code> 編)</h1>
+				<p>
+<code>Vec</code> と ZST の組合せも何の役にも立たない。
+				</p> <p>
+各要素ごとにはもちろん全体でのメモリも用意されない。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let vec1 = vec![Zst {}];
+    let vec2 = vec![Zst {}];
+    dbg!(&amp;vec1.as_slice()[0] as *const _);
+    dbg!(&amp;vec2.as_slice()[0] as *const _);
+}
+
+pub struct Zst;
+</code></pre>
+<pre><samp>
+[src\main.rs:4] &amp;vec1.as_slice()[0] as *const _ = 0x0000000000000001
+[src\main.rs:5] &amp;vec2.as_slice()[0] as *const _ = 0x0000000000000001
 </samp></pre>
 			</section>
 		</section>
