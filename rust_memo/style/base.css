@@ -88,7 +88,7 @@
 	}
 
 	samp, code, *.monospace {
-		font-family: "Consolas", monospace;
+		font-family: "Consolas", "Meiryo", monospace;
 		hyphens: none;
 		tab-size: 4;
 	}
@@ -142,7 +142,7 @@
 	}
 
 	*.mt {
-		font-family: "Consolas", monospace;
+		font-family: "Consolas", "Meiryo", monospace;
 	}
 
 	*.nw {
