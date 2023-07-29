@@ -13,10 +13,15 @@
 		<p>
 <code>Sized</code> トレイトについて。
 		</p>
+		<aside class="normal moan">
+			<p>
+個人的に初見殺しが多かった…。
+			</p>
+		</aside>
 		<section>
 			<h1>基礎知識</h1>
 			<p>
-<code>Sized</code> トレイトはマーカートレイトであり、スタック上でのメモリサイズが固定値になる型に自動的に実装される。また、そうでない型は <code>!Sized</code> としてマークされる。そして、型がそのどちらでも構わない場合のトレイト境界には <code>?Sized</code> を指定する。
+<code>Sized</code> トレイトはコンパイラにより自動実装されるマーカートレイトであり、対象となる型はスタック上での必要なメモリサイズが予め決まっている型である。なお、そうでない型は <code>!Sized</code> としてマークされる。そして、型がそのどちらでも構わない場合、トレイト境界には <code>?Sized</code> を指定する。
 			</p>
 			<aside class="normal">
 				<p>
@@ -27,35 +32,40 @@
 				</p>
 			</aside>
 			<div class="sub">
-				<h2>代表的な型について</h2>
+				<h2>自動実装の例</h2>
 				<p>
-以下の型は <code>Sized</code> になる。
+以下は代表的な型について、<code>Sized</code> かどうかの一覧。
 				</p>
-				<ul>
-					<li>
+				<dl class="normal">
+					<dt> <code>Sized</code> になる型 </dt>
+					<dd>
+						<ul>
+							<li>
 一般的な型 (<code>u32</code> や <code>Vec&lt;u32&gt;</code> など)
-					</li> <li>
+							</li> <li>
 参照型 (<code>&amp;u32</code> や <code>&amp;str</code> など)
-					</li> <li>
+							</li> <li>
 配列型 (<code>[u32; 256]</code> など)
-					</li> <li>
+							</li> <li>
 構造体型かつ全てのフィールドが <code>Sized</code>
-					</li>
-				</ul>
-				<p>
-以下の型は <code>!Sized</code> になる。
-				</p>
-				<ul>
-					<li>
+							</li>
+						</ul>
+					</dd>
+					<dt> <code>!Sized</code> になる型</dt>
+					<dd>
+						<ul>
+							<li>
 スライス型 (<code>[u32]</code> や <code>[i32]</code> など)
-					</li> <li>
+							</li> <li>
 文字列スライス型 (<code>str</code> のこと)
-					</li> <li>
+							</li> <li>
 トレイトオブジェクト (<code>dyn Display</code> など)
-					</li> <li>
+							</li> <li>
 構造体型かつ一部のフィールドが <code>!Sized</code>
-					</li>
-				</ul>
+							</li>
+						</ul>
+					</dd>
+				</dl>
 				<aside class="normal">
 					<p>
 <code>Sized</code> トレイトと構造体について。
@@ -86,13 +96,8 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 			</section> <section>
 				<h1>トレイトとその Self</h1>
 				<p>
-トレイトについてはいくつか特殊なルールがある。
+トレイトとその <code>Self</code> には特殊な扱いがされる。
 				</p>
-				<aside class="normal moan">
-					<p>
-個人的にかなりの初見殺しだった…。
-					</p>
-				</aside>
 				<div class="sub">
 					<h2><code>Sized</code> を指定する方法</h2>
 					<p>
@@ -112,45 +117,38 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 その糖衣構文でトレイト宣言時に <code><var>TraitName</var>: Sized</code> とする方法。
 							</p>
 						</li> <li>
+							<p>
 上記のどれかで <code>Sized</code> の代わりに、<code>Sized</code> を実装したトレイトを使う方法。
+							</p>
 						</li>
 					</ul>
 				</div>
 				<div class="sub">
-					<h2><code>Sized</code> を指定した場合の仕様</h2>
+					<h2><code>Sized</code> を指定した場合</h2>
 					<p>
-トレイトにおける <code>Sized</code> の意味は他とは異なり、以下のような仕様になる。
+トレイトにおける <code>Sized</code> は以下のような仕様になる。
 					</p> 
-					<dl class="normal">
-						<dt>他と共通する仕様</dt>
-						<dd>
-							<ul>
-								<li>
-									<p>
+					<ul>
+						<li>
+							<p>
 引数や戻り値にて値渡しが可能になる。
-									</p>
-								</li>
-							</ul>
-						</dd>
-						<dt>他と異なる仕様</dt>
-						<dd>
-							<ul>
-								<li>
-									<p>
+							</p> <p>
+※ これはトレイト以外と同じ。
+							</p>
+						</li> <li>
+							<p>
 トレイトの本体において、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
-									</p> <p>
+							</p> <p>
 そのトレイトのトレイトオブジェクトが作れなくなる。
-									</p>
-								</li> <li>
-									<p>
+							</p>
+						</li> <li>
+							<p>
 トレイトのメソッドにおいて、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
-									</p> <p>
+							</p> <p>
 そのメソッドをトレイトオブジェクトから呼べなくなる。
-									</p>
-								</li>
-							</ul>
-						</dd>
-					</dl>
+							</p>
+						</li>
+					</ul>
 				</div>
 			</section>
 		</section>
