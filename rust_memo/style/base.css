@@ -2,7 +2,6 @@
 
 @layer
 	import_color,
-	lang,
 	root,
 	default,
 	normal,
@@ -21,16 +20,10 @@
 @import url("prism/dark.css") layer(import_syntax_highlight) screen and (prefers-color-scheme: dark);
 @import url("console_rustc.css") layer(import_console_rustc);
 
-@layer lang {
-	:root:lang(ja) {
-		line-height: 1.7;
-	}
-}
-
 @layer root {
 	:root {
-		font-size: 0.93em;
 		font-family: "Meiryo", sans-serif;
+		font-size: 0.93em;
 		color: var(--fg-color);
 	}
 
