@@ -100,7 +100,7 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 					</p> <p>
 必要な場合、明示的に指定しなければならない。
 					</p> <p>
-指定方法には幾つかある。
+指定方法は幾つかある。
 					</p>
 					<ul>
 						<li>
@@ -112,15 +112,9 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 その糖衣構文でトレイト宣言時に <code><var>TraitName</var>: Sized</code> とする方法。
 							</p>
 						</li> <li>
-							<p>
-ブランケット実装の <code>for</code> キーワードで制限する方法。<br/>
-(ここで使われる型パラメタは通常のものなのでデフォルトで <code>Sized</code>)
-							</p>
+上記の一覧で <code>Sized</code> の代わりに、<code>Sized</code> を実装したトレイトを使う方法。
 						</li>
 					</ul>
-					<p>
-<code>Sized</code> の代わりに、<code>Sized</code> を実装したトレイトを使ってもよい。
-					</p>
 				</div>
 				<div class="sub">
 					<h2><code>Sized</code> を指定した場合の仕様</h2>
@@ -142,12 +136,6 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 						<dd>
 							<ul>
 								<li>
-									<p>
-本来の意味での <code>Sized</code> 境界が機能しない。
-									</p> <p>
-つまり、<code>Self</code> が <code>!Sized</code> でもトレイトやトレイトメソッドの対象になる。 
-									</p>
-								</li> <li>
 									<p>
 トレイトの本体において、<code>Self</code> に <code>Sized</code> 境界を指定した場合。
 									</p> <p>
