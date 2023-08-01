@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust エラーメモ: E0521 - 関数外への参照引数の持ち出し。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+</samp></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0521]</mark>: borrowed data escapes outside of method
+</samp></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0521]</mark>: borrowed data escapes outside of closure
+</samp></pre>
+		<p>
+メッセージには関数版、メソッド版、そしてクロージャ版があるが、どれも似た内容である。そのため、ここでは主に関数版について説明する (クロージャ版には<a href="#ptnD">後述</a>の特殊事情あり)。
+		</p>
+		<section>
+			<h1>エラーの概要</h1>
+			<p>
+このエラーは参照型の引数についての処理を間違えると発生する。
+			</p> <p>
+参照型の引数は、ライフタイム注釈に <code>'static</code> を指定されない限り、関数のライフタイムを包む程度のライフタイムしか保証されない。これを、関数の外でも通用するより広いライフタイムを持つ参照として処理すると、このエラーが発生する。
+			</p>
+		</section> <section>
+			<h1>パターン</h1>
+			<dl class="normal lowProfile">
+				<dt><a href="#ptnA">パターン A</a></dt>
+				<dd>引数をそのまま使用。</dd>
+				<dt><a href="#ptnB">パターン B</a></dt>
+				<dd>引数を辿った別の参照を使用。</dd>
+				<dt><a href="#ptnC">パターン C</a></dt>
+				<dd>トレイトのライフタイム境界が関連。</dd>
+				<dt><a href="#ptnD">パターン D</a></dt>
+				<dd>クロージャが関連。</dd>
+			</dl>
+			<section>
+				<h1 id="ptnA">パターン A</h1>
+				<p>
+参照引数をそのまま、関数外に持ち出そうとしたパターン。
+				</p> <p>
+以下では、匿名のライフタイムを持つ参照 <code>arg</code> を、それよりも広い <code>'static</code> ライフタイムを持つ参照として扱おうとしている。
+				</p>
+<pre><code class="language-rust">
+fn f(arg: &amp;i32) {
+	<mark class="error">use_static(arg)</mark>;
+}
+
+fn use_static(_: &amp;'static i32) {
+    /* ... */
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+<mark class="info"> --&gt;</mark> src\main.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">1 |</mark> fn f(arg: &amp;i32) {
+<mark class="info">  |</mark>      <mark class="info">---  - let's call the lifetime of this reference `'1`</mark>
+<mark class="info">  |</mark>      <mark class="info">|</mark>
+<mark class="info">  |</mark>      <mark class="info">`arg` is a reference that is only valid in the function body</mark>
+<mark class="info">2 |</mark>     use_static(arg);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>     <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="error">`arg` escapes the function body here</mark>
+<mark class="info">  |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnB">パターン B</h1>
+				<p>
+参照型の引数を辿って取得した参照を、関数外に持ち出そうとしたパターン。
+				</p> <p>
+前のパターンとほぼ同じだが、より間接的なため気付きにくくなる。
+				</p>
+<pre><code class="language-rust">
+fn f(arg: &amp;Box&lt;i32&gt;) {
+    use_static(arg.as_ref());
+}
+
+fn use_static(_: &amp;'static i32) {
+    /* ... */
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+<mark class="info"> --&gt;</mark> src\main.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">1 |</mark> fn f(arg: &amp;Box&lt;i32&gt;) {
+<mark class="info">  |</mark>      <mark class="info">---  - let's call the lifetime of this reference `'1`</mark>
+<mark class="info">  |</mark>      <mark class="info">|</mark>
+<mark class="info">  |</mark>      <mark class="info">`arg` is a reference that is only valid in the function body</mark>
+<mark class="info">2 |</mark>     use_static(arg.as_ref());
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>     <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="error">`arg` escapes the function body here</mark>
+<mark class="info">  |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnC">パターン C</h1>
+				<p>
+トレイトのライフタイム境界が関係するパターン。
+				</p> <p>
+以下では、匿名のライフタイムを持つ参照 <code>arg</code> を、<code>Any</code> トレイトを持つものとして扱おうとしている。しかし、<code>Any</code> トレイトは <code>'static</code> ライフタイム境界を持つため、それまたはその内部により狭いライフタイムを持つ参照があってはならない。
+				</p>
+<pre><code class="language-rust">
+use std::any::Any;
+
+fn f(arg: &amp;i32) {
+	<mark class="error">use_any(arg)</mark>;
+}
+
+fn use_any&lt;T: Any&gt;(_: T) {
+    /* ... */
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+<mark class="info"> --&gt;</mark> src\main.rs:4:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark> fn f(arg: &amp;i32) {
+<mark class="info">  |</mark>      <mark class="info">---  - let's call the lifetime of this reference `'1`</mark>
+<mark class="info">  |</mark>      <mark class="info">|</mark>
+<mark class="info">  |</mark>      <mark class="info">`arg` is a reference that is only valid in the function body</mark>
+<mark class="info">4 |</mark>     use_any(arg);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>     <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="error">`arg` escapes the function body here</mark>
+<mark class="info">  |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnD">パターン D</h1>
+				<p>
+クロージャが関係するパターン。
+				</p> <p>
+以下のように、クロージャでも関数と同様のエラーが発生する。<br/>
+ただし、以下ではクロージャの引数の型を明示している点に注意。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut vec = Vec::&lt;&amp;i32&gt;::new();
+    let _closure = |item: &amp;i32| {
+		<mark class="error">vec.push(item)</mark>;
+    };
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0521]</mark>: borrowed data escapes outside of closure
+<mark class="info"> --&gt;</mark> src\main.rs:4:9
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let mut vec = Vec::&lt;&amp;i32&gt;::new();
+<mark class="info">  |</mark>         <mark class="info">------- `vec` declared here, outside of the closure body</mark>
+<mark class="info">3 |</mark>     let _closure = |item: &amp;i32| {
+<mark class="info">  |</mark>                     <mark class="info">---- `item` is a reference that is only valid in the closure body</mark>
+<mark class="info">4 |</mark>         vec.push(item);
+<mark class="info">  |</mark>         <mark class="error">^^^^^^^^^^^^^^ `item` escapes the closure body here</mark>
+</samp></pre>
+				<div class="sub">
+					<h2>引数の型推論</h2>
+					<p>
+クロージャでは実引数の型情報が利用できるため、関数とは異なり、引数の型推論が行える。そして、これにより問題のエラーを解消できる場合がある。
+					</p> <p>
+なぜなら、型を明示した場合、引数のライフタイムはクロージャのライフタイムを包む程度にしか保証されないが、型を省略した場合、引数のライフタイムは実引数のものと同じとなり、それはクロージャの外でも通用するためである。
+					</p>
+					<aside class="normal">
+						<p>
+Rust の独特な仕様。
+						</p> <p>
+Rust 以外の多くの言語では、型推論はただの糖衣構文である。一方、Rust では、型の明示は新しいスコープの立ち上げを意味していて、これにより動作が微妙に変わる事がある。
+						</p>
+					</aside>
+				</div>
+			</section>
+		</section>
+	</body>
+</html>
