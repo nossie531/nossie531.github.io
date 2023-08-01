@@ -1,6 +1,4 @@
-remote_theme: jekyll/minima
-google_analytics: G-X01B3QVSC1
+google-analytics: G-X01B3QVSC1
 plugins:
-  - jekyll-remote-theme
   - jekyll-sitemap
 
