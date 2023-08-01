@@ -8,6 +8,7 @@ class Base {
 
 		Base.#instance = new Base();
 		Base.#instance.#setupViewport();
+		Base.#instance.#setupGoogleAnalytics();
 		Base.#instance.#setupScripts();
 		document.addEventListener("DOMContentLoaded", () => {
 			Base.#instance.#setupCodes();
@@ -28,12 +29,28 @@ class Base {
 		result.src = src;
 		return result;
 	}
+
+	static #createGtagJs(src) {
+		const url = "https://www.googletagmanager.com/gtag/js?id=G-X01B3QVSC1";
+		const result = Base.#createScriptElement(url);
+		result.async = true;
+		return result;
+	}
 	
 	#setupViewport() {
 		const meta = document.createElement("meta");
 		meta.name = "viewport";
 		meta.content = "width=device-width,initial-scale=1,minimum-scale=1";
 		document.head.insertBefore(meta, document.head.firstElement);
+	}
+
+	#setupGoogleAnalytics() {
+		const scriptHolder = Base.#getCurrentScript().parentNode;
+		scriptHolder.append(Base.#createGtagJs());
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'G-X01B3QVSC1');
 	}
 
 	#setupScripts() {
@@ -57,7 +74,6 @@ class Base {
 		for (const code of codes) {
 			code.setAttribute("tabindex", 0);
 		}
-
 	}
 }
 
