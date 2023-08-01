@@ -16,8 +16,8 @@
 
 @import url("color.css") layer(import_color);
 @import url("../lib/nav/nav.css") layer(import_nav);
-@import url("prism/light.css") layer(import_syntax_highlight) screen and (prefers-color-scheme: light);
-@import url("prism/dark.css") layer(import_syntax_highlight) screen and (prefers-color-scheme: dark);
+@import url("prism/light.css") layer(import_syntax_highlight) (prefers-color-scheme: light);
+@import url("prism/dark.css") layer(import_syntax_highlight) (prefers-color-scheme: dark);
 @import url("console_rustc.css") layer(import_console_rustc);
 
 @layer root {
@@ -233,7 +233,7 @@
 			float: left;
 			width: 2.2em;
 			height: 2.2em;
-			margin: 0.1em 0.5ch 0 0;
+			margin-right: 0.5ch;
 			background-size: 2.2em;
 			background-image: url("img/book_light.svg");
 		}
