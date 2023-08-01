@@ -44,19 +44,26 @@ let _data_ref = data_mut as &amp;i32;
 		</section> <section>
 			<h1>型推論との関係</h1>
 			<p>
-型推論と再借用の奇妙な関係について。
+型推論と再借用について。
 			</p> <p>
-型推論による型の省略は、それを実装する多くの言語において、ただの糖衣構文であり、型を明示した場合とで動作に違いはない。ところが、Rust では型を省略するかどうかで動作が変わる場合がある。
-			</p> <p>
-具体的には、可変参照を利用する場合において、(<code>let</code> での宣言やキャストなどで) 型を明示すると再借用による別名の取得と見なされ、型を省略すると所有権の移動とみなされる。
+参照から <code>let</code> による初期化を行う場合、型宣言やキャストにより型を明示すると、再借用による新しい参照と見なされ、型を省略すると、既存の参照の所有権の移動とみなされる。
 			</p>
+			<aside class="normal">
+				<p>
+Rust の独特な仕様。
+				</p> <p>
+Rust 以外の多くの言語では、型推論はただの糖衣構文である。一方、Rust では、型の明示は新しいスコープの立ち上げを意味していて、これにより動作が微妙に変わる事がある。
+				</p>
+			</aside>
 <pre><code class="language-rust">
+// 型を明示 ⇒ 再借用。
 fn test1() {
     let x = &amp;mut 0;
     let _y = x as &amp;mut _;
     dbg!(*x);
 }
 
+// 型を省略 ⇒ 所有権の移動。
 fn test2() {
     let x = &amp;mut 0;
     let _y = x;
@@ -67,11 +74,11 @@ fn test2() {
 <mark class="error">error[E0382]</mark>: use of moved value: `x`
 <mark class="info">  --&gt;</mark> src\main.rs:10:10
 <mark class="info">   |</mark>
-<mark class="info">8  |</mark>     let x = &amp;mut 0;
+<mark class="info">10 |</mark>     let x = &amp;mut 0;
 <mark class="info">   |</mark>         <mark class="info">- move occurs because `x` has type `&amp;mut i32`, which does not implement the `Copy` trait</mark>
-<mark class="info">9  |</mark>     let _y = x;
+<mark class="info">11 |</mark>     let _y = x;
 <mark class="info">   |</mark>              <mark class="info">- value moved here</mark>
-<mark class="info">10 |</mark>     dbg!(*x);
+<mark class="info">12 |</mark>     dbg!(*x);
 <mark class="info">   |</mark>          <mark class="error">^^ value used here after move</mark>
 </samp></pre>
 		</section>

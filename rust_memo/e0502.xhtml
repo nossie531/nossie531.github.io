@@ -10,20 +10,20 @@
 		<div class="title">
 			<script>Base.insertTitle();</script>
 		</div>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
+</samp></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
+</samp></pre>
 		<p>
 同じ参照先への不変参照と可変参照は共存できない。このルールはコンパイラによる静的解析や最適化に利用できるだけでなく、取得系操作と更新系操作の分離を促進することで、コードの可読性も高める。
 		</p>
-		<dl class="normal lowProfile">
-			<dt><a href="#ptnA">パターン A</a></dt>
-			<dd>不変参照中の可変参照。</dd>
-			<dt><a href="#ptnB">パターン B</a></dt>
-			<dd>可変参照中の不変参照。</dd>
-		</dl>
 		<aside class="normal">
 			<p>
-初見殺しのパターン。
+初見殺しの落し穴。
 			</p> <p>
-このエラー自体は単純だが､『<a href="topic_ref_lifetime.xhtml">参照のライフタイム</a>』で紹介しているライフタイムについての<a href="topic_ref_lifetime.xhtml#first_sight_killer">初見殺しのパターン</a>の影響を受ける場合があり、その点には注意が必要。
+このエラー自体は単純だが､『<a href="topic_ref_lifetime.xhtml">参照のライフタイム</a>』で紹介しているライフタイムについての<a href="topic_ref_lifetime.xhtml#first_sight_killer">初見殺し</a>の影響を受ける場合があり、その点には注意が必要。
 			</p>
 		</aside>
 		<section>
@@ -43,15 +43,21 @@
 			</p>
 			<ul>
 				<li>
-不変参照の発生個所 ← 必ずエラー個所より前方
+不変参照の発生個所 ← エラー個所より前方
 				</li> <li>
-可変参照の発生個所 ← ここがエラー個所
+可変参照の発生個所 ← エラー個所
 				</li> <li>
-不変参照の使用箇所 ← 必ずエラー個所より後方
+不変参照の使用箇所 ← エラー個所より後方
 				</li>
 			</ul>
 		</section> <section>
 			<h1>パターン</h1>
+			<dl class="normal lowProfile">
+				<dt><a href="#ptnA">パターン A</a></dt>
+				<dd>不変参照中の可変参照。</dd>
+				<dt><a href="#ptnB">パターン B</a></dt>
+				<dd>可変参照中の不変参照。</dd>
+			</dl>
 			<section>
 				<h1 id="ptnA">パターン A.</h1>
 				<p>
