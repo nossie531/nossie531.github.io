@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust トピック: 参照のライフタイム。</title>
+		<title>Rust トピック: 参照のライフタイムまわりのエラー。</title>
 		<link rel="_up" href="index.xhtml"/>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
@@ -12,14 +12,12 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-参照のライフタイムとそれに関連するエラーについて。
+Rust のコンパイルエラーには、参照のライフタイム中 (借用期間中) に、参照先への特定の操作を禁じるものが多い。
 		</p>
 		<section>
 			<h1>関連エラー</h1>
 			<p>
-Rust のコンパイルエラーには、参照のライフタイム中 (借用期間中) に、参照先への特定の操作を禁じるものが多い。
-			</p> <p>
-以下は代表的なそうしたエラー。
+以下はよくあるエラー。
 			</p>
 <pre><samp class="console_rustc">
 <mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
