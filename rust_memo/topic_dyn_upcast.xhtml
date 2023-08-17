@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: dyn 型のアップキャスト。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+<code>dyn</code> 型をアップキャストする方法について。
+		</p> 
+		<aside class="normal">
+			<p>
+このメモの背景。
+			</p> <p>
+2023 年現在、アップキャストがやや面倒。将来のバージョンでは <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/trait-upcasting.html">trait_upcasting</a> が正式に導入されて解決されるかもしれない。
+			</p>
+		</aside>
+		<section>
+			<h1>正しい書き方</h1>
+			<p>
+以下はビルド可能。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let some = &amp;0 as &amp;dyn SomeTrait;
+    let _base = some.as_base();
+}
+
+trait BaseTrait {}
+
+impl&lt;T&gt; BaseTrait for T {}
+
+trait SomeTrait: BaseTrait {
+    fn as_base(&amp;self) -&gt; &amp;dyn BaseTrait;
+}
+
+impl&lt;T: BaseTrait&gt; SomeTrait for T {
+    fn as_base(&amp;self) -&gt; &amp;dyn BaseTrait {
+        self
+    }
+}
+</code></pre>
+		</section> <section>
+			<h1>エラーになる書き方</h1>
+			<p>
+以下はエラーになる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let some = &amp;0 as &amp;dyn SomeTrait;
+	let _base = <mark class="error">some</mark> as &amp;dyn BaseTrait;
+}
+
+trait BaseTrait {}
+
+impl&lt;T&gt; BaseTrait for T {}
+
+trait SomeTrait: BaseTrait {}
+
+impl&lt;T: BaseTrait&gt; SomeTrait for T {}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0658]</mark>: cannot cast `dyn SomeTrait` to `dyn BaseTrait`, trait upcasting coercion is experimental
+<mark class="info"> --&gt;</mark> src\main.rs:3:16
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let _base = some as &amp;dyn BaseTrait;
+<mark class="info">  |</mark>                 <mark class="error">^^^^</mark>
+<mark class="info">  |</mark>
+  = note: see issue #65991 &lt;https://github.com/rust-lang/rust/issues/65991&gt; for more information
+  = note: required when coercing `&amp;dyn SomeTrait` into `&amp;dyn BaseTrait`
+</samp></pre>
+		</section> <section>
+			<h1>補足: 既存のトレイトの場合</h1>
+			<p>
+既存のトレイトへのアップキャストの場合、アップキャスト用のトレイトを実装すればよい。
+			</p> <p>
+以下では <code>Any</code> への不変版と可変版のアップキャストを実装している。
+			</p>
+<pre><code class="language-rust">
+use std::any::Any;
+
+fn main() {
+    let some = &amp;0;
+    let _any = some.as_any_ref();
+}
+
+pub trait AsAny: Any {
+    fn as_any_ref(&amp;self) -&gt; &amp;dyn Any;
+    fn as_any_mut(&amp;mut self) -&gt; &amp;mut dyn Any;
+}
+
+impl&lt;T: Any&gt; AsAny for T {
+    fn as_any_ref(&amp;self) -&gt; &amp;dyn Any {
+        self
+    }
+
+    fn as_any_mut(&amp;mut self) -&gt; &amp;mut dyn Any {
+        self
+    }
+}
+</code></pre>
+		</section>
+	</body>
+</html>
