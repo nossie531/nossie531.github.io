@@ -12,6 +12,7 @@ class Base {
 		Base.#instance.#setupScripts();
 		document.addEventListener("DOMContentLoaded", () => {
 			Base.#instance.#setupCodes();
+			Base.#instance.#setupBlockquotes();
 		});
 	}
 
@@ -53,6 +54,8 @@ class Base {
 		gtag('config', 'G-X01B3QVSC1');
 	}
 
+	/* Chrome は XHTML と ES Module の組合せに未対応のため自前でロード。
+	 - https://bugs.chromium.org/p/chromium/issues/detail?id=717643 */
 	#setupScripts() {
 		const scriptHolder = Base.#getCurrentScript().parentNode;
 		const navJs = Base.#createScriptElement("lib/nav/nav.js");
@@ -61,20 +64,48 @@ class Base {
 		scriptHolder.append(navJs, prismJs);
 	}
 
+	/* Prism.js の tabindex の自動設定を無効化。
+	 - https://github.com/PrismJS/prism/issues/3658 */
 	#setupPrismJs() {
-		/* Prism.js の tabindex の自動設定を無効化。
-		- https://github.com/PrismJS/prism/issues/3658 */
 		Prism.hooks.add("complete", (env) => {
 			env.element.parentElement.removeAttribute("tabindex");
 		});
 	}
 
+	/* ブロックコードをフォーカス可能に設定。*/
 	#setupCodes() {
-		const codes = document.querySelectorAll("pre > code:only-child, pre > samp:only-child");
-		for (const code of codes) {
-			code.setAttribute("tabindex", 0);
+		const selector = "pre > code:only-child, pre > samp:only-child";
+		for (const target of document.querySelectorAll(selector)) {
+			target.setAttribute("tabindex", 0);
 		}
 	}
+
+	/* blockquote 要素内の a 要素の href 属性を調整。*/
+	#setupBlockquotes() {
+		const selector = "blockquote";
+		for (const target of document.querySelectorAll(selector)) {
+			for (const anchor of target.getElementsByTagName("a")) {
+				adjustAnchor(anchor, target);
+			}
+		}
+
+		function adjustAnchor(anchor, blockquote) {
+			const cite = blockquote.getAttribute("cite");
+			const href = anchor.getAttribute("href");
+			if (cite && href && !isAbsUrl(href)) {
+				anchor.href = (new URL(href, cite)).toString();
+			}
+		}
+
+		/* URL が絶対かを判定。
+		JavaScript 標準の URL は相対から絶対へ解決可能だが相対 URL を持てない。
+		そのため、下記ではややまわりくどい解決策を取っている…。
+		 - https://github.com/whatwg/url/issues/531 */
+		function isAbsUrl(urlStr) {
+			return new URL(urlStr, "dummy://dummy/").protocol !== "dummy:";
+		}
+	}
+
 }
 
 Base.init();

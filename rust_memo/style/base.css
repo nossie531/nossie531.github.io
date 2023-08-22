@@ -8,6 +8,7 @@
 	semantic,
 	ui,
 	util,
+	quote,
 	import_nav,
 	import_syntax_highlight,
 	import_console_rustc,
@@ -22,6 +23,7 @@
 
 @layer root {
 	:root {
+		--mt-font: "Consolas", "Meiryo", monospace;
 		font-family: "Meiryo", sans-serif;
 		font-size: 0.93em;
 		color: var(--fg-color);
@@ -88,7 +90,7 @@
 	}
 
 	samp, code, *.monospace {
-		font-family: "Consolas", "Meiryo", monospace;
+		font-family: var(--mt-font);
 		hyphens: none;
 		tab-size: 4;
 	}
@@ -142,7 +144,7 @@
 	}
 
 	*.mt {
-		font-family: "Consolas", "Meiryo", monospace;
+		font-family: var(--mt-font);
 	}
 
 	*.nw {
@@ -314,6 +316,48 @@
 
 	*.todo {
 		color: var(--x-color);
+	}
+}
+
+@layer quote {
+	blockquote {
+		margin: 0;
+		padding: 0 1em;
+		border: thin dashed;
+	}
+
+	blockquote::before, blockquote::after {
+		content: "";
+		margin-top: 2ex;
+		display: block;
+	}
+
+	blockquote * {
+		all: revert;
+	}
+
+	blockquote code {
+		font-family: var(--mt-font);
+	}
+
+	blockquote a:link, blockquote a:visited {
+		color: var(--link-color);
+	}
+
+	blockquote[cite^="https://doc.rust-lang.org/"] {
+		font-family: serif;
+	}
+
+	@media screen and (prefers-color-scheme: light) {
+		blockquote {
+			background: hsla(0, 0%, 100%, 0.3);
+		}
+	}
+
+	@media screen and (prefers-color-scheme: dark) {
+		blockquote {
+			background: hsla(0, 0%, 100%, 0.1);
+		}
 	}
 }
 
