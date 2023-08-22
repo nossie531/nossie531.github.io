@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: セットやマップからの検索と Borrow トレイト。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+<code>std</code> クレートのセットやマップ (<code>BTreeSet</code>, <code>HashSet</code>, <code>BTreeMap</code>, <code>HashMap</code>) における検索系のメソッドについて。検索引数の型、検索対象の型、それから <code>Borrow</code> トレイト、それぞれの関係を紹介する。
+		</p> 
+		<section>
+			<h1>基本ルール</h1>
+			<p>
+検索メソッドにおける検索引数の型は、検索対象の型の参照型を使うのが一般的だが、検索対象の型から <code>Borrow</code> でその参照型が得られ、かつ検索のための <code>Eq</code>, <code>Ord</code>, <code>Hash</code> などのトレイトがあれば、他の型でもよい。
+			</p> <p>
+ただしその場合、その型は上記の性質の他にも、いくつか追加のルールにも従う必要がある (詳細は次セクションでの個別のメソッドの説明を参照)。
+			</p>
+		</section> <section>
+			<h1 id="each_method">各メソッド</h1>
+			<p>
+代表的なメソッドについて見てみる。
+			</p>
+			<section>
+				<h1><code>BTreeMap::get</code></h1>
+				<p>
+以下はメソッドの宣言部分。
+				</p>
+<pre><code class="language-rust">
+impl&lt;K, V, A&gt; BTreeMap&lt;K, V, A&gt;
+where
+    A: Allocator + Clone,
+{
+	// ...
+
+	pub fn get&lt;Q&gt;(&amp;self, key: &amp;Q) -&gt; Option&lt;&amp;V&gt;
+	where
+		K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + ?Sized,
+	{
+		// ...
+	}
+
+	// ...
+}
+</code></pre>
+				<p>
+検索対象の型 <code>K</code> と検索引数の型 <code>&amp;Q</code> について、<code>K: Borrow&lt;Q&gt;</code> の制約があるため、前者から後者へと変換できる。ここで、<code>K</code> と <code>Q</code> はどちらも <code>Ord</code> が必要になる。
+				</p> <p>
+ただし、追加ルールがあり、<code>K</code> から <code>Q</code> への変換の前後で <code>Ord</code> による値同士の関係性は維持されなければならない。
+				</p> <p>
+以下は <cite><a href="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html#method.get">rustdoc</a></cite> からの引用。
+				</p>
+				<blockquote cite="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html#method.get">
+					<p>
+The key may be any borrowed form of the map’s key type, but the ordering on the borrowed form must match the ordering on the key type.
+					</p>
+				</blockquote>
+			</section> <section>
+				<h1><code>HashMap::get</code></h1>
+				<p>
+以下はメソッドの宣言部分。
+				</p>
+<pre><code class="language-rust">
+impl&lt;K, V, S&gt; HashMap&lt;K, V, S&gt;
+where
+    K: Eq + Hash,
+    S: BuildHasher,
+{
+	// ...
+
+	pub fn get&lt;Q&gt;(&amp;self, k: &amp;Q) -&gt; Option&lt;&amp;V&gt;
+	where
+		K: Borrow&lt;Q&gt;,
+		Q: Hash + Eq + ?Sized,
+	{
+		// ...
+	}
+
+	// ...
+}
+</code></pre>
+				<p>
+検索対象の型 <code>K</code> と検索引数の型 <code>&amp;Q</code> について、<code>K: Borrow&lt;Q&gt;</code> の制約があるため、前者から後者へと変換できる。ここで、<code>K</code> と <code>Q</code> はどちらも <code>Eq + Hash</code> が必要になる。
+				</p> <p>
+ただし、追加ルールがあり、<code>K</code> から <code>Q</code> への変換の前後で <code>Hash</code> が生成する値は同じでなければならない。また、<code>Eq</code> による値同士の関係性も維持されなければならない。
+				</p> <p>
+以下は <cite><a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html#method.get">rustdoc</a></cite> からの引用。
+				</p>
+				<blockquote cite="https://doc.rust-lang.org/std/collections/struct.HashMap.html#method.get">
+					<p>
+The key may be any borrowed form of the map’s key type, but <a href="../hash/trait.Hash.html" title="trait std::hash::Hash"><code>Hash</code></a> and <a href="../cmp/trait.Eq.html" title="trait std::cmp::Eq"><code>Eq</code></a> on the borrowed form <em>must</em> match those for the key type.
+					</p>
+				</blockquote>
+			</section>
+		</section> <section>
+			<h1>使用例</h1>
+			<section>
+				<h1>通常版</h1>
+				<p>
+以下は最もよくある使い方。
+				</p> <p>
+検索対象は <code>i32</code>、検索引数はその参照型の <code>&amp;i32</code> を利用。
+				</p>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+
+fn main() {
+    let mut dict = HashMap::&lt;i32, String&gt;::new();
+    dict.insert(0, "foo".to_string());
+    dict.insert(1, "bar".to_string());
+    dict.insert(2, "baz".to_string());
+
+	let result = dict.get(&amp;1);
+
+    assert_eq!(result , Some(&amp;"bar".to_string()));
+}
+</code></pre>
+			</section> <section>
+				<h1>キー型が <code>String</code></h1>
+				<p>
+これもよくある使い方。
+				</p> <p>
+検索対象は <code>String</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;str</code> を利用。
+				</p>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+
+fn main() {
+    let mut dict = HashMap::&lt;String, String&gt;::new();
+    dict.insert("Foo".to_string(), "foo".to_string());
+    dict.insert("Bar".to_string(), "bar".to_string());
+    dict.insert("Baz".to_string(), "baz".to_string());
+
+    let result = dict.get("Bar");
+
+    assert_eq!(result, Some(&amp;"bar".to_string()));
+}
+</code></pre>
+			</section> <section>
+				<h1>キー型が <code>Box</code></h1>
+				<p>
+以下では Box 化した型を使用。
+				</p> <p>
+検索対象は <code>Box&lt;i32&gt;</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;i32</code> を利用。
+				</p>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+
+fn main() {
+    let mut dict = HashMap::&lt;Box&lt;i32&gt;, String&gt;::new();
+    dict.insert(Box::new(0), "foo".to_string());
+    dict.insert(Box::new(1), "bar".to_string());
+    dict.insert(Box::new(2), "baz".to_string());
+
+    let result = dict.get(&amp;1);
+
+    assert_eq!(result, Some(&amp;"bar".to_string()));
+}
+</code></pre>
+			</section> <section>
+				<h1>キー型が独自型</h1>
+				<p>
+以下では Key 型を新たに定義。
+				</p> <p>
+検索対象は <code>Key</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;u32</code> を利用。
+				</p>
+<pre><code class="language-rust">
+use std::{borrow::Borrow, collections::HashMap, hash::Hash};
+
+fn main() {
+    let mut dict = HashMap::&lt;Key, String&gt;::new();
+    dict.insert(Key { id: 0 }, "foo".to_string());
+    dict.insert(Key { id: 1 }, "bar".to_string());
+    dict.insert(Key { id: 2 }, "baz".to_string());
+
+	let result = dict.get(&amp;1);
+
+    assert_eq!(result, Some(&amp;"bar".to_string()));
+}
+
+#[derive(PartialEq, Eq, Hash)]
+struct Key {
+    id: u32,
+}
+
+impl Borrow&lt;u32&gt; for Key {
+    fn borrow(&amp;self) -&gt; &amp;u32 {
+        &amp;self.id
+    }
+}
+</code></pre>
+				<p>
+この検索が成り立つのは、<code>derive</code> で自動実装される <code>Hash</code>、そして <code>Key</code> の <code>Borrow&lt;u32&gt;</code> から生成される <code>&amp;u32</code> に実装されている <code>Hash</code>、両者の生成するハッシュ値が同じため。
+				</p>
+			</section>
+		</section>
+	</body>
+</html>
