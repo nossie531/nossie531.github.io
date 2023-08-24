@@ -11,54 +11,35 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-<code>dyn</code> 型をアップキャストする方法について。
+<code>dyn</code> 型 (動的型) のアップキャストについて。
 		</p> 
 		<aside class="normal">
 			<p>
 このメモの背景。
 			</p> <p>
-2023 年現在、アップキャストがやや面倒。将来のバージョンでは <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/trait-upcasting.html">trait_upcasting</a> が正式に導入されて解決されるかもしれない。
+2023 年現在、動的型から動的型へのアップキャストが面倒。
+			</p> <p>
+将来は <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/trait-upcasting.html">trait_upcasting</a> で解決されるかもしれない。
 			</p>
 		</aside>
 		<section>
-			<h1>正しい書き方</h1>
+			<h1>失敗例</h1>
 			<p>
-以下はビルド可能。
+動的型から動的型へのキャストはエラーになる。
 			</p>
 <pre><code class="language-rust">
 fn main() {
     let some = &amp;0 as &amp;dyn SomeTrait;
-    let _base = some.as_base();
+    let _base = <mark class="error">some</mark> as &amp;dyn BaseTrait;
 }
+
+// -- BaseTrait -- //
 
 trait BaseTrait {}
 
 impl&lt;T&gt; BaseTrait for T {}
 
-trait SomeTrait: BaseTrait {
-    fn as_base(&amp;self) -&gt; &amp;dyn BaseTrait;
-}
-
-impl&lt;T: BaseTrait&gt; SomeTrait for T {
-    fn as_base(&amp;self) -&gt; &amp;dyn BaseTrait {
-        self
-    }
-}
-</code></pre>
-		</section> <section>
-			<h1>エラーになる書き方</h1>
-			<p>
-以下はエラーになる。
-			</p>
-<pre><code class="language-rust">
-fn main() {
-    let some = &amp;0 as &amp;dyn SomeTrait;
-	let _base = <mark class="error">some</mark> as &amp;dyn BaseTrait;
-}
-
-trait BaseTrait {}
-
-impl&lt;T&gt; BaseTrait for T {}
+// -- SomeTrait -- //
 
 trait SomeTrait: BaseTrait {}
 
@@ -75,35 +56,115 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
   = note: required when coercing `&amp;dyn SomeTrait` into `&amp;dyn BaseTrait`
 </samp></pre>
 		</section> <section>
-			<h1>補足: 既存のトレイトの場合</h1>
+			<h1>回避策</h1>
 			<p>
-既存のトレイトへのアップキャストの場合、アップキャスト用のトレイトを実装すればよい。
+アップキャスト用のメソッドを派生側のトレイトに作る。
 			</p> <p>
-以下では <code>Any</code> への不変版と可変版のアップキャストを実装している。
+つまり、キャストの位置をトレイトの実装内へと移す。これにより、キャスト対象の静的型が分かっている箇所でキャストできるため、静的型から動的型へのキャストとなり、エラーにはならなくなる。
 			</p>
 <pre><code class="language-rust">
-use std::any::Any;
-
 fn main() {
-    let some = &amp;0;
-    let _any = some.as_any_ref();
+    let some = &amp;0 as &amp;dyn SomeTrait;
+    let _base = some.as_base();
 }
 
-pub trait AsAny: Any {
-    fn as_any_ref(&amp;self) -&gt; &amp;dyn Any;
-    fn as_any_mut(&amp;mut self) -&gt; &amp;mut dyn Any;
+// -- BaseTrait -- //
+
+trait BaseTrait {}
+
+impl&lt;T&gt; BaseTrait for T {}
+
+// -- SomeTrait -- //
+
+trait SomeTrait: BaseTrait {
+    fn as_base(&amp;self) -&gt; &amp;dyn BaseTrait;
 }
 
-impl&lt;T: Any&gt; AsAny for T {
-    fn as_any_ref(&amp;self) -&gt; &amp;dyn Any {
-        self
-    }
-
-    fn as_any_mut(&amp;mut self) -&gt; &amp;mut dyn Any {
+impl&lt;T: BaseTrait&gt; SomeTrait for T {
+    fn as_base(&amp;self) -&gt; &amp;dyn BaseTrait {
         self
     }
 }
 </code></pre>
+		</section> <section>
+			<h1>楽な実装</h1>
+			<p>
+派生側のトレイトが多い場合、個別に上の実装を行うのは面倒。
+			</p> <p>
+以下は考えられる対策。
+			</p>
+			<div class="sub">
+				<h2>基底側でのアップキャスト</h2>
+				<p>
+アップキャスト用メソッドを派生側ではなく基底側に作っておく。
+				</p> <p>
+当然、この方法は基底側が定義済だと使えない。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let some = &amp;0 as &amp;dyn SomeTrait;
+    let _base = some.as_base();
+}
+
+// -- BaseTrait -- //
+
+trait BaseTrait {
+    fn as_base(&amp;self) -&gt; &amp;dyn BaseTrait;
+}
+
+impl&lt;T&gt; BaseTrait for T {
+    fn as_base(&amp;self) -&gt; &amp;dyn BaseTrait {
+        self
+    }
+}
+
+// -- SomeTrait -- //
+
+trait SomeTrait: BaseTrait {}
+
+impl&lt;T: BaseTrait&gt; SomeTrait for T {}
+</code></pre>
+			</div>
+			<div class="sub">
+				<h2>アップキャスト用トレイト</h2>
+				<p>
+予めアップキャスト用のトレイトを作っておく。
+				</p> <p>
+なお、この方法は基底側が定義済でも使える。
+				</p> <p>
+以下では定義済のトレイト <code>Any</code> のために <code>AsAny</code> を用意している。
+				</p>
+<pre><code class="language-rust">
+use std::any::Any;
+
+fn main() {
+    let some = &amp;0 as &amp;dyn SomeTrait;
+    let _any = some.as_any();
+}
+
+// -- AsAny -- //
+
+trait AsAny: Any {
+    fn as_any(&amp;self) -&gt; &amp;dyn Any;
+}
+
+impl&lt;T: Any&gt; AsAny for T {
+    fn as_any(&amp;self) -&gt; &amp;dyn Any {
+        self
+    }
+}
+
+// -- SomeTrait -- //
+
+trait SomeTrait: AsAny {
+    fn test(&amp;self) {
+        let _any = self.as_any();
+    }
+}
+
+impl&lt;T: Any&gt; SomeTrait for T {}
+</code></pre>
+			</div>
 		</section>
 	</body>
 </html>
