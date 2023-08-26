@@ -156,7 +156,7 @@ impl&lt;T: Any&gt; AsAny for T {
 
 // -- SomeTrait -- //
 
-trait SomeTrait: AsAny {
+trait SomeTrait: Any + AsAny {
     fn test(&amp;self) {
         let _any = self.as_any();
     }
