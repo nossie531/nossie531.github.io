@@ -29,6 +29,10 @@
 		color: var(--fg-color);
 	}
 
+	:lang(ja) {
+		text-justify: inter-character;
+	}
+
 	@media screen {
 		:root {
 			background-color: var(--bg-color);
@@ -89,7 +93,7 @@
 		quotes: "\201C" "\201D" "\2018" "\2019";
 	}
 
-	samp, code, *.monospace {
+	pre, samp, code, *.monospace {
 		font-family: var(--mt-font);
 		hyphens: none;
 		tab-size: 4;
@@ -106,7 +110,7 @@
 		/* TODO: FireFox の対応待ち (単位 lh)。
 		 * - code-lh の使用箇所を削除。
 		 * - line-height: initial へ変更予定。*/
-		--code-lh: 1.2em;
+		--code-lh: 1.5em;
 		line-height: var(--code-lh);
 	}
 
@@ -390,10 +394,6 @@
 	}
 
 	pre > code[class|="language"] {
-		/* TODO: FireFox の対応待ち (単位 lh)。
-		 * - code-lh の使用箇所を削除。
-		 * - line-height: initial へ変更予定。*/
-		line-height: var(--code-lh);
 		background-color: var(--code-bg-color);
 	}
 

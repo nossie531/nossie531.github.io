@@ -153,7 +153,7 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 				<div class="sub">
 					<h2>その他の注意点</h2>
 					<p>
-トレイトと <code>self</code>、それから <code>Sized</code> が関わる落とし穴には、このセクションで紹介したものの他にも、ドット演算子による自動的な型変換の影響で『<a href="topic_dot_and_self.xhtml#disabled_sized"><code>Sized</code> 境界が無効に見える例</a>』がよく発生する。こちらはブランケット実装に関わるものだが、筆者は両者の問題をうまく切り分けられず混乱した事がある…。
+上記の仕様とはまた別件で、同じキーワード (トレイト，<code>self</code>，<code>Sized</code>) を含む話題として、メソッドによる自動型変換と関係する『<a href="topic_dot_and_self.xhtml#disabled_sized"><code>Sized</code> 境界が無効に見える例</a>』がある。混同するとよくないので注意。
 					</p>
 				</div>
 			</section>

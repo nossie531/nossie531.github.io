@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust トピック: self とドット演算子。</title>
+		<title>Rust トピック: メソッド呼出のための自動型変換。</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,19 +11,14 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-<code>self</code> とドット演算子によるメソッドの呼出について。
+メソッド呼出ではドット演算子の左辺が <code>self</code> に適合するよう、自動型変換がある。
 		</p> <p>
-ドット演算子はメソッドの呼出のために <code>self</code> に適合するよう左辺側に様々な型変換を行う。
+この機能は便利だが、初心者にとって予想しにくい挙動につながる場合がある。
 		</p>
-		<aside class="normal moan">
-			<p>
-より単純な糖衣構文だと思っていると、落とし穴にはまる事がある。
-			</p>
-		</aside>
 		<section>
-			<h1>型変換の仕様</h1>
+			<h1>仕様</h1>
 			<p>
-ドット演算子の左辺が <code>self</code> の型に適合するまで、以下のルールを再帰的に適用する。
+左辺が <code>self</code> の型に適合するまで、以下の型変換ルールを再帰的に適用する。
 			</p>
 			<ol>
 				<li>
@@ -40,7 +35,7 @@
 					</p>
 				</li> <li>
 					<p>
-元の型が Deref を実装するなら、参照を外した型を試す (autoderef)。
+元の型が <code>Deref</code> を実装するなら、参照を外した型を試す (autoderef)。
 					</p>
 				</li> <li>
 					<p>
@@ -49,51 +44,65 @@
 				</li>
 			</ol>
 		</section> <section>
-			<h1>筆者の体験談</h1>
+			<h1>弊害</h1>
+			<p>
+型変換について失念、または異なる型変換を期待していると、予想外の型で処理が進む。
+			</p> <p>
+これにより、コンパイルエラーのメッセージが的外れに思えたり、より悪くコンパイルエラーが出なかった場合だと、任意の型を格納できる領域に、本来の格納対象の型ではなく、その参照型が格納されていた、などの事態が起きてしまう。
+			</p> 
+		</section> <section>
+			<h1>対策</h1>
+			<p>
+関数呼出の記法では、ドット演算子による記法とは違い、問題となる自動型変換がない。そのため、上記の弊害を疑っている場合、記法を変えると問題の理解に役立つ可能性がある。
+			</p> <p>
+例えば、<code>x.method()</code> の場合、<code>&lt;SomeStruct&gt;::<wbr/>method(x)</code> や <code>&lt;SomeStruct&gt;::<wbr/>method(&amp;x)</code> 等を試すとよい (参考: トレイトが絡む場合は <code>&lt;&amp;SomeStruct as SomeTrait&gt;::<wbr/>method(&amp;x)</code> のような記法も使える)。
+			</p>
+		</section> <section>
+			<h1>体験談</h1>
 			<p>
 ここでは筆者がしばらくハテナ？となった事例を紹介する。
 			</p>
 			<div class="sub">
 				<h2 id="disabled_sized"><code>Sized</code> 境界が無効に見える例</h2>
 				<p>
-以下のコードでは、前述のルールを知らないと <code>Sized</code> 境界が機能していないように見える。つまり、ルールの一つ目だけでは <code>Sized</code> 境界によるコンパイルエラーになるべきで、ルールの二つ目によって初めて正常なコードであると評価できる。
+以下のコードでは、前述のルールを知らないと、<code>Sized</code> 境界が機能していないように見える。つまり、ルールの一つ目だけでは <code>Sized</code> 境界によるコンパイルエラーになるべきで、ルールの二つ目によって初めて正常なコードであると評価できる。
 				</p>
 				<ol>
 					<li>
 						<p>
-ルールの一つ目を適用。
+一つ目のルールの適用は失敗する。
 						</p>
 						<ul>
 							<li>
 								<p>
-<code>&amp;str</code> をそのまま使おうとする。
+<code>&lt;str as SomeTrait&gt;::method(text)</code> が試される。
 								</p>
 							</li> <li>
 								<p>
-<code>&amp;self</code> つまり <code>&amp;T</code> の実際の型は <code>&amp;str</code> が指定される。
+つまり、<code>T</code> は <code>str</code> になる。
 								</p>
 							</li> <li>
 								<p>
-結果、<code>T</code> は <code>str</code> となり、これは <code>Sized</code> でないため失敗する。
+しかし、<code>T</code> は <code>Sized</code> に違反する。
 								</p>
 							</li>
 						</ul>
 					</li> <li>
 						<p>
-ルールの二つ目を適用。
+二つ目のルールの適用は失敗する。
 						</p>
 						<ul>
 							<li>
 								<p>
-<code>&amp;str</code> を参照して <code>&amp;&amp;str</code> とする。
+<code>&lt;&amp;str as SomeTrait&gt;::method(&amp;text)</code> が試される。
 								</p>
 							</li> <li>
 								<p>
-<code>&amp;self</code> つまり <code>&amp;T</code> の実際の型は <code>&amp;&amp;str</code> が指定される。
+つまり、<code>T</code> は <code>&amp;str</code> になる。
 								</p>
 							</li> <li>
 								<p>
-結果、<code>T</code> は <code>&amp;str</code> となり、これは <code>Sized</code> のため成功する。
+ここで、<code>T</code> は <code>Sized</code> に適合する。
 								</p>
 							</li>
 						</ul>
@@ -101,13 +110,8 @@
 				</ol>
 <pre><code class="language-rust">
 fn main() {
-    let str: &amp;str = "abc";
-
-    str.method();
-	// これは以下のどれかに書換可能。
-    // (&amp;str).method();
-    // &lt;&amp;str&gt;::method(&amp;str);
-    // SomeTrait::method(&amp;str);
+    let text: &amp;str = "abc";
+    text.method();
 }
 
 trait SomeTrait {
@@ -118,6 +122,86 @@ impl&lt;T: Sized&gt; SomeTrait for T {
     // NOP.
 }
 </code></pre>
+			</div>
+			<div class="sub">
+				<h2>意味不明なコンパイルエラーになる例</h2>
+				<p>
+以下のコードでは、前述のルールを知らないと、コンパイル時のエラーメッセージが理解できない。つまり、どのルールもエラーにはなるが、コンパイラはそれらの中から二つ目のルールに対してのエラーメッセージのみを出力する (<code>T</code> が暗黙の <code>Sized</code> 境界を持つ事、それから <code>Any</code> が <code>static</code> ライフタイム境界を持つ事に注意)。
+				</p>
+				<ol>
+					<li>
+						<p>
+一つ目のルールの適用は失敗する。
+						</p>
+						<ul>
+							<li>
+								<p>
+<code>&lt;[i32] as SomeTrait&gt;::method(arr)</code> が試される。
+								</p>
+							</li> <li>
+								<p>
+つまり、<code>T</code> は <code>[i32]</code> になる。
+								</p>
+							</li> <li>
+								<p>
+しかし、<code>T</code> は <code>Sized</code> に違反する。
+								</p>
+							</li>
+						</ul>
+					</li> <li>
+						<p>
+二つ目のルールの適用も失敗する。
+						</p>
+						<ul>
+							<li>
+								<p>
+<code>&lt;&amp;[i32] as SomeTrait&gt;::method(&amp;arr)</code> が試される。
+								</p>
+							</li> <li>
+								<p>
+つまり、<code>T</code> は <code>&amp;[i32]</code> になる。
+								</p>
+							</li> <li>
+								<p>
+ここで、<code>T</code> は <code>Sized</code> に適合する。
+								</p>
+							</li> <li>
+								<p>
+しかし、<code>T</code> は <code>'static</code> に違反する。
+								</p>
+							</li>
+						</ul>
+					</li>
+				</ol>
+<pre><code class="language-rust">
+use std::any::Any;
+
+trait SomeTrait {
+    fn method(&amp;self) {}
+}
+
+impl&lt;T: Any&gt; SomeTrait for T {
+    // NOP.
+}
+
+fn test(arr: &amp;[i32]) {
+	<mark class="error">arr.method()</mark>;
+}
+</code></pre>
+<pre><samp class="console_rustc">
+<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+<mark class="info">  --&gt;</mark> src\main.rs:12:5
+<mark class="info">   |</mark> 
+<mark class="info">11 |</mark> fn test(arr: &amp;[i32]) {
+<mark class="info">   |</mark>         <mark class="info">---  - let's call the lifetime of this reference `'1`</mark>
+<mark class="info">   |</mark>         <mark class="info">|</mark>
+<mark class="info">   |</mark>         <mark class="info">`arr` is a reference that is only valid in the function body</mark>
+<mark class="info">12 |</mark>     arr.method();
+<mark class="info">   |</mark>     <mark class="error">^^^^^^^^^^^^</mark>
+<mark class="info">   |</mark>     <mark class="error">|</mark>
+<mark class="info">   |</mark>     <mark class="error">`arr` escapes the function body here</mark>
+<mark class="info">   |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
+</samp></pre>
 			</div>
 		</section>
 	</body>
