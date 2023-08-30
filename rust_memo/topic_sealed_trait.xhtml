@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust トピック: Sealed トレイト。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+Sealed トレイトは Rust でよく使われるデザインパターンである。トレイトにクレート内でのみ公開されるアイテムを組み込む事で、外部のクレートから使用はできるが、実装や派生はできないトレイトを作成する。
+		</p> 
+		<section>
+			<h1>使用例</h1>
+			<p>
+以下では、<code>SomeTrait</code> の実装は <code>f32</code> と <code>f64</code> のみとなり、他クレートからの追加はできない。なぜなら、<code>SomeTrait</code> の実装には、<code>private::<wbr/>Sealed</code> の実装が前提になるが、クレート外ではその名前は使用できない。
+			</p>
+<pre><code class="language-rust">
+pub(crate) mod private {
+    pub trait Sealed {}
+}
+
+pub trait SomeTrait: private::Sealed {
+    fn test(&amp;self) {
+        // ...
+    }
+}
+
+impl private::Sealed for f32 {}
+impl private::Sealed for f64 {}
+impl SomeTrait for f32 {}
+impl SomeTrait for f64 {}
+</code></pre>
+		</section> <section>
+			<h1>利点</h1>
+			<section>
+				<h1>考察対象の限定</h1>
+				<div class="sub">
+					<h2>従来手法の欠点</h2>
+					<p>
+トレイトの実装は後から増やせる。そのため、トレイトを扱う場合、それらに共通した一般的な動作について考えなければならない。
+					</p>
+				</div>
+				<div class="sub">
+					<h2>パターンの利点</h2>
+					<p>
+Sealed トレイトパターンを使うと、トレイトの実装はクレート内で定義された種類に限定される。これにより、考察対象を減らす事ができる。
+					</p>
+				</div>
+			</section> <section>
+				<h1>互換性の維持</h1>
+				<div class="sub">
+					<h2>従来手法の欠点</h2>
+					<p>
+トレイトにデフォルト実装のないメソッドを追加すると、そのトレイトの実装箇所の全てで、そのメソッドの実装が必要になる。当然、外部クレートでの実装箇所についても作業が必要となるため、これはバージョン間の互換性に問題を生じさせる。
+					</p>
+				</div>
+				<div class="sub">
+					<h2>パターンの利点</h2>
+					<p>
+Sealed トレイトパターンを使うと、外部クレートにトレイトの実装がない事が保証される。そのため、気軽にメソッドの追加を行える (追加以外、変更や削除では使用箇所への影響があるため、この限りでない)。
+					</p>
+				</div>
+			</section>
+		</section>
+	</body>
+</html>
