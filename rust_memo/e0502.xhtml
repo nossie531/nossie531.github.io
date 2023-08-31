@@ -10,10 +10,10 @@
 		<div class="title">
 			<script>Base.insertTitle();</script>
 		</div>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
 </samp></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
 </samp></pre>
 		<p>
@@ -71,7 +71,7 @@ fn main() {
     println!("{}", data_ref);
 }
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
  --&gt; src\main.rs:4:6
   |
@@ -95,7 +95,7 @@ fn main() {
     *data_mut = 1;
 }
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
  --&gt; src\main.rs:4:20
   |

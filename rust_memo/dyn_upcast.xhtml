@@ -45,7 +45,7 @@ trait SomeTrait: BaseTrait {}
 
 impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0658]</mark>: cannot cast `dyn SomeTrait` to `dyn BaseTrait`, trait upcasting coercion is experimental
 <mark class="info"> --&gt;</mark> src\main.rs:3:16
 <mark class="info">  |</mark>

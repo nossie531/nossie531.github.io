@@ -10,13 +10,13 @@
 		<div class="title">
 			<script>Base.insertTitle();</script>
 		</div>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
 </samp></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0521]</mark>: borrowed data escapes outside of method
 </samp></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0521]</mark>: borrowed data escapes outside of closure
 </samp></pre>
 		<p>
@@ -57,7 +57,7 @@ fn use_static(_: &amp;'static i32) {
     /* ... */
 }
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
 <mark class="info"> --&gt;</mark> src\main.rs:2:5
 <mark class="info">  |</mark>
@@ -87,7 +87,7 @@ fn use_static(_: &amp;'static i32) {
     /* ... */
 }
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
 <mark class="info"> --&gt;</mark> src\main.rs:2:5
 <mark class="info">  |</mark>
@@ -119,7 +119,7 @@ fn use_any&lt;T: Any&gt;(_: T) {
     /* ... */
 }
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
 <mark class="info"> --&gt;</mark> src\main.rs:4:5
 <mark class="info">  |</mark>
@@ -149,7 +149,7 @@ fn main() {
     };
 }
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0521]</mark>: borrowed data escapes outside of closure
 <mark class="info"> --&gt;</mark> src\main.rs:4:9
 <mark class="info">  |</mark>

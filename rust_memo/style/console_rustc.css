@@ -1,11 +1,11 @@
 @charset "utf-8";
 
-samp.console_rustc > mark.info {
+samp.console-rustc > mark.info {
 	color: hsla(195, 90%, 40%, 0.8);
 	background-color: transparent;
 }
 
-samp.console_rustc > mark.error {
+samp.console-rustc > mark.error {
 	color: hsla(5, 90%, 60%, 0.8);
 	background-color: transparent;
 }

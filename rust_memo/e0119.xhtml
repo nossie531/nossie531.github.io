@@ -10,7 +10,7 @@
 		<div class="title">
 			<script>Base.insertTitle();</script>
 		</div>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `SomeTrait`
 </samp></pre>
 		<p>
@@ -42,7 +42,7 @@ trait TargetTrait { fn f(&amp;self); }
 impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
 <mark class="error">impl TargetTrait for SomeStruct</mark> { fn f(&amp;self) { /* ... */ } }
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `SomeStruct`
 <mark class="info"> --&gt;</mark> src\main.rs:5:1
 <mark class="info">  |</mark>
@@ -63,7 +63,7 @@ trait TargetTrait {}
 impl TargetTrait for SomeStruct {}
 impl TargetTrait for SomeStruct {}
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `SomeStruct`
 <mark class="info"> --&gt;</mark> src\sub.rs:5:1
 <mark class="info">  |</mark>
@@ -85,7 +85,7 @@ trait TargetTrait {}
 impl TargetTrait for SomeStruct {}
 <mark class="error">impl&lt;T&gt; TargetTrait for T</mark> {}
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `SomeStruct`
 <mark class="info"> --&gt;</mark> src\sub.rs:5:1
 <mark class="info">  |</mark>
@@ -110,7 +110,7 @@ trait TargetTrait {}
 impl&lt;T&gt; TargetTrait for T where T: SomeTraitX {}
 <mark class="error">impl&lt;T&gt; TargetTrait for T</mark> where T: SomeTraitY {}
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait`
 <mark class="info"> --&gt;</mark> src\main.rs:6:1
 <mark class="info">  |</mark>
@@ -134,7 +134,7 @@ impl&lt;T&gt; SomeTrait for T {}
 impl&lt;X: SomeTrait&gt; TargetTrait for X {}
 <mark class="error">impl TargetTrait for i32</mark> {}
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `i32`
 <mark class="info"> --&gt;</mark> src\main.rs:6:1
 <mark class="info">  |</mark>
@@ -158,7 +158,7 @@ impl&lt;T&gt; SomeTrait for T {}
 impl&lt;T, X: SomeTrait&gt; TargetTrait&lt;X&gt; for T {}
 <mark class="error">impl&lt;T&gt; TargetTrait&lt;i32&gt; for T</mark> {}
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait&lt;i32&gt;`
 <mark class="info"> --&gt;</mark> src\main.rs:6:1
 <mark class="info">  |</mark>
@@ -184,7 +184,7 @@ impl&lt;T&gt; TargetTrait for T {}
     }
 }
 </code></pre>
-<pre><samp class="console_rustc">
+<pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `From&lt;Box&lt;(dyn TargetTrait + 'static)&gt;&gt;` for type `Box&lt;(dyn TargetTrait + 'static)&gt;`
 <mark class="info"> --&gt;</mark> src\main.rs:4:1
 <mark class="info">  |</mark>
