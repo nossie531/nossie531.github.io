@@ -112,34 +112,34 @@
 		 * - line-height: initial へ変更予定。*/
 		--code-lh: 1.5em;
 		line-height: var(--code-lh);
-	}
 
-	pre > code:only-child,
-	pre > samp:only-child {
-		display: block;
-		padding: 0.5rem;
-		overflow: auto;
-		scrollbar-width: thin;
-		background-color: var(--code-bg-color);
-	}
+		> code:only-child {
+			border: thin solid;
+			border-radius: 0.5rem;
+			border-color: var(--edge-color);
+		}
 
-	pre > code:only-child {
-		border: thin solid;
-		border-radius: 0.5rem;
-		border-color: var(--edge-color);
-	}
+		> samp:only-child {
+			border: thin solid;
+			border-color: var(--edge-color);
+		}
 
-	pre > samp:only-child {
-		border: thin solid;
-		border-color: var(--edge-color);
-	}
+		> code:only-child,
+		> samp:only-child {
+			display: block;
+			padding: 0.5rem;
+			overflow: auto;
+			scrollbar-width: thin;
+			background-color: var(--code-bg-color);
+		}
 
-	pre > code:only-child::before,
-	pre > samp:only-child::before {
-		content: "";
-		display: block;
-		margin-bottom: calc(var(--code-lh) * -1);
-		margin-bottom: -1lh;
+		> code:only-child::before,
+		> samp:only-child::before {
+			content: "";
+			display: block;
+			margin-bottom: calc(var(--code-lh) * -1);
+			margin-bottom: -1lh;
+		}
 	}
 
 	a:link, a:visited {
@@ -184,57 +184,55 @@
 }
 
 @layer normal {
-	@layer dl {
-		dl.normal > dt::before {
+	dl.normal {
+		> dt::before {
 			content: "≫";
 			margin-right: 0.5ch;
 		}
 
-		dl.normal > dd {
+		> dd {
 			margin-left: 1.5ch;
 		}
 
-		dl.normal.lowProfile {
+		&.lowProfile {
 			display: grid;
 			grid-template-columns: auto minmax(0, 1fr);
 		}
 
-		dl.normal.lowProfile > dt {
+		&.lowProfile > dt {
 			align-self: baseline;
 		}
 
-		dl.normal.lowProfile > dd {
+		&.lowProfile > dd {
 			display: list-item;
 			margin-left: 1.5em;
 			padding-left: 0.5em;
 			align-self: baseline;
 		}
 
-		dl.normal.lowProfile > dd::marker {
+		&.lowProfile > dd::marker {
 			content: "…";
 		}
 
-		dl.normal.highProfile > dt {
+		&.highProfile > dt {
 			margin-top: 2em;
 		}
 
-		dl.normal.highProfile > dd {
+		&.highProfile > dd {
 			margin: 1em 0 2em 2em;
 		}
 	}
 
-	@layer aside {
-		aside.normal {
-			box-sizing: border-box;
-			margin: 1rem -0.5rem;
-			padding: 0 0.5rem;
-			border-width: thick ;
-			border-style: solid none;
-			border-color: var(--thick-color);
-			background-color: var(--fill-color);
-		}
+	aside.normal {
+		box-sizing: border-box;
+		margin: 1rem -0.5rem;
+		padding: 0 0.5rem;
+		border-width: thick ;
+		border-style: solid none;
+		border-color: var(--thick-color);
+		background-color: var(--fill-color);
 
-		aside.normal::before {
+		&::before {
 			content: "";
 			float: left;
 			width: 2.2em;
@@ -244,31 +242,31 @@
 			background-image: url("img/book_light.svg");
 		}
 
-		aside.normal.moan::before {
+		&.moan::before {
 			background-image: url("img/unhappy.svg");
 			filter: saturate(30%);
 		}
+	}
 
-		@media screen and (prefers-color-scheme: dark) {
-			aside.normal::before { 
+	@media screen and (prefers-color-scheme: dark) {
+		aside.normal {
+			&::before { 
 				background-image: url("img/book_dark.svg");
 			}
 
-			aside.normal.moan::before {
+			&.moan::before {
 				background-image: url("img/unhappy.svg");
 				filter: saturate(20%) brightness(85%);
 			}
 		}
 	}
 
-	@layer table {
-		table.normal {
-			margin: 1em 0;
-			border-collapse: collapse;
-		}
+	table.normal {
+		margin: 1em 0;
+		border-collapse: collapse;
 
-		table.normal > tr > *,
-		table.normal > * > tr > * {
+		> tr > *,
+		> * > tr > * {
 			padding: 0.5ex 0.5ch;
 			border: thin solid var(--edge-color);
 		}
@@ -328,28 +326,28 @@
 		margin: 0;
 		padding: 0 1em;
 		border: thin dashed;
-	}
 
-	blockquote::before, blockquote::after {
-		content: "";
-		margin-top: 2ex;
-		display: block;
-	}
+		&::before, &::after {
+			content: "";
+			margin-top: 2ex;
+			display: block;
+		}
 
-	blockquote * {
-		all: revert;
-	}
+		& * {
+			all: revert;
+		}
 
-	blockquote code {
-		font-family: var(--mt-font);
-	}
+		& code {
+			font-family: var(--mt-font);
+		}
 
-	blockquote a:link, blockquote a:visited {
-		color: var(--link-color);
-	}
+		& a:link, & a:visited {
+			color: var(--link-color);
+		}
 
-	blockquote[cite^="https://doc.rust-lang.org/"] {
-		font-family: serif;
+		&[cite^="https://doc.rust-lang.org/"] {
+			font-family: serif;
+		}
 	}
 
 	@media screen and (prefers-color-scheme: light) {

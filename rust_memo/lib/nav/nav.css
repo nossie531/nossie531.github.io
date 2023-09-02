@@ -13,79 +13,80 @@ nav.forPage {
 	z-index: 1;
 	background-color: var(--nav-bg-color);
 	border-color: var(--nav-bd-color);
-}
 
-nav.forPage > div.head { 
-	text-align: right;
-	border-bottom: thin dotted;
-	padding: 0.5ex 0.5em;
-}
+	> div.head { 
+		text-align: right;
+		border-bottom: thin dotted;
+		padding: 0.5ex 0.5em;
+	}
 
-nav.forPage > div.head > a { 
-	margin-left: 0.5ch;
-	user-select: none;
-	font-family: ui-monospace;
-}
+	> div.head > a { 
+		margin-left: 0.5ch;
+		user-select: none;
+		font-family: ui-monospace;
+	}
 
-nav.forPage > div.head > a:not([href]) { 
-	color: hsla(0, 0%, 50%, 0.5);
-	cursor: default;
-}
+	> div.head > a:not([href]) { 
+		color: hsla(0, 0%, 50%, 0.5);
+		cursor: default;
+	}
 
-nav.forPage > ul {
-	margin: 0;
-	padding: 0.5ex 0.5em 1ex;
-	overflow-y: auto;
-	scrollbar-gutter: stable;
-	scrollbar-width: thin;
-}
+	> ul {
+		margin: 0;
+		padding: 0.5ex 0.5em 1ex;
+		overflow-y: auto;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+	}
 
-nav.forPage > ul ul {
-	margin: 0 0 0 1em;
-	padding: 0;
-}
+	> ul ul {
+		margin: 0 0 0 1em;
+		padding: 0;
+	}
 
-nav.forPage li {
-	margin: 0.5ex 0 0 0;
-	list-style-type: none;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	overflow: hidden;
-}
+	& li {
+		margin: 0.5ex 0 0 0;
+		list-style-type: none;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
 
-nav.forPage li a code {
-	color: unset;
-	background-color: unset;
-}
+	& li a code {
+		color: unset;
+		background-color: unset;
+	}
 
-nav.forPage li a:focus-visible {
-	outline: none;
-	text-decoration: underline;
-}
+	& li a:focus-visible {
+		outline: none;
+		text-decoration: underline;
+	}
 
-nav.forPage li::before {
-	content: "\2022";
-	text-align: center;
-	display: inline-block;
-	width: 1em;
-	margin-right: 0.25em;
+	& li::before {
+		content: "\2022";
+		text-align: center;
+		display: inline-block;
+		width: 1em;
+		margin-right: 0.25em;
+	}
 }
 
 @media screen and (width <= 65rem) {
+	nav.forPage:not(.open) {
+		> div.head {
+			visibility: hidden;
+		}
 
-	nav.forPage:not(.open) > div.head {
-		visibility: hidden;
-	}
+		> div.head > *,
+		> ul {
+			display: none;
+		}
 
-	nav.forPage:not(.open) > div.head > *,
-	nav.forPage:not(.open) > ul {
-		display: none;
-	}
-
-	nav.forPage:not(.open) > div.head > a.toggle {
-		display: block;
-		visibility: visible;
-		margin-left: 0;
+		> div.head > a.toggle {
+			display: block;
+			visibility: visible;
+			margin-left: 0;
+		}
 	}
 }
 
@@ -96,6 +97,11 @@ nav.forPage li::before {
 }
 
 @media print {
-	nav.forPage { all: revert; }
-	nav.forPage > div.head { display: none; }
+	nav.forPage {
+		all: revert;
+	}
+
+	nav.forPage > div.head {
+		display: none;
+	}
 }
