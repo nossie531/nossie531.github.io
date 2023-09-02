@@ -6,6 +6,7 @@
 	default,
 	normal,
 	semantic,
+	precode,
 	ui,
 	util,
 	quote,
@@ -27,6 +28,12 @@
 		font-family: "Meiryo", sans-serif;
 		font-size: 0.93em;
 		color: var(--fg-color);
+	}
+
+	/* TODO: FireFox が単位 lh に未対応。
+	 * ⇒ 対応時は code-lh の使用箇所を削除。*/
+	:root {
+		--code-lh: 1.5em;
 	}
 
 	:lang(ja) {
@@ -106,42 +113,6 @@
 		border-radius: 0.25ch;
 	}
 
-	pre {
-		/* TODO: FireFox の対応待ち (単位 lh)。
-		 * - code-lh の使用箇所を削除。
-		 * - line-height: initial へ変更予定。*/
-		--code-lh: 1.5em;
-		line-height: var(--code-lh);
-
-		> code:only-child {
-			border: thin solid;
-			border-radius: 0.5rem;
-			border-color: var(--edge-color);
-		}
-
-		> samp:only-child {
-			border: thin solid;
-			border-color: var(--edge-color);
-		}
-
-		> code:only-child,
-		> samp:only-child {
-			display: block;
-			padding: 0.5rem;
-			overflow: auto;
-			scrollbar-width: thin;
-			background-color: var(--code-bg-color);
-		}
-
-		> code:only-child::before,
-		> samp:only-child::before {
-			content: "";
-			display: block;
-			margin-bottom: calc(var(--code-lh) * -1);
-			margin-bottom: -1lh;
-		}
-	}
-
 	a:link, a:visited {
 		color: var(--link-color);
 		text-decoration: none;
@@ -160,11 +131,6 @@
 			margin-left: 1.5rem;
 			margin-right: -1.5rem;
 		}
-
-		pre > code:only-child,
-		pre > samp:only-child {
-			width: 90ch;
-		}
 	}
 
 	@media all and (width <= 55rem) {
@@ -174,11 +140,6 @@
 
 		section > section > section > h1::before {
 			content: ">> ";
-		}
-
-		pre > code:only-child,
-		pre > samp:only-child {
-			width: auto;
 		}
 	}
 }
@@ -290,6 +251,80 @@
 	}
 }
 
+@layer precode {
+	pre {
+		> code:only-child {
+			border-radius: 0.5rem;
+		}
+
+		> code:only-child,
+		> samp:only-child {
+			margin: 1em 0;
+			border: thin solid;
+			border-color: var(--edge-color);
+			line-height: var(--code-lh);
+		}
+
+		> code:only-child,
+		> samp:only-child {
+			display: block;
+			padding: 0.5rem;
+			overflow: auto;
+			scrollbar-width: thin;
+			background-color: var(--code-bg-color);
+		}
+
+		> code:only-child::before,
+		> samp:only-child::before {
+			content: "";
+			display: block;
+			margin-bottom: calc(var(--code-lh) * -1);
+			margin-bottom: -1lh;
+		}
+	}
+
+	figure.file {
+		font-family: var(--mt-font);
+		margin: 1em 0;
+	}
+
+	figure.file > figcaption {
+		border: thin solid;
+		border-radius: 0.5rem 0.5rem 0 0;
+		padding: 0.5ex 1ch 0.5ex;
+		background-color: var(--path-bg-color);
+		border-color: var(--edge-color);
+	}
+
+	figure.file > pre,
+	figure.file > pre > code{
+		margin-top: 0;
+	}
+
+	figure.file > pre > code {
+		width: auto;
+		border-top-style: none;
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
+	}
+
+	@media all and (width > 55rem) {
+		figure.file,
+		pre > code:only-child,
+		pre > samp:only-child {
+			width: 90ch;
+		}
+	}
+
+	@media all and (width <= 55rem) {
+		figure.file,
+		pre > code:only-child,
+		pre > samp:only-child {
+			width: auto;
+		}
+	}
+}
+
 @layer ui {
 	:root {
 		overflow: auto scroll;
@@ -389,10 +424,6 @@
 		border-radius: unset;
 		box-shadow: unset;
 		background-color: unset;
-	}
-
-	pre > code[class|="language"] {
-		background-color: var(--code-bg-color);
 	}
 
 	pre > code[class|="language"] mark.error {
