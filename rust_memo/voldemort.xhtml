@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Voldemort パターン。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+		<p>
+Voldemort パターンは Rust でよく使われるデザインパターンである。
+		</p> <p>
+クレート外に公開はされるが、名前は使えない型やトレイトを作成する。
+		</p>
+		<aside class="normal">
+			<p>
+名前の由来について。
+			</p> <p>
+Voldemort は J. K. Rowling の小説『Harry Potter』の登場人物の名前である。彼は同作における最大の悪役で、他の登場人物からはその名前を口にする事すらも恐れられており、代わりに「名前を言ってはいけないあの人」などと言われている。
+			</p>
+		</aside>
+		<section>
+			<h1>作成方法</h1>
+			<p>
+以下を満たす型やトレイトが Voldemort パターンの適用対象になる。
+			</p>
+			<ul>
+				<li>
+					<p>
+それを含むモジュールがクレート外に非公開である。
+					</p>
+				</li> <li>
+					<p>
+それがクレート外に公開されるアイテムの構成要素になる。
+					</p>
+				</li>
+			</ul>
+			<div class="sub">
+				<h2>Voldemort 型の例</h2>
+<pre><code class="language-rust">
+mod private {
+    pub struct Voldemort {}
+}
+
+pub fn pub_fn(_arg: private::Voldemort) {
+    // ...
+}
+</code></pre>
+				<aside class="normal">
+					<p>
+このコードがエラーにならない理由。
+					</p> <p>
+このコードは怪しく見えるかもしれない。たとえ、クレート外でその名前が使えないからだとしても、非公開のモジュール内のアイテムを、クレート外に公開しても良いのだろうか？
+					</p> <p>
+ここで理解すべき点は、モジュールとアイテムの公開指定の違いである。モジュール側の公開指定は、そのモジュールや内部のアイテムを名指しできるかを制御する。一方、アイテム側の公開指定は、そのアイテムが実際に公開されるかを制御する。もちろん殆どの場合、名指しができないなら公開もされないが、Voldemort パターンはその例外となる。
+					</p>
+				</aside>
+			</div>
+		</section> <section>
+			<h1>使用方法</h1>
+			<div class="sub">
+				<h2>Sealed トレイトパターン</h2>
+				<p>
+詳しくは『<a href="sealed_trait.xhtml">Sealed トレイトパターン</a>』を参照。
+				</p> <p>
+トレイトの基底を Voldemort トレイトにする事で、トレイトの実装に Voldemort トレイトの実装も必要にする。これにより、クレート外からのトレイトの実装を禁止する。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>トレイトでの非公開メソッド</h2>
+				<p>
+トレイトに非公開メソッドを強引に作り、デフォルト実装の置場として使う。
+				</p> <p>
+実現方法は二種類ある。一つは、Sealed トレイトを利用してメソッド置場を作る方法。もう一つは、Voldemort 型のダミー引数やダミー型引数を使って公開メソッドを仮想的に非公開にする方法である。前者は Sealed トレイトの効果が副作用でつく。
+				</p> <p>
+ただ、これらの方法は rustdoc および IDE との相性が悪い。まず、rustdoc で Sealed トレイトの名前や仮想的な非公開メソッドの内容が文書化される。そして、IDE の補完候補にも仮想的な非公開メソッドが表れる。つまり、非公開もどきでしかない。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>あまり見ない用法</h2>
+				<p>
+主要な用途は上記の通りで、その他の使われ方は珍しい。
+				</p> <p>
+なぜなら、Voldemort パターンで作られたアイテムは、名前以外の情報についてもクレート外に一切公開されない。そのため、殆どの操作が行えなくなる。可能なのは、代入や取得等のごく基本的な操作のみで、それも型の明示が必要ない状況に限られる。
+				</p> <p>
+以下は Voldemort 型でデータの受け渡しをする例。
+				</p>
+				<figure class="file">
+					<figcaption>my_app/src/main.rs</figcaption>
+<pre><code class="language-rust">
+use my_lib::*;
+
+fn main() {
+    print_magic_no(get_magic_no());
+}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>my_lib/src/lib.rs</figcaption>
+<pre><code class="language-rust">
+mod private {
+    pub struct MagicNo(pub i32);
+}
+
+pub fn print_magic_no(val: private::MagicNo) {
+    println!("Magic number is {}.", val.0);
+}
+
+pub fn get_magic_no() -&gt; private::MagicNo {
+    private::MagicNo(42)
+}
+</code></pre>
+				</figure>
+			</div>
+		</section> <section>
+			<h1>rustdoc</h1>
+			<p>
+Voldemort パターンを適用したアイテムは、rustdoc では文書化されない。
+			</p> <p>
+ただし、それを構成要素とするアイテムの宣言部には名前が残る。この名前はもはや名指しできないが、それを含むために制限される操作がある事の暗示や、Voldemort パターンが適用されたその他のアイテムとの区別には役立つ。
+			</p>
+		</section>
+	</body>
+</html>
