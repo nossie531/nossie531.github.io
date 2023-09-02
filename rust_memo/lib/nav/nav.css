@@ -41,7 +41,7 @@ nav.forPage > ul {
 }
 
 nav.forPage > ul ul {
-	margin: 0 0 0 1.25em;
+	margin: 0 0 0 1em;
 	padding: 0;
 }
 
@@ -67,12 +67,8 @@ nav.forPage li::before {
 	content: "\2022";
 	text-align: center;
 	display: inline-block;
-	margin-right: 0.25ch;
 	width: 1em;
-}
-
-nav.forPage li li::before {
-	content: "\25E6";
+	margin-right: 0.25em;
 }
 
 @media screen and (width <= 65rem) {
