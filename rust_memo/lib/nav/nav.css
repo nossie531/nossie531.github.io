@@ -100,7 +100,6 @@ nav.forPage li li::before {
 }
 
 @media print {
-	nav.forPage { position: static; }
+	nav.forPage { all: revert; }
 	nav.forPage > div.head { display: none; }
-	nav.forPage > ul.index { background-image: none !important; }
 }
