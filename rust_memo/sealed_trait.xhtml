@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: Sealed トレイト。</title>
+		<title>Rust メモ: Sealed トレイトパターン。</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,7 +11,9 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-Sealed トレイトは Rust でよく使われるデザインパターンである。トレイトにクレート内でのみ公開されるアイテムを組み込む事で、外部のクレートから使用はできるが、実装や派生はできないトレイトを作成する。
+Sealed トレイトパターンは Rust でよく使われるデザインパターンである。
+		</p> <p>
+トレイトの基底を Voldemort パターンで作成したトレイトにする事で、外部のクレートから使用はできるが、実装や派生はできないトレイトを作成する。
 		</p> 
 		<section>
 			<h1>使用例</h1>

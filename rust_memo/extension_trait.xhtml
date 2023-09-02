@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: 拡張トレイト。</title>
+		<title>Rust メモ: 拡張トレイトパターン。</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,7 +11,9 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-拡張トレイトは Rust でよく使われるデザインパターン。新しくトレイトを作る事で、既存の型やトレイトに後付けでメソッドを追加する。外部クレートが提供する型やトレイトに対し、その利用者が「こんなメソッドもあれば良かったのに…」と思うような補助目的のメソッドを追加するのによく使われる。
+拡張トレイトパターンは Rust でよく使われるデザインパターンである。
+		</p> <p>
+既存の型やトレイトに後付けでのメソッドの追加を可能にする。外部クレートが提供する型やトレイトに対し、その利用者が「こんなメソッドもあれば良かったのに…」と思うような補助目的のメソッドを追加するのによく使われる。
 		</p>
 		<aside class="normal">
 			<p>
