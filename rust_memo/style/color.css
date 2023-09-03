@@ -9,6 +9,8 @@
 		--base0-color: hsl(80, 10%, 80%);
 		--base1-color: hsl(80, 10%, 75%);
 		--base2-color: hsl(80, 10%, 70%);
+		/* 枠外の色。*/
+		--ob-color: hsl(0, 0%, 85%);
 		/* 影 */
 		--shadow-color: hsla(0, 0%, 0%, 0.05);
 		/* 標準の前景色。*/
@@ -39,6 +41,8 @@
 		--base0-color: hsl(150, 10%, 18%);
 		--base1-color: hsl(150, 10%, 23%);
 		--base2-color: hsl(150, 10%, 30%);
+		/* 枠外の色。*/
+		--ob-color: hsl(150, 10%, 10%);
 		/* 影 */
 		--shadow-color: hsla(0, 0%, 0%, 0.5);
 		/* 標準の前景色。*/

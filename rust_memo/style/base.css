@@ -2,6 +2,7 @@
 
 @layer
 	import_color,
+	lang,
 	root,
 	default,
 	normal,
@@ -22,52 +23,53 @@
 @import url("prism/dark.css") layer(import_syntax_highlight) (prefers-color-scheme: dark);
 @import url("console_rustc.css") layer(import_console_rustc);
 
-@layer root {
-	:root {
-		--mt-font: "Consolas", "Meiryo", monospace;
-		font-family: "Meiryo", sans-serif;
-		font-size: 0.93em;
-		color: var(--fg-color);
-	}
-
-	/* TODO: FireFox が単位 lh に未対応。
-	 * ⇒ 対応時は code-lh の使用箇所を削除。*/
-	:root {
-		--code-lh: 1.5em;
-	}
-
+@layer lang {
 	:lang(ja) {
 		text-justify: inter-character;
 	}
+}
 
-	@media screen {
+@layer root {
+	:root {
+		--base-width: 42rem;
+		--mt-font: "Consolas", "Meiryo", monospace;
+		font-family: "Meiryo", sans-serif;
+		font-size: 93%;
+		height: 100%;
+		padding: 0 0.5rem;
+		color: var(--fg-color);
+		background-color: var(--bg-color);
+	}
+
+	:root > body {
+		margin: 0 auto;
+		padding: 2rem 0 6rem;
+		min-width: 20rem;
+		max-width: 46rem;
+		min-height: calc(100% - 8rem);
+	}
+
+	@media print {
+		:root > body {
+			padding-top: 0;
+		}
+	}
+
+	@media screen and (width > 56rem) {
 		:root {
+			background-color: var(--ob-color);
+		}
+
+		:root > body {
+			padding-left: 4rem;
+			padding-right: 4rem;
+			box-shadow: 0 0 0.5em hsla(0, 0%, 0%, 0.5);
 			background-color: var(--bg-color);
-		}
-	}
-
-	@media screen and (width <= 55rem) {
-		:root > body {
-			margin: 1rem 1rem 2rem;
-		}
-	}
-
-	@media screen and (width > 55rem) {
-		:root > body {
-			margin: 2rem 1rem 4rem 2rem;
 		}
 	}
 }
 
 @layer default {
-	body, section {
-		max-width: calc(42rem + 1px);
-	}
-
-	section {
-		margin: 2rem 0 1rem;
-	}
-
 	h1 {
 		font-size: 1.05em;
 		margin: 1rem -0.5rem;
@@ -96,11 +98,27 @@
 		margin: 0.5em 0;
 	}
 
+	section, body > *:not(div.title) {
+		max-width: calc(var(--base-width) + 1px);
+	}
+
+	section {
+		margin: 2rem 0 1rem;
+	}
+
+	section > section > h1::before {
+		content: "> ";
+	}
+
+	section > section > section > h1::before {
+		content: ">> ";
+	}
+
 	q {
 		quotes: "\201C" "\201D" "\2018" "\2019";
 	}
 
-	pre, samp, code, *.monospace {
+	pre, samp, code {
 		font-family: var(--mt-font);
 		hyphens: none;
 		tab-size: 4;
@@ -126,20 +144,15 @@
 		white-space: nowrap;
 	}
 
-	@media all and (width > 55rem) {
+	@media all and (width > calc(56rem)) {
 		section section {
 			margin-left: 1.5rem;
 			margin-right: -1.5rem;
 		}
-	}
 
-	@media all and (width <= 55rem) {
-		section > section > h1::before {
-			content: "> ";
-		}
-
+		section > section > h1::before,
 		section > section > section > h1::before {
-			content: ">> ";
+			content: none;
 		}
 	}
 }
@@ -185,7 +198,6 @@
 	}
 
 	aside.normal {
-		box-sizing: border-box;
 		margin: 1rem -0.5rem;
 		padding: 0 0.5rem;
 		border-width: thick ;
@@ -252,6 +264,12 @@
 }
 
 @layer precode {
+	/* TODO: FireFox が単位 lh に未対応。
+	 * ⇒ 対応時は code-lh の使用箇所を削除。*/
+	:root {
+		--code-lh: 1.5em;
+	}
+
 	pre {
 		> code:only-child {
 			border-radius: 0.5rem;
@@ -259,7 +277,7 @@
 
 		> code:only-child,
 		> samp:only-child {
-			margin: 1em 0;
+			margin: 1em -0.5rem;
 			border: thin solid;
 			border-color: var(--edge-color);
 			line-height: var(--code-lh);
@@ -289,6 +307,7 @@
 	}
 
 	figure.file > figcaption {
+		margin: 0 -0.5rem;
 		border: thin solid;
 		border-radius: 0.5rem 0.5rem 0 0;
 		padding: 0.5ex 1ch 0.5ex;
@@ -307,27 +326,12 @@
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
 	}
-
-	@media all and (width > 55rem) {
-		figure.file,
-		pre > code:only-child,
-		pre > samp:only-child {
-			width: 90ch;
-		}
-	}
-
-	@media all and (width <= 55rem) {
-		figure.file,
-		pre > code:only-child,
-		pre > samp:only-child {
-			width: auto;
-		}
-	}
 }
 
 @layer ui {
 	:root {
-		overflow: auto scroll;
+		overflow: auto;
+		scrollbar-gutter: stable;
 		scroll-behavior: smooth;
 	}
 
