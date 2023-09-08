@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0515 - 戻り値にローカル変数への参照を指定。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark>: cannot return value referencing local variable `x`
+</samp></pre>
+		<p>
+関数の戻り値にローカル変数 (引数も同様) への参照を含めると発生する。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<dl class="normal lowProfile">
+				<dt><a href="#ptnA">パターン A</a></dt>
+				<dd>戻り値にローカル変数への参照が含まれる。</dd>
+				<dt><a href="#ptnB">パターン B</a></dt>
+				<dd>戻り値に引数への参照が含まれる。</dd>
+			</dl>
+			<section>
+				<h1 id="ptnA">パターン A.</h1>
+				<p>
+戻り値にローカル変数への参照が含まれるパターン。
+				</p>
+<pre><code class="language-rust">
+fn test() -&gt; &amp;'static i32 {
+    let var = 0;
+    &amp;var
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark>: cannot return reference to local variable `var`
+<mark class="info"> --&gt;</mark> src\lib.rs:3:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     &amp;var
+<mark class="info">  |</mark>     <mark class="error">^^^^ returns a reference to data owned by the current function</mark>
+
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnB">パターン B.</h1>
+				<p>
+戻り値に引数への参照が含まれるパターン。
+				</p>
+<pre><code class="language-rust">
+fn test(arg: i32) -&gt; &amp;'static i32 {
+    &amp;arg
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark>: cannot return reference to function parameter `arg`
+<mark class="info"> --&gt;</mark> src\lib.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     &amp;arg
+<mark class="info">  |</mark>     <mark class="error">^^^^ returns a reference to data owned by the current function</mark>
+</samp></pre>
+			</section>
+		</section>
+	</body>
+</html>
