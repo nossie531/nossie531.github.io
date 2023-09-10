@@ -73,14 +73,14 @@ fn main() {
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
- --&gt; src\main.rs:4:6
-  |
-3 |     let data_ref = &amp;data;
-  |                    <mark class="info">----- immutable borrow occurs here</mark>
-4 |     *&amp;mut data = 1;
-  |      <mark class="error">^^^^^^^^^ mutable borrow occurs here</mark>
-5 |     println!("{}", data_ref);
-  |                    <mark class="info">-------- immutable borrow later used here</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:6
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let data_ref = &amp;data;
+<mark class="info">  |</mark>                    <mark class="info">----- immutable borrow occurs here</mark>
+<mark class="info">4 |</mark>     *&amp;mut data = 1;
+<mark class="info">  |</mark>      <mark class="error">^^^^^^^^^ mutable borrow occurs here</mark>
+<mark class="info">5 |</mark>     println!("{}", data_ref);
+<mark class="info">  |</mark>                    <mark class="info">-------- immutable borrow later used here</mark>
 </samp></pre>
 			</section> <section>
 				<h1 id="ptnB">パターン B.</h1>
@@ -97,14 +97,14 @@ fn main() {
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
- --&gt; src\main.rs:4:20
-  |
-3 |     let data_mut = &amp;mut data;
-  |                    <mark class="info">--------- mutable borrow occurs here</mark>
-4 |     println!("{}", &amp;data);
-  |                    <mark class="error">^^^^^ immutable borrow occurs here</mark>
-5 |     *data_mut = 1;
-  |     <mark class="info">------------- mutable borrow later used here</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:20
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let data_mut = &amp;mut data;
+<mark class="info">  |</mark>                    <mark class="info">--------- mutable borrow occurs here</mark>
+<mark class="info">4 |</mark>     println!("{}", &amp;data);
+<mark class="info">  |</mark>                    <mark class="error">^^^^^ immutable borrow occurs here</mark>
+<mark class="info">5 |</mark>     *data_mut = 1;
+<mark class="info">  |</mark>     <mark class="info">------------- mutable borrow later used here</mark>
 </samp></pre>
 			</section> 
 		</section>
