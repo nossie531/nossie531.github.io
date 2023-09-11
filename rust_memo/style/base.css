@@ -264,12 +264,6 @@
 }
 
 @layer precode {
-	/* TODO: FireFox が単位 lh に未対応。
-	 * ⇒ 対応時は code-lh の使用箇所を削除。*/
-	:root {
-		--code-lh: 1.5em;
-	}
-
 	pre {
 		> code:only-child {
 			border-radius: 0.5rem;
@@ -280,7 +274,6 @@
 			margin: 1em -0.5rem;
 			border: thin solid;
 			border-color: var(--edge-color);
-			line-height: var(--code-lh);
 		}
 
 		> code:only-child,
@@ -292,12 +285,16 @@
 			background-color: var(--code-bg-color);
 		}
 
+		> code:only-child::first-line,
+		> samp:only-child::first-line {
+			line-height: 1em;
+		}
+
 		> code:only-child::before,
 		> samp:only-child::before {
 			content: "";
 			display: block;
-			margin-bottom: calc(var(--code-lh) * -1);
-			margin-bottom: -1lh;
+			margin-bottom: -1em;
 		}
 	}
 
