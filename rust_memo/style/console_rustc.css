@@ -1,13 +1,18 @@
 @charset "utf-8";
 
 samp.console-rustc {
-	> mark.info {
+	& mark.info {
 		color: hsla(195, 90%, 40%, 0.8);
 		background-color: transparent;
 	}
 
-	> mark.error {
+	& mark.error {
 		color: hsla(5, 90%, 60%, 0.8);
+		background-color: transparent;
+	}
+
+	& mark.edit {
+		color: hsla(156, 70%, 40%, 0.8);
 		background-color: transparent;
 	}
 }
