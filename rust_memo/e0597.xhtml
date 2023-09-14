@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0597 - 参照中の参照先の破棄。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark>: `x` does not live long enough
+</samp></pre>
+		<p>
+参照先が参照より先に破棄される場合に発生するエラー。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<dl class="normal lowProfile">
+				<dt><a href="#ptnA">パターン A</a></dt>
+				<dd>基本形。</dd>
+				<dt><a href="#ptnB">パターン B</a></dt>
+				<dd>初見殺し。</dd>
+			</dl>
+			<section>
+				<h1 id="ptnA">パターン A.</h1>
+				<p>
+基本形となるパターン。
+				</p> <p>
+以下では、<code>inside_val</code> と <code>outside_ref</code> を比べると、前者が先に破棄される。<br/>
+そのため、前者の参照は後者に代入できない。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let outside_ref;
+
+    {
+        let inside_val = 0;
+        outside_ref = <mark class="error">&amp;inside_val</mark>
+    }
+
+    dbg!(outside_ref);
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `inside_val` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:6:23
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark>         let inside_val = 0;
+<mark class="info">  |</mark>             <mark class="info">---------- binding `inside_val` declared here</mark>
+<mark class="info">6 |</mark>         outside_ref = &amp;inside_val
+<mark class="info">  |</mark>                       <mark class="error">^^^^^^^^^^^ borrowed value does not live long enough</mark>
+<mark class="info">7 |</mark>     <mark class="error">}</mark>
+<mark class="info">  |</mark>     <mark class="info">- `inside_val` dropped here while still borrowed</mark>
+<mark class="info">8 |</mark>
+<mark class="info">9 |</mark>     dbg!(outside_ref);
+<mark class="info">  |</mark>          <mark class="info">----------- borrow later used here</mark>
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnB">パターン B.</h1>
+				<p>
+初見殺しのパターン。
+				</p> <p>
+ブロック式内のローカル変数は、ブロック式の値部にある一時変数より先に破棄される。そのため、後者が前者を参照していると、後者の破棄のタイミングで参照先が存在していない事になってしまう。多くの場合、それでも問題ないのだが、<code>Drop</code> トレイトを実装していると、参照先がないため状態異常となる。
+				</p> <p>
+なお、後述のエラーメッセージの <q>help</q> の項目にある通り、エラーの解決は比較的に簡単で、ブロック式の値部分を文として切り出すだけでよい。これで一時変数はローカル変数よりも先に破棄されるようになる。
+				</p> <p>
+以下では、一時変数 <code>local<wbr/>.sub()</code> がローカル変数 <code>local</code> を参照している。そして、<code>local</code> は <code>local<wbr/>.sub()</code> より先に解放される。つまり、<code>local<wbr/>.sub()</code> で <code>Drop</code> が起動された時にはすでに参照先 <code>self.0</code> は存在しない。
+				</p>
+<pre><code class="language-rust">
+pub fn main() {
+    let val = {
+        let local = MyData(42);
+        f(&amp;<mark class="error">local.sub()</mark>)
+    };
+
+    println!("{}", val);
+}
+
+fn f(arg: &amp;SubData) -&gt; i32 {
+    *arg.0
+}
+
+pub struct MyData(i32);
+impl MyData {
+    pub fn sub(&amp;self) -&gt; SubData&lt;'_&gt; {
+        SubData(&amp;self.0)
+    }
+}
+
+pub struct SubData&lt;'a&gt;(&amp;'a i32);
+impl Drop for SubData&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        // NOP.
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `local` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:12
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>         let local = MyData(42);
+<mark class="info">  |</mark>             <mark class="info">----- binding `local` declared here</mark>
+<mark class="info">4 |</mark>         f(&amp;local.sub())
+<mark class="info">  |</mark>            <mark class="error">^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>            <mark class="error">|</mark>
+<mark class="info">  |</mark>            <mark class="error">borrowed value does not live long enough</mark>
+<mark class="info">  |</mark>            <mark class="error">a temporary with access to the borrow is created here ...</mark>
+<mark class="info">5 |</mark>     <mark class="error">}</mark>;
+<mark class="info">  |</mark>     <mark class="info">-- ... and the borrow might be used here, when that temporary is dropped and runs the `Drop` code for type `SubData`</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="info">`local` dropped here while still borrowed</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: the temporary is part of an expression at the end of a block;
+<mark class="info"></mark>          consider forcing this temporary to be dropped sooner, before the block's local variables are dropped
+<mark class="info">help</mark>: for example, you could save the expression's value in a new local variable `x` and then make `x` be the expression at the end of the block
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>         <mark class="edit">let x =</mark> f(&amp;local.sub()); <mark class="edit">x</mark>
+<mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                <mark class="edit">+++</mark>
+</samp></pre>
+			</section>
+		</section>
+	</body>
+</html>
