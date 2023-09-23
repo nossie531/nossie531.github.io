@@ -26,6 +26,7 @@
 @layer lang {
 	:lang(ja) {
 		text-justify: inter-character;
+		line-height: 1.7;
 	}
 }
 
@@ -72,6 +73,7 @@
 @layer default {
 	h1 {
 		font-size: 1.05em;
+		line-height: normal;
 		margin: 1rem -0.5rem;
 		padding: 0.5ex 0.5em;
 		background-color: var(--header-color);
@@ -271,6 +273,7 @@
 
 		> code:only-child,
 		> samp:only-child {
+			line-height: normal;
 			margin: 1em -0.5rem;
 			border: thin solid;
 			border-color: var(--edge-color);
@@ -338,12 +341,6 @@
 
 	@keyframes firstHighlight {
 		0% { background-color: #F84; }
-	}
-
-	@media screen {
-		::selection {
-			background-color: var(--selection-color);
-		}
 	}
 }
 
