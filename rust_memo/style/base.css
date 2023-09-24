@@ -24,9 +24,9 @@
 @import url("console_rustc.css") layer(import_console_rustc);
 
 @layer lang {
-	:lang(ja) {
-		text-justify: inter-character;
+	:root:lang(ja) {
 		line-height: 1.7;
+		text-justify: inter-character;
 	}
 }
 
@@ -273,7 +273,6 @@
 
 		> code:only-child,
 		> samp:only-child {
-			line-height: normal;
 			margin: 1em -0.5rem;
 			border: thin solid;
 			border-color: var(--edge-color);
@@ -288,16 +287,21 @@
 			background-color: var(--code-bg-color);
 		}
 
-		> code:only-child::first-line,
-		> samp:only-child::first-line {
-			line-height: 1em;
-		}
-
 		> code:only-child::before,
 		> samp:only-child::before {
 			content: "";
 			display: block;
-			margin-bottom: -1em;
+			margin-top: -1lh;
+		}
+	}
+
+	@supports not (margin-top: -1lh) {
+		pre {
+			line-height: 1.2;
+			> code:only-child::before,
+			> samp:only-child::before {
+				margin-top: -1.2em;
+			}
 		}
 	}
 
