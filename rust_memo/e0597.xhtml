@@ -20,14 +20,16 @@
 			<h1>パターン</h1>
 			<dl class="normal lowProfile">
 				<dt><a href="#ptnA">パターン A</a></dt>
-				<dd>基本形。</dd>
+				<dd>スコープの違反。</dd>
 				<dt><a href="#ptnB">パターン B</a></dt>
-				<dd>初見殺し。</dd>
+				<dd>ライフタイムの違反。</dd>
+				<dt><a href="#ptnC">パターン C</a></dt>
+				<dd>Drop トレイトが暗躍。</dd>
 			</dl>
 			<section>
 				<h1 id="ptnA">パターン A.</h1>
 				<p>
-基本形となるパターン。
+スコープの違反が原因となるパターン。
 				</p> <p>
 以下では、<code>inside_val</code> と <code>outside_ref</code> を比べると、前者が先に破棄される。<br/>
 そのため、前者の参照は後者に代入できない。
@@ -61,14 +63,54 @@ fn main() {
 			</section> <section>
 				<h1 id="ptnB">パターン B.</h1>
 				<p>
-初見殺しのパターン。
+ライフタイムの違反が原因となるパターン。
 				</p> <p>
-ブロック式内のローカル変数は、ブロック式の値部にある一時変数より先に破棄される。そのため、後者が前者を参照していると、後者の破棄のタイミングで参照先が存在していない事になってしまう。多くの場合、それでも問題ないのだが、<code>Drop</code> トレイトを実装していると、参照先がないため状態異常となる。
-				</p> <p>
-なお、後述のエラーメッセージの <q>help</q> の項目にある通り、エラーの解決は比較的に簡単で、ブロック式の値部分を文として切り出すだけでよい。これで一時変数はローカル変数よりも先に破棄されるようになる。
-				</p> <p>
-以下では、一時変数 <code>local<wbr/>.sub()</code> がローカル変数 <code>local</code> を参照している。そして、<code>local</code> は <code>local<wbr/>.sub()</code> より先に解放される。つまり、<code>local<wbr/>.sub()</code> で <code>Drop</code> が起動された時にはすでに参照先 <code>self.0</code> は存在しない。
+以下では、<code>use_static_ref</code> の引数は <code>static</code> ライフタイムの参照型でなければならない。<br/>
+にも関わらず、ローカルライフタイムの参照 <code>&amp;local</code> を指定している。
 				</p>
+<pre><code class="language-rust">
+pub fn main() {
+    let local = 0;
+	use_static_ref(<mark class="error">&amp;local</mark>);
+}
+
+fn use_static_ref(_: &amp;'static i32) {
+    // NOP.
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `local` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:20
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let local = 0;
+<mark class="info">  |</mark>         <mark class="info">----- binding `local` declared here</mark>
+<mark class="info">3 |</mark>     use_static_ref(&amp;local);
+<mark class="info">  |</mark>     <mark class="info">---------------</mark><mark class="error">^^^^^^</mark><mark class="info">-</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>              <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>              <mark class="error">borrowed value does not live long enough</mark>
+<mark class="info">  |</mark>     <mark class="info">argument requires that `local` is borrowed for `'static`</mark>
+<mark class="info">4 |</mark> <mark class="error">}</mark>
+<mark class="info">  |</mark> <mark class="info">- `local` dropped here while still borrowed</mark>
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnC">パターン C.</h1>
+				<p>
+<code>Drop</code> トレイトが暗躍するパターン。
+				</p> <p>
+ブロック式内のローカル変数は、ブロック式の値部にある一時変数より先に破棄される。そのため、後者が前者を参照していると、後者の破棄のタイミングで参照先が存在していない事になる。多くの場合、これでも問題ないが、<code>Drop</code> トレイトを実装していると、<code>drop</code> メソッドの実行時に状態異常になる。
+				</p>
+				<div class="sub">
+					<h2>エラーの解決方法</h2>
+					<p>
+後述のエラーメッセージの <q>help</q> の項目にある通り、エラーの解決はブロック式の値部分を文として切り出すとよい。これで一時変数はローカル変数よりも先に破棄されるようになる。
+					</p>
+				</div>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、一時変数 <code>local<wbr/>.sub()</code> がローカル変数 <code>local</code> を参照している。そして、<code>local</code> は <code>local<wbr/>.sub()</code> より先に解放される。つまり、<code>local<wbr/>.sub()</code> で <code>Drop</code> が起動された時にはすでに参照先 <code>self.0</code> は存在しない。
+					</p>
+				</div>
 <pre><code class="language-rust">
 pub fn main() {
     let val = {
