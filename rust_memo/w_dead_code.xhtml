@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: [dead_code] 使われていないコード。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<div class="title">
+			<script>Base.insertTitle();</script>
+		</div>
+<pre><samp class="console-rustc">
+<mark class="title"><mark class="warn">warning</mark>: function `xxx` is never used</mark>
+</samp></pre>
+		<p>
+使われていないコードがあると警告が出る。
+		</p> <p>
+当然の機能なのだが、Rust 特有の落し穴がいくつかある。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<dl class="normal lowProfile">
+				<dt><a href="#ptnA">パターン A</a></dt>
+				<dd>基本形。</dd>
+				<dt><a href="#ptnB">パターン B</a></dt>
+				<dd>使用元が未使用。</dd>
+				<dt><a href="#ptnC">パターン C</a></dt>
+				<dd>単体テストが関係。</dd>
+				<dt><a href="#ptnD">パターン D</a></dt>
+				<dd>統合テストが関係。</dd>
+			</dl>
+			<section>
+				<h1 id="ptnA">パターン A.</h1>
+				<p>
+基本形となるパターン。
+				</p>
+<pre><code class="language-rust">
+pub fn main() {
+	// nop.
+}
+
+fn <mark class="warn">unused</mark>() {
+	// nop.
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="title"><mark class="warn">warning</mark>: function `unused` is never used</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:4
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark> fn unused() {
+<mark class="info">  |</mark>    <mark class="warn">^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnB">パターン B.</h1>
+				<p>
+そのコードを使っているコードが使われていないパターン。
+				</p>
+				<aside class="normal">
+					<p>
+Rust の独特な仕様。
+					</p>
+					<p>
+Rust 以外の多くの言語では、こうした巻き添えのような警告は出力されない。Rust の方法は、網羅的だが本質的な警告が数に埋もれるため、筆者個人としては微妙な所である。
+					</p>
+				</aside>
+<pre><code class="language-rust">
+pub fn main() {
+    // nop.
+}
+
+fn <mark class="warn">unused</mark>() {
+    unused_sub();
+}
+
+fn <mark class="warn">unused_sub</mark>() {
+    // nop.
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="title"><mark class="warn">warning</mark>: function `unused` is never used</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:5:4
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> fn unused() {
+<mark class="info">  |</mark>    <mark class="warn">^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
+
+<mark class="title"><mark class="warn">warning</mark>: function `unused_sub` is never used</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:9:4
+<mark class="info">  |</mark>
+<mark class="info">9 |</mark> fn unused_sub() {
+<mark class="info">  |</mark>    <mark class="warn">^^^^^^^^^^</mark>
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnC">パターン C.</h1>
+				<p>
+単体テストが絡むパターン。
+				</p> <p>
+対象のコードが単体テストからのみ使用されている場合に発生する。
+				</p> <p>
+解決するには、対象に <code>#[cfg(test)]</code> を付加すれば良い。
+				</p>
+<pre><code class="language-rust">
+#[test]
+fn test() {
+    test_helper();
+}
+
+fn <mark class="warn">test_helper</mark>() {
+    // nop.
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="title"><mark class="warn">warning</mark>: function `test_helper` is never used</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:6:4
+<mark class="info">  |</mark>
+<mark class="info">6 |</mark> fn test_helper() {
+<mark class="info">  |</mark>    <mark class="warn">^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
+</samp></pre>
+			</section> <section>
+				<h1 id="ptnD">パターン D.</h1>
+				<p>
+統合テストが絡むパターン。
+				</p>
+				<aside class="normal">
+					<p>
+バグの可能性。
+					</p> <p>
+2023 年現在、この現象はバグとして<a href="https://github.com/rust-lang/rust/issues/46379">報告</a>されているため、将来的には解決されるかも…。
+					</p>
+				</aside>
+				<p>
+Rust の統合テストでは、<code>tests</code> ディレクトリ直下のファイルがそれぞれ独立したクレートとして認識される。そのため、テストヘルパ部品について、それが一部のファイルからは使われていても、他のファイルからは使われていない場合、クレート内に使われていない部品があると認識されてしまう。
+				</p> <p>
+解決するには、面倒だが新しくテストヘルパ用のクレートを作るか、トリッキーだが部品を <code>pub use</code> でダミーとして公開するか (テストコードなので公開しても外部からは使えない)、くらいしか方法がない。
+				</p>
+				<figure class="file">
+					<figcaption>my_lib/tests/common/mod.rs</figcaption>
+<pre><code class="language-rust">
+pub fn test_helper1() {}
+pub fn <mark class="warn">test_helper2</mark>() {}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>my_lib/tests/a.rs</figcaption>
+<pre><code class="language-rust">
+mod common;
+use common::*;
+
+#[test]
+fn test() {
+    test_helper1();
+}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>my_lib/tests/b.rs</figcaption>
+<pre><code class="language-rust">
+mod common;
+use common::*;
+
+#[test]
+fn test() {
+    test_helper1();
+    test_helper2();
+}
+</code></pre>
+				</figure>
+<pre><samp class="console-rustc">
+<mark class="title"><mark class="warn">warning</mark>: function `test_helper2` is never used</mark>
+<mark class="info"> --&gt;</mark> tests\common\mod.rs:2:8
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark> pub fn test_helper2() {}
+<mark class="info">  |</mark>        <mark class="warn">^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
+</samp></pre>
+			</section>
+		</section>
+	</body>
+</html>
