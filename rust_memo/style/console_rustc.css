@@ -2,12 +2,18 @@
 
 samp.console-rustc {
 	& mark.title {
+		font-weight: bold;
 		color: hsla(0, 0%, 50%, 1.0);
 		background-color: transparent;
 	}
 
 	& mark.info {
 		color: hsla(195, 90%, 40%, 0.8);
+		background-color: transparent;
+	}
+
+	& mark.warn {
+		color: hsla(60, 50%, 40%, 0.8);
 		background-color: transparent;
 	}
 

@@ -267,6 +267,8 @@
 
 @layer precode {
 	pre {
+		line-height: 1.4;
+
 		> code:only-child {
 			border-radius: 0.5rem;
 		}
@@ -292,16 +294,7 @@
 			content: "";
 			display: block;
 			margin-top: -1lh;
-		}
-	}
-
-	@supports not (margin-top: -1lh) {
-		pre {
-			line-height: 1.2;
-			> code:only-child::before,
-			> samp:only-child::before {
-				margin-top: -1.2em;
-			}
+			margin-top: -1.4em;
 		}
 	}
 
@@ -431,7 +424,14 @@
 	pre > code[class|="language"] mark.error {
 		color: inherit;
 		background-color: transparent;
-		text-decoration: wavy underline rgba(255, 0, 0, 0.5);
+		text-decoration: wavy underline hsla(5, 90%, 60%, 0.6);
+		text-decoration-skip-ink: none;
+	}
+
+	pre > code[class|="language"] mark.warn {
+		color: inherit;
+		background-color: transparent;
+		text-decoration: wavy underline hsla(60, 50%, 40%, 0.8);
 		text-decoration-skip-ink: none;
 	}
 }
