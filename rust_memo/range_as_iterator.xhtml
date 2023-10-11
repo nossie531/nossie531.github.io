@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: Range 構造体のイテレータとしての機能。</title>
+		<title>Rust メモ: RangeBounds トレイトとイテレータ。</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,7 +11,9 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-<code>Range</code> 構造体はその範囲端のための型が <code>Step</code> トレイトに適合する場合、イテレータとして機能する。そして、その <code>next</code> メソッドを呼ぶと、開始端がステップサイズだけインクリメントされ、直前の開始端が結果として戻される。
+範囲型 (<code>RangeBounds</code> トレイトを実装する型) にはイテレータとして機能するものがある。
+		</p> <p>
+<code>next</code> メソッドを呼ぶと、開始端がインクリメントされ、直前の開始端が戻される。
 		</p> 
 		<aside class="normal">
 			<p>
@@ -21,6 +23,26 @@
 			</p>
 		</aside>
 		<section>
+			<h1>対象となる型</h1>
+			<p>
+対象となる型には以下の条件が必要。
+			</p>
+			<ul>
+				<li>
+					<p>
+範囲端を表す型が <code>Step</code> トレイトに適合。
+					</p>
+				</li> <li>
+					<p>
+範囲の開始点を持つ。
+					</p> <p>
+つまり、<code>Range</code>, <code>RangeFrom</code>, <code>RangeInclusive</code> が対象。
+					</p> <p>
+つまり、<code>RangeTo</code>, <code>RangeToInclusive</code>, <code>RangeFull</code> は対象外。
+					</p>
+				</li>
+			</ul>
+		</section> <section>
 			<h1>簡単な例</h1>
 			<p>
 以下では <code>Range</code> 構造体をイテレータとして直接操作している。

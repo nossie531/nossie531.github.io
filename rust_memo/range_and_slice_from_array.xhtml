@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: Range 構造体によるスライスの切り出し。</title>
+		<title>Rust メモ: RangeBounds トレイトと配列のスライス。</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,30 +11,135 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-<code>Range</code> 構造体で配列からスライスを切り出す方法について。
+範囲型 (<code>RangeBounds</code> トレイトを実装する型) による配列のスライスについて。
 		</p>
-		<aside class="normal">
-			<p>
-このメモの背景。
-			</p> <p>
-他の言語ではあまり見ない書き方のため、筆者はたまに忘れる…。
-			</p>
-		</aside>
 		<section>
 			<h1>簡単な例</h1>
 			<p>
-以下はどれも配列からスライスを切り出す式になっている。
+以下では配列からスライスを取得している。
 			</p>
 <pre><code class="language-rust">
-let arr = [1, 2, 3, 4, 5, 6];
-let slice = &amp;arr[..];
-let slice = &amp;arr[..3];
-let slice = &amp;arr[4..];
-let slice = &amp;arr[2..4];
+let arr: [i32;6] = [0, 1, 2, 3, 4, 5];
+let slice: &amp;[i32] = &amp;arr[..];    // 0, 1, 2, 3, 4, 5
+let slice: &amp;[i32] = &amp;arr[2..];   // 2, 3, 4, 5
+let slice: &amp;[i32] = &amp;arr[..4];   // 0, 1, 2, 3
+let slice: &amp;[i32] = &amp;arr[2..4];  // 2, 3
+let slice: &amp;[i32] = &amp;arr[..=4];  // 0, 1, 2, 3, 4
+let slice: &amp;[i32] = &amp;arr[2..=4]; // 2, 3, 4
+let slice: &amp;[i32] = &amp;arr[(Bound::Excluded(2), Bound::Unbounded)]; // 3, 4, 5
 </code></pre>
+		</section> <section>
+			<h1>型の論理構造</h1>
 			<p>
-補足: 上記で <code>arr</code> は <code>[i32;6]</code> の配列型、<code>slice</code> は <code>&amp;[i32]</code> のスライス型への参照型 (動的サイズ型への参照となるのでファットポインタで管理される)。
+配列のスライスとそれに関わる型の論理構造について。
+			</p> <p>
+関連する型を順に見ていくと、配列とスライスは <code>Index</code> による添え字での操作機能を共有、スライスの添え字となるには <code>SliceIndex</code> の実装が必要、範囲型はどれも <code>SliceIndex</code> を実装している…という構造になっている事がわかる。
 			</p>
+			<section>
+				<h1><code>Index</code></h1>
+				<p>
+添え字によるアクセスには <code>Index</code> トレイトが必要になる。
+				</p> <p>
+以下は <code>Index</code> トレイトの宣言部分。<br/>
+				</p>
+				<dl class="normal lowProfile">
+					<dt><code>Idx</code></dt><dd>添え字を表すジェネリクス型。</dd>
+					<dt><code>Output</code></dt><dd>結果を表す関連型。</dd>
+					<dt><code>index</code></dt><dd>添え字によるアクセスを行うメソッド。</dd>
+				</dl>
+<pre><code class="language-rust">
+pub trait Index&lt;Idx&gt;
+where
+    Idx: ?Sized,
+{
+    type Output: ?Sized;
+
+    // Required method
+    fn index(&amp;self, index: Idx) -&gt; &amp;Self::Output;
+}
+</code></pre>
+			</section> <section>
+				<h1>配列</h1>
+				<p>
+配列は <code>Index</code> トレイトを実装している。
+				</p> <p>
+より詳しく実装の宣言を見ると、配列 <code>[T; N]</code> の <code>Index&lt;I&gt;</code> の実装は、スライス <code>[T]</code> が <code>Index&lt;I&gt;</code> を実装することで実現されている。
+				</p>
+<pre><code class="language-rust">
+impl&lt;T, I, const N: usize&gt; Index&lt;I&gt; for [T; N]
+where
+    [T]: Index&lt;I&gt;,
+{
+    type Output = &lt;[T] as Index&lt;I&gt;&gt;::Output;
+
+    /* ... */
+}
+</code></pre>
+			</section> <section>
+				<h1>スライス</h1>
+				<p>
+スライスは <code>Index</code> トレイトを実装している。
+				</p> <p>
+添え字の型は <code>SliceIndex</code> を実装している必要があり、<code>Index</code> の <code>Output</code> と <code>SliceIndex</code> の <code>Output</code> が一致している必要がある。
+				</p>
+<pre><code class="language-rust">
+impl&lt;T, I&gt; Index&lt;I&gt; for [T]
+where
+    I: SliceIndex&lt;[T]&gt;,
+{
+    type Output = I::Output;
+
+    /* ... */
+}
+</code></pre>
+			</section> <section>
+				<h1><code>SliceIndex</code></h1>
+				<p>
+<code>SliceIndex</code> トレイトはスライスの添え字として使われる。
+				</p> <p>
+関連型 <code>Output</code> は添え字のアクセスで取得される要素の型を表す。
+				</p> 
+				<aside class="normal">
+					<p>メソッド。</p>
+					<p>
+2023 年現在、メソッドは全てナイトリーになっている。<br/>
+どれもスライス本体を引数に各要素へのアクセスを行う。
+					</p> 
+				</aside>
+<pre><code class="language-rust">
+pub unsafe trait SliceIndex&lt;T&gt;: Sealed
+where
+    T: ?Sized,
+{
+    type Output: ?Sized;
+
+    /* ... */
+}
+</code></pre>
+				<div class="sub">
+					<h2>実装する型</h2>
+					<p>
+主な実装について (他にも文字列スライス絡みの実装がある)。
+					</p> <p>
+以下は添え字が単一値で、<code>Output</code> が <code>T</code> 型の実装。
+					</p>
+					<ul>
+						<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for usize</code></li>
+					</ul>
+					<p>
+以下は添え字が範囲型で、<code>Output</code> が <code>[T]</code> 型の実装。
+					</p>
+					<ul>
+						<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for Range&lt;usize&gt;</code></li>
+						<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeFrom&lt;usize&gt;</code></li>
+						<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeFull</code></li>
+						<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeInclusive&lt;usize&gt;</code></li>
+						<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeTo&lt;usize&gt;</code></li>
+						<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeToInclusive&lt;usize&gt;</code></li>
+						<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for (Bound&lt;usize&gt;, Bound&lt;usize&gt;)</code></li>
+					</ul>
+				</div>
+			</section>
 		</section>
 	</body>
 </html>
