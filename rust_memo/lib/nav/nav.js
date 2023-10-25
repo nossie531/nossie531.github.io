@@ -45,7 +45,7 @@ class Nav {
 	// 全セクションのヘッダ要素に ID を設定。
 	#setupHeaderIds(element, contextId) {
 		let sectionId = 0;
-		for (const section of this.#getTargetSections(element)) {
+		for (const section of this.#getCapSections(element)) {
 			const secHeader = section.firstElementChild;
 			secHeader.id = secHeader.id || contextId + "-" + sectionId++;
 			this.#setupHeaderIds(section, secHeader.id);
@@ -166,7 +166,6 @@ class Nav {
 
 	// ページ先頭へのリンク要素を生成。
 	#createPageTopLink(text) {
-
 		const result = document.createElement("a");
 		result.href = location.href.replace(/#.*/, "");
 		result.append(text);
@@ -189,8 +188,7 @@ class Nav {
 
 	// 目次要素を生成。
 	#createIndex(element) {
-
-		const sections = this.#getTargetSections(element);
+		const sections = this.#getCapSections(element);
 		if (sections.length === 0) {
 			return document.createDocumentFragment();
 		}
@@ -217,11 +215,20 @@ class Nav {
 		return li;
 	}
 
-	// 指定した要素直下の対象セクションを取得。
-	#getTargetSections(element) {
-		return [...element.children].filter(x => {
-			return x.tagName === "section" && x.firstElementChild?.tagName === "h1";
-		});
+	// 指定した要素の子孫から代表となるセクションを取得。
+	#getCapSections(element) {
+		const result = [];
+		const tw = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT);
+
+		tw.nextNode();
+		for (let elm = tw.nextNode(); elm;) {
+			const isSection = elm.tagName === "section";
+			const hasH1 = elm.firstElementChild?.tagName === "h1";
+			result.push(...(isSection && hasH1 ? [elm] : []))
+			elm = isSection ? tw.nextSibling() : tw.nextNode();
+		}
+
+		return result;
 	}
 
 	// 関連リンクを設定。
