@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: メソッド呼出と自動型変換。</title>
+		<title>Rust メモ: メソッド呼出と型変換。</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,10 +11,13 @@
 			<script>Base.insertTitle();</script>
 		</div>
 		<p>
-メソッド呼出ではドット演算子の左辺が <code>self</code> に適合するよう、自動型変換がある。
-		</p> <p>
-この機能は便利だが、初心者にとって予想しにくい挙動につながる場合がある。
+メソッド呼出では、ドット演算子の左辺が <code>self</code> に適合するよう型変換される。
 		</p>
+		<aside class="normal">
+		<p>
+この機能は便利だが、初心者殺しな挙動につながる場合がある。
+		</p>
+		</aside>
 		<section>
 			<h1>仕様</h1>
 			<p>
@@ -44,89 +47,24 @@
 				</li>
 			</ol>
 		</section> <section>
-			<h1>弊害</h1>
+			<h1>注意点</h1>
 			<p>
-型変換について失念、または異なる型変換を期待していると、予想外の型で処理が進む。
-			</p> <p>
-これにより、コンパイルエラーのメッセージが的外れに思えたり、より悪くコンパイルエラーが出なかった場合だと、任意の型を格納できる変数に、意図していた型ではなく、その参照型が格納されていた、などの事態が起きてしまう。
-			</p> 
-		</section> <section>
-			<h1>対策</h1>
-			<p>
-関数呼出の記法では、ドット演算子による記法とは違い、問題となる自動型変換がない。そのため、上記の弊害を疑っている場合、記法を変えると問題の理解に役立つ可能性がある。
-			</p> <p>
+仕様を知らないと、予想外の型で処理が進んでしまう。これにより、コンパイルエラーのメッセージが意味不明に思えたり、より悪くコンパイルエラーにならない場合だと、意図したのと別の型で処理が実行される、等の事態が起きてしまう。
+			</p>
+			<section>
+				<h1>対策</h1>
+				<p>
+関数呼出の記法は、ドット演算子の記法より型変換が弱い。そのため、上記の仕様が関係していると疑われる場合、記法を変えると問題の理解に役立つ可能性がある。
+				</p> <p>
 例えば、<code>x.method()</code> の場合、<code>&lt;SomeStruct&gt;::<wbr/>method(x)</code> や <code>&lt;SomeStruct&gt;::<wbr/>method(&amp;x)</code> 等を試すとよい (参考: トレイトが絡む場合は <code>&lt;&amp;SomeStruct as SomeTrait&gt;::<wbr/>method(&amp;x)</code> のような記法も使える)。
-			</p>
-		</section> <section>
-			<h1>体験談</h1>
-			<p>
-ここでは筆者がしばらくハテナ？となった事例を紹介する。
-			</p>
-			<div class="sub">
-				<h2 id="disabled_sized"><code>Sized</code> 境界が無効に見える例</h2>
-				<p>
-以下のコードでは、前述のルールを知らないと、<code>Sized</code> 境界が機能していないように見える。つまり、ルールの一つ目だけでは <code>Sized</code> 境界によるコンパイルエラーになるべきで、ルールの二つ目によって初めて正常なコードであると評価できる。
 				</p>
-				<ol>
-					<li>
-						<p>
-一つ目のルールの適用は失敗する。
-						</p>
-						<ul>
-							<li>
-								<p>
-<code>&lt;str as SomeTrait&gt;::method(text)</code> が試される。
-								</p>
-							</li> <li>
-								<p>
-つまり、<code>T</code> は <code>str</code> になる。
-								</p>
-							</li> <li>
-								<p>
-しかし、<code>T</code> は <code>Sized</code> に違反する。
-								</p>
-							</li>
-						</ul>
-					</li> <li>
-						<p>
-二つ目のルールの適用は失敗する。
-						</p>
-						<ul>
-							<li>
-								<p>
-<code>&lt;&amp;str as SomeTrait&gt;::method(&amp;text)</code> が試される。
-								</p>
-							</li> <li>
-								<p>
-つまり、<code>T</code> は <code>&amp;str</code> になる。
-								</p>
-							</li> <li>
-								<p>
-ここで、<code>T</code> は <code>Sized</code> に適合する。
-								</p>
-							</li>
-						</ul>
-					</li>
-				</ol>
-<pre><code class="language-rust">
-fn main() {
-    let text: &amp;str = "abc";
-    text.method();
-}
-
-trait SomeTrait {
-    fn method(&amp;self) {}
-}
-
-impl&lt;T: Sized&gt; SomeTrait for T {
-    // NOP.
-}
-</code></pre>
-			</div>
-			<div class="sub">
-				<h2>意味不明なコンパイルエラーになる例</h2>
+			</section> <section>
+				<h1>事例 1.</h1>
 				<p>
-以下のコードでは、前述のルールを知らないと、コンパイル時のエラーメッセージが理解できない。つまり、どのルールもエラーにはなるが、コンパイラはそれらの中から二つ目のルールに対してのエラーメッセージのみを出力する (<code>T</code> が暗黙の <code>Sized</code> 境界を持つ事、それから <code>Any</code> が <code>static</code> ライフタイム境界を持つ事に注意)。
+コンパイルエラーが意味不明となる例。
+				</p>
+				<p>
+以下のコードでは、前述のどのルールでもエラーになるが、エラーメッセージについては二つ目のルールを基準に出力されている。そのため、型変換なしのパターンのみを考えていると、エラーメッセージの意味が通らなくなる。
 				</p>
 				<ol>
 					<li>
@@ -148,6 +86,9 @@ impl&lt;T: Sized&gt; SomeTrait for T {
 								</p>
 							</li>
 						</ul>
+						<p>
+※ 型パラメタは暗黙で Sized 境界を持つ。
+						</p>
 					</li> <li>
 						<p>
 二つ目のルールの適用も失敗する。
@@ -171,10 +112,21 @@ impl&lt;T: Sized&gt; SomeTrait for T {
 								</p>
 							</li>
 						</ul>
+						<p>
+※ <code>Any</code> は <code>'static</code> ライフタイム境界を持つ。
+						</p>
 					</li>
 				</ol>
 <pre><code class="language-rust">
 use std::any::Any;
+
+fn main() {
+    test(&amp;[1, 2, 3]);
+}
+
+fn test(arr: &amp;[i32]) {
+    <mark class="error">arr.method()</mark>;
+}
 
 trait SomeTrait {
     fn method(&amp;self) {}
@@ -183,26 +135,124 @@ trait SomeTrait {
 impl&lt;T: Any&gt; SomeTrait for T {
     // NOP.
 }
-
-fn test(arr: &amp;[i32]) {
-	<mark class="error">arr.method()</mark>;
-}
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
-<mark class="info">  --&gt;</mark> src\main.rs:12:5
-<mark class="info">   |</mark> 
-<mark class="info">11 |</mark> fn test(arr: &amp;[i32]) {
-<mark class="info">   |</mark>         <mark class="info">---  - let's call the lifetime of this reference `'1`</mark>
-<mark class="info">   |</mark>         <mark class="info">|</mark>
-<mark class="info">   |</mark>         <mark class="info">`arr` is a reference that is only valid in the function body</mark>
-<mark class="info">12 |</mark>     arr.method();
-<mark class="info">   |</mark>     <mark class="error">^^^^^^^^^^^^</mark>
-<mark class="info">   |</mark>     <mark class="error">|</mark>
-<mark class="info">   |</mark>     <mark class="error">`arr` escapes the function body here</mark>
-<mark class="info">   |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of function</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:8:5
+<mark class="info">  |</mark>
+<mark class="info">7 |</mark> fn test(arr: &amp;[i32]) {
+<mark class="info">  |</mark>         <mark class="info">---  - let's call the lifetime of this reference `'1`</mark>
+<mark class="info">  |</mark>         <mark class="info">|</mark>
+<mark class="info">  |</mark>         <mark class="info">`arr` is a reference that is only valid in the function body</mark>
+<mark class="info">8 |</mark>     arr.method();
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>     <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="error">`arr` escapes the function body here</mark>
+<mark class="info">  |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
 </samp></pre>
-			</div>
+			</section> <section>
+				<h1>事例 2.</h1>
+				<p>
+意図しない型で処理が実行される例。
+				</p>
+				<p>
+以下のコードでは、いくつかの値と型をペアで出力しているが、文字列スライス型でのみ失敗している。これは筆者が誤って文字列スライスを <code>Sized</code> として処理、コンパイラがその不備を修正するため、型変換でスライス型をスライスの参照型にした結果である。
+				</p>
+				<ol>
+					<li>
+						<p>
+一つ目のルールの適用は失敗する。
+						</p>
+						<ul>
+							<li>
+								<p>
+<code>&lt;str as Report&gt;::report("text")</code> が試される。
+								</p>
+							</li> <li>
+								<p>
+つまり、<code>T</code> は <code>str</code> になる。
+								</p>
+							</li> <li>
+								<p>
+しかし、<code>T</code> は <code>Sized</code> に違反する。
+								</p>
+							</li>
+						</ul>
+						<p>
+※ 型パラメタは暗黙で Sized 境界を持つ。
+						</p>
+					</li> <li>
+						<p>
+二つ目のルールの適用は成功する。
+						</p>
+						<ul>
+							<li>
+								<p>
+<code>&lt;&amp;str as Report&gt;::report(&amp;"text")</code> が試される。
+								</p>
+							</li> <li>
+								<p>
+つまり、<code>T</code> は <code>&amp;str</code> になる。
+								</p>
+							</li> <li>
+								<p>
+ここで、<code>T</code> は <code>Sized</code> に適合する。
+								</p>
+							</li>
+						</ul>
+					</li>
+				</ol>
+<pre><code class="language-rust">
+use std::any::{Any, TypeId};
+use std::collections::HashMap;
+use std::fmt::Display;
+use std::sync::OnceLock;
+
+fn main() {
+    (&amp;false as &amp;bool).report();
+    (&amp;42 as &amp;i32).report();
+    ("text" as &amp;str).report();
+}
+
+trait Report {
+    fn report(&amp;self);
+}
+
+impl&lt;T: Any + Display&gt; Report for T {
+    fn report(&amp;self) {
+        let type_id = TypeId::of::&lt;T&gt;();
+        let header = *header_map().get(&amp;type_id).unwrap_or(&amp;"?");
+        println!("{}: {}", header, self);
+    }
+}
+
+fn header_map() -&gt; &amp;'static HashMap&lt;TypeId, &amp;'static str&gt; {
+    static MAP: OnceLock&lt;HashMap&lt;TypeId, &amp;'static str&gt;&gt; = OnceLock::new();
+    MAP.get_or_init(|| {
+        let mut result = HashMap::new();
+        result.insert(TypeId::of::&lt;bool&gt;(), "b");
+        result.insert(TypeId::of::&lt;i32&gt;(), "i");
+        result.insert(TypeId::of::&lt;str&gt;(), "s");
+        result
+    })
+}
+</code></pre>
+<pre><code>
+b: false
+i: 42  
+?: text
+</code></pre>
+			</section>
 		</section>
+		<footer>
+			<section>
+				<h1>参考文献</h1>
+				<ul>
+					<li>
+<a href="https://doc.rust-lang.org/nomicon/dot-operator.html">The Rustonomicon / The Dot Operator</a>
+					</li>
+				</ul>
+			</section>
+		</footer>
 	</body>
 </html>
