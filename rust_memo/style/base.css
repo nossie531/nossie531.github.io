@@ -51,8 +51,13 @@
 	}
 
 	@media print {
+		:root {
+			background-color: transparent;
+		}
+
 		:root > body {
 			padding-top: 0;
+			background-color: transparent;
 		}
 	}
 
@@ -124,6 +129,7 @@
 		font-family: var(--mt-font);
 		hyphens: none;
 		tab-size: 4;
+		text-justify: none;
 	}
 
 	:not(h1):not(pre) > code {
