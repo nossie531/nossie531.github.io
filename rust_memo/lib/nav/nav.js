@@ -46,7 +46,7 @@ class Nav {
 	#setupHeaderIds(element, contextId) {
 		let sectionId = 0;
 		for (const section of this.#getCapSections(element)) {
-			const secHeader = section.firstElementChild;
+			const secHeader = this.#getSectionHeader(section);
 			secHeader.id = secHeader.id || contextId + "-" + sectionId++;
 			this.#setupHeaderIds(section, secHeader.id);
 		}
@@ -195,7 +195,7 @@ class Nav {
 
 		const ul = document.createElement("ul");
 		for (const section of sections) {
-			const secHeader = section.firstElementChild;
+			const secHeader = this.#getSectionHeader(section);
 			const secChildren = this.#createIndex(section);
 			ul.append(this.#createIndexEntry(secHeader, secChildren));
 		}
@@ -222,13 +222,25 @@ class Nav {
 
 		tw.nextNode();
 		for (let elm = tw.nextNode(); elm;) {
-			const isSection = elm.tagName === "section";
-			const hasH1 = elm.firstElementChild?.tagName === "h1";
-			result.push(...(isSection && hasH1 ? [elm] : []))
-			elm = isSection ? tw.nextSibling() : tw.nextNode();
+			const scElm = elm.tagName === "section" ? elm : null;
+			const h1Elm = this.#getSectionHeader(scElm);
+			result.push(...(h1Elm ? [scElm] : []));
+			elm = scElm ? tw.nextSibling() : tw.nextNode();
 		}
 
 		return result;
+	}
+
+	// セクション要素の見出しを取得します。
+	#getSectionHeader(elm) {
+		const sectionElm = elm?.tagName === "section" ? elm : null;
+		const hgroupElm = getFirstElementIf(sectionElm, "hgroup");
+		return getFirstElementIf(hgroupElm || sectionElm, "h1");
+
+		function getFirstElementIf(elm, tagName) {
+			const fstElm = elm?.firstElementChild;
+			return fstElm?.tagName === tagName ? fstElm : null;
+		}
 	}
 
 	// 関連リンクを設定。

@@ -7,9 +7,9 @@
 		<script src="lib/base.js"></script>
 	</head>
 	<body>
-		<div class="title">
-			<script>Base.insertTitle();</script>
-		</div>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
 		<p>
 メソッド呼出では、ドット演算子の左辺が <code>self</code> に適合するよう型変換される。
 		</p>
@@ -59,10 +59,12 @@
 例えば、<code>x.method()</code> の場合、<code>&lt;SomeStruct&gt;::<wbr/>method(x)</code> や <code>&lt;SomeStruct&gt;::<wbr/>method(&amp;x)</code> 等を試すとよい (参考: トレイトが絡む場合は <code>&lt;&amp;SomeStruct as SomeTrait&gt;::<wbr/>method(&amp;x)</code> のような記法も使える)。
 				</p>
 			</section> <section>
-				<h1>事例 1.</h1>
-				<p>
-コンパイルエラーが意味不明となる例。
-				</p>
+				<hgroup>
+					<h1>事例 1.</h1>
+					<div class="subtitle">
+						コンパイルエラーが意味不明
+					</div>
+				</hgroup>
 				<p>
 以下のコードでは、前述のどのルールでもエラーになるが、エラーメッセージについては二つ目のルールを基準に出力されている。そのため、型変換なしのパターンのみを考えていると、エラーメッセージの意味が通らなくなる。
 				</p>
@@ -151,10 +153,12 @@ impl&lt;T: Any&gt; SomeTrait for T {
 <mark class="info">  |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
 </samp></pre>
 			</section> <section>
-				<h1>事例 2.</h1>
-				<p>
-意図しない型で処理が実行される例。
-				</p>
+				<hgroup>
+					<h1>事例 2.</h1>
+					<div class="subtitle">
+						意図しない型での処理の実行
+					</div>
+				</hgroup>
 				<p>
 以下のコードでは、いくつかの値と型をペアで出力しているが、文字列スライス型でのみ失敗している。これは筆者が誤って文字列スライスを <code>Sized</code> として処理、コンパイラがその不備を修正するため、型変換でスライス型をスライスの参照型にした結果である。
 				</p>

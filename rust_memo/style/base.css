@@ -5,8 +5,8 @@
 	lang,
 	root,
 	default,
-	normal,
 	semantic,
+	normal,
 	precode,
 	ui,
 	util,
@@ -76,22 +76,6 @@
 }
 
 @layer default {
-	h1 {
-		font-size: 1.05em;
-		line-height: normal;
-		margin: 1rem -0.5rem;
-		padding: 0.5ex 0.5em;
-		background-color: var(--header-color);
-	}
-
-	h2 {
-		font-size: 1rem;
-	}
-
-	h2::before {
-		content: "■ ";
-	}
-
 	p {
 		margin: 0.5em 0;
 		text-align: justify;
@@ -103,22 +87,6 @@
 
 	ul, ol, dl {
 		margin: 0.5em 0;
-	}
-
-	section, body > *:not(div.title) {
-		max-width: calc(var(--base-width) + 1px);
-	}
-
-	section {
-		margin: 2rem 0 1rem;
-	}
-
-	section > section > h1::before {
-		content: "> ";
-	}
-
-	section > section > section > h1::before {
-		content: ">> ";
 	}
 
 	q {
@@ -151,6 +119,73 @@
 	*.nw {
 		white-space: nowrap;
 	}
+}
+
+@layer semantic {
+	body > header > h1 {
+		display: table;
+		font-size: 1rem;
+		font-weight: normal;
+		margin-bottom: 2rem;
+		border: thin dashed red;
+		padding: 1ex 1em;
+	}
+
+	section, body > * {
+		max-width: calc(var(--base-width) + 1px);
+	}
+
+	section {
+		margin: 2rem 0 1rem;
+	}
+
+	section > h1,
+	section > hgroup > h1 {
+		font-size: 1.05em;
+		line-height: normal;
+		padding: 0.5ex 0.5em;
+		margin: 1rem -0.5rem;
+		background-color: var(--header-color);
+	}
+
+	section > section > h1::before,
+	section > section > hgroup > h1::before {
+		content: "> ";
+	}
+
+	section > section > section > h1::before,
+	section > section > section > hgroup > h1::before {
+		content: ">> ";
+	}
+
+	section > hgroup {
+		margin: 1rem 0;
+
+		> div.subtitle {
+			font-weight: bold;
+		}
+
+		> div.subtitle::before,
+		> div.subtitle::after {
+			content: "〜";
+		}
+	}
+
+	div.sub {
+		margin: 1rem 0;
+	}
+
+	div.sub:not(h1+*) {
+		border-top: thin dashed;
+	}
+
+	div.sub > h2 {
+		font-size: 1rem;
+	}
+
+	div.sub > h2::before {
+		content: "■ ";
+	}
 
 	@media all and (width > calc(56rem)) {
 		section section {
@@ -159,7 +194,9 @@
 		}
 
 		section > section > h1::before,
-		section > section > section > h1::before {
+		section > section > hgroup > h1::before,
+		section > section > section > h1::before,
+		section > section > section > hgroup > h1::before {
 			content: none;
 		}
 	}
@@ -251,23 +288,6 @@
 			padding: 0.5ex 0.5ch;
 			border: thin solid var(--edge-color);
 		}
-	}
-}
-
-@layer semantic {
-	div.title {
-		display: table;
-		margin-bottom: 2rem;
-		border: thin dashed red;
-		padding: 1ex 1em;
-	}
-
-	div.sub {
-		margin: 1rem 0;
-	}
-
-	div.sub:not(h1+*) {
-		border-top: thin dashed;
 	}
 }
 
