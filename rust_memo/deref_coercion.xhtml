@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Deref 型強制。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>Deref</code> 型強制を使った省力化について。
+		</p>
+		<section>
+			<h1>仕様</h1>
+			<p>
+型強制では頻出の型変換を自動で行ってくれる。そして、自動化された変換の一つに、<code>Deref</code> トレイトの参照を自動で辿る機能がある。
+			</p> <p>
+より具体的には、型 <code>T</code> が <code>Deref&lt;Target = U&gt;</code> の境界を持つ時に、<code>&amp;T</code> から <code>&amp;U</code> へと自動的に変換してくれる。
+			</p>
+		</section> <section>
+			<h1>TIPS</h1>
+			<p>
+上記の仕様により、通常の参照型で複数種のスマートポインタに対応できる。
+			</p>
+<pre><code class="language-rust">
+use std::rc::Rc;
+
+fn main() {
+    test(&amp;42);
+    test(&amp;Box::new(42));
+    test(&amp;Rc::new(42));
+}
+
+fn test(r: &amp;i32) {
+    println!("{}", r);
+}
+</code></pre>
+		</section>
+	</body>
+</html>
