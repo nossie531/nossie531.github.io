@@ -288,6 +288,12 @@
 			padding: 0.5ex 0.5ch;
 			border: thin solid var(--edge-color);
 		}
+
+		> tr > th,
+		> * > tr > th {
+			font-weight: normal;
+			background-color: var(--fill-color);
+		}
 	}
 }
 

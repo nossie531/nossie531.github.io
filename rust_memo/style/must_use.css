@@ -1,0 +1,15 @@
+@charset "utf-8";
+
+table.fn_bool > tr > th {
+	width: 12em;
+	text-align: left;
+
+	& code {
+		background: transparent;
+	}
+}
+
+table.fn_bool > tr > td {
+	width: 1.5em;
+	text-align: center;
+}

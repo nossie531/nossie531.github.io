@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: must_use 注釈。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<link rel="stylesheet" href="style/must_use.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>must_use</code> 注釈は、値の使い忘れを防止してくれる。
+		</p>
+		<section>
+			<h1>仕様</h1>
+			<p>
+以下は注釈の適用対象ごとの効果。
+			</p>
+			<ul>
+				<li>
+					<p>
+型に注釈を指定した場合、その値について、使い忘れを警告。
+					</p>
+				</li> <li>
+					<p>
+関数に注釈を指定した場合、その戻り値について、使い忘れを警告。
+					</p>
+				</li> <li>
+					<p>
+トレイトに注釈を指定した場合、全ての実装型について、注釈の効果を適用。
+					</p>
+				</li> <li>
+					<p>
+トレイトの実装側の関数に指定した場合、無視 (トレイト側の関数の指定を適用)。
+					</p>
+				</li>
+			</ul>
+			<div class="sub">
+				<h2>警告の例</h2>
+				<p>
+以下は <code>must_use</code> 注釈による警告の例。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    <mark class="warn">must_use()</mark>;
+}
+
+#[must_use]
+fn must_use() -&gt; i32 {
+    42
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="warn">warning</mark><mark class="title">: unused return value of `must_use` that must be used</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     must_use();
+<mark class="info">  |</mark>     <mark class="warn">^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(unused_must_use)]` on by default
+<mark class="info">help</mark>: use `let _ = ...` to ignore the resulting value
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     <mark class="edit">let _ = </mark>must_use();
+<mark class="info">  |</mark>     <mark class="edit">+++++++</mark>
+</samp></pre>
+			</div>
+			<div class="sub">
+				<h2>制限</h2>
+				<p>
+全ての使い忘れが警告されるわけではない。
+				</p> <p>
+ブロックやタプルなどでラップされると検出できない。
+				</p> <p>
+以下は前述のコードとほぼ同じだがブロックでラップしたため警告が出ない。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    { must_use() };
+}
+
+#[must_use]
+fn must_use() -&gt; i32 {
+    42
+}
+</code></pre>
+			</div>
+		</section> <section>
+			<h1>適用基準</h1>
+			<p>
+以下のアイテムは <code>must_use</code> が適用する場合が多い。
+			</p>
+			<ul>
+				<li>
+副作用のない関数。
+				</li> <li>
+遅延評価を目的に生成される型 (例: イテレータのコンビネータ)
+				</li> <li>
+対処すべきエラー情報を含む型 (例: <code>Result&lt;T, E&gt;</code>)
+				</li>
+			</ul>
+			<p>
+なお、<code>Option::map</code> など、コールバック引数を持つ関数では、たとえ副作用を伴わない用法が多くても、常にそうとは限らないので、対象外とする傾向がある。
+			</p>
+		</section> <section>
+			<h1><code>std</code> の状況</h1>
+			<aside class="normal moan">
+				<p>
+仕様の不備？
+				</p>
+				<p>
+筆者の知識不足かもしれないが、以下の内容は仕様の不備に思える。
+				</p>
+			</aside>
+			<p>
+2023 年現在、上記の基準から外れたものも多い。<br/>
+また、同系統のアイテムについての一貫性もない。<br/>
+			</p>
+			<div class="sub">
+				<h2>調査結果</h2>
+				<p>
+いくつかピックアップして調べた結果…。
+				</p>
+				<dl class="normal">
+					<dt>コンストラクタ系</dt>
+					<dd>
+						<p>
+以下はどれも副作用なしのため、全て <code>must_use</code> が期待される。
+						</p>
+						<table class="normal fn_bool">
+							<tr> <th><code>Box::new</code></th> <td>〇</td></tr>
+							<tr> <th><code>Vec::new</code></th> <td>〇</td></tr>
+							<tr> <th><code>Rc::new</code></th> <td>×</td></tr>
+						</table>
+					</dd>
+					<dt>ゲッター系</dt>
+					<dd>
+						<p>
+以下はどれも副作用なしのため、全て <code>must_use</code> が期待される。
+						</p>
+						<table class="normal fn_bool">
+							<tr> <th><code>slice::len</code></th> <td>〇</td></tr>
+							<tr> <th><code>slice::is_empty</code></th> <td>〇</td></tr>
+							<tr> <th><code>Vec::len</code></th> <td>×</td></tr>
+							<tr> <th><code>Vec::is_empty</code></th> <td>×</td></tr>
+						</table>
+					</dd>
+					<dt>コールバック系</dt>
+					<dd>
+						<p>
+以下はどれもコールバックを伴うため、全て <code>must_use</code> なしが期待される。
+						</p>
+						<table class="normal fn_bool">
+							<tr> <th><code>Option::map</code></th> <td>×</td></tr>
+							<tr> <th><code>Option::is_some_and</code></th> <td>〇</td></tr>
+						</table>
+					</dd>
+					<dt>その他</dt>
+					<dd>
+						<p>
+以下は副作用なしだが <code>must_use</code> なし。
+						</p>
+						<table class="normal fn_bool">
+							<tr> <th><code>Result::ok</code></th> <td>×</td></tr>
+							<tr> <th><code>Result::err</code></th> <td>×</td></tr>
+						</table>
+					</dd>
+				</dl>
+			</div>
+		</section>
+	</body>
+</html>
