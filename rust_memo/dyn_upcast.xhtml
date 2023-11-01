@@ -46,22 +46,48 @@ trait SomeTrait: BaseTrait {}
 impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0658]</mark>: cannot cast `dyn SomeTrait` to `dyn BaseTrait`, trait upcasting coercion is experimental
+<mark class="error">error[E0658]</mark><mark class="title">: cannot cast `dyn SomeTrait` to `dyn BaseTrait`, trait upcasting coercion is experimental</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:3:16
 <mark class="info">  |</mark>
 <mark class="info">3 |</mark>     let _base = some as &amp;dyn BaseTrait;
 <mark class="info">  |</mark>                 <mark class="error">^^^^</mark>
 <mark class="info">  |</mark>
-  = note: see issue #65991 &lt;https://github.com/rust-lang/rust/issues/65991&gt; for more information
-  = note: required when coercing `&amp;dyn SomeTrait` into `&amp;dyn BaseTrait`
+<mark class="info">  =</mark> <mark class="title">note</mark>: see issue #65991 &lt;https://github.com/rust-lang/rust/issues/65991&gt; for more information
+<mark class="info">  =</mark> <mark class="title">note</mark>: required when coercing `&amp;dyn SomeTrait` into `&amp;dyn BaseTrait`
 </samp></pre>
 		</section> <section>
-			<h1>回避策</h1>
+			<h1>解決策</h1>
 			<p>
-アップキャスト用のメソッドを派生側のトレイトに作る。
-			</p> <p>
-つまり、キャストの位置をトレイトの実装内へと移す。これにより、キャスト対象の静的型が分かっている箇所でキャストできるため、静的型から動的型へのキャストとなり、エラーにはならなくなる。
+幾つか方法がある。
 			</p>
+			<dl class="normal lowProfile">
+				<dt><a href="way1">方法１</a></dt>
+				<dd>基本となる戦略</dd>
+				<dt><a href="way2">方法２</a></dt>
+				<dd>基底側でのアップキャスト</dd>
+				<dt><a href="way3">方法３</a></dt>
+				<dd>アップキャスト用トレイト</dd>
+			</dl>
+			<p>
+※ 方法３が最も汎用的なので迷ったらそれを選ぶとよい。
+			</p>
+			<section>
+				<hgroup>
+					<h1 id="way1">方法１</h1>
+					<div class="subtitle">
+						基本となる戦略
+					</div>
+				</hgroup>
+				<p>
+アップキャスト用のメソッドを派生側のトレイトに作る。
+				</p> <p>
+つまり、キャストの位置をトレイトの実装内へと移す。これにより、キャスト対象の静的型が分かっている箇所でキャストできるため、静的型から動的型へのキャストとなり、エラーにはならなくなる。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>SomeTrait</code> にアップキャスト用のメソッド <code>as_base</code> を定義している。
+					</p>
 <pre><code class="language-rust">
 fn main() {
     let some = &amp;0 as &amp;dyn SomeTrait;
@@ -86,20 +112,26 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {
     }
 }
 </code></pre>
-		</section> <section>
-			<h1>楽な実装</h1>
-			<p>
-派生側のトレイトが多い場合、個別に上の実装を行うのは面倒。
-			</p> <p>
-以下は考えられる対策。
-			</p>
-			<div class="sub">
-				<h2>基底側でのアップキャスト</h2>
+				</div>
+			</section> <section>
+				<hgroup>
+					<h1 id="way2">方法２</h1>
+					<div class="subtitle">
+						基底側でのアップキャスト
+					</div>
+				</hgroup>
 				<p>
 アップキャスト用メソッドを派生側ではなく基底側に作っておく。
 				</p> <p>
-当然、この方法は基底側が定義済だと使えない。
+この方法は、複数の派生トレイトに楽に対応できる。
+				</p> <p>
+ただし、基底側が定義済だと使えない。
 				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>BaseTrait</code> にアップキャスト用のメソッド <code>as_base</code> を定義している。
+					</p>
 <pre><code class="language-rust">
 fn main() {
     let some = &amp;0 as &amp;dyn SomeTrait;
@@ -124,16 +156,26 @@ trait SomeTrait: BaseTrait {}
 
 impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 </code></pre>
-			</div>
-			<div class="sub">
-				<h2>アップキャスト用トレイト</h2>
+				</div>
+			</section> <section>
+				<hgroup id="way3">
+					<h1>方法３</h1>
+					<div class="subtitle">
+						アップキャスト用トレイト
+					</div>
+				</hgroup>
 				<p>
 予めアップキャスト用のトレイトを作っておく。
 				</p> <p>
-なお、この方法は基底側が定義済でも使える。
+この方法は、複数の派生トレイトに楽に対応できる。
 				</p> <p>
-以下では定義済のトレイト <code>Any</code> のために <code>AsAny</code> を用意している。
+また、基底側が定義済でも使える。
 				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、定義済の <code>Any</code> へのアップキャスト用に <code>AsAny</code> を用意している。
+					</p>
 <pre><code class="language-rust">
 use std::any::Any;
 
@@ -164,7 +206,8 @@ trait SomeTrait: Any + AsAny {
 
 impl&lt;T: Any&gt; SomeTrait for T {}
 </code></pre>
-			</div>
+				</div>
+			</section>
 		</section>
 	</body>
 </html>
