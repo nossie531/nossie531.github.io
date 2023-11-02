@@ -158,8 +158,8 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 </code></pre>
 				</div>
 			</section> <section>
-				<hgroup id="way3">
-					<h1>方法３</h1>
+				<hgroup>
+					<h1 id="way3">方法３</h1>
 					<div class="subtitle">
 						アップキャスト用トレイト
 					</div>
@@ -208,6 +208,38 @@ impl&lt;T: Any&gt; SomeTrait for T {}
 </code></pre>
 				</div>
 			</section>
+		</section> <section>
+			<h1>発展形</h1>
+			<p>
+上記では、不変参照を通したアップキャストについて説明したが、他にも可変参照や <code>Box</code> を通した関数があると便利 (<code>Box</code> 以外のスマートポインタ、例えば <code>Rc</code> などは、<code>Box</code> から <code>From</code> トレイトで変換できるため、事前に関数を用意しておく必要性は低い)。
+			</p>
+			<div class="sub">
+				<h2>サンプルコード</h2>
+				<p>
+以下では、前述の『<a href="#way3">方法３</a>』のサンプルコードの <code>AsAny</code> を強化している。
+				</p>
+<pre><code class="language-rust">
+trait AsAny: Any {
+    fn as_any(&amp;self) -&gt; &amp;dyn Any;
+    fn as_any_mut(&amp;mut self) -&gt; &amp;mut dyn Any;
+    fn as_any_box(self: Box&lt;Self&gt;) -&gt; Box&lt;dyn Any&gt;;
+}
+
+impl&lt;T: Any&gt; AsAny for T {
+    fn as_any(&amp;self) -&gt; &amp;dyn Any {
+        self
+    }
+
+    fn as_any_mut(&amp;mut self) -&gt; &amp;mut dyn Any {
+        self
+    }
+
+    fn as_any_box(self: Box&lt;Self&gt;) -&gt; Box&lt;dyn Any&gt; {
+        self
+    }
+}
+</code></pre>
+			</div>
 		</section>
 	</body>
 </html>
