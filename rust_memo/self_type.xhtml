@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: self 引数の取扱い。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<link rel="stylesheet" href="style/must_use.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>self</code> 引数の各種の取扱い方法について。
+		</p>
+		<section>
+			<h1>メジャーな用法</h1>
+			<dl class="normal lowProfile">
+				<dt><code>self</code></dt>
+				<dd>
+値渡し、<code>self: Self</code> の省略記法。
+				</dd>
+				<dt><code>&amp;self</code></dt>
+				<dd>
+不変参照渡し、<code>self: &amp;Self</code> の省略記法。
+				</dd>
+				<dt class="nw"><code>&amp;mut self</code></dt>
+				<dd>
+可変参照渡し、<code>self: &amp;mut Self</code> の省略記法。
+				</dd>
+			</dl>
+		</section> <section>
+			<h1>マイナーな用法</h1>
+			<p>
+<code>self</code> の型に指定できるのは、参照外しの反復で <code>Self</code> 型にできる型である。
+			</p> <p>
+そのため、<code>self: Box&lt;Self&gt;</code> のような指定も可能になる。
+			</p> <p>
+以下、簡単な使用例。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let bx = Box::new(Test {});
+    bx.method();
+}
+
+struct Test {}
+impl Test {
+    fn method(self: Box&lt;Self&gt;) {
+        // nop.
+    }
+}
+</code></pre>
+			<div class="sub">
+				<h2>この用法の使い所</h2>
+				<p>
+この用法を使わなくても、『<a href="dot_and_self.xhtml">メソッド呼出と型変換</a>』による自動型変換があるため、<wbr/><code>&amp;self</code> でも <code>Box&lt;Self&gt;</code> 型の実引数を受けられる。そのため、この記法は <code>&amp;self</code> で受けられる他の型を除外し、<code>Box&lt;Self&gt;</code> 型のみを扱いたい場合に役に立つ。
+				</p>
+			</div>
+		</section>
+	</body>
+</html>
