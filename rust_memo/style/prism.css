@@ -1,0 +1,86 @@
+@media (prefers-color-scheme: light) {
+	code[class|="language"] {
+		color: hsla(0, 0%, 0%, 0.8);
+
+		& .token.keyword,
+		& .token.url {
+			color: hsla(240, 90%, 60%, 0.8);
+		}
+
+		& .token.comment {
+			color: hsla(120, 100%, 25%, 0.8);
+		}
+
+		& .token.operator,
+		& .token.symbol {
+			color: hsla(40, 100%, 30%, 0.8);
+		}
+
+		& .token.punctuation,
+		& .token.attribute {
+			color: hsla(0, 0%, 50%, 0.8);
+		}
+
+		& .token.namespace,
+		& .token.class-name,
+		& .token.function {
+			color: inherit;
+		}
+
+		& .token.macro {
+			color: hsla(330, 90%, 35%, 0.8);
+		}
+
+		& .token.constant,
+		& .token.number,
+		& .token.boolean,
+		& .token.string,
+		& .token.char {
+			color: hsla(20, 90%, 40%, 0.8);
+		}
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	code[class|="language"] {
+		color: hsla(0, 0%, 75%, 0.8);
+
+		& .token.keyword,
+		& .token.url {
+			color: hsla(240, 80%, 75%, 0.8);
+		}
+
+		& .token.comment {
+			color: hsla(120, 80%, 40%, 0.8);
+		}
+
+		& .token.operator,
+		& .token.symbol {
+			color: hsla(40, 100%, 70%, 0.8);
+		}
+
+		& .token.punctuation,
+		& .token.attribute {
+			color: hsla(0, 0%, 50%, 0.8);
+		}
+
+		& .token.namespace,
+		& .token.class-name,
+		& .token.function {
+			color: inherit;
+		}
+
+		& .token.macro {
+			color: hsla(330, 90%, 65%, 0.8);
+		}
+
+		& .token.constant,
+		& .token.number,
+		& .token.boolean,
+		& .token.string,
+		& .token.char {
+			color: hsla(20, 90%, 60%, 0.8);
+		}
+	}
+}
+
