@@ -15,33 +15,39 @@
 <code>must_use</code> 注釈は、値の使い忘れを防止してくれる。
 		</p>
 		<section>
-			<h1>仕様</h1>
-			<p>
-以下は注釈の適用対象ごとの効果。
-			</p>
-			<ul>
-				<li>
-					<p>
-型に注釈を指定した場合、その値について、使い忘れを警告。
-					</p>
-				</li> <li>
-					<p>
-関数に注釈を指定した場合、その戻り値について、使い忘れを警告。
-					</p>
-				</li> <li>
-					<p>
-トレイトに注釈を指定した場合、全ての実装型について、注釈の効果を適用。
-					</p>
-				</li> <li>
-					<p>
-トレイトの実装側の関数に指定した場合、無視 (トレイト側の関数の指定を適用)。
-					</p>
-				</li>
-			</ul>
+			<h1>基本</h1>
 			<div class="sub">
-				<h2>警告の例</h2>
+				<h2>適用対象ごとの効果</h2>
+				<dl class="normal lowProfile">
+					<dt>関数</dt>
+					<dd>その関数の戻り値について、使い忘れを警告。</dd>
+					<dt>型</dt>
+					<dd>その型の全ての値について、使い忘れを警告。</dd>
+					<dt>トレイト</dt>
+					<dd>そのトレイトを実装する全ての型について、注釈の効果を適用。</dd>
+				</dl>
 				<p>
-以下は <code>must_use</code> 注釈による警告の例。
+なお、注釈をトレイトの実装側の関数に適用した場合、無視される。<br/>
+つまり、トレイト側の関数の指定が適用される。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>警告のカスタマイズ</h2>
+				<p>
+警告のメッセージはカスタマイズできる。
+				</p>
+				<ul>
+					<li>
+<code>#[must_use]</code> … デフォルトのメッセージ。
+					</li> <li>
+<code>#[must_use = "message"]</code> … カスタムのメッセージ。
+					</li>
+				</ul>
+			</div>
+			<div class="sub">
+				<h2>使用例</h2>
+				<p>
+以下、デフォルトのメッセージによる警告の例。
 				</p>
 <pre><code class="language-rust">
 fn main() {
@@ -67,15 +73,15 @@ fn must_use() -&gt; i32 {
 <mark class="info">  |</mark>     <mark class="edit">+++++++</mark>
 </samp></pre>
 			</div>
-			<div class="sub">
-				<h2>制限</h2>
-				<p>
+		</section> <section>
+			<h1>制限</h1>
+			<p>
 全ての使い忘れが警告されるわけではない。
-				</p> <p>
+			</p> <p>
 ブロックやタプルなどでラップされると検出できない。
-				</p> <p>
-以下は前述のコードとほぼ同じだがブロックでラップしたため警告が出ない。
-				</p>
+			</p> <p>
+以下、警告が出力されない例
+			</p>
 <pre><code class="language-rust">
 fn main() {
     { must_use() };
@@ -86,11 +92,10 @@ fn must_use() -&gt; i32 {
     42
 }
 </code></pre>
-			</div>
 		</section> <section>
 			<h1>適用基準</h1>
 			<p>
-以下のアイテムは <code>must_use</code> が適用する場合が多い。
+以下のアイテムは <code>must_use</code> を適用する場合が多い。
 			</p>
 			<ul>
 				<li>
@@ -104,71 +109,72 @@ fn must_use() -&gt; i32 {
 			<p>
 なお、<code>Option::map</code> など、コールバック引数を持つ関数では、たとえ副作用を伴わない用法が多くても、常にそうとは限らないので、対象外とする傾向がある。
 			</p>
-		</section> <section>
-			<h1><code>std</code> の状況</h1>
-			<aside class="normal moan">
+			<section>
+				<h1><code>std</code> の状況</h1>
 				<p>
-仕様の不備？
-				</p>
-				<p>
-筆者の知識不足かもしれないが、以下の内容は仕様の不備に思える。
-				</p>
-			</aside>
-			<p>
 2023 年現在、上記の基準から外れたものも多い。<br/>
 また、同系統のアイテムについての一貫性もない。<br/>
-			</p>
-			<div class="sub">
-				<h2>調査結果</h2>
-				<p>
-いくつかピックアップして調べた結果…。
 				</p>
-				<dl class="normal">
-					<dt>コンストラクタ系</dt>
-					<dd>
-						<p>
+				<aside class="normal moan">
+					<p>
+仕様の不備？
+					</p>
+					<p>
+筆者の知識不足かもしれないが、これは仕様の不備に思える。
+					</p>
+				</aside>
+				<div class="sub">
+					<h2>調査結果</h2>
+					<p>
+いくつかピックアップした調査結果…。
+					</p>
+					<dl class="normal">
+						<dt>コンストラクタ系</dt>
+						<dd>
+							<p>
 以下はどれも副作用なしのため、全て <code>must_use</code> が期待される。
-						</p>
-						<table class="normal fn_bool">
-							<tr> <th><code>Box::new</code></th> <td>〇</td></tr>
-							<tr> <th><code>Vec::new</code></th> <td>〇</td></tr>
-							<tr> <th><code>Rc::new</code></th> <td>×</td></tr>
-						</table>
-					</dd>
-					<dt>ゲッター系</dt>
-					<dd>
-						<p>
+							</p>
+							<table class="normal fn_bool">
+								<tr> <th><code>Box::new</code></th> <td>〇</td></tr>
+								<tr> <th><code>Vec::new</code></th> <td>〇</td></tr>
+								<tr> <th><code>Rc::new</code></th> <td>×</td></tr>
+							</table>
+						</dd>
+						<dt>ゲッター系</dt>
+						<dd>
+							<p>
 以下はどれも副作用なしのため、全て <code>must_use</code> が期待される。
-						</p>
-						<table class="normal fn_bool">
-							<tr> <th><code>slice::len</code></th> <td>〇</td></tr>
-							<tr> <th><code>slice::is_empty</code></th> <td>〇</td></tr>
-							<tr> <th><code>Vec::len</code></th> <td>×</td></tr>
-							<tr> <th><code>Vec::is_empty</code></th> <td>×</td></tr>
-						</table>
-					</dd>
-					<dt>コールバック系</dt>
-					<dd>
-						<p>
+							</p>
+							<table class="normal fn_bool">
+								<tr> <th><code>slice::len</code></th> <td>〇</td></tr>
+								<tr> <th><code>slice::is_empty</code></th> <td>〇</td></tr>
+								<tr> <th><code>Vec::len</code></th> <td>×</td></tr>
+								<tr> <th><code>Vec::is_empty</code></th> <td>×</td></tr>
+							</table>
+						</dd>
+						<dt>コールバック系</dt>
+						<dd>
+							<p>
 以下はどれもコールバックを伴うため、全て <code>must_use</code> なしが期待される。
-						</p>
-						<table class="normal fn_bool">
-							<tr> <th><code>Option::map</code></th> <td>×</td></tr>
-							<tr> <th><code>Option::is_some_and</code></th> <td>〇</td></tr>
-						</table>
-					</dd>
-					<dt>その他</dt>
-					<dd>
-						<p>
+							</p>
+							<table class="normal fn_bool">
+								<tr> <th><code>Option::map</code></th> <td>×</td></tr>
+								<tr> <th><code>Option::is_some_and</code></th> <td>〇</td></tr>
+							</table>
+						</dd>
+						<dt>その他</dt>
+						<dd>
+							<p>
 以下は副作用なしだが <code>must_use</code> なし。
-						</p>
-						<table class="normal fn_bool">
-							<tr> <th><code>Result::ok</code></th> <td>×</td></tr>
-							<tr> <th><code>Result::err</code></th> <td>×</td></tr>
-						</table>
-					</dd>
-				</dl>
-			</div>
+							</p>
+							<table class="normal fn_bool">
+								<tr> <th><code>Result::ok</code></th> <td>×</td></tr>
+								<tr> <th><code>Result::err</code></th> <td>×</td></tr>
+							</table>
+						</dd>
+					</dl>
+				</div>
+			</section>
 		</section>
 	</body>
 </html>
