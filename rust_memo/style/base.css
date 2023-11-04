@@ -358,8 +358,15 @@
 
 @layer ui {
 	:root {
-		overflow: auto;
 		scroll-behavior: smooth;
+
+		/* -- 右スクロールバーは常に表示 --
+		 * nav.css の右サイドバーには、ページ遷移用ボタンがある。この位置が
+		 * ページごとにスクロールバーの有無で変わると、連続したページ遷移の
+		 * 操作がしにくい。なお、overflow: auto; scrollbar-gutter: stable;
+		 * とすると、より良いデザインになるが、2023 年時点、Safari は非対応、
+		 * Chrome はガターが右寄せの固定配置を覆い隠す問題がある。*/
+		overflow: auto scroll;
 	}
 
 	*:target {
