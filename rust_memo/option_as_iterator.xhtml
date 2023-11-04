@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Option とイテレータ。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>Option</code> が実装する <code>Iterator</code> について。
+		</p> 
+		<aside class="normal">
+			<p>
+このメモの背景。
+			</p> <p>
+<code>Option</code> の使い方としては比較的マイナーなのでメモ。
+			</p>
+		</aside>
+		<section>
+			<h1>仕様</h1>
+			<p>
+<code>Option</code> の <code>Iterator</code> は 0 個か 1 個の要素を走査する。<br/>
+つまり、<code>None</code> なら 0 個、<code>Some</code> なら 1 個となる。
+			</p>
+		</section> <section>
+			<h1>簡単な例</h1>
+			<p>
+以下の例では、<code>Option</code> を利用してコレクションに要素を選択的に追加している。
+			</p>
+<pre><code class="language-rust">
+ fn main() {
+    let mut nums = vec![];
+    nums.extend(filter(0));
+    nums.extend(filter(1));
+    nums.extend(filter(2));
+    assert_eq!(nums, vec![0, 2]);
+}
+
+fn filter(arg: i32) -&gt; Option&lt;i32&gt; {
+    if arg % 2 == 0 { Some(arg) } else { None }
+}
+</code></pre>
+		</section>
+	</body>
+</html>
