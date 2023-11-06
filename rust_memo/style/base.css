@@ -166,7 +166,7 @@
 
 		> div.subtitle::before,
 		> div.subtitle::after {
-			content: "〜";
+			content: " 〜 ";
 		}
 	}
 
