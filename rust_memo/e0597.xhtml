@@ -24,13 +24,14 @@
 				<dt><a href="#ptnB">パターン B</a></dt>
 				<dd>ライフタイムの違反。</dd>
 				<dt><a href="#ptnC">パターン C</a></dt>
-				<dd>Drop トレイトが暗躍。</dd>
+				<dd><code>Drop</code> トレイトの暗躍。</dd>
 			</dl>
 			<section>
-				<h1 id="ptnA">パターン A.</h1>
+				<hgroup>
+					<h1 id="ptnA">パターン A.</h1>
+					<div class="subtitle">スコープの違反</div>
+				</hgroup>
 				<p>
-スコープの違反が原因となるパターン。
-				</p> <p>
 以下では、<code>inside_val</code> と <code>outside_ref</code> を比べると、前者が先に破棄される。<br/>
 そのため、前者の参照は後者に代入できない。
 				</p>
@@ -61,10 +62,11 @@ fn main() {
 <mark class="info">  |</mark>          <mark class="info">----------- borrow later used here</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnB">パターン B.</h1>
+				<hgroup>
+					<h1 id="ptnB">パターン B.</h1>
+					<div class="subtitle">ライフタイムの違反</div>
+				</hgroup>
 				<p>
-ライフタイムの違反が原因となるパターン。
-				</p> <p>
 以下では、<code>use_static_ref</code> の引数は <code>static</code> ライフタイムの参照型でなければならない。<br/>
 にも関わらず、ローカルライフタイムの参照 <code>&amp;local</code> を指定している。
 				</p>
@@ -93,22 +95,23 @@ fn use_static_ref(_: &amp;'static i32) {
 <mark class="info">  |</mark> <mark class="info">- `local` dropped here while still borrowed</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnC">パターン C.</h1>
+				<hgroup>
+					<h1 id="ptnC">パターン C.</h1>
+					<div class="subtitle"><code>Drop</code> トレイトの暗躍</div>
+				</hgroup>
 				<p>
-<code>Drop</code> トレイトが暗躍するパターン。
-				</p> <p>
-ブロック式内のローカル変数は、ブロック式の値部にある一時変数より先に破棄される。そのため、後者が前者を参照していると、後者の破棄のタイミングで参照先が存在していない事になる。多くの場合、これでも問題ないが、<code>Drop</code> トレイトを実装していると、<code>drop</code> メソッドの実行時に状態異常になる。
+ブロック内のローカル変数と、ブロック末尾の式内にて生成される値とでは、前者が先に破棄される。そのため、後者が前者を参照していると、後者を破棄する時点ですでに後者は参照先を失っている。殆どの場合、それでも問題はないが、後者が <code>Drop</code> トレイトを実装する場合、その状態で <code>drop</code> メソッドを実行するわけにもいかず、エラーとなる。
 				</p>
 				<div class="sub">
 					<h2>エラーの解決方法</h2>
 					<p>
-後述のエラーメッセージの <q>help</q> の項目にある通り、エラーの解決はブロック式の値部分を文として切り出すとよい。これで、一時変数はローカル変数よりも先に破棄される。
+後述のエラーメッセージの <q>help</q> にある通り、ブロック末尾の式をローカル変数として切り出せばよい。これにより、値が破棄される順序を逆転できる。
 					</p>
 				</div>
 				<div class="sub">
 					<h2>サンプルコード</h2>
 					<p>
-以下では、一時変数 <code>local<wbr/>.sub()</code> がローカル変数 <code>local</code> を参照している。そして、<code>local</code> は <code>local<wbr/>.sub()</code> より先に解放される。つまり、<code>local<wbr/>.sub()</code> で <code>Drop</code> が起動された時にはすでに参照先 <code>self.0</code> は存在しない。
+以下では、一時変数 <code>local<wbr/>.sub()</code> がローカル変数 <code>local</code> を参照している。そして、<code>local</code> は <code>local<wbr/>.sub()</code> より先に解放される。つまり、<code>local<wbr/>.sub()</code> で <code>Drop</code> が起動された時にはすでに参照先 <code>&amp;'a i32</code> は存在しない。
 					</p>
 				</div>
 <pre><code class="language-rust">
