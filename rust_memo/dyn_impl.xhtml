@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: dyn 型の実装。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>dyn</code> 型 (トレイトオブジェクト) はそれ自体に実装を付加できる。
+		</p>
+		<section>
+			<h1>実装方法</h1>
+			<section>
+				<h1>固有機能の実装</h1>
+				<p>
+<code>impl dyn <var>MyTrait</var> { ... }</code> のスタイルで記載する。
+				</p>
+				<div class="sub">
+					<h2>主な用途</h2>
+					<p>
+あまり使われていない。なぜなら、トレイトとトレイトオブジェクト、どちらにでも機能を実装できる場合が多く、慣習的には前者が優先されるため。数少ない利用例としては、<code>std</code> の <code>dyn Any</code> の実装があり、それは動的な型情報へのアクセスポイントを提供している。
+					</p>
+				</div>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>dyn Animal</code> 型にレポート用の関数を持たせている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let dog = Dog { name: "Pochi".to_string() };
+    let animal = &amp;dog as &amp;dyn Animal;
+    animal.print_status();
+}
+
+trait Animal {
+    fn species(&amp;self) -&gt; &amp;str;
+    fn name(&amp;self) -&gt; &amp;str;
+}
+
+impl dyn Animal {
+    fn print_status(&amp;self) {
+        let species = self.species();
+        let name = self.name();
+        println!("species: {species}, name: {name}")
+    }
+}
+
+struct Dog {
+    name: String,
+}
+
+impl Animal for Dog {
+    fn species(&amp;self) -&gt; &amp;str { "Dog" }
+    fn name(&amp;self) -&gt; &amp;str { &amp;self.name }
+}
+</code></pre>
+				</div>
+			</section> <section>
+				<h1>トレイトの実装</h1>
+				<p>
+<code>impl <var>SomeTrait</var> for dyn <var>MyTrait</var> { ... }</code> のスタイルで記載する。
+				</p>
+				<div class="sub">
+					<h2>主な用途</h2>
+					<p>
+トレイトをトレイトオブジェクトに実装する事で、トレイトが扱う <code>Self</code> 型を動的にできる。例えば、<code>PartialEq</code> トレイトを実装する型は、その型自身 (<code>Self</code>) としか <code>eq</code> メソッドで比較できないが、この手法を使えば、トレイトオブジェクトどうしを比較できるようになる。
+					</p>
+				</div>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、数値型と文字列型を <code>Id</code> トレイトで抽象化している。<br/>
+これにより、両者を <code>PartialEq</code> で比較できるようにしている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let x = &amp;1 as &amp;dyn Id;
+    let y = &amp;"1".to_string() as &amp;dyn Id;
+    assert!(!x.eq(y));
+}
+
+trait Id {
+    fn key(&amp;self) -&gt; String;
+    fn is(&amp;self, other: &amp;dyn Id) -&gt; bool {
+        self.key() == other.key()
+    }
+}
+
+impl PartialEq for dyn Id {
+    fn eq(&amp;self, other: &amp;Self) -&gt; bool {
+        self.is(other)
+    }
+}
+
+impl Id for i32 {
+    fn key(&amp;self) -&gt; String { format!("i32: {self}") }
+}
+
+impl Id for String {
+    fn key(&amp;self) -&gt; String { format!("str: {self}") }
+}
+</code></pre>
+				</div>
+			</section>
+		</section> <section>
+			<h1>注意点</h1>
+			<p>
+上記を応用する上で、忘れがちな落し穴について。
+			</p>
+			<section>
+				<h1>ライフタイム</h1>
+				<p>
+<code>dyn <var>TraitName</var></code> は糖衣構文であり、<code>dyn <var>TraitName</var> + 'static</code> と等価である。
+				</p> <p>
+<code>dyn <var>TraitName</var> + '_</code> のように匿名ライフタイムを使えば、<code>'static</code> 境界が解除される。
+				</p>
+			</section> <section>
+				<h1>トレイト間の関係</h1>
+				<p>
+トレイトオブジェクトに実装されたトレイトが、派生側のトレイトオブジェクトに自動的に実装されたりはしない。なぜなら、派生側のトレイトオブジェクトは、基底側のトレイトオブジェクトに比べ、取り扱える型が減る。そのため、トレイトが取り扱える型についての保証を含んでいる場合、その保証が破綻してしまう。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>dyn SubTrait</code> は <code>TraitX</code> を実装しない。
+					</p>
+					<figure class="normal">
+						<object data="img/dyn_impl.svg" style="height: calc(13rem * 0.9);"/>
+					</figure>
+<pre><code class="language-rust">
+fn main() {
+    let x = &amp;0 as &amp;dyn SubTrait;
+    x.<mark class="error">test</mark>();
+}
+
+trait TraitX {
+    fn test(&amp;self) {
+        // nop.
+    }
+}
+
+trait BaseTrait {}
+impl&lt;T&gt; BaseTrait for T {}
+impl TraitX for dyn BaseTrait {}
+
+trait SubTrait: BaseTrait {}
+impl&lt;T: BaseTrait&gt; SubTrait for T {}
+</code></pre>
+				</div>
+			</section>
+		</section>
+	</body>
+</html>

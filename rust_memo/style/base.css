@@ -265,19 +265,6 @@
 		}
 	}
 
-	@media screen and (prefers-color-scheme: dark) {
-		aside.normal {
-			&::before { 
-				background-image: url("img/book_dark.svg");
-			}
-
-			&.moan::before {
-				background-image: url("img/unhappy.svg");
-				filter: saturate(20%) brightness(85%);
-			}
-		}
-	}
-
 	table.normal {
 		margin: 1em 0;
 		border-collapse: collapse;
@@ -292,6 +279,29 @@
 		> * > tr > th {
 			font-weight: normal;
 			background-color: var(--fill-color);
+		}
+	}
+
+	figure.normal {
+		margin: 1rem 0;
+		text-align: center;
+
+		> object {
+			border: 1px dashed hsla(0, 0%, 0%, 0.25);
+			vertical-align: bottom;
+		}
+	}
+
+	@media screen and (prefers-color-scheme: dark) {
+		aside.normal {
+			&::before { 
+				background-image: url("img/book_dark.svg");
+			}
+
+			&.moan::before {
+				background-image: url("img/unhappy.svg");
+				filter: saturate(20%) brightness(85%);
+			}
 		}
 	}
 }

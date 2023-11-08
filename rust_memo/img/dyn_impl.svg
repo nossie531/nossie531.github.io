@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	viewBox="0 0 380 130"
+	style="width:38em; height:13em;">
+	<style>
+:root { font-size:10px; }
+text { font-family: "Verdana", "Meiryo", sans-serif; }
+g.type > rect { fill: white; stroke: black; stroke-width: 1; }
+g.type > text { text-anchor: middle; font-family: "Consolas", monospace; }
+g.type > text.name { font-weight: bold; }
+path.rel { fill: none; stroke: black; stroke-width: 1; }
+marker#impl path { fill: white; stroke: black; stroke-width: 1; stroke-linejoin: bevel; }
+marker#not path { fill: none; stroke: red; stroke-width: 1.5; }
+	</style>
+	<defs>
+		<marker id="impl" 
+			markerUnits="userSpaceOnUse"
+			markerWidth="20" markerHeight="20"
+			viewBox="-15 -10 20 20"
+			orient="auto-start-reverse">
+			<path d="M 0,0 L-10,-5 L-10,5 Z"/>
+		</marker>
+		<marker id="not" 
+			markerUnits="userSpaceOnUse"
+			markerWidth="10" markerHeight="10"
+			viewBox="-5 -5 10 10"
+			orient="auto-start-reverse">
+			<path d="M -4,-4 L+4,+4"/>
+			<path d="M -4,+4 L+4,-4"/>
+		</marker>
+	</defs>
+	<g class="type" transform="translate(10,10)">
+		<rect width="100" height="40"/>
+		<text x="50" y="17">«trait»</text>
+		<text class="name" x="50" y="28">BaseTrait</text>
+	</g>
+	<g class="type" transform="translate(10,80)">
+		<rect width="100" height="40"/>
+		<text x="50" y="17">«trait»</text>
+		<text class="name" x="50" y="28">SubTrait</text>
+	</g>
+	<g class="type" transform="translate(140,10)">
+		<rect width="100" height="40"/>
+		<text class="name" x="50" y="22.5">dyn BaseTrait</text>
+	</g>
+	<g class="type" transform="translate(140,80)">
+		<rect width="100" height="40"/>
+		<text class="name" x="50" y="22.5">dyn SubTrait</text>
+	</g>
+	<g class="type" transform="translate(270,45)">
+		<rect width="100" height="40"/>
+		<text x="50" y="17">«trait»</text>
+		<text class="name" x="50" y="28">TraitX</text>
+	</g>
+	<path class="rel" d="M60,50 v30" marker-start="url(#impl)"/>
+	<path class="rel" d="M110,30 h30"/>
+	<path class="rel" d="M110,100 h30"/>
+	<path class="rel" d="M270,45 l-30,-15" marker-start="url(#impl)"/>
+	<path class="rel" d="M270,85 l-19,9.5 l-11,5.5" marker-start="url(#impl)" marker-mid="url(#not)"/>
+</svg>
