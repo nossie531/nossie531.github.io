@@ -111,7 +111,7 @@ impl Id for String {
 		</section> <section>
 			<h1>注意点</h1>
 			<p>
-上記を応用する上で、忘れがちな落し穴について。
+上記を応用する上で、つい忘れがちな点について。
 			</p>
 			<section>
 				<h1>ライフタイム</h1>
@@ -121,36 +121,36 @@ impl Id for String {
 <code>dyn <var>TraitName</var> + '_</code> のように匿名ライフタイムを使えば、<code>'static</code> 境界が解除される。
 				</p>
 			</section> <section>
-				<h1>トレイト間の関係</h1>
+				<h1>継承関係</h1>
 				<p>
-トレイトオブジェクトに実装されたトレイトが、派生側のトレイトオブジェクトに自動的に実装されたりはしない。なぜなら、派生側のトレイトオブジェクトは、基底側のトレイトオブジェクトに比べ、取り扱える型が減る。そのため、トレイトが取り扱える型についての保証を含んでいる場合、その保証が破綻してしまう。
+トレイト間の継承関係は、トレイトオブジェクト間の継承関係には反映されない。なぜなら、派生側のトレイトオブジェクトでは、基底側のトレイトオブジェクトと比べて、扱える型がより限定されるため、基底側のトレイトオブジェクトとしては振る舞えない (両トレイトオブジェクトに共通した性質を見いだせる場合、同じトレイトを個別に実装すればよい)。
 				</p>
 				<div class="sub">
 					<h2>サンプルコード</h2>
 					<p>
-以下では、<code>dyn SubTrait</code> は <code>TraitX</code> を実装しない。
+以下では、<code>dyn SubTrait</code> は <code>dyn BaseTrait</code> を実装しない。
 					</p>
 					<figure class="normal">
 						<object data="img/dyn_impl.svg" style="height: calc(13rem * 0.9);"/>
 					</figure>
 <pre><code class="language-rust">
 fn main() {
-    let x = &amp;0 as &amp;dyn SubTrait;
-    x.<mark class="error">test</mark>();
-}
-
-trait TraitX {
-    fn test(&amp;self) {
-        // nop.
-    }
+    let dyn_sub = &amp;0 as &amp;dyn SubTrait;
+    dyn_sub.sub_method();
+	dyn_sub.<mark class="error">base_method</mark>();
 }
 
 trait BaseTrait {}
 impl&lt;T&gt; BaseTrait for T {}
-impl TraitX for dyn BaseTrait {}
+impl dyn BaseTrait {
+    fn base_method(&amp;self) { /* nop. */ }
+}
 
 trait SubTrait: BaseTrait {}
 impl&lt;T: BaseTrait&gt; SubTrait for T {}
+impl dyn SubTrait {
+    fn sub_method(&amp;self) { /* nop. */ }
+}
 </code></pre>
 				</div>
 			</section>
