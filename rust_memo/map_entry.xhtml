@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: マップの entry メソッド。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+マップの <code>entry</code> メソッドとその応用例をいくつか紹介する。
+		</p> 
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+マップ系の型 (<code>HashMap</code> や <code>BTreeMap</code>) の <code>entry</code> メソッドは、エントリ編集系のよくある処理のためのヘルパメソッドである。これにより、その他の編集用メソッド (<code>get</code>, <code>get_mut</code>, <code>insert</code>, <code>remove</code> など) のみを使った場合と比べ、処理の効率化や、条件分岐の削減ができる場合がある。
+			</p>
+			<aside class="normal moan">
+				<p>
+セット系について。
+				</p>
+マップ系と異なり、セット系の型 (<code>HashSet</code> や <code>BTreeSet</code>) には、2023 年の時点では同様のメソッドがまだない。<a href="https://github.com/rust-lang/rfcs/issues/1490">提案</a>はされているので、そのうち導入されるかも…。
+			</aside>
+			<div class="sub">
+				<h2>メソッドとその周辺仕様</h2>
+				<p>
+以下は <code>entry</code> メソッドの宣言。
+				</p>
+<pre><code class="language-rust">
+pub fn entry(&amp;mut self, key: K) -&gt; Entry&lt;'_, K, V&gt;
+</code></pre>
+				<p>
+引数と戻り値、およびその型について。
+				</p>
+				<ul>
+					<li>
+引数 <code>key</code> には、編集予定のエントリのキーを指定。
+					</li> <li>
+<code>Entry</code> 型は列挙型。値は <code>Vacant</code> と <code>Ocupied</code>。
+					</li> <li>
+<code>Vacant</code> の場合、対象にキーが未登録。
+					</li> <li>
+<code>Ocupied</code> の場合、対象にキーが登録済。
+					</li>
+				</ul>
+			</div>
+		</section> <section>
+			<h1>応用例</h1>
+			<p>
+代表的な応用例。
+			</p>
+			<dl class="normal lowProfile">
+				<dt><a href="#ex1">応用例１</a></dt>
+				<dd>
+キーが未登録なら、キーと対応する値を登録。
+				</dd>
+				<dt><a href="#ex2">応用例２</a></dt>
+				<dd>
+キーが登録済なら、キーに対応する値を更新。
+				</dd>
+				<dt><a href="#ex3">応用例３</a></dt>
+				<dd>
+キーに対応する値を設定後、値への参照を取得 (簡易版)。
+				</dd>
+				<dt><a href="#ex4">応用例４</a></dt>
+				<dd>
+キーに対応する値を設定後、値への参照を取得 (発展版)。
+				</dd>
+			</dl>
+			<section>
+				<hgroup>
+					<h1 id="ex1">応用例１</h1>
+					<div class="subtitle">
+キーが未登録なら、キーと対応する値を登録
+					</div>
+				</hgroup>
+				<p>
+以下、<code>or_insert</code> メソッドを活用。
+				</p>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert("A", false);
+    map.entry("A").or_insert(true);
+    map.entry("B").or_insert(true);
+    assert_eq!(map["A"], false);
+    assert_eq!(map["B"], true);
+}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="ex2">応用例２</h1>
+					<div class="subtitle">
+キーが登録済なら、キーに対応する値を更新
+					</div>
+				</hgroup>
+				<p>
+以下、<code>and_modify</code> メソッドを活用。
+				</p>
+				<pre><code class="language-rust">
+use std::collections::HashMap;
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert("A", false);
+    map.entry("A").and_modify(|x| *x = true);
+    map.entry("B").and_modify(|x| *x = true);
+    assert_eq!(map.get("A"), Some(&amp;true));
+    assert_eq!(map.get("B"), None);
+}
+				</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="ex3">応用例３</h1>
+					<div class="subtitle">
+キーに対応する値を設定後、値への参照を取得 (簡易版)
+					</div>
+				</hgroup>
+				<p>
+以下、<code>and_modify</code> と <code>or_insert</code> を連結 (<code>V</code> に <code>Copy</code> トレイトが必要)。
+				</p>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+use std::hash::Hash;
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert("A", false);
+    let v1 = *set_map_val(&amp;mut map, "A", true);
+    let v2 = *set_map_val(&amp;mut map, "B", true);
+    assert_eq!(v1, map["A"]);
+    assert_eq!(v2, map["B"]);
+}
+
+fn set_map_val&lt;K, V&gt;(map: &amp;mut HashMap&lt;K, V&gt;, k: K, v: V) -&gt; &amp;V
+where
+    K: Eq + Hash,
+    V: Copy,
+{
+    map.entry(k).and_modify(|x| *x = v).or_insert(v)
+}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="ex4">応用例４</h1>
+					<div class="subtitle">
+キーに対応する値を設定後、値への参照を取得 (発展版)
+					</div>
+				</hgroup>
+				<p>
+以下、<code>Vacant</code> と <code>Occupied</code> を個別に対応 (<code>V</code> に <code>Copy</code> トレイトは不要)。
+				</p>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+use std::collections::hash_map::Entry::*;
+use std::hash::Hash;
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert("A", false);
+    let v1 = *set_map_val(&amp;mut map, "A", true);
+    let v2 = *set_map_val(&amp;mut map, "B", true);
+    assert_eq!(v1, map["A"]);
+    assert_eq!(v2, map["B"]);
+}
+
+fn set_map_val&lt;K, V&gt;(map: &amp;mut HashMap&lt;K, V&gt;, k: K, v: V) -&gt; &amp;V
+where
+    K: Eq + Hash,
+{
+    match map.entry(k) {
+        Vacant(x) =&gt; x.insert(v),
+        Occupied(x) =&gt; {
+            let vr = x.into_mut();
+            *vr = v;
+            vr
+        },
+    }
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
