@@ -44,7 +44,7 @@ Singleton パターンとは、GoF 本に掲載されるデザインパターン
 					</div>
 				</hgroup>
 				<p>
-以下では、<code>MyData</code> のインスタンスは、<code>sample</code> 内でただ一つのみ作られる。そして、それを <code>sample</code> の外から作る事は、必要となるメンバが非公開のため、不可能になっている。
+以下では、<code>MyData</code> のインスタンスの作成に必要となるメンバが、<code>sample</code> から公開されていない。そのため、<code>MyData</code> のインスタンスは、<code>sample</code> が作るただ一つに制限される。
 				</p>
 <pre><code class="language-rust">
 use crate::sample::MyData;
@@ -138,7 +138,7 @@ mod sample {
 					</div>
 				</hgroup>
 				<p>
-以下では、遅延初期化の例とは異なり、<code>Lazy</code> の代わりに <code>OnceCell</code> を使っています。これにより、インスタンスへのアクセス時に遅延初期化するのではなく、事前に引数を与えて手動初期化できるようにします。
+以下では、遅延初期化のサンプルで使われていた <code>Lazy</code> に代わって <code>OnceCell</code> を使っている。これにより、アクセス時に既定値で自動的に初期化するのではなく、引数を与えて事前に初期化するようにしている。
 				</p>
 <pre><code class="language-rust">
 use crate::sample::MyData;
