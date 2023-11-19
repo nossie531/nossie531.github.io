@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 内部可変性パターン。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+Rust における内部可変性パターンについて。
+		</p> 
+		<section>
+			<h1>用語</h1>
+			<p>
+内部可変性パターンは、対象データが不変として扱われていても、部分的に可変として扱える特例を設けるパターン (注: あくまで特例であり、乱用するとコードが読みにくくなる)。
+			</p>
+		</section> <section>
+			<h1>利用例</h1>
+			<p>
+特に多い利用例は、内部的な管理変数など。<code>Rc</code> 型もその代表。この型はヒープ上に共有可能なデータ領域を作るが、それがどこからも参照されなくなった時に検出するために、内部に参照カウンタを持つ。このカウンタは、たとえ <code>Rc</code> で管理するデータ本体が不変でも、その参照数に応じて増減する。そのため、可変でなければならい。
+			</p>
+		</section> <section>
+			<h1>実装用の型</h1>
+			<p>
+内部可変性パターンの実装に必要な型について。
+			</p>
+			<div class="sub">
+				<h2><code>UnsafeCell</code></h2>
+				<p>
+<code>UnsafeCell</code> は仕様上の特別な型で、ここで紹介しているその他の型の実装の基盤にもなっている。コンパイラはこの型でラップされた値については、たとえ不変とマークされていても、変更されうるものとして扱う。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>バグ対策</h2>
+				<p>
+内部可変性は Rust が普段なら保証してくれる読込と書込の排他性を失わせる。そのため、<code>UnsafeCell</code> をそのまま使うとバグを書きやすい。一方で、<code>UnsafeCell</code> をラップした型は、そうした問題をうまく回避できる理論的背景がある場合が多い。そのため、積極的にそちらを採用した方がよい。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>代表例</h2>
+				<p>
+以下、<code>std</code> における代表例。
+				</p>
+				<dl class="normal lowProfile">
+					<dt><code>UnsafeCell</code></dt>
+					<dd>
+						危険で特別な型。
+					</dd>
+					<dt><code>Cell</code></dt>
+					<dd>
+						他に影響がないようコピーを使う。
+					</dd>
+					<dt><code>RefCell</code></dt>
+					<dd>
+						他が読んでいない時だけ書く。
+					</dd>
+					<dt><code>OnceCell</code></dt>
+					<dd>
+						他が読む前に一度だけ初期化。
+					</dd>
+					<dt><code>LazyCell</code></dt>
+					<dd>
+						他が読む前に一度だけ遅延初期化。
+					</dd>
+					<dt><code>Mutex</code></dt>
+					<dd>
+						他が使っていない時だけ使う (<code>RwLock</code> の簡易版)。
+					</dd>
+					<dt><code>RwLock</code></dt>
+					<dd>
+						他が読んでいない時だけ書く (<code>RefCell</code> の非同期版)。
+					</dd>
+					<dt><code>OnceLock</code></dt>
+					<dd>
+						他が読む前に一度だけ初期化 (<code>OnceCell</code> の非同期版)。
+					</dd>
+					<dt><code>LazyLock</code></dt>
+					<dd>
+						他が読む前に一度だけ遅延初期化 (<code>LazyCell</code> の非同期版)。
+					</dd>
+					<dt><code>Atomic<em>XXX</em></code></dt>
+					<dd>
+						他が割り込むスキを与えない (<code>AtomicI32</code> や <code>AtomicU32</code> など)。
+					</dd>
+				</dl>
+				<p>
+※ <code>LazyCell</code> と <code>LazyLock</code> は 2023 年現在はナイトリー。
+				</p>
+			</div>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、変数 <code>my_cell</code> に <code>mut</code> の指定はないが、値を変更できる。
+			</p>
+<pre><code class="language-rust">
+use std::cell::Cell;
+
+fn main() {
+    let my_cell = Cell::new(42);
+    my_cell.set(43);
+    assert_eq!(my_cell.get(), 43);
+}
+</code></pre>
+		</section>
+	</body>
+</html>
