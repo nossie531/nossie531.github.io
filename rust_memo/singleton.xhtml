@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Singleton パターン。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+Rust での Singleton パターンの適用方法について。
+		</p> 
+		<section>
+			<h1>用語</h1>
+			<p>
+Singleton パターンとは、GoF 本に掲載されるデザインパターンの一つ。クラス (構造体) のインスタンスをただ一つに制限する事で、一つの共有データにアプリのどこからでもアクセスできるようにする。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+状況によって微妙にパターンが異なる。
+			</p>
+			<dl class="normal lowProfile">
+				<dt><a href="#sample1">サンプル 1</a></dt>
+				<dd>遅延初期化 (読取専用)。</dd>
+				<dt><a href="#sample2">サンプル 2</a></dt>
+				<dd>遅延初期化 (書込可能)。</dd>
+				<dt><a href="#sample3">サンプル 3</a></dt>
+				<dd>手動初期化。</dd>
+			</dl>
+			<aside class="normal">
+				<p>
+以下では、<code>once_cell</code> クレートを使用している。このクレートの機能は、Rust 1.70 で一部が標準化され、他は 2023 年現在、ナイトリー版にて先行実装中である (注: アイテム名は標準版と異なるものもある)。
+				</p>
+			</aside>
+			<section>
+				<hgroup>
+					<h1 id="sample1">サンプル 1</h1>
+					<div class="subtitle">
+						遅延初期化 (読取専用)
+					</div>
+				</hgroup>
+				<p>
+以下では、<code>MyData</code> のインスタンスは、<code>sample</code> 内でただ一つのみ作られる。そして、それを <code>sample</code> の外から作る事は、必要となるメンバが非公開のため、不可能になっている。
+				</p>
+<pre><code class="language-rust">
+use crate::sample::MyData;
+
+fn main() {
+    let singleton = MyData::get();
+    assert_eq!(singleton.val(), 42);
+}
+
+mod sample {
+    use once_cell::sync::Lazy;
+
+    static SINGLETON: Lazy&lt;MyData&gt; = Lazy::new(||
+        MyData::new(42)
+    );
+
+    pub struct MyData {
+        val: i32
+    }
+    
+    impl MyData {
+        pub fn get() -&gt; &amp;'static MyData {
+            Lazy::force(&amp;SINGLETON)
+        }
+
+        pub fn val(&amp;self) -&gt; i32 {
+            self.val
+        }
+
+        fn new(val: i32) -&gt; Self {
+            Self { val }
+        }
+    }
+}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="sample2">サンプル 2</h1>
+					<div class="subtitle">
+						遅延初期化 (書込可能)
+					</div>
+				</hgroup>
+				<p>
+以下では、前の例とは異なり、構造体へのアクセスを <code>Mutex</code> で同期している。なお、同期を構造体単位でなくフィールド単位にしたり、<code>Mutex</code> の代わりに <code>RwLock</code> やアトミック型を使う方法も考えられる (コード量と並列性からどれも一長一短がある)。 
+				</p>
+<pre><code class="language-rust">
+use crate::sample::MyData;
+
+fn main() {
+    let mut singleton = MyData::get();
+    singleton.set_val(43);
+    assert_eq!(singleton.val(), 43);
+}
+
+mod sample {
+    use once_cell::sync::Lazy;
+    use std::sync::{Mutex, MutexGuard};
+
+    static SINGLETON: Lazy&lt;Mutex&lt;MyData&gt;&gt; = Lazy::new(||
+        Mutex::new(MyData::new(42))
+    );
+
+    pub struct MyData {
+        val: i32,
+    }
+
+    impl MyData {
+        pub fn get() -&gt; MutexGuard&lt;'static, MyData&gt; {
+            Lazy::force(&amp;SINGLETON).lock().unwrap()
+        }
+
+        pub fn val(&amp;self) -&gt; i32 {
+            self.val
+        }
+
+        pub fn set_val(&amp;mut self, value: i32) {
+            self.val = value
+        }
+
+        fn new(val: i32) -&gt; Self {
+            Self { val }
+        }
+    }
+}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="sample3">サンプル 3</h1>
+					<div class="subtitle">
+						手動初期化
+					</div>
+				</hgroup>
+				<p>
+以下では、遅延初期化の例とは異なり、<code>Lazy</code> の代わりに <code>OnceCell</code> を使っています。これにより、インスタンスへのアクセス時に遅延初期化するのではなく、事前に引数を与えて手動初期化できるようにします。
+				</p>
+<pre><code class="language-rust">
+use crate::sample::MyData;
+
+fn main() {
+    MyData::init(42);
+    assert_eq!(MyData::get().val(), 42);
+}
+
+mod sample {
+    use once_cell::sync::OnceCell;
+
+    static SINGLETON: OnceCell&lt;MyData&gt; = OnceCell::new();
+
+    #[derive(Debug)]
+    pub struct MyData {
+        val: i32,
+    }
+
+    impl MyData {
+        pub fn init(val: i32) {
+            SINGLETON
+                .set(MyData::new(val))
+                .expect("Should be called only one time.");
+        }
+
+        pub fn get() -&gt; &amp;'static MyData {
+            SINGLETON
+                .get()
+                .expect("Should be called after initialization.")
+        }
+
+        pub fn val(&amp;self) -&gt; i32 {
+            self.val
+        }
+
+        fn new(val: i32) -&gt; Self {
+            Self { val }
+        }
+    }
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
