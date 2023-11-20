@@ -21,7 +21,7 @@ Singleton パターンとは、GoF 本に掲載されるデザインパターン
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-状況によって微妙にパターンが異なる。
+状況に応じた手法がいくつかある。
 			</p>
 			<dl class="normal lowProfile">
 				<dt><a href="#sample1">サンプル 1</a></dt>
@@ -138,7 +138,7 @@ mod sample {
 					</div>
 				</hgroup>
 				<p>
-以下では、遅延初期化のサンプルで使われていた <code>Lazy</code> に代わって <code>OnceCell</code> を使っている。これにより、アクセス時に既定値で自動的に初期化するのではなく、引数を与えて事前に初期化するようにしている。
+以下では、遅延初期化のサンプルで使われていた <code>Lazy</code> に代わって <code>OnceCell</code> を使っている。これにより、アクセス時に自動的に既定値で初期化するのではなく、事前に引数を与えて初期化するようにしている。
 				</p>
 <pre><code class="language-rust">
 use crate::sample::MyData;
