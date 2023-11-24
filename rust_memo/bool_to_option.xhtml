@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: bool から Option への変換。</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>bool</code> 型から <code>Option</code> 型への変換。
+		</p> 
+		<aside class="normal">
+			<p>
+このメモの背景。
+			</p> <p>
+知っていると便利なマイナー機能なのでメモ。
+			</p>
+		</aside>
+		<section>
+			<h1>仕様</h1>
+			<p>
+以下の関数を使うと、<code>if</code> 式での分岐が不要になる。
+			</p>
+			<dl class="normal">
+				<dt><code>then_some</code></dt>
+				<dd>
+					<p>
+<code>false</code> なら <code>None</code>、<code>true</code> なら <code>Some</code> でラップした指定値へと変換する。
+					</p>
+				</dd>
+				<dt><code>then</code></dt>
+				<dd>
+					<p>
+<code>then_some</code> とほぼ同じだが、指定値の生成にクロージャを使用する。
+					</p>
+				</dd>
+			</dl>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、空文字列を <code>None</code> に変換している。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(get_some_text(""), None);
+    assert_eq!(get_some_text("test"), Some("test"));
+}
+
+fn get_some_text(text: &amp;str) -&gt; Option&lt;&amp;str&gt; {
+    (!text.is_empty()).then_some(text)
+}
+</code></pre>
+		</section>
+	</body>
+</html>
