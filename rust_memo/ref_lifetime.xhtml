@@ -12,11 +12,12 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-参照とそのライフタイムまわりのエラーについて。参照のライフタイム中に参照先への特定の操作を禁じるものが多くある。殆どは単純明快だが、状況によっては初見殺しとなるパターンもあるため、ここでは主にそれらを紹介する。
+参照は存在しているだけで、それと競合する各種の操作をコンパイルエラーにする。そして、参照のライフタイムの期間は、最低でもその参照が最後に使われるまで、用法によってはより延長される事もある。ここではその延長されるパターンについて紹介する。
 		</p>
 		<section>
 			<h1>関連エラー</h1>
 			<p>
+			</p> <p>
 以下はよくあるエラー。
 			</p>
 <pre><samp class="console-rustc">
@@ -32,7 +33,7 @@
 <mark class="error">error[E0506]</mark>: cannot assign to `target.something` because it is borrowed
 </samp></pre>
 		</section> <section>
-			<h1 id="first_sight_killer">初見殺しのパターン</h1>
+			<h1>ケーススタディ</h1>
 			<section>
 				<h1 id="ref_to_ref">参照からの参照</h1>
 				<p>
@@ -201,7 +202,7 @@ fn set_ref_cell_value(immutable_ref: &amp;RefCell&lt;i32&gt;, value: i32) {
 </samp></pre>
 				</div>
 			</section> <section>
-				<h1>構造体への参照</h1>
+				<h1>特殊な入れ子の参照</h1>
 				<p>
 <code>&amp;'a A&lt;'a&gt;</code> のような指定について。つまり、構造体への参照と構造体からの参照とが、同じライフタイム注釈を持つ場合について。
 				</p> <p>
