@@ -35,7 +35,7 @@ let slice: &amp;[i32] = &amp;arr[(Bound::Excluded(2), Bound::Unbounded)]; // 3, 
 添字式は <a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index</code></a> や <a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut</code></a> トレイトを通して処理される。スライスや配列はこれらを実装している。そして、スライスや配列の添字として使える型は、<a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> トレイトにまとめられていて、これには <code>usize</code> や範囲型が該当する。
 			</p>
 			<aside class="normal">
-				<p><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> の実装。</p>
+				<p><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> の実装について。</p>
 				<p>
 2023 年現在、<a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> のメソッドはどれもナイトリーのため、自前での実装はできない (スライス本体を引数に各要素へのアクセスを行う類いのものが多い)。
 				</p> 
@@ -43,7 +43,7 @@ let slice: &amp;[i32] = &amp;arr[(Bound::Excluded(2), Bound::Unbounded)]; // 3, 
 			<section>
 				<h1><code>Index</code></h1>
 				<p>
-添字によるアクセスを提供するトレイト。
+<a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index</code></a> トレイトは取得系の添字式を処理する。
 				</p> <p>
 型パラメタ <code>Idx</code> が添字型を、関連型 <code>Output</code> が出力型を表す。
 				</p>
@@ -59,11 +59,27 @@ where
 }
 </code></pre>
 			</section> <section>
+				<h1><code>IndexMut</code></h1>
+				<p>
+<a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut</code></a> トレイトは更新系の添字式を処理する。
+				</p> <p>
+このトレイトの実装には <a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index</code></a> トレイトの実装が前提になっている。
+				</p>
+<pre><code class="language-rust">
+pub trait IndexMut&lt;Idx&gt;: Index&lt;Idx&gt;
+where
+    Idx: ?Sized,
+{
+    // Required method
+    fn index_mut(&amp;mut self, index: Idx) -&gt; &amp;mut Self::Output;
+}
+</code></pre>
+			</section> <section>
 				<h1>スライス</h1>
 				<p>
-スライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> は <code>Index&lt;I&gt;</code> トレイトを実装している。
+スライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> は <a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index&lt;I&gt;</code></a> と <a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut&lt;I&gt;</code></a> を実装している。
 				</p> <p>
-添字型 <code>I</code> には <code>SliceIndex&lt;[T]&gt;</code> トレイトの実装が必要。
+ここで、添字型 <code>I</code> には <code>SliceIndex&lt;[T]&gt;</code> トレイトの実装が必要。
 				</p>
 <pre><code class="language-rust">
 impl&lt;T, I&gt; Index&lt;I&gt; for [T]
@@ -75,12 +91,20 @@ where
     /* ... */
 }
 </code></pre>
+<pre><code class="language-rust">
+impl&lt;T, I&gt; IndexMut&lt;I&gt; for [T]
+where
+    I: SliceIndex&lt;[T]&gt;,
+{
+    /* ... */
+}
+</code></pre>
 			</section> <section>
 				<h1>配列</h1>
 				<p>
-配列 <a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a> は <code>Index&lt;I&gt;</code> トレイトを実装している。
+配列 <a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a> は <a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index&lt;I&gt;</code></a> と <a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut&lt;I&gt;</code></a> を実装している。
 				</p> <p>
-この実装はスライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> の実装に基づいている。
+これらの実装はスライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> の実装が基になっている。
 				</p>
 <pre><code class="language-rust">
 impl&lt;T, I, const N: usize&gt; Index&lt;I&gt; for [T; N]
@@ -92,12 +116,20 @@ where
     /* ... */
 }
 </code></pre>
+<pre><code class="language-rust">
+impl&lt;T, I, const N: usize&gt; IndexMut&lt;I&gt; for [T; N]
+where
+	[T]: IndexMut&lt;I&gt;,
+{
+    /* ... */
+}
+</code></pre>
 			</section> <section>
 				<h1><code>SliceIndex</code></h1>
 				<p>
 スライスや配列の添字として使える型をまとめるトレイト。
-				</p> 
-<code>SliceIndex&lt;[T]&gt;</code> トレイトはスライス <code>&lt;[T]&gt;</code> むけの添字型として使われる。
+				</p> <p>
+<code>SliceIndex&lt;T&gt;</code> トレイトは型 <code>T</code> むけの添字型として使われる。
 				</p> 
 <pre><code class="language-rust">
 pub unsafe trait SliceIndex&lt;T&gt;: Sealed
@@ -112,7 +144,7 @@ where
 			</section> <section>
 				<h1><code>usize</code></h1>
 				<p>
-添字が <code>usize</code> の場合、出力は単一の値 <code>T</code> になる。
+添字が <a href="https://doc.rust-lang.org/std/primitive.usize.html"><code>usize</code></a> の場合、出力は単一の値 <code>T</code> になる。
 				</p>
 <pre><code class="language-rust">
 unsafe impl&lt;T&gt; SliceIndex&lt;[T]&gt; for usize {
@@ -134,7 +166,7 @@ unsafe impl&lt;T&gt; SliceIndex&lt;[T]&gt; for ops::Range&lt;usize&gt; {
 }
 </code></pre>
 				<p>
-上記の <code>Range</code> とその他、以下の範囲型が使用できる。
+上記の <code>Range</code> を含め、以下の範囲型が使用できる。
 				</p>
 				<ul>
 					<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for Range&lt;usize&gt;</code></li>
