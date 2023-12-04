@@ -23,41 +23,49 @@
 				<div class="sub">
 					<h2>主な用途</h2>
 					<p>
-あまり使われていない。なぜなら、トレイトとトレイトオブジェクト、どちらにでも機能を実装できる場合が多く、慣習的には前者が優先されるため。数少ない利用例としては、<code>std</code> の <code>dyn Any</code> の実装があり、それは動的な型情報へのアクセスポイントを提供している。
+ダウンキャスト系のメソッドを実装する場合が多い。
 					</p>
 				</div>
 				<div class="sub">
 					<h2>サンプルコード</h2>
 					<p>
-以下では、<code>dyn Animal</code> 型にレポート用の関数を持たせている。
+以下では、<code>dyn Animal</code> を <code>Dog</code> にダウンキャストしている。なお、ダウンキャスト用のメソッドは <code>dyn Any</code> にあるため、いったん <code>dyn Animal</code> から <code>dyn Any</code> へアップキャストしている (参考:『<a href="dyn_upcast.xhtml"><code>dyn</code> 型のアップキャスト</a>』)。
 					</p>
 <pre><code class="language-rust">
+use std::any::Any;
+
 fn main() {
-    let dog = Dog { name: "Pochi".to_string() };
-    let animal = &amp;dog as &amp;dyn Animal;
-    animal.print_status();
+    let animal = &amp;(Dog {}) as &amp;dyn Animal;
+    let dog = animal.downcast::&lt;Dog&gt;();
+    dog.trick();
 }
 
-trait Animal {
-    fn species(&amp;self) -&gt; &amp;str;
-    fn name(&amp;self) -&gt; &amp;str;
+// -- Animal -- //
+
+trait Animal: Any {
+    fn upcast(&amp;self) -&gt; &amp;dyn Any;
 }
 
 impl dyn Animal {
-    fn print_status(&amp;self) {
-        let species = self.species();
-        let name = self.name();
-        println!("species: {species}, name: {name}")
+    fn downcast&lt;T: Animal&gt;(&amp;self) -&gt; &amp;T {
+        self.upcast().downcast_ref().unwrap()
     }
 }
 
-struct Dog {
-    name: String,
+// -- Dog -- //
+
+struct Dog {}
+
+impl Dog {
+    fn trick(&amp;self) {
+        println!("Bow!");
+    }
 }
 
 impl Animal for Dog {
-    fn species(&amp;self) -&gt; &amp;str { "Dog" }
-    fn name(&amp;self) -&gt; &amp;str { &amp;self.name }
+    fn upcast(&amp;self) -&gt; &amp;dyn Any {
+        self
+    }
 }
 </code></pre>
 				</div>
@@ -69,14 +77,13 @@ impl Animal for Dog {
 				<div class="sub">
 					<h2>主な用途</h2>
 					<p>
-トレイトをトレイトオブジェクトに実装する事で、トレイトが扱う <code>Self</code> 型を動的にできる。例えば、<code>PartialEq</code> トレイトを実装する型は、その型自身 (<code>Self</code>) としか <code>eq</code> メソッドで比較できないが、この手法を使えば、トレイトオブジェクトどうしを比較できるようになる。
+オブジェクトセーフでないトレイトを動的に活用できるようにする。
 					</p>
 				</div>
 				<div class="sub">
 					<h2>サンプルコード</h2>
 					<p>
-以下では、数値型と文字列型を <code>Id</code> トレイトで抽象化している。<br/>
-これにより、両者を <code>PartialEq</code> で比較できるようにしている。
+以下では、<code>PartialEq</code> トレイトの <code>eq</code> メソッドにより、数値型または文字列型をとる <code>dyn Id</code> どうしを比較している。なお、<code>eq</code> は比較先に <code>Self</code> を用いる。そのため、<code>PartialEq</code> はこの手法なしでは、異なる型どうしの比較も、動的型の処理もできない (オブジェクトセーフの条件を満たせないため)。
 					</p>
 <pre><code class="language-rust">
 fn main() {
