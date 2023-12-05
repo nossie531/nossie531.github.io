@@ -14,23 +14,21 @@
 <code>dyn</code> 型 (トレイトオブジェクト) はそれ自体に実装を付加できる。
 		</p>
 		<section>
-			<h1>実装方法</h1>
-			<section>
-				<h1>固有機能の実装</h1>
-				<p>
+			<h1>固有機能の実装</h1>
+			<p>
 <code>impl dyn <var>MyTrait</var> { ... }</code> のスタイルで記載する。
-				</p>
-				<div class="sub">
-					<h2>主な用途</h2>
-					<p>
+			</p>
+			<div class="sub">
+				<h2>主な用途</h2>
+				<p>
 ダウンキャスト系のメソッドを実装する場合が多い。
-					</p>
-				</div>
-				<div class="sub">
-					<h2>サンプルコード</h2>
-					<p>
+				</p>
+			</div>
+			<div class="sub">
+				<h2>サンプルコード</h2>
+				<p>
 以下では、<code>dyn Animal</code> を <code>Dog</code> にダウンキャストしている。なお、ダウンキャスト用のメソッドは <code>dyn Any</code> にあるため、いったん <code>dyn Animal</code> から <code>dyn Any</code> へアップキャストしている (参考:『<a href="dyn_upcast.xhtml"><code>dyn</code> 型のアップキャスト</a>』)。
-					</p>
+				</p>
 <pre><code class="language-rust">
 use std::any::Any;
 
@@ -68,23 +66,23 @@ impl Animal for Dog {
     }
 }
 </code></pre>
-				</div>
-			</section> <section>
-				<h1>トレイトの実装</h1>
-				<p>
+			</div>
+		</section> <section>
+			<h1>トレイトの実装</h1>
+			<p>
 <code>impl <var>SomeTrait</var> for dyn <var>MyTrait</var> { ... }</code> のスタイルで記載する。
-				</p>
-				<div class="sub">
-					<h2>主な用途</h2>
-					<p>
+			</p>
+			<div class="sub">
+				<h2>主な用途</h2>
+				<p>
 オブジェクトセーフでないトレイトを動的に活用できるようにする。
-					</p>
-				</div>
-				<div class="sub">
-					<h2>サンプルコード</h2>
-					<p>
+				</p>
+			</div>
+			<div class="sub">
+				<h2>サンプルコード</h2>
+				<p>
 以下では、<code>PartialEq</code> トレイトの <code>eq</code> メソッドにより、数値型または文字列型をとる <code>dyn Id</code> どうしを比較している。なお、<code>eq</code> は比較先に <code>Self</code> を用いる。そのため、<code>PartialEq</code> はこの手法なしでは、異なる型どうしの比較も、動的型の処理もできない (オブジェクトセーフの条件を満たせないため)。
-					</p>
+				</p>
 <pre><code class="language-rust">
 fn main() {
     let x = &amp;1 as &amp;dyn Id;
@@ -113,54 +111,16 @@ impl Id for String {
     fn key(&amp;self) -&gt; String { format!("str: {self}") }
 }
 </code></pre>
-				</div>
-			</section>
+			</div>
 		</section> <section>
-			<h1>注意点</h1>
+			<h1>備考</h1>
 			<p>
 上記を応用する上で、つい忘れがちな点について。
-			</p>
-			<section>
-				<h1>ライフタイム</h1>
-				<p>
+			</p> <p>
 <code>dyn <var>TraitName</var></code> は糖衣構文であり、<code>dyn <var>TraitName</var> + 'static</code> と等価である。
-				</p> <p>
+			</p> <p>
 <code>dyn <var>TraitName</var> + '_</code> のように匿名ライフタイムを使えば、<code>'static</code> 境界が解除される。
-				</p>
-			</section> <section>
-				<h1>継承関係</h1>
-				<p>
-トレイト間の継承関係は、トレイトオブジェクト間の継承関係には反映されない。なぜなら、派生側のトレイトオブジェクトでは、基底側のトレイトオブジェクトと比べて、扱える型がより限定されるため、基底側のトレイトオブジェクトとしては振る舞えない (両トレイトオブジェクトに共通した性質を見いだせる場合、同じトレイトを個別に実装すればよい)。
-				</p>
-				<div class="sub">
-					<h2>サンプルコード</h2>
-					<p>
-以下では、<code>dyn SubTrait</code> は <code>dyn BaseTrait</code> を実装しない。
-					</p>
-					<figure class="normal">
-						<object data="img/dyn_impl.svg" style="height: calc(13rem * 0.9);"/>
-					</figure>
-<pre><code class="language-rust">
-fn main() {
-    let dyn_sub = &amp;0 as &amp;dyn SubTrait;
-    dyn_sub.sub_method();
-	dyn_sub.<mark class="error">base_method</mark>();
-}
-
-trait BaseTrait {}
-impl&lt;T&gt; BaseTrait for T {}
-impl dyn BaseTrait {
-    fn base_method(&amp;self) { /* nop. */ }
-}
-
-trait SubTrait: BaseTrait {}
-impl&lt;T: BaseTrait&gt; SubTrait for T {}
-impl dyn SubTrait {
-    fn sub_method(&amp;self) { /* nop. */ }
-}
-</code></pre>
-				</div>
-			</section>
+			</p>
 		</section>
 	</body>
 </html>
