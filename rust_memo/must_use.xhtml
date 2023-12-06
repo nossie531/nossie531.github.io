@@ -135,9 +135,22 @@ fn must_use() -&gt; i32 {
 以下はどれも副作用なしのため、全て <code>must_use</code> が期待される。
 							</p>
 							<table class="normal fn_bool">
-								<tr> <th><code>Box::new</code></th> <td>〇</td></tr>
-								<tr> <th><code>Vec::new</code></th> <td>〇</td></tr>
-								<tr> <th><code>Rc::new</code></th> <td>×</td></tr>
+								<tr> 
+									<th>
+<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.new"><code>Box::new</code></a>
+									</th>
+									<td>〇</td>
+								</tr> <tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.new"><code>Vec::new</code></a>
+									</th>
+									<td>〇</td>
+								</tr> <tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html#method.new"><code>Rc::new</code></a>
+									</th>
+									<td>×</td>
+								</tr>
 							</table>
 						</dd>
 						<dt>ゲッター系</dt>
@@ -146,10 +159,27 @@ fn must_use() -&gt; i32 {
 以下はどれも副作用なしのため、全て <code>must_use</code> が期待される。
 							</p>
 							<table class="normal fn_bool">
-								<tr> <th><code>slice::len</code></th> <td>〇</td></tr>
-								<tr> <th><code>slice::is_empty</code></th> <td>〇</td></tr>
-								<tr> <th><code>Vec::len</code></th> <td>×</td></tr>
-								<tr> <th><code>Vec::is_empty</code></th> <td>×</td></tr>
+								<tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.len"><code>slice::len</code></a>
+									</th>
+									<td>〇</td>
+								</tr> <tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.is_empty"><code>slice::is_empty</code></a>
+									</th>
+									<td>〇</td>
+								</tr> <tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.len"><code>Vec::len</code></a>
+									</th>
+									<td>×</td>
+								</tr> <tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.is_empty"><code>Vec::is_empty</code></a>
+									</th>
+									<td>×</td>
+								</tr>
 							</table>
 						</dd>
 						<dt>コールバック系</dt>
@@ -158,8 +188,17 @@ fn must_use() -&gt; i32 {
 以下はどれもコールバックを伴うため、全て <code>must_use</code> なしが期待される。
 							</p>
 							<table class="normal fn_bool">
-								<tr> <th><code>Option::map</code></th> <td>×</td></tr>
-								<tr> <th><code>Option::is_some_and</code></th> <td>〇</td></tr>
+								<tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map"><code>Option::map</code></a>
+									</th>
+									<td>×</td>
+								</tr> <tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_some_and"><code>Option::is_some_and</code></a>
+									</th>
+									<td>〇</td>
+								</tr>
 							</table>
 						</dd>
 						<dt>その他</dt>
@@ -168,8 +207,17 @@ fn must_use() -&gt; i32 {
 以下は副作用なしだが <code>must_use</code> なし。
 							</p>
 							<table class="normal fn_bool">
-								<tr> <th><code>Result::ok</code></th> <td>×</td></tr>
-								<tr> <th><code>Result::err</code></th> <td>×</td></tr>
+								<tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.ok"><code>Result::ok</code></a>
+									</th>
+									<td>×</td>
+								</tr> <tr>
+									<th>
+<a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.err"><code>Result::err</code></a>
+									</th>
+									<td>×</td>
+								</tr>
 							</table>
 						</dd>
 					</dl>
