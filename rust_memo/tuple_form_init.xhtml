@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: タプル形式の初期化</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+構造体や列挙体の列挙子がタプル形式の場合、識別子は初期化用の関数として扱われる。
+		</p> <p>
+これらの識別子は他の関数のそれと全く同様に扱える。そのため、識別子から直接的に関数を呼び出してもよいし、参照として持ちだしてから関数を呼び出してもよい。
+		</p>
+		<section>
+			<h1>構造体の場合</h1>
+<pre><code class="language-rust">
+fn main() {
+    let x_f = MyStructX;
+    let y_f = MyStructY;
+    let z_f = MyStructZ;
+    assert!(x_f() == MyStructX());
+    assert!(y_f(1) == MyStructY(1));
+    assert!(z_f(1, 2) == MyStructZ(1, 2));
+}
+
+#[derive(Eq, PartialEq)]
+struct MyStructX();
+
+#[derive(Eq, PartialEq)]
+struct MyStructY(i32);
+
+#[derive(Eq, PartialEq)]
+struct MyStructZ(i32, i32);
+</code></pre>
+		</section> <section>
+			<h1>列挙体の場合</h1>
+<pre><code class="language-rust">
+fn main() {
+    let a_f = MyEnum::A;
+    let b_f = MyEnum::B;
+    let c_f = MyEnum::C;
+    assert!(a_f() == MyEnum::A());
+    assert!(b_f(1) == MyEnum::B(1));
+    assert!(c_f(1, 2) == MyEnum::C(1, 2));
+}
+
+#[derive(Eq, PartialEq)]
+enum MyEnum {
+    A(),
+    B(i32),
+    C(i32, i32)
+}
+</code></pre>
+		</section> <section>
+			<h1>補足</h1>
+			<p>
+タプル形式における空のタプルと異なり、まったく中身の指定されない識別子では、関数としての利用はできない。
+			</p>
+		</section>
+	</body>
+</html>
