@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: self 引数の取扱い</title>
+		<title>Rust メモ: self への型指定</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<link rel="stylesheet" href="style/must_use.css"/>
 		<script src="lib/base.js"></script>
@@ -12,10 +12,13 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-<code>self</code> 引数の各種の取扱い方法について。
+<code>self</code> 引数への型指定について。
 		</p>
 		<section>
-			<h1>メジャーな用法</h1>
+			<h1>型指定の省略</h1>
+			<p>
+最も一般的な用法では、型指定は省略される。
+			</p>
 			<dl class="normal lowProfile">
 				<dt><code>self</code></dt>
 				<dd>
@@ -31,8 +34,10 @@
 				</dd>
 			</dl>
 		</section> <section>
-			<h1>マイナーな用法</h1>
+			<h1>特殊な型指定</h1>
 			<p>
+こちらは少しマイナーな用法。
+			</p> <p>
 <code>self</code> の型に指定できるのは、参照外しの反復で <code>Self</code> 型にできる型である。
 			</p> <p>
 そのため、<code>self: Box&lt;Self&gt;</code> のような指定も可能になる。
