@@ -71,7 +71,7 @@ impl&lt;T&gt; MyTrait for T {}
 			<div class="sub">
 				<h2>補足</h2>
 				<p>
-補足: 以下は最初のサンプルの <code>for &amp;MyStruct</code> から <code>&amp;</code> を削った場合のエラー。
+以下は最初のサンプルの <code>for &amp;MyStruct</code> から <code>&amp;</code> を削った場合のエラー。
 				</p>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0507]</mark>: cannot move out of `*r` which is behind a shared reference
@@ -115,7 +115,7 @@ fn main() {
 			<p>
 こうした手法は、値での操作が基本となるトレイトについて、値と参照、その両方からの呼出に対応した実装を提供するのに向いている。
 			</p> <p>
-補足: より簡単に <code>&amp;self</code> を受けとるメソッドだけでも、値と参照、その両方からの呼出に対応できる (値から参照への自動型変換があるため)。ただこの場合、値と参照とで実装を分離できない。また、値の場合にその消費が行われない。など、両者には微妙な違いがある。
+なお、より簡単に <code>&amp;self</code> を受けとるメソッドだけでも、値と参照、その両方からの呼出に対応できる (値から参照への自動型変換があるため)。ただこの場合、値と参照とで実装を分離できない。また、値の場合にその消費が行われない。など、両者には微妙な違いがある。
 			</p>
 		</section>
 	</body>
