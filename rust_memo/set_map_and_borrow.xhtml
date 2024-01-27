@@ -14,14 +14,24 @@
 <code>std</code> クレートのセットやマップ (<code>BTreeSet</code>, <code>HashSet</code>, <code>BTreeMap</code>, <code>HashMap</code>) における検索系のメソッドについて。検索引数の型、検索対象の型、それから <code>Borrow</code> トレイト、それぞれの関係を紹介する。
 		</p> 
 		<section>
-			<h1>基本ルール</h1>
+			<h1>基本と応用</h1>
 			<p>
-メジャーな用法では、検索メソッドの検索引数には、検索対象への参照型を渡す。
-			</p> <p>
-一方、検索メソッドの型パラメタについて調べると、検索対象以外への参照型でも、渡せる場合がある事が分かる。具体的には、検索対象から借用でき、かつ検索対象と同様にふるまえる型であれば、その参照型は検索引数として使える。
+検索メソッドの用法には基本と応用がある。
 			</p>
+			<div class="sub">
+				<h2>基本編</h2>
+				<p>
+検索引数として、検索対象への参照型を渡す。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>応用編</h2>
+				<p>
+上記以外の検索引数も渡せるよう、検索メソッドの仕様はより汎用的になっている。具体的には、検索引数として渡せる型は、検索対象から借用でき、かつ検索対象と似た動作ができる型への参照型であればよい。
+				</p>
+			</div>
 		</section> <section>
-			<h1 id="each_method">各メソッド</h1>
+			<h1>具体例</h1>
 			<p>
 代表的なメソッドについて、いくつか見てみる。
 			</p>
@@ -96,10 +106,8 @@ The key may be any borrowed form of the map’s key type, but <a href="../hash/t
 		</section> <section>
 			<h1>サンプル</h1>
 			<section>
-				<h1>通常版</h1>
+				<h1>基本編</h1>
 				<p>
-以下は最もよくある使い方。
-				</p> <p>
 検索対象は <code>i32</code>、検索引数はその参照型の <code>&amp;i32</code> を利用。
 				</p>
 <pre><code class="language-rust">
@@ -117,10 +125,13 @@ fn main() {
 }
 </code></pre>
 			</section> <section>
-				<h1>キー型が <code>String</code></h1>
+				<hgroup>
+					<h1>応用編 1</h1>
+					<div class="subtitle">
+						キー型が <code>String</code>
+					</div>
+				</hgroup>
 				<p>
-これもよくある使い方。
-				</p> <p>
 検索対象は <code>String</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;str</code> を利用。
 				</p>
 <pre><code class="language-rust">
@@ -138,10 +149,13 @@ fn main() {
 }
 </code></pre>
 			</section> <section>
-				<h1>キー型が <code>Box</code></h1>
+				<hgroup>
+					<h1>応用編 2</h1>
+					<div class="subtitle">
+						キー型が <code>Box</code>
+					</div>
+				</hgroup>
 				<p>
-以下では Box 化した型を使用。
-				</p> <p>
 検索対象は <code>Box&lt;i32&gt;</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;i32</code> を利用。
 				</p>
 <pre><code class="language-rust">
@@ -159,10 +173,13 @@ fn main() {
 }
 </code></pre>
 			</section> <section>
-				<h1>キー型が独自型</h1>
+				<hgroup>
+					<h1>応用編 3</h1>
+					<div class="subtitle">
+						キー型が独自型
+					</div>
+				</hgroup>
 				<p>
-以下では Key 型を新たに定義。
-				</p> <p>
 検索対象は <code>Key</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;u32</code> を利用。
 				</p>
 <pre><code class="language-rust">
