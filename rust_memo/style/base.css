@@ -106,13 +106,17 @@
 		border-radius: 0.25ch;
 	}
 
-	h1 code {
-		background-color: revert;
-	}
-
 	a:link, a:visited {
 		color: var(--link-color);
 		text-decoration: none;
+	}
+
+	a:link:hover, a:visited:hover {
+		text-decoration: underline;
+	}
+
+	h1 code {
+		background-color: revert;
 	}
 
 	*.mt {
