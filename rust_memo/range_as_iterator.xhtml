@@ -11,9 +11,9 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-範囲型 (<code>RangeBounds</code> トレイトを実装する型) にはイテレータとして機能するものがある。
+範囲型 (<a href="https://doc.rust-lang.org/std/ops/trait.RangeBounds.html"><code>RangeBounds</code></a> トレイトを実装する型) にはイテレータとして機能するものがある。
 		</p> <p>
-<code>next</code> メソッドを呼ぶと、開始端がインクリメントされ、直前の開始端が戻される。
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#tymethod.next"><code>next</code></a> メソッドを呼ぶと、開始端がインクリメントされ、直前の開始端が戻される。
 		</p> 
 		<aside class="normal">
 			<p>
@@ -30,22 +30,22 @@
 			<ul>
 				<li>
 					<p>
-範囲端を表す型が <code>Step</code> トレイトに適合。
+範囲端を表す型が <a href="https://doc.rust-lang.org/std/iter/trait.Step.html"><code>Step</code></a> トレイトに適合。
 					</p>
 				</li> <li>
 					<p>
 範囲の開始点を持つ。
 					</p> <p>
-つまり、<code>Range</code>, <code>RangeFrom</code>, <code>RangeInclusive</code> が対象。
+つまり、<a href="https://doc.rust-lang.org/std/ops/struct.Range.html"><code>Range</code></a>, <a href="https://doc.rust-lang.org/std/ops/struct.RangeFrom.html"><code>RangeFrom</code></a>, <a href="https://doc.rust-lang.org/std/ops/struct.RangeInclusive.html"><code>RangeInclusive</code></a> が対象。
 					</p> <p>
-つまり、<code>RangeTo</code>, <code>RangeToInclusive</code>, <code>RangeFull</code> は対象外。
+つまり、<a href="https://doc.rust-lang.org/std/ops/struct.RangeTo.html"><code>RangeTo</code></a>, <a href="https://doc.rust-lang.org/std/ops/struct.RangeToInclusive.html"><code>RangeToInclusive</code></a>, <a href="https://doc.rust-lang.org/std/ops/struct.RangeFull.html"><code>RangeFull</code></a> は対象外。
 					</p>
 				</li>
 			</ul>
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-以下では、<code>Range</code> 構造体をイテレータとして直接操作している。
+以下では、<a href="https://doc.rust-lang.org/std/ops/struct.Range.html"><code>Range</code></a> 構造体をイテレータとして直接操作している。
 			</p>
 <pre><code class="language-rust">
 fn main() {

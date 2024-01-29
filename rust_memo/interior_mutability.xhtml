@@ -15,7 +15,7 @@
 			<p>
 内部可変性のある型は、可変と指定されていなくても、特例として値を変更できる。
 			</p> <p>
-この仕組は主に、値全体は不変のまま、その一部のみを可変として処理するのに用いられる (内部可変性を乱用するとコードの可読性が悪化するため要注意)。例えば、<code>Rc</code> 型の内部的な参照カウンタの型には、内部可変性が必要になる。なぜなら、たとえ <code>Rc</code> 型の値が不変でも、参照カウンタはその参照数に応じて増減するため、独立して可変でなければならない。
+この仕組は主に、値全体は不変のまま、その一部のみを可変として処理するのに用いられる (内部可変性を乱用するとコードの可読性が悪化するため要注意)。例えば、<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> 型の内部的な参照カウンタの型には、内部可変性が必要になる。なぜなら、たとえ <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> 型の値が不変でも、参照カウンタはその参照数に応じて増減するため、独立して可変でなければならない。
 			</p>
 		</section> <section>
 			<h1>標準の型</h1>
@@ -23,63 +23,83 @@
 標準で提供される内部可変性のある型について。
 			</p>
 			<div class="sub">
-				<h2><code>UnsafeCell</code></h2>
+				<h2 id="UnsafeCell"><code>UnsafeCell</code></h2>
 				<p>
-<code>UnsafeCell</code> は仕様上の特別な型で、ここで紹介しているその他の型の実装の基盤にもなっている。コンパイラはこの型でラップされた値については、たとえ不変とマークされていても、変更されうるものとして扱う。
+<a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html"><code>UnsafeCell</code></a> は仕様上の特別な型で、ここで紹介しているその他の型の実装の基盤にもなっている。コンパイラはこの型でラップされた値については、たとえ不変とマークされていても、変更されうるものとして扱う。
 				</p>
 			</div>
 			<div class="sub">
 				<h2><code>UnsafeCell</code> 以外</h2>
 				<p>
-<code>UnsafeCell</code> をそのまま使うのは、あまりお勧めできない。なぜなら、内部可変性は普段なら Rust が保証してくれる読込と書込の排他性を失わせる。そのため、バグを書きやすくなる。一方、<code>UnsafeCell</code> を利用して実装されたその他の標準の型では、そうした問題をうまく回避できる理論的背景がある場合が多い。そのため、可能な限りそちらを採用した方がよい。
+<a href="#UnsafeCell"><code>UnsafeCell</code></a> をそのまま使うのは、あまりお勧めできない。なぜなら、内部可変性は普段なら Rust が保証してくれる読込と書込の排他性を失わせる。そのため、バグを書きやすくなる。一方、<a href="#UnsafeCell"><code>UnsafeCell</code></a> を利用して実装されたその他の標準の型では、そうした問題をうまく回避できる理論的背景がある場合が多い。そのため、可能な限りそちらを採用した方がよい。
 				</p>
 			</div>
 			<div class="sub">
 				<h2>代表的な型の一覧</h2>
 				<dl class="normal lowProfile">
-					<dt><code>UnsafeCell</code></dt>
+					<dt>
+<a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html"><code>UnsafeCell</code></a>
+					</dt>
 					<dd>
-						危険で特別な型。
+危険で特別な型。
 					</dd>
-					<dt><code>Cell</code></dt>
+					<dt>
+<a href="https://doc.rust-lang.org/std/cell/struct.Cell.html"><code>Cell</code></a>
+					</dt>
 					<dd>
-						他に影響がないようコピーを使う。
+他に影響がないようコピーを使う。
 					</dd>
-					<dt><code>RefCell</code></dt>
+					<dt id="RefCell">
+<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html"><code>RefCell</code></a>
+					</dt>
 					<dd>
-						他が読んでいない時だけ書く。
+他が読んでいない時だけ書く。
 					</dd>
-					<dt><code>OnceCell</code></dt>
+					<dt id="OnceCell">
+<a href="https://doc.rust-lang.org/std/cell/struct.OnceCell.html"><code>OnceCell</code></a>
+					</dt>
 					<dd>
-						他が読む前に一度だけ初期化。
+他が読む前に一度だけ初期化。
 					</dd>
-					<dt><code>LazyCell</code></dt>
+					<dt id="LazyCell">
+<a href="https://doc.rust-lang.org/std/cell/struct.LazyCell.html"><code>LazyCell</code></a>
+					</dt>
 					<dd>
-						他が読む前に一度だけ遅延初期化。
+他が読む前に一度だけ遅延初期化。
 					</dd>
-					<dt><code>Mutex</code></dt>
+					<dt>
+<a href="https://doc.rust-lang.org/std/sync/struct.Mutex.html"><code>Mutex</code></a>
+					</dt>
 					<dd>
-						他が使っていない時だけ使う (<code>RwLock</code> の簡易版)。
+他が使っていない時だけ使う (<a href="#RwLock"><code>RwLock</code></a> の簡易版)。
 					</dd>
-					<dt><code>RwLock</code></dt>
+					<dt id="RwLock">
+<a href="https://doc.rust-lang.org/std/sync/struct.RwLock.html"><code>RwLock</code></a>
+					</dt>
 					<dd>
-						他が読んでいない時だけ書く (<code>RefCell</code> の非同期版)。
+他が読んでいない時だけ書く (<a href="#RefCell"><code>RefCell</code></a> の非同期版)。
 					</dd>
-					<dt><code>OnceLock</code></dt>
+					<dt>
+<a href="https://doc.rust-lang.org/std/sync/struct.OnceLock.html"><code>OnceLock</code></a>
+					</dt>
 					<dd>
-						他が読む前に一度だけ初期化 (<code>OnceCell</code> の非同期版)。
+他が読む前に一度だけ初期化 (<a href="#OnceCell"><code>OnceCell</code></a> の非同期版)。
 					</dd>
-					<dt><code>LazyLock</code></dt>
+					<dt id="LazyLock">
+<a href="https://doc.rust-lang.org/std/sync/struct.LazyLock.html"><code>LazyLock</code></a>
+					</dt>
 					<dd>
-						他が読む前に一度だけ遅延初期化 (<code>LazyCell</code> の非同期版)。
+他が読む前に一度だけ遅延初期化 (<a href="#LazyCell"><code>LazyCell</code></a> の非同期版)。
 					</dd>
-					<dt><code>Atomic<em>XXX</em></code></dt>
+					<dt>
+<code>Atomic<em>XXX</em></code>
+					</dt>
 					<dd>
-						他が割り込むスキを与えない (<code>AtomicI32</code> や <code>AtomicU32</code> など)。
+他が割り込むスキを与えない (<a href="https://doc.rust-lang.org/std/sync/atomic/struct.AtomicI32.html"><code>AtomicI32</code></a> や <a href="https://doc.rust-lang.org/std/sync/atomic/struct.AtomicU32.html"><code>AtomicU32</code></a> など)。
 					</dd>
 				</dl>
 				<p>
-※ <code>LazyCell</code> と <code>LazyLock</code> は 2023 年現在はナイトリー。
+※ <a href="#LazyCell"><code>LazyCell</code></a> と <a href="#LazyLock"><code>LazyLock</code></a> は 2023 年現在はナイトリー。
 				</p>
 			</div>
 		</section> <section>

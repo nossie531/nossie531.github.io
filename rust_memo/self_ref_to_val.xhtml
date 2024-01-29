@@ -80,18 +80,18 @@ impl&lt;T&gt; MyTrait for T {}
 		</section> <section>
 			<h1>身近な例</h1>
 			<p>
-<code>std</code> では、<code>Iterator</code> の一部メソッドなどに利用例がある。
+<a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> では、<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> の一部メソッドなどに利用例がある。
 			</p>
 			<div class="sub">
 				<h2>関連する宣言</h2>
 				<p>
-以下は <code>Iterator</code> の <code>count</code> メソッド。
+以下は <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> の <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.count"><code>count</code></a> メソッド。
 				</p>
 <pre><code class="language-rust">
 fn count(self) -&gt; usize where Self: Sized
 </code></pre>
 				<p>
-以下は <code>Iterator</code> の参照に対する実装 。
+以下は <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> の参照に対する実装。
 				</p>
 <pre><code class="language-rust">
 impl&lt;I: Iterator + ?Sized&gt; Iterator for &amp;mut I

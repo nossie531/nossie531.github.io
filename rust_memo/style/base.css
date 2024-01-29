@@ -99,11 +99,15 @@
 		text-justify: none;
 	}
 
-	:not(h1):not(pre) > code {
+	code {
 		background-color: var(--shadow-color);
 		margin: 0 -0.25ch;
 		padding: 0 0.25ch;
 		border-radius: 0.25ch;
+	}
+
+	h1 code {
+		background-color: revert;
 	}
 
 	a:link, a:visited {
@@ -219,6 +223,7 @@
 
 		&.lowProfile > dt {
 			align-self: baseline;
+			white-space: nowrap;
 		}
 
 		&.lowProfile > dd {

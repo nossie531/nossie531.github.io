@@ -11,14 +11,14 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-<code>Deref</code> 型強制を使った省力化について。
+<a href="https://doc.rust-lang.org/std/ops/trait.Deref.html"><code>Deref</code></a> 型強制を使った省力化について。
 		</p>
 		<section>
 			<h1>仕様</h1>
 			<p>
-型強制では頻出の型変換を自動で行ってくれる。そして、自動化された変換の一つに、<code>Deref</code> トレイトの参照を自動で辿る機能がある。
+型強制では頻出の型変換を自動で行ってくれる。そして、自動化された変換の一つに、<a href="https://doc.rust-lang.org/std/ops/trait.Deref.html"><code>Deref</code></a> トレイトの参照を自動で辿る機能がある。
 			</p> <p>
-より具体的には、型 <code>T</code> が <code>Deref&lt;Target = U&gt;</code> の境界を持つ時に、<code>&amp;T</code> から <code>&amp;U</code> へと自動的に変換してくれる。
+より具体的には、型 <code>T</code> が <code><a href="https://doc.rust-lang.org/std/ops/trait.Deref.html">Deref</a>&lt;<a href="https://doc.rust-lang.org/std/ops/trait.Deref.html#associatedtype.Target">Target</a> = U&gt;</code> の境界を持つ時に、<code>&amp;T</code> から <code>&amp;U</code> へと自動的に変換してくれる。
 			</p>
 		</section> <section>
 			<h1>TIPS</h1>

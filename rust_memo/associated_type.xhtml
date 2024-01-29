@@ -63,9 +63,9 @@ impl Sequence for IntCounter {
 				<div class="sub">
 					<h2>サンプルコード</h2>
 					<p>
-以下のコードは、直前の例と似たような構成だが、関連型 <code>Value</code> に境界 <code>Ord</code> がある。
+以下のコードは、直前の例と似たような構成だが、関連型 <code>Value</code> に境界 <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> がある。
 					</p> <p>
-そして、型 <code>IntCounter</code> における <code>Value</code> である <code>i32</code> はもちろん <code>Ord</code> である。
+そして、型 <code>IntCounter</code> における <code>Value</code> である <code>i32</code> はもちろん <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> である。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -106,7 +106,7 @@ impl Sequence for IntCounter {
 				<div class="sub">
 					<h2>サンプルコード</h2>
 					<p>
-以下のコードは、直前の例と同じ動作をする。ただし、関連型 <code>Value</code> の境界 <code>Ord</code> は、関連型の定義時でなく、外部の関数 <code>skip_to</code> での関連型の使用時に指定されている。
+以下のコードは、直前の例と同じ動作をする。ただし、関連型 <code>Value</code> の境界 <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> は、関連型の定義時でなく、外部の関数 <code>skip_to</code> での関連型の使用時に指定されている。
 					</p>
 <pre><code class="language-rust">
 fn main() {

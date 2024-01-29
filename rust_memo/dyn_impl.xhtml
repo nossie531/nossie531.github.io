@@ -81,7 +81,7 @@ impl Animal for Dog {
 			<div class="sub">
 				<h2>サンプルコード</h2>
 				<p>
-以下では、<code>PartialEq</code> トレイトの <code>eq</code> メソッドにより、数値型または文字列型をとる <code>dyn Id</code> どうしを比較している。なお、<code>eq</code> は比較先に <code>Self</code> を用いる。そのため、<code>PartialEq</code> はこの手法なしでは、異なる型どうしの比較も、動的型の処理もできない (オブジェクトセーフの条件を満たせないため)。
+以下では、<a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html"><code>PartialEq</code></a> トレイトの <a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html#tymethod.eq"><code>eq</code></a> メソッドにより、数値型または文字列型をとる <code>dyn Id</code> どうしを比較している。なお、<a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html#tymethod.eq"><code>eq</code></a> は比較先に <code>Self</code> を用いる。そのため、<a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html"><code>PartialEq</code></a> はこの手法なしでは、異なる型どうしの比較も、動的型の処理もできない (オブジェクトセーフの条件を満たせないため)。
 				</p>
 <pre><code class="language-rust">
 fn main() {

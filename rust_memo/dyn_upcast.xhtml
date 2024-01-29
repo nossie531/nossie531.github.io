@@ -174,7 +174,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 				<div class="sub">
 					<h2>サンプルコード</h2>
 					<p>
-以下では、定義済の <code>Any</code> へのアップキャスト用に <code>AsAny</code> を用意している。
+以下では、定義済の <a href="https://doc.rust-lang.org/std/any/trait.Any.html"><code>Any</code></a> へのアップキャスト用に <code>AsAny</code> を用意している。
 					</p>
 <pre><code class="language-rust">
 use std::any::Any;
@@ -211,7 +211,7 @@ impl&lt;T: Any&gt; SomeTrait for T {}
 		</section> <section>
 			<h1>発展形</h1>
 			<p>
-上記では、不変参照を通したアップキャストについて説明したが、他にも可変参照や <code>Box</code> を通した関数があると便利 (<code>Box</code> 以外のスマートポインタ、例えば <code>Rc</code> などは、<code>Box</code> から <code>From</code> トレイトで変換できるため、事前に関数を用意しておく必要性は低い)。
+上記では、不変参照を通したアップキャストについて説明したが、他にも可変参照や <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> を通した関数があると便利 (<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> 以外のスマートポインタ、例えば <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> などは、<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> から <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> トレイトで変換できるため、事前に関数を用意しておく必要性は低い)。
 			</p>
 			<div class="sub">
 				<h2>サンプルコード</h2>

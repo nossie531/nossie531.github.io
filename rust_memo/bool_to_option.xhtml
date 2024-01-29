@@ -11,7 +11,7 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-<code>bool</code> 型から <code>Option</code> 型への変換。
+<a href="https://doc.rust-lang.org/std/primitive.bool.html"><code>bool</code></a> 型から <a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> 型への変換。
 		</p> 
 		<aside class="normal">
 			<p>
@@ -26,16 +26,20 @@
 以下の関数を使うと、<code>if</code> 式での分岐が不要になる。
 			</p>
 			<dl class="normal">
-				<dt><code>then_some</code></dt>
+				<dt id="then_some">
+<a href="https://doc.rust-lang.org/std/primitive.bool.html#method.then_some"><code>then_some</code></a>
+				</dt>
 				<dd>
 					<p>
-<code>false</code> なら <code>None</code>、<code>true</code> なら <code>Some</code> でラップした指定値へと変換する。
+<code>false</code> なら <a href="https://doc.rust-lang.org/std/option/enum.Option.html#variant.None"><code>None</code></a> へ、<code>true</code> なら <a href="https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some"><code>Some</code></a> でラップした指定値へ、それぞれ変換する。
 					</p>
 				</dd>
-				<dt><code>then</code></dt>
+				<dt>
+<a href="https://doc.rust-lang.org/std/primitive.bool.html#method.then"><code>then</code></a>
+				</dt>
 				<dd>
 					<p>
-<code>then_some</code> とほぼ同じだが、指定値の生成にクロージャを使用する。
+<a href="#then_some"><code>then_some</code></a> とほぼ同じだが、指定値の生成にクロージャを使用する。
 					</p>
 				</dd>
 			</dl>

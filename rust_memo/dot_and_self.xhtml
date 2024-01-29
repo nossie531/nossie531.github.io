@@ -84,12 +84,12 @@
 								</p>
 							</li> <li>
 								<p>
-しかし、<code>T</code> は <code>Sized</code> に違反する。
+しかし、<code>T</code> は <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> に違反する。
 								</p>
 							</li>
 						</ul>
 						<p>
-※ 型パラメタは暗黙で Sized 境界を持つ。
+※ 型パラメタは暗黙で <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> 境界を持つ。
 						</p>
 					</li> <li>
 						<p>
@@ -106,7 +106,7 @@
 								</p>
 							</li> <li>
 								<p>
-ここで、<code>T</code> は <code>Sized</code> に適合する。
+ここで、<code>T</code> は <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> に適合する。
 								</p>
 							</li> <li>
 								<p>
@@ -160,7 +160,7 @@ impl&lt;T: Any&gt; SomeTrait for T {
 					</div>
 				</hgroup>
 				<p>
-以下のコードでは、いくつかの値と型をペアで出力しているが、文字列スライス型でのみ失敗している。これは筆者が誤って文字列スライスを <code>Sized</code> として処理、コンパイラがその不備を修正するため、型変換でスライス型をスライスの参照型にした結果である。
+以下のコードでは、いくつかの値と型をペアで出力しているが、文字列スライス型でのみ失敗している。これは筆者が誤って文字列スライスを <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> として処理、コンパイラがその不備を修正するため、型変換でスライス型をスライスの参照型にした結果である。
 				</p>
 				<ol>
 					<li>
@@ -178,12 +178,12 @@ impl&lt;T: Any&gt; SomeTrait for T {
 								</p>
 							</li> <li>
 								<p>
-しかし、<code>T</code> は <code>Sized</code> に違反する。
+しかし、<code>T</code> は <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> に違反する。
 								</p>
 							</li>
 						</ul>
 						<p>
-※ 型パラメタは暗黙で Sized 境界を持つ。
+※ 型パラメタは暗黙で <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> 境界を持つ。
 						</p>
 					</li> <li>
 						<p>
@@ -200,7 +200,7 @@ impl&lt;T: Any&gt; SomeTrait for T {
 								</p>
 							</li> <li>
 								<p>
-ここで、<code>T</code> は <code>Sized</code> に適合する。
+ここで、<code>T</code> は <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> に適合する。
 								</p>
 							</li>
 						</ul>

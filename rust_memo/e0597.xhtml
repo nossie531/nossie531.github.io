@@ -100,7 +100,7 @@ fn use_static_ref(_: &amp;'static i32) {
 					<div class="subtitle"><code>Drop</code> トレイトの暗躍</div>
 				</hgroup>
 				<p>
-ブロック内のローカル変数と、ブロック末尾の式内にて生成される値とでは、前者が先に破棄される。そのため、後者が前者を参照していると、後者を破棄する時点ですでに後者は参照先を失っている。殆どの場合、それでも問題はないが、後者が <code>Drop</code> トレイトを実装する場合、その状態で <code>drop</code> メソッドを実行するわけにもいかず、エラーとなる。
+ブロック内のローカル変数と、ブロック末尾の式内にて生成される値とでは、前者が先に破棄される。そのため、後者が前者を参照していると、後者を破棄する時点ですでに後者は参照先を失っている。殆どの場合、それでも問題はないが、後者が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する場合、その状態で <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッドを実行するわけにもいかず、エラーとなる。
 				</p>
 				<div class="sub">
 					<h2>エラーの解決方法</h2>

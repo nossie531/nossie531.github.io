@@ -204,13 +204,14 @@ class Nav {
 		return ul;
 	}
 
-	// 目次の項目を一つ作成します。
+	// 目次の項目を一つ作成。
 	#createIndexEntry(header, children) {
 		const li = document.createElement("li");
 		const a = document.createElement("a");
+		const vHeader = Nav.#adjustForHeader(Nav.#cloneContents(header));
 		const vChildren = children || document.createDocumentFragment();
 		a.href = "#" + header.id;
-		a.innerHTML = header.innerHTML;
+		a.append(vHeader);
 		li.append(a, vChildren);
 		return li;
 	}
@@ -231,7 +232,7 @@ class Nav {
 		return result;
 	}
 
-	// セクション要素の見出しを取得します。
+	// セクション要素の見出しを取得。
 	#getSectionHeader(elm) {
 		const sectionElm = elm?.tagName === "section" ? elm : null;
 		const hgroupElm = getFirstElementIf(sectionElm, "hgroup");
@@ -270,7 +271,42 @@ class Nav {
 		}
 	}
 
-	// XHTML 文書のロード。
+	// 要素の内容をクローン。
+	static #cloneContents(elm) {
+		const range = document.createRange();
+		range.selectNodeContents(elm);
+		return range.cloneContents();
+	}
+
+	// 要素の内容をヘッダ用にカスタマイズします。
+	static #adjustForHeader(elm) {
+		Nav.#removeAnchors(elm);
+		Nav.#trimTextNodes(elm);
+		return elm;
+	}
+	
+	// 要素内の a 要素から href 属性を削除します。
+	static #removeAnchors(elm) {
+		for (const a of [].values.call(elm.querySelectorAll("a"))) {
+			a.removeAttribute("href");
+		}
+	}
+
+	// 要素内のテキストから空白をトリムします。
+	static #trimTextNodes(elm) {
+		const tw = document.createTreeWalker(elm, NodeFilter.SHOW_TEXT);
+		while (tw.nextNode()) {
+			if (tw.currentNode.previousSibling === null) {
+				tw.currentNode.data = tw.currentNode.data.replace(/^\s*/, "");
+			}
+
+			if (tw.currentNode.nextSibling === null) {
+				tw.currentNode.data = tw.currentNode.data.replace(/\s*$/, "");
+			}
+		}
+	}
+
+	// XHTML 文書をロード。
 	static async #fetchXhtml(url) {
 		const response = await fetch(url);
 		const text = await response.text();

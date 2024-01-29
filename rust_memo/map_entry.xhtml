@@ -16,18 +16,18 @@
 		<section>
 			<h1>基礎知識</h1>
 			<p>
-マップ系の型 (<code>HashMap</code> や <code>BTreeMap</code>) の <code>entry</code> メソッドは、エントリ編集系のよくある処理のためのヘルパメソッドである。これにより、その他の編集用メソッド (<code>get</code>, <code>get_mut</code>, <code>insert</code>, <code>remove</code> など) のみを使った場合と比べ、処理の効率化や、条件分岐の削減ができる場合がある。
+マップ系の型 (<a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html"><code>HashMap</code></a> や <a href="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html"><code>BTreeMap</code></a>) の <code>entry</code> メソッドは、エントリ編集系のよくある処理のためのヘルパメソッドである。これにより、その他の編集用メソッド (<code>get</code>, <code>get_mut</code>, <code>insert</code>, <code>remove</code> など) のみを使った場合と比べ、処理の効率化や、条件分岐の削減ができる場合がある。
 			</p>
 			<aside class="normal moan">
 				<p>
 セット系について。
 				</p>
-マップ系と異なり、セット系の型 (<code>HashSet</code> や <code>BTreeSet</code>) には、2023 年の時点では同様のメソッドがまだない。<a href="https://github.com/rust-lang/rfcs/issues/1490">提案</a>はされているので、そのうち導入されるかも…。
+マップ系と異なり、セット系の型 (<a href="https://doc.rust-lang.org/std/collections/struct.HashSet.html"><code>HashSet</code></a> や <a href="https://doc.rust-lang.org/std/collections/struct.BTreeSet.html"><code>BTreeSet</code></a>) には、2023 年の時点では同様のメソッドがまだない。<a href="https://github.com/rust-lang/rfcs/issues/1490">提案</a>はされているので、そのうち導入されるかも…。
 			</aside>
 			<div class="sub">
 				<h2>メソッドとその周辺仕様</h2>
 				<p>
-以下は <code>entry</code> メソッドの宣言。
+以下は <a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html"><code>HashMap</code></a> の <a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html#method.entry"><code>entry</code></a> メソッドの宣言。
 				</p>
 <pre><code class="language-rust">
 pub fn entry(&amp;mut self, key: K) -&gt; Entry&lt;'_, K, V&gt;
@@ -39,11 +39,11 @@ pub fn entry(&amp;mut self, key: K) -&gt; Entry&lt;'_, K, V&gt;
 					<li>
 引数 <code>key</code> には、編集予定のエントリのキーを指定。
 					</li> <li>
-<code>Entry</code> 型は列挙型。値は <code>Vacant</code> と <code>Ocupied</code>。
+<a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html"><code>Entry</code></a> 型は列挙型。値は <a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#variant.Vacant"><code>Vacant</code></a> と <a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#variant.Occupied"><code>Ocupied</code></a>。
 					</li> <li>
-<code>Vacant</code> の場合、対象にキーが未登録。
+<a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#variant.Vacant"><code>Vacant</code></a> の場合、対象にキーが未登録。
 					</li> <li>
-<code>Ocupied</code> の場合、対象にキーが登録済。
+<a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#variant.Occupied"><code>Ocupied</code></a> の場合、対象にキーが登録済。
 					</li>
 				</ul>
 			</div>
@@ -78,7 +78,7 @@ pub fn entry(&amp;mut self, key: K) -&gt; Entry&lt;'_, K, V&gt;
 					</div>
 				</hgroup>
 				<p>
-以下、<code>or_insert</code> メソッドを活用。
+以下、<a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#method.or_insert"><code>or_insert</code></a> メソッドを活用。
 				</p>
 <pre><code class="language-rust">
 use std::collections::HashMap;
@@ -99,7 +99,7 @@ fn main() {
 					</div>
 				</hgroup>
 				<p>
-以下、<code>and_modify</code> メソッドを活用。
+以下、<a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#method.and_modify"><code>and_modify</code></a> メソッドを活用。
 				</p>
 				<pre><code class="language-rust">
 use std::collections::HashMap;
@@ -120,7 +120,7 @@ fn main() {
 					</div>
 				</hgroup>
 				<p>
-以下、<code>and_modify</code> と <code>or_insert</code> を連結 (<code>V</code> に <code>Copy</code> トレイトが必要)。
+以下、<a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#method.and_modify"><code>and_modify</code></a> と <a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#method.or_insert"><code>or_insert</code></a> を連結 (<code>V</code> に <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトが必要)。
 				</p>
 <pre><code class="language-rust">
 use std::collections::HashMap;
@@ -150,7 +150,7 @@ where
 					</div>
 				</hgroup>
 				<p>
-以下、<code>Vacant</code> と <code>Occupied</code> を個別に対応 (<code>V</code> に <code>Copy</code> トレイトは不要)。
+以下、<a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#variant.Vacant"><code>Vacant</code></a> と <a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#variant.Occupied"><code>Ocupied</code></a> を個別に対応 (<code>V</code> に <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトは不要)。
 				</p>
 <pre><code class="language-rust">
 use std::collections::HashMap;

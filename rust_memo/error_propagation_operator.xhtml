@@ -11,53 +11,57 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-エラー伝搬演算子 (<code>?</code> 演算子) は戻り値の型が <code>Result</code> や <code>Option</code> の関数内で使える。
+エラー伝搬演算子 (<code>?</code> 演算子) は戻り値の型が <a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> や <a href="https://doc.rust-lang.org/std/result/enum.Result.html"><code>Result</code></a> の関数内で使える。
 		</p> 
 		<aside class="normal">
 			<p>
 このメモの背景。
 			</p> <p>
-<code>Option</code> でも使えるようになったのは、Rust のバージョン 1.22.0 (2017/11/22 リリース) 以降。その名残りか 2023 年現在でも <code>Result</code> でのみ使えるとしている記事がある。筆者も勘違いしていたのでメモを残す。
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> でも使えるようになったのは、Rust のバージョン 1.22.0 (2017/11/22 リリース) 以降。その名残りか 2023 年現在でも <a href="https://doc.rust-lang.org/std/result/enum.Result.html"><code>Result</code></a> でのみ使えるとしている記事がある。筆者も勘違いしていたのでメモを残す。
 			</p> <p>
-より厳密には <code>Result</code> や <code>Option</code> の背後にいる <code>Try</code> トレイトが関係しているようだが、こちらは現在ナイトリー限定の機能となっている。
+より厳密には、<a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> や <a href="https://doc.rust-lang.org/std/result/enum.Result.html"><code>Result</code></a> の背後にいる <a href="https://doc.rust-lang.org/std/ops/trait.Try.html"><code>Try</code></a> トレイトが関係しているようだが、こちらはまだナイトリー版限定の機能である。
 			</p>
 		</aside>
 		<section>
-			<h1><code>Result</code> による例</h1>
-			<p>
-<code>Result</code> では <code>Ok</code> か <code>Err</code> かで動作が分岐する。
-			</p>
-<pre><code class="language-rust">
-fn main() {
-    let result = calc().map_or("fail".to_string(), |x| format!("success: {}", x));
-    println!("{result}");
-}
-
-fn calc() -&gt; Result&lt;i32, ()&gt; {
-    Ok(get_src(1)? + get_src(2)?)
-}
-
-fn get_src(x: i32) -&gt; Result&lt;i32, ()&gt; {
-    if x &gt; 0 { Ok(x) } else { Err(()) }
-}
-</code></pre>
-		</section> <section>
 			<h1><code>Option</code> による例</h1>
 			<p>
-<code>Option</code> では <code>Some</code> か <code>None</code> かで動作が分岐する。
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> では <a href="https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some"><code>Some</code></a> か <a href="https://doc.rust-lang.org/std/option/enum.Option.html#variant.None"><code>None</code></a> かで動作が分岐する。
 			</p>
 <pre><code class="language-rust">
 fn main() {
-    let result = calc().map_or("fail".to_string(), |x| format!("success: {}", x));
-    println!("{result}");
+    let a1 = calc(40, 2);
+    let a2 = calc(40, -2);
+    assert_eq!(a1, Some(42));
+    assert_eq!(a2, None);
 }
 
-fn calc() -&gt; Option&lt;i32&gt; {
-    Some(get_src(1)? + get_src(2)?)
+fn calc(x: i32, y: i32) -&gt; Option&lt;i32&gt; {
+    Some(get_src(x)? + get_src(y)?)
 }
 
 fn get_src(x: i32) -&gt; Option&lt;i32&gt; {
     if x &gt; 0 { Some(x) } else { None }
+}
+</code></pre>
+		</section> <section>
+			<h1><code>Result</code> による例</h1>
+			<p>
+<a href="https://doc.rust-lang.org/std/result/enum.Result.html"><code>Result</code></a> では <a href="https://doc.rust-lang.org/std/result/enum.Result.html#variant.Ok"><code>Ok</code></a> か <a href="https://doc.rust-lang.org/std/result/enum.Result.html#variant.Err"><code>Err</code></a> かで動作が分岐する。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let a1 = calc(40, 2);
+    let a2 = calc(40, -2);
+    assert_eq!(a1, Ok(42));
+    assert_eq!(a2, Err(()));
+}
+
+fn calc(x: i32, y: i32) -&gt; Result&lt;i32, ()&gt; {
+    Ok(get_src(x)? + get_src(y)?)
+}
+
+fn get_src(x: i32) -&gt; Result&lt;i32, ()&gt; {
+    if x &gt; 0 { Ok(x) } else { Err(()) }
 }
 </code></pre>
 		</section>

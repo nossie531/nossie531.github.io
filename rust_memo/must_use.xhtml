@@ -103,14 +103,16 @@ fn must_use() -&gt; i32 {
 				</li> <li>
 遅延評価を目的に生成される型 (例: イテレータのコンビネータ)
 				</li> <li>
-対処すべきエラー情報を含む型 (例: <code>Result&lt;T, E&gt;</code>)
+対処すべきエラー情報を含む型 (例: <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T, E&gt;</code>)
 				</li>
 			</ul>
 			<p>
-なお、<code>Option::map</code> など、コールバック引数を持つ関数では、たとえ副作用を伴わない用法が多くても、常にそうとは限らないので、対象外とする傾向がある。
+なお、<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map">map</a></code> など、コールバック引数を持つ関数では、たとえ副作用を伴わない用法が多くても、常にそうとは限らないので、対象外とする傾向がある。
 			</p>
 			<section>
-				<h1><code>std</code> の状況</h1>
+				<h1>
+<a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> の状況
+				</h1>
 				<p>
 2023 年現在、上記の基準から外れたものも多い。<br/>
 また、同系統のアイテムについての一貫性もない。<br/>
@@ -137,17 +139,17 @@ fn must_use() -&gt; i32 {
 							<table class="normal fn_bool">
 								<tr> 
 									<th>
-<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.new"><code>Box::new</code></a>
+<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>::<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.new">new</a></code>
 									</th>
 									<td>〇</td>
 								</tr> <tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.new"><code>Vec::new</code></a>
+<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.new">new</a></code>
 									</th>
 									<td>〇</td>
 								</tr> <tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html#method.new"><code>Rc::new</code></a>
+<code><a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>::<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html#method.new">new</a></code>
 									</th>
 									<td>×</td>
 								</tr>
@@ -161,22 +163,22 @@ fn must_use() -&gt; i32 {
 							<table class="normal fn_bool">
 								<tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.len"><code>slice::len</code></a>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.len">len</a></code>
 									</th>
 									<td>〇</td>
 								</tr> <tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.is_empty"><code>slice::is_empty</code></a>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.is_empty">is_empty</a></code>
 									</th>
 									<td>〇</td>
 								</tr> <tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.len"><code>Vec::len</code></a>
+<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.len">len</a></code>
 									</th>
 									<td>×</td>
 								</tr> <tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.is_empty"><code>Vec::is_empty</code></a>
+<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.is_empty">is_empty</a></code>
 									</th>
 									<td>×</td>
 								</tr>
@@ -190,12 +192,12 @@ fn must_use() -&gt; i32 {
 							<table class="normal fn_bool">
 								<tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map"><code>Option::map</code></a>
+<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map">map</a></code>
 									</th>
 									<td>×</td>
 								</tr> <tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_some_and"><code>Option::is_some_and</code></a>
+<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_some_and">is_some_and</a></code>
 									</th>
 									<td>〇</td>
 								</tr>
@@ -209,12 +211,12 @@ fn must_use() -&gt; i32 {
 							<table class="normal fn_bool">
 								<tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.ok"><code>Result::ok</code></a>
+<code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>::<a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.ok">ok</a></code>
 									</th>
 									<td>×</td>
 								</tr> <tr>
 									<th>
-<a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.err"><code>Result::err</code></a>
+<code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>::<a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.err">err</a></code>
 									</th>
 									<td>×</td>
 								</tr>

@@ -11,7 +11,7 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-<code>std</code> クレートのセットやマップ (<code>BTreeSet</code>, <code>HashSet</code>, <code>BTreeMap</code>, <code>HashMap</code>) における検索系のメソッドについて。検索引数の型、検索対象の型、それから <code>Borrow</code> トレイト、それぞれの関係を紹介する。
+<a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> クレートのセットやマップ (<a href="https://doc.rust-lang.org/std/collections/struct.BTreeSet.html"><code>BTreeSet</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.HashSet.html"><code>HashSet</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html"><code>BTreeMap</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html"><code>HashMap</code></a>) における検索系のメソッドについて。検索引数の型、検索対象の型、それから <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> トレイト、それぞれの関係を紹介する。
 		</p> 
 		<section>
 			<h1>基本と応用</h1>
@@ -36,7 +36,9 @@
 代表的なメソッドについて、いくつか見てみる。
 			</p>
 			<section>
-				<h1><code>BTreeMap::get</code></h1>
+				<h1>
+<code><a href="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html"><code>BTreeMap</code></a>::<a href="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html#method.get">get</a></code>
+				</h1>
 				<p>
 以下はメソッドの宣言部分。
 				</p>
@@ -59,7 +61,7 @@ where
 }
 </code></pre>
 				<p>
-検索引数の型 <code>&amp;Q</code> と検索対象の型 <code>K</code> について。<code>Q</code> は <code>K</code> から <code>Borrow</code> を通して借用でき、かつ <code>K</code> と同じく <code>Ord</code> が必要。そして、<code>Q</code> を <code>K</code> から得る過程で、<code>Ord</code> による順序関係は変化してはならない。
+検索引数の型 <code>&amp;Q</code> と検索対象の型 <code>K</code> について。<code>Q</code> は <code>K</code> から <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> を通して借用でき、かつ <code>K</code> と同じく <code>Ord</code> が必要。そして、<code>Q</code> を <code>K</code> から得る過程で、<code>Ord</code> による順序関係は変化してはならない。
 				</p> <p>
 以下は <cite><a href="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html#method.get">rustdoc</a></cite> からの引用。
 				</p>
@@ -69,7 +71,9 @@ The key may be any borrowed form of the map’s key type, but the ordering on th
 					</p>
 				</blockquote>
 			</section> <section>
-				<h1><code>HashMap::get</code></h1>
+				<h1>
+<code><a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html">HashMap</a>::<a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html#method.get">get</a></code>
+				</h1>
 				<p>
 以下はメソッドの宣言部分。
 				</p>
@@ -93,7 +97,7 @@ where
 }
 </code></pre>
 				<p>
-検索引数の型 <code>&amp;Q</code> と検索対象の型 <code>K</code> について。<code>Q</code> は <code>K</code> から <code>Borrow</code> を通して借用でき、かつ <code>K</code> と同じく <code>Eq + Hash</code> が必要。そして、<code>Q</code> を <code>K</code> から得る過程で、<code>Eq</code> による同値関係と、<code>Hash</code> が生成する値は変化してはならない。
+検索引数の型 <code>&amp;Q</code> と検索対象の型 <code>K</code> について。<code>Q</code> は <code>K</code> から <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> を通して借用でき、かつ <code>K</code> と同じく <code>Eq + Hash</code> が必要。そして、<code>Q</code> を <code>K</code> から得る過程で、<code>Eq</code> による同値関係と、<code>Hash</code> が生成する値は変化してはならない。
 				</p> <p>
 以下は <cite><a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html#method.get">rustdoc</a></cite> からの引用。
 				</p>
@@ -132,7 +136,7 @@ fn main() {
 					</div>
 				</hgroup>
 				<p>
-検索対象は <code>String</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;str</code> を利用。
+検索対象は <a href="https://doc.rust-lang.org/std/string/struct.String.html"><code>String</code></a>、検索引数はそこから <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> で得られる <code>&amp;str</code> を利用。
 				</p>
 <pre><code class="language-rust">
 use std::collections::HashMap;
@@ -156,7 +160,7 @@ fn main() {
 					</div>
 				</hgroup>
 				<p>
-検索対象は <code>Box&lt;i32&gt;</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;i32</code> を利用。
+検索対象は <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;i32&gt;</code>、検索引数はそこから <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> で得られる <code>&amp;i32</code> を利用。
 				</p>
 <pre><code class="language-rust">
 use std::collections::HashMap;
@@ -180,7 +184,7 @@ fn main() {
 					</div>
 				</hgroup>
 				<p>
-検索対象は <code>Key</code>、検索引数はそこから <code>Borrow</code> で得られる <code>&amp;u32</code> を利用。
+検索対象は独自型 <code>Key</code>、検索引数はそこから <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> で得られる <code>&amp;u32</code> を利用。
 				</p>
 <pre><code class="language-rust">
 use std::{borrow::Borrow, collections::HashMap, hash::Hash};
@@ -208,7 +212,7 @@ impl Borrow&lt;u32&gt; for Key {
 }
 </code></pre>
 				<p>
-この検索が成り立つのは、<code>derive</code> で自動実装される <code>Hash</code>、そして <code>Key</code> の <code>Borrow&lt;u32&gt;</code> から生成される <code>&amp;u32</code> に実装されている <code>Hash</code>、両者の生成するハッシュ値が同じため。
+この検索が成立するのは、<code>derive</code> で自動実装される <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a>、そして <code>Key</code> の <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Borrow</a>&lt;u32&gt;</code> から借用される <code>&amp;u32</code> の <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a>、両者の生成するハッシュ値が同じため。
 				</p>
 			</section>
 		</section>

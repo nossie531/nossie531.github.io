@@ -35,17 +35,20 @@ let slice: &amp;[i32] = &amp;arr[(Bound::Excluded(2), Bound::Unbounded)]; // 3, 
 添字式は <a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index</code></a> や <a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut</code></a> トレイトを通して処理される。スライスや配列はこれらを実装している。そして、スライスや配列の添字として使える型は、<a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> トレイトにまとめられていて、これには <code>usize</code> や範囲型が該当する。
 			</p>
 			<aside class="normal">
-				<p><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> の実装について。</p>
 				<p>
+<a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> の実装について。
+				</p> <p>
 2023 年現在、<a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> のメソッドはどれもナイトリーのため、自前での実装はできない (スライス本体を引数に各要素へのアクセスを行う類いのものが多い)。
 				</p> 
 			</aside>
 			<section>
-				<h1><code>Index</code></h1>
+				<h1>
+<a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index</code></a>
+				</h1>
 				<p>
-<a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index</code></a> トレイトは取得系の添字式を処理する。
+取得系の添字式を処理するトレイト。
 				</p> <p>
-型パラメタ <code>Idx</code> が添字型を、関連型 <code>Output</code> が出力型を表す。
+型パラメタ <code>Idx</code> が添字型を、関連型 <a href="https://doc.rust-lang.org/std/ops/trait.Index.html#associatedtype.Output"><code>Output</code></a> が出力型を表す。
 				</p>
 <pre><code class="language-rust">
 pub trait Index&lt;Idx&gt;
@@ -59,9 +62,11 @@ where
 }
 </code></pre>
 			</section> <section>
-				<h1><code>IndexMut</code></h1>
+				<h1>
+<a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut</code></a>
+				</h1>
 				<p>
-<a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut</code></a> トレイトは更新系の添字式を処理する。
+更新系の添字式を処理するトレイト。
 				</p> <p>
 このトレイトの実装には <a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index</code></a> トレイトの実装が前提になっている。
 				</p>
@@ -77,9 +82,9 @@ where
 			</section> <section>
 				<h1>スライス</h1>
 				<p>
-スライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> は <a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index&lt;I&gt;</code></a> と <a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut&lt;I&gt;</code></a> を実装している。
+スライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> は <code><a href="https://doc.rust-lang.org/std/ops/trait.Index.html">Index</a>&lt;I&gt;</code> と <code><a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html">IndexMut</a>&lt;I&gt;</code> を実装している。
 				</p> <p>
-ここで、添字型 <code>I</code> には <code>SliceIndex&lt;[T]&gt;</code> トレイトの実装が必要。
+ここで、添字型 <code>I</code> には <code><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt;</code> トレイトの実装が必要。
 				</p>
 <pre><code class="language-rust">
 impl&lt;T, I&gt; Index&lt;I&gt; for [T]
@@ -102,7 +107,7 @@ where
 			</section> <section>
 				<h1>配列</h1>
 				<p>
-配列 <a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a> は <a href="https://doc.rust-lang.org/std/ops/trait.Index.html"><code>Index&lt;I&gt;</code></a> と <a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html"><code>IndexMut&lt;I&gt;</code></a> を実装している。
+配列 <a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a> は <code><a href="https://doc.rust-lang.org/std/ops/trait.Index.html">Index</a>&lt;I&gt;</code> と <code><a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html">IndexMut</a>&lt;I&gt;</code> を実装している。
 				</p> <p>
 これらの実装はスライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> の実装が基になっている。
 				</p>
@@ -125,11 +130,13 @@ where
 }
 </code></pre>
 			</section> <section>
-				<h1><code>SliceIndex</code></h1>
+				<h1>
+<a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a>
+				</h1>
 				<p>
 スライスや配列の添字として使える型をまとめるトレイト。
 				</p> <p>
-<code>SliceIndex&lt;T&gt;</code> トレイトは型 <code>T</code> むけの添字型として使われる。
+<code><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;T&gt;</code> トレイトは型 <code>T</code> むけの添字型として使われる。
 				</p> 
 <pre><code class="language-rust">
 pub unsafe trait SliceIndex&lt;T&gt;: Sealed
@@ -142,7 +149,9 @@ where
 }
 </code></pre>
 			</section> <section>
-				<h1><code>usize</code></h1>
+				<h1>
+<a href="https://doc.rust-lang.org/std/primitive.usize.html"><code>usize</code></a>
+				</h1>
 				<p>
 添字が <a href="https://doc.rust-lang.org/std/primitive.usize.html"><code>usize</code></a> の場合、出力は単一の値 <code>T</code> になる。
 				</p>
@@ -166,16 +175,24 @@ unsafe impl&lt;T&gt; SliceIndex&lt;[T]&gt; for ops::Range&lt;usize&gt; {
 }
 </code></pre>
 				<p>
-上記の <code>Range</code> を含め、以下の範囲型が使用できる。
+上記の <a href="https://doc.rust-lang.org/std/ops/struct.Range.html"><code>Range</code></a> を含め、以下の範囲型が使用できる。
 				</p>
 				<ul>
-					<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for Range&lt;usize&gt;</code></li>
-					<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeFrom&lt;usize&gt;</code></li>
-					<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeFull</code></li>
-					<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeInclusive&lt;usize&gt;</code></li>
-					<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeTo&lt;usize&gt;</code></li>
-					<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for RangeToInclusive&lt;usize&gt;</code></li>
-					<li><code>impl&lt;T&gt; SliceIndex&lt;[T]&gt; for (Bound&lt;usize&gt;, Bound&lt;usize&gt;)</code></li>
+					<li>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt; for <a href="https://doc.rust-lang.org/std/ops/struct.Range.html">Range</a>&lt;usize&gt;</code>
+					</li> <li>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt; for <a href="https://doc.rust-lang.org/std/ops/struct.RangeFrom.html">RangeFrom</a>&lt;usize&gt;</code>
+					</li> <li>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt; for <a href="https://doc.rust-lang.org/std/ops/struct.RangeFull.html">RangeFull</a></code>
+					</li> <li>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt; for <a href="https://doc.rust-lang.org/std/ops/struct.RangeInclusive.html">RangeInclusive</a>&lt;usize&gt;</code>
+					</li> <li>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt; for <a href="https://doc.rust-lang.org/std/ops/struct.RangeTo.html">RangeTo</a>&lt;usize&gt;</code>
+					</li> <li>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt; for <a href="https://doc.rust-lang.org/std/ops/struct.RangeToInclusive.html">RangeToInclusive</a>&lt;usize&gt;</code>
+					</li> <li>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt; for (<a href="https://doc.rust-lang.org/std/ops/enum.Bound.html">Bound</a>&lt;<a href="https://doc.rust-lang.org/std/primitive.usize.html">usize</a>&gt;, <a href="https://doc.rust-lang.org/std/ops/enum.Bound.html">Bound</a>&lt;<a href="https://doc.rust-lang.org/std/primitive.usize.html">usize</a>&gt;)</code>
+					</li>
 				</ul>
 			</section>
 		</section>
