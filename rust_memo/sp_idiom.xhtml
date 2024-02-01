@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: スマートポインタまわりの慣習</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+スマートポインタ (<a href="https://doc.rust-lang.org/std/ops/trait.Deref.html"><code>Deref</code></a> や <a href="https://doc.rust-lang.org/std/ops/trait.DerefMut.html"><code>DerefMut</code></a>トレイトを実装する型) まわりの慣習について。
+		</p>
+		<section>
+			<h1>概要</h1>
+			<p>
+スマートポインタでは、メソッドとして実装可能な関数であるにも関わらず、通常の関連関数として定義されている事が多い (言い換えると、スマートポインタでは <code>self</code> や <code>&amp;self</code> などの引数の使用が少ない)。
+			</p>
+			<div class="sub">
+				<h2>理由</h2>
+				<p>
+これにはコードを分かりやすくする狙いがある。
+				</p> <p>
+ここで、ドット演算子からのメソッドの呼出において、スマートポインタには <code>Deref</code> 型強制がある。つまり、指定されたメソッド名は、スマートポインタ自身のメソッド、そして参照先のメソッド、その両方から探される。
+				</p> <p>
+そのため、コードリーディング時はそのメソッドがどちらに属するのか、そのつど調べないといけない。また、コードライティング時はメソッド名が衝突している場合、参照先のメソッドを呼ぶには、まず手動で参照を外さないといけない。一方、スマートポインタ側の処理の多くがそもそもメソッドでなければ、この問題はいくらか緩和される。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>基準</h2>
+				<p>
+メソッドにすべきか否かの基準は処理対象で決まる。具体的には、処理対象がスマートポインタそのものなら通常の関連関数、処理対象がスマートポインタの参照先ならメソッドとする。そのため、<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn <a href="https://doc.rust-lang.org/std/any/trait.Any.html">Any</a>&gt;</code> の <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.downcast">downcast</a>&lt;T&gt;(self)</code> 等はメソッド形式である。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>限界</h2>
+				<p>
+この方法には限界もあり、スマートポインタが実装するトレイトのメソッドまでは呼出方法を強制できない。これには、<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;T, A&gt;</code> に実装される <code><a href="https://doc.rust-lang.org/std/clone/trait.Clone.html">Clone</a>::<a href="https://doc.rust-lang.org/std/clone/trait.Clone.html#tymethod.clone">clone</a>(&amp;self)</code> 等がある。<code>Box<wbr/>::<wbr/>clone(<wbr/>x)</code> 等と関数形式で呼ぶ事もできるが、あくまで任意であり一般的でもない。
+				</p>
+			</div>
+		</section> <section>
+			<h1>実例</h1>
+			<p>
+<a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> クレートの多くのスマートポインタも、この慣習に従っている。
+			</p>
+			<ul>
+				<li>
+<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;T, A&gt;::<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.into_raw">into_raw</a>(b: <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;T, A&gt;)</code>
+				</li> <li>
+<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;T, A&gt;::<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.leak">leak</a>&lt;'a&gt;(b: <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;T, A&gt;)</code>
+				</li> <li>
+<code><a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>&lt;T, A&gt;::<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html#method.downgrade">downgrade</a>(this: &amp;<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>&lt;T, A&gt;)</code>
+				</li> <li>
+<code><a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>&lt;T, A&gt;::<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html#method.strong_count">strong_count</a>(this: &amp;<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>&lt;T, A&gt;)</code>
+				</li> <li>
+<code><a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>&lt;T, A&gt;::<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html#method.weak_count">weak_count</a>(this: &amp;<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>&lt;T, A&gt;)</code>
+				</li> <li>
+and more...
+				</li>
+			</ul>
+			<p>
+なお、<code><a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>&lt;T, A&gt;::<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html#method.downgrade">downgrade</a>(this: &amp;<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html">Rc</a>&lt;T, A&gt;)</code> の逆操作 <code><a href="https://doc.rust-lang.org/std/rc/struct.Weak.html">Weak</a>&lt;T, A&gt;<wbr/>::<wbr/><a href="https://doc.rust-lang.org/std/rc/struct.Weak.html#method.upgrade">upgrade</a><wbr/>(<wbr/>&amp;<wbr/>self)</code> はメソッド形式である。この違いは <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> と <a href="https://doc.rust-lang.org/std/rc/struct.Weak.html"><code>Weak</code></a> の <a href="https://doc.rust-lang.org/std/ops/trait.Deref.html"><code>Deref</code></a> の実装有無に由来する。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>MyPtr</code> 型の <code>dup</code> 関数は <code>_dup</code> 関数より好ましい実装方法である。
+			</p>
+			<pre><code class="language-rust">
+use std::ops::Deref;
+
+fn main() {
+    let p1 = MyPtr::new(42);
+    let p2 = MyPtr::dup(&amp;p1);
+    assert_eq!(*p1, *p2);
+}
+
+struct MyPtr&lt;T&gt; {
+    value: Box&lt;T&gt;
+}
+
+impl&lt;T: Clone&gt; MyPtr&lt;T&gt; {
+    fn new(value: T) -&gt; Self {
+        Self { value: Box::new(value) }
+    }
+
+    fn dup(this: &amp;Self) -&gt; Self {
+        Self { value: this.value.clone() }
+    }
+
+    fn _dup(&amp;self) -&gt; Self {
+        Self { value: self.value.clone() }
+    }
+}
+
+impl&lt;T&gt; Deref for MyPtr&lt;T&gt; {
+    type Target = T;
+
+    fn deref(&amp;self) -&gt; &amp;Self::Target {
+        &amp;self.value.as_ref()
+    }
+}
+			</code></pre>
+		</section>
+	</body>
+</html>
