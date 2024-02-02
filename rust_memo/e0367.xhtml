@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0367 - Drop 実装の特殊化</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0367]</mark>: `Drop` impl requires `T: std::fmt::Display` but the struct it is implemented for does not
+</samp></pre>
+		<p>
+<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトの実装を、ジェネリクス型の特定の型パラメタに対して特殊化しようとした。
+		</p>
+		<section>
+			<h1>原因</h1>
+			<p>
+2024 年現在、GitHub 上の<a href="https://github.com/rust-lang/rust/issues/46893">改善依頼</a>を見ると、このエラーは歴史的経緯によるものらしい。
+			</p>
+			<aside class="normal moan">
+				<p>
+個人的な感想。
+				</p> <p>
+筆者としては、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを特殊化できた場合、何か技術的に整合性がとれなくなる背景があるのではないか？それをちゃんと理解しておいた方が良いのではないか？と勘ぐっていたのだが…取り越し苦労だった…。
+				</p>
+			</aside>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、ジェネリクス型 <code>MyStruct&lt;T&gt;</code> にトレイト <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> を、型パラメタ <code>T</code> が <a href="https://doc.rust-lang.org/std/fmt/trait.Display.html"><code>Display</code></a> を実装する場合にだけ特殊化して実装しようとしている。
+			</p>
+<pre><code class="language-rust">
+use std::fmt::Display;
+
+fn main() {
+    let _ = MyStruct("test");
+}
+
+struct MyStruct&lt;T&gt;(T);
+
+impl&lt;T&gt; Drop for MyStruct&lt;T&gt;
+where
+    T: <mark class="error">Display</mark>
+{
+    fn drop(&amp;mut self) {
+        println!("`{}` is droped.", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0367]</mark>: `Drop` impl requires `T: std::fmt::Display` but the struct it is implemented for does not
+<mark class="info">  --&gt;</mark> src\main.rs:11:8
+<mark class="info">   |</mark>
+<mark class="info">11 |</mark>     T: Display
+<mark class="info">   |</mark>        <mark class="error">^^^^^^^</mark>
+<mark class="info">   |</mark>
+<mark class="edit">note</mark>: the implementor must specify the same requirement
+<mark class="info">  --&gt;</mark> src\main.rs:7:1
+<mark class="info">   |</mark>
+<mark class="info">7  |</mark> struct MyStruct&lt;T&gt;(T);
+<mark class="info">   |</mark> <mark class="edit">^^^^^^^^^^^^^^^^^^</mark>
+</samp></pre>
+		</section> <section>
+			<h1>回避策</h1>
+			<p>
+ジェネリクス型の型パラメタと実装時の型パラメタの境界条件を同じにすれば、何も制限していないため特殊化とはならない。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> の実装時と境界条件を合わせたラッパー型を用意すればよい。
+			</p>
+			<hr class="split"/>
+			<p>
+以下では、型 <code>MyStruct&lt;T&gt;</code> のラッパー型 <code>MyStructWrapper&lt;T&gt;</code> の境界条件が、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> の実装時の境界条件と同じで、<code>T: <a href="https://doc.rust-lang.org/std/fmt/trait.Display.html">Display</a></code> になっている。
+			</p>
+<pre><code class="language-rust">
+use std::fmt::Display;
+
+fn main() {
+    let _ = MyStructWrapper(MyStruct("test"));
+}
+
+struct MyStruct&lt;T&gt;(T);
+
+struct MyStructWrapper&lt;T&gt;(MyStruct&lt;T&gt;)
+where
+    T: Display;
+
+impl&lt;T&gt; Drop for MyStructWrapper&lt;T&gt;
+where
+    T: Display,
+{
+    fn drop(&amp;mut self) {
+        println!("`{}` is droped.", self.0 .0)
+    }
+}
+</code></pre>
+		</section>
+	</body>
+</html>

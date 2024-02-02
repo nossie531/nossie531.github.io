@@ -194,6 +194,12 @@
 		content: "■ ";
 	}
 
+	hr.split {
+		border-style: dashed none none;
+		border-width: thin;
+		margin: 1rem 0;
+	}
+
 	@media all and (width > calc(56rem)) {
 		section section {
 			margin-left: 1.5rem;
