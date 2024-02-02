@@ -16,7 +16,7 @@
 		<section>
 			<h1>概要</h1>
 			<p>
-スマートポインタでは、メソッドとして実装可能な関数であるにも関わらず、通常の関連関数として定義されている事が多い (言い換えると、スマートポインタでは <code>self</code> や <code>&amp;self</code> などの引数の使用が少ない)。
+スマートポインタでは、メソッドとして実装できる処理であっても、通常の関連関数として定義されている事が多い (言い換えると、スマートポインタでは <code>self</code> や <code>&amp;self</code> などの引数の使用が少ない)。
 			</p>
 			<div class="sub">
 				<h2>理由</h2>
@@ -31,7 +31,7 @@
 			<div class="sub">
 				<h2>基準</h2>
 				<p>
-メソッドにすべきか否かの基準は処理対象で決まる。具体的には、処理対象がスマートポインタそのものなら通常の関連関数、処理対象がスマートポインタの参照先ならメソッドとする。そのため、<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn <a href="https://doc.rust-lang.org/std/any/trait.Any.html">Any</a>&gt;</code> の <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.downcast">downcast</a>&lt;T&gt;(self)</code> 等はメソッド形式である。
+関数をメソッドにすべきかどうかは、その処理対象による。具体的には、処理対象がスマートポインタ自身ならば通常の関連関数、処理対象がスマートポインタの参照先ならばメソッドとする。そのため、<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn <a href="https://doc.rust-lang.org/std/any/trait.Any.html">Any</a>&gt;</code> の <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.downcast">downcast</a>&lt;T&gt;(self)</code> 等はメソッド形式である。
 				</p>
 			</div>
 			<div class="sub">
