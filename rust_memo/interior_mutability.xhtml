@@ -15,7 +15,9 @@
 			<p>
 内部可変性のある型は、可変と指定されていなくても、特例として値を変更できる。
 			</p> <p>
-この仕組は主に、値全体は不変のまま、その一部のみを可変として処理するのに用いられる (内部可変性を乱用するとコードの可読性が悪化するため要注意)。例えば、<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> 型の内部的な参照カウンタの型には、内部可変性が必要になる。なぜなら、たとえ <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> 型の値が不変でも、参照カウンタはその参照数に応じて増減するため、独立して可変でなければならない。
+これは例えば、不変参照により共有される値の更新などで必要となる。
+			</p> <p>
+ただし、内部可変性を乱用するとコードが読みにくくなるので注意が必要。
 			</p>
 		</section> <section>
 			<h1>標準の型</h1>
@@ -31,7 +33,7 @@
 			<div class="sub">
 				<h2><code>UnsafeCell</code> 以外</h2>
 				<p>
-<a href="#UnsafeCell"><code>UnsafeCell</code></a> をそのまま使うのは、あまりお勧めできない。なぜなら、内部可変性は普段なら Rust が保証してくれる読込と書込の排他性を失わせる。そのため、バグを書きやすくなる。一方、<a href="#UnsafeCell"><code>UnsafeCell</code></a> を利用して実装されたその他の標準の型では、そうした問題をうまく回避できる理論的背景がある場合が多い。そのため、可能な限りそちらを採用した方がよい。
+<a href="#UnsafeCell"><code>UnsafeCell</code></a> をそのまま使うのは、あまりお勧めできない。なぜなら、内部可変性は普段なら Rust が保証してくれる読込と書込の排他性、それから書込と書込の排他性を失わせる。そのため、バグを書きやすくなる。一方、<a href="#UnsafeCell"><code>UnsafeCell</code></a> を利用して実装された他の標準の型では、そうした問題をうまく回避できる理論的背景がある場合が多い。そのため、可能な限りそちらを採用した方がよい。
 				</p>
 			</div>
 			<div class="sub">
@@ -49,12 +51,6 @@
 					<dd>
 他に影響がないようコピーを使う。
 					</dd>
-					<dt id="RefCell">
-<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html"><code>RefCell</code></a>
-					</dt>
-					<dd>
-他が読んでいない時だけ書く。
-					</dd>
 					<dt id="OnceCell">
 <a href="https://doc.rust-lang.org/std/cell/struct.OnceCell.html"><code>OnceCell</code></a>
 					</dt>
@@ -67,17 +63,11 @@
 					<dd>
 他が読む前に一度だけ遅延初期化。
 					</dd>
-					<dt>
-<a href="https://doc.rust-lang.org/std/sync/struct.Mutex.html"><code>Mutex</code></a>
+					<dt id="RefCell">
+<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html"><code>RefCell</code></a>
 					</dt>
 					<dd>
-他が使っていない時だけ使う (<a href="#RwLock"><code>RwLock</code></a> の簡易版)。
-					</dd>
-					<dt id="RwLock">
-<a href="https://doc.rust-lang.org/std/sync/struct.RwLock.html"><code>RwLock</code></a>
-					</dt>
-					<dd>
-他が読んでいない時だけ書く (<a href="#RefCell"><code>RefCell</code></a> の非同期版)。
+他が読み書きしていないか動的に確認。
 					</dd>
 					<dt>
 <a href="https://doc.rust-lang.org/std/sync/struct.OnceLock.html"><code>OnceLock</code></a>
@@ -90,6 +80,18 @@
 					</dt>
 					<dd>
 他が読む前に一度だけ遅延初期化 (<a href="#LazyCell"><code>LazyCell</code></a> の非同期版)。
+					</dd>
+					<dt>
+<a href="https://doc.rust-lang.org/std/sync/struct.Mutex.html"><code>Mutex</code></a>
+					</dt>
+					<dd>
+他が使用していないか動的に確認 (<a href="#RwLock"><code>RwLock</code></a> の簡易版)。
+					</dd>
+					<dt id="RwLock">
+<a href="https://doc.rust-lang.org/std/sync/struct.RwLock.html"><code>RwLock</code></a>
+					</dt>
+					<dd>
+他が読み書きしていないか動的に確認 (<a href="#RefCell"><code>RefCell</code></a> の非同期版)。
 					</dd>
 					<dt>
 <code>Atomic<em>XXX</em></code>
@@ -105,15 +107,15 @@
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-以下では、変数 <code>my_cell</code> に <code>mut</code> の指定はないが、値を変更できる。
+以下では、変数 <code>cell</code> に <code>mut</code> の指定はないが、値を変更できる。
 			</p>
 <pre><code class="language-rust">
 use std::cell::Cell;
 
 fn main() {
-    let my_cell = Cell::new(42);
-    my_cell.set(43);
-    assert_eq!(my_cell.get(), 43);
+    let cell = Cell::new(42);
+    cell.set(43);
+    assert_eq!(cell.get(), 43);
 }
 </code></pre>
 		</section>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 内部可変性と get_mut, from_mut 関数</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+		<style><![CDATA[
+table.methods {
+	& > tr > td {
+		white-space: nowrap;
+		padding-right: 2ch;
+	}
+
+	& > tr > td code{
+		background: initial;
+	}
+
+	& > tr > td:nth-child(1) {
+		border-right-style: dashed;
+	}
+
+	& > tr > td:nth-child(2) {
+		border-left-style: dashed;
+	}
+}
+		]]></style>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+内部可変性のある型の <code>get_mut</code> 関数と <code>from_mut</code> 関数について。
+		</p>
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+『<a href="interior_mutability.xhtml">内部可変性のある型</a>』では、可変と指定されていなくても、特例として値を変更できる。
+			</p> <p>
+しかし、これだと普段は Rust が保証してくれる読込と書込の排他性、それから書込と書込の排他性が保証されなくなってしまう。そのため、それらの型では独自のルールで別途それらの排他性を保証している場合が多い。例えば、<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html"><code>RefCell</code></a> 型ではその内部値へのアクセス前に、競合する操作を他で実行中でないか、動的に確認するようになっている。
+			</p>
+		</section> <section>
+			<h1 id="get_mut">
+<code>get_mut</code> 関数
+			</h1>
+			<p>
+上記のように、内部可変性のある型では、各操作の排他性の保証のために独自のルールを持つものが多い。しかし、内部可変性のある型への可変参照がある場合、もはやそのルールに従わなくてもよい。なぜなら、可変参照は参照先の専有を意味しているからである。
+			</p> <p>
+そのため、内部可変性のある型では、その可変参照からは値を自由に操作できるよう、<code>get_mut</code> という名称の関数がある場合が多く、そこから内部の値への可変参照が得られる。
+			</p> <p>
+以下は <code>get_mut</code> 関数の代表例である。
+			</p>
+			<table class="normal methods">
+				<tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html">UnsafeCell</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; &amp;mut T</code>
+					</td>
+				</tr> <tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/cell/struct.Cell.html">Cell</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/cell/struct.Cell.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; &amp;mut T</code>
+					</td>
+				</tr> <tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/cell/struct.OnceCell.html">OnceCell</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/cell/struct.OnceCell.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; <a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;&amp;mut T&gt;</code>
+					</td>
+				</tr> <tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html">RefCell</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; &amp;mut T</code>
+					</td>
+				</tr> <tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/sync/struct.OnceLock.html">OnceLock</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/sync/struct.OnceLock.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; <a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;&amp;mut T&gt;</code>
+					</td>
+				</tr> <tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/sync/struct.Mutex.html">Mutex</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/sync/struct.Mutex.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; <a href="https://doc.rust-lang.org/std/sync/type.LockResult.html">LockResult</a>&lt;&amp;mut T&gt;</code>
+					</td>
+				</tr> <tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/sync/struct.RwLock.html">RwLock</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/sync/struct.RwLock.html#method.get_mut">get_mut</a>(&amp;mut self) -&gt; <a href="https://doc.rust-lang.org/std/sync/type.LockResult.html">LockResult</a>&lt;&amp;mut T&gt;</code>
+					</td>
+				</tr>
+			</table>
+		</section> <section>
+			<h1>
+<code>from_mut</code> 関数
+			</h1>
+			<p>
+<code>from_mut</code> 関数は <a href="#get_mut"><code>get_mut</code></a> 関数の逆操作にあたる。
+			</p> <p>
+なお、<code>from_mut</code> 関数を提供する型は、<a href="#get_mut"><code>get_mut</code></a> 関数を提供する型に比べると少ない。これは元となる内部値への可変参照だけでは、目的の内部可変型の材料として不足するためである (例えば、<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html"><code>RefCell</code></a> 型では、それが読込中か書込中かなどの制御情報がある)。
+			</p> <p>
+以下は <code>from_mut</code> 関数の代表例である。
+			</p>
+			<table class="normal methods">
+				<tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html">UnsafeCell</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html#method.from_mut">from_mut</a>(value: &amp;mut T) -&gt; &amp;mut <a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html">UnsafeCell</a>&lt;T&gt;</code>
+					</td>
+				</tr> <tr>
+					<td>
+<code><a href="https://doc.rust-lang.org/std/cell/struct.Cell.html">Cell</a>&lt;T&gt;</code>
+					</td> <td>
+<code>fn <a href="https://doc.rust-lang.org/std/cell/struct.Cell.html#method.from_mut">from_mut</a>(t: &amp;mut T) -&gt; &amp;<a href="https://doc.rust-lang.org/std/cell/struct.Cell.html">Cell</a>&lt;T&gt;</code>
+					</td>
+				</tr>
+			</table>
+			<p>
+※ <code><a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html">UnsafeCell</a>::<a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html#method.from_mut">from_mut</a></code> は 2024 年現在はナイトリー。 
+			</p>
+		</section>
+	</body>
+</html>
