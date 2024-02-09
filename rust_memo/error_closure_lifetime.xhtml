@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: クロージャでのライフタイム規則によるエラー</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark>: lifetime may not live long enough
+</samp></pre>
+		<p>
+2024 年現在、クロージャでのライフタイムの規則は関数のそれと異なる。
+		</p> <p>
+この場合、ライフタイムの推測があまり働かず、また詳細な指定もできない。
+		</p> <p>
+これにより、やや不当に感じられるエラーになる事がある。
+		</p>
+		<aside class="normal moan">
+			<p>
+仕様の不備？
+			</p> <p>
+規則を関数と統一したほうが良いのでは？という<a href="https://github.com/rust-lang/rust/issues/86921">提案</a>はやはりある。<br/>
+ただ、既存のコードへの影響等、色々と難しい事情があるらしい。
+			</p>
+		</aside>
+		<section>
+			<h1>サンプルコード</h1>
+			<p>
+以下では、単純なライフタイムの推測ができずエラーになっている。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let _closure = |x: &amp;i32| -&gt; &amp;i32 { <mark class="error">x</mark> };
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="title"><mark class="error">error</mark>: lifetime may not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:40
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let _closure = |x: &amp;i32| -&gt; &amp;i32 { x };
+<mark class="info">  |</mark>                        <mark class="info">-</mark>        <mark class="info">-</mark>      <mark class="error">^ returning this value requires that `'1` must outlive `'2`</mark>
+<mark class="info">  |</mark>                        <mark class="info">|</mark>        <mark class="info">|</mark>
+<mark class="info">  |</mark>                        <mark class="info">|</mark>        <mark class="info">let's call the lifetime of this reference `'2`</mark>
+<mark class="info">  |</mark>                        <mark class="info">let's call the lifetime of this reference `'1`</mark>
+</samp></pre>
+		</section> <section>
+			<h1>解決策</h1>
+			<p>
+解決策はいくつかある。
+			</p>
+			<dl class="normal lowProfile">
+				<dt><a href="#solution1">解決策 1</a></dt> <dd>不安定な機能</dd>
+				<dt><a href="#solution2">解決策 2</a></dt> <dd>型指定</dd>
+				<dt><a href="#solution3">解決策 3</a></dt> <dd>関数化</dd>
+				<dt><a href="#solution4">解決策 4</a></dt> <dd>高階関数</dd>
+			</dl>
+			<p>
+※ 高階関数は万能だが少し面倒…。
+			</p>
+			<section>
+				<hgroup>
+					<h1 id="solution1">解決策 1.</h1>
+					<div class="subtitle">不安定な機能</div>
+				</hgroup>
+				<p>
+不安定な機能 <a href="https://rust-lang.github.io/rfcs/3216-closure-lifetime-binder.html">closure_lifetime_binder</a> を使う。
+				</p> <p>
+欠点: 2024 年現在、ナイトリー版でしか使えない。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let _closure = for&lt;'a&gt; |x: &amp;'a i32| -&gt; &amp;'a i32 { x };
+}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="solution2">解決策 2.</h1>
+					<div class="subtitle">型指定</div>
+				</hgroup>
+				<p>
+クロージャ専用の機能を使っていなければ、関数として型指定すればよい。
+				</p> <p>
+欠点: クロージャによる変数のキャプチャができない。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let _closure = (|x| { x }) as fn(&amp;i32) -&gt; &amp;i32;
+}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="solution3">解決策 3.</h1>
+					<div class="subtitle">関数化</div>
+				</hgroup>
+				<p>
+クロージャの代わりに関数を使えば、同じ構成でも問題にならない。
+				</p> <p>
+欠点: クロージャによる変数のキャプチャができない。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let _closure = function;
+}
+
+fn function(x: &amp;i32) -&gt; &amp;i32 {
+    x
+}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="solution4">解決策 4.</h1>
+					<div class="subtitle">高階関数</div>
+				</hgroup>
+				<p>
+クロージャを生成する関数を利用すれば、関数のライフタイム規則を利用できる。
+				</p> <p>
+利点: クロージャによる変数をキャプチャを再現するには、関数にその変数を渡せばよい。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let _closure = make_closure();
+}
+
+fn make_closure() -&gt; impl Fn(&amp;i32) -&gt; &amp;i32 {
+    |x| x
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
