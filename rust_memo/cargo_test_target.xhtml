@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: cargo test での対象の指定</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>cargo test</code> でのテスト対象の指定方法について。
+		</p> 
+		<section>
+			<h1>基礎知識</h1>
+			<div class="sub">
+				<h2>コマンドの構文</h2>
+<pre class="command"><code>cargo test</code> [<var>options</var>] [<var>testname</var>] [<code>--</code> <var>test-options</var>]</pre>
+				<p>
+コマンドは二段構成になっている。
+				</p> <p>
+<var class="mt">options</var> までは <code>cargo</code> が自分で処理する。
+				</p> <p>
+<var class="mt">testname</var> 以降はテスト実行機能 <code>libtest</code> に渡される。
+				</p>
+				<aside class="normal moan">
+					<p>
+テスト対象の指定には両方の組合せが必要 (少し紛らわしい…)。
+					</p>
+				</aside>
+			</div>
+			<div class="sub">
+				<h2><code>cargo</code> オプション</h2>
+				<p>
+ビルド成果物を単位とした絞り込みを行う (<a href="https://doc.rust-lang.org/cargo/commands/cargo-test.html#options">公式資料</a>)。
+				</p> <p>
+以下は代表的なオプションの抜粋。
+				</p>
+				<dl class="normal lowProfile">
+					<dt><code>--workspace</code></dt>
+					<dd>ワークスペース全体</dd>
+					<dt><code>--package <var>name</var></code></dt>
+					<dd>クレート指定</dd>
+					<dt><code>--lib</code></dt>
+					<dd>ライブラリコード</dd>
+					<dt><code>--bins</code></dt>
+					<dd>バイナリコード全て</dd>
+					<dt><code>--bin <var>name</var></code></dt>
+					<dd>バイナリコード指定</dd>
+					<dt><code>--tests</code></dt>
+					<dd>テストコード全て</dd>
+					<dt><code>--test <var>name</var></code></dt>
+					<dd>統合テストファイル指定</dd>
+				</dl>
+			</div>
+			<div class="sub">
+				<h2><code>libtest</code> オプション</h2>
+				<p>
+関数を単位とした絞り込みを行う (<a href="https://doc.rust-lang.org/rustc/tests/index.html#cli-arguments">公式資料</a>)。
+				</p> <p>
+最初の引数、<var class="mt">testname</var> が関数のパスに対するフィルタ文字列になる。
+				</p> 
+				<p>
+ここで、パスにはクレート名より後の部分を指定する (<code>cargo</code> 側との役割分担のため)。
+				</p> <p>
+なお、フィルタはデフォルトでは部分一致で行われるため注意。つまり、<code>hoge</code> や <code>foo_bar</code> は <code>hoge::<wbr/>piyo::<wbr/>fuga::<wbr/>foo_bar_baz()</code> メソッドを対象とする。そうではなく、完全一致が必要となる場合、<var class="mt">test-options</var> の箇所にて <code>--exact</code> オプションを指定すればよい。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>補足 (一意の指定)</h2>
+				<p>
+<code>cargo</code> 側で複数の対象が選択され、それらそれぞれに <code>libtest</code> 側の条件に該当するものがあった場合、その全てがテスト対象になる。そのため、一意に限定するには両方の条件による絞り込みが必要。
+				</p>
+			</div>
+		</section> <section>
+			<h1>ケーススタディ</h1>
+			<div class="sub">
+				<h2>ワークスペース全体</h2>
+<pre><code>
+cargo test --workspace
+</code></pre>
+			</div>
+			<div class="sub">
+				<h2>ライブラリテストの範囲指定</h2>
+<pre><code>
+cargo test --lib <var>basic::api</var>
+</code></pre>
+				<p>
+				</p>
+			</div>
+			<div class="sub">
+				<h2>テスト関数の個別指定</h2>
+<pre><code>
+cargo test --package <var>my_crate</var> <var>funcPath</var> -- --exact
+</code></pre>
+			</div>
+			<div class="sub">
+				<h2 id="execSingleIT">結合テスト関数の指定</h2>
+<pre><code>
+cargo test --package <var>my_crate</var> --test <var>my_test_file</var> <var>funcPath</var> -- --exact
+</code></pre>
+				<p>
+※ 結合テストの場合、<code>funcPath</code> が関数名のみになる場合が多い。
+				</p>
+			</div>
+		</section> <section>
+			<h1>付録 (<code>launch.json</code>)</h1>
+			<p>
+IDE に VSCode を使っている場合、よく使う起動構成を <code>.vscode/launch.json</code> ファイルに登録しておくと、テスト実行ボタンからすぐに実行できるため便利になる。
+			</p> <p>
+以下は上述の『<a href="#execSingleIT">結合テスト関数の指定</a>』とだいたい同じになる登録例。
+			</p>
+<pre><code>
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+			"name": "<var>Custom test</var>",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+					"--test=<var>my_test_file</var>",
+					"--package=<var>my_crate</var>",
+                ],
+                "filter": {
+                    "name": "<var>my_test_file</var>",
+                    "kind": "test"
+                }
+            },
+			"args": ["<var>funcPath</var>", "--exact"],
+            "cwd": "${workspaceFolder}",
+            "env": { "RUST_BACKTRACE": "1" }
+        },
+
+		// --  略 -- //
+	]
+}
+</code></pre>
+		</section>
+	</body>
+</html>

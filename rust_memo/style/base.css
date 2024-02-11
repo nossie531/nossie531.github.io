@@ -354,6 +354,16 @@
 		}
 	}
 
+	pre.command {
+		line-height: 1.4;
+		margin: 1em -0.5rem;
+		padding: 0.5rem;
+		border: thin solid;
+		border-radius: 0.5rem;
+		border-color: var(--edge-color);
+		background-color: var(--code-bg-color);
+	}
+
 	figure.file {
 		font-family: var(--mt-font);
 		margin: 1em 0;
