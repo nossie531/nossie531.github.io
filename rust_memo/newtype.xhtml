@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Newtype パターン</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+Rust での Newtype パターンの適用方法について。
+		</p> 
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+Newtype パターンは既存の型をラップし、新しい型として使うデザインパターンである。
+			</p> <p>
+			Rust では既存の型 <code>Old</code> を新しい型 <code>New</code> でラップするには <code>sturuct New(Old);</code> と定義すればよい。そして、新しい型の self から既存の型にアクセスするには、<code>self.0</code> とする。なおこの場合、ラップによるオーバーヘッドはコンパイラの最適化によりゼロコストになる。
+			</p>
+		</section> <section>
+			<h1>使用目的</h1>
+			<p>
+Newtype パターンの使用目的はだいたい二通りである。
+			</p>
+			<ul>
+				<li><a href="#specialiseType">汎用的な型の特化</a></li>
+				<li><a href="#editPublished">発行済の型の編集</a></li>
+			</ul>
+			<section>
+				<h1 id="specialiseType">汎用的な型の特化</h1>
+				<p>
+既存の型が汎用的すぎる場合、Newtype で特殊化するとよい。
+				</p> <p>
+例えば、数値型から距離型と質量型を作れば、それらを取り違えるミスは減る。また、それらそれぞれに専用関数も用意できるようになる。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>f32</code> 型から <code>Length</code> 型を作り、専用関数 <code>from_km</code> を用意している。
+					</p>
+<pre><code class="language-rust">
+use std::ops::Add;
+
+fn main() {
+    let length1 = Length(300.0);
+    let length2 = Length::from_km(1.0);
+    assert!(length1 + length2 == Length(1300.0));
+}
+
+#[derive(PartialEq)]
+struct Length(f32);
+
+impl Length {
+    pub fn from_km(value: f32) -&gt; Self {
+        Self(value * 1000.0)
+    }
+}
+
+impl Add for Length {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -&gt; Self::Output {
+        Self(self.0 + rhs.0)
+    }
+}
+</code></pre>
+				</div>
+			</section> <section>
+				<h1 id="editPublished">発行済の型の編集</h1>
+				<p>
+既存の型が発行済で編集できない場合、Newtype で新しい型を作るとよい。
+				</p> <p>
+例えば、Rust には孤児ルールがあるため、他クレート由来の型に他クレート由来のトレイトを新たに実装できない。そこで、既存の型へと処理を移譲するだけの新しい型を自クレート内に作成し、このルールに抵触しないようにする。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、クレート <code>sub1</code> の型 <code>SomeStruct</code> にクレート <code>sub2</code> のトレイト <code>SomeTrait</code> を直接は実装できないため、<code>SomeStruct</code> を <code>Newtype</code> 型でラップしている。
+					</p>
+					<figure class="file">
+						<figcaption>app/src/main.rs</figcaption>
+<pre><code class="language-rust">
+use sub1::SomeStruct;
+use sub2::SomeTrait;
+
+fn main() {
+    let some = Newtype::new();
+    some.action();
+}
+
+pub struct Newtype(SomeStruct);
+
+impl Newtype {
+    pub fn new() -&gt; Self {
+        Self(SomeStruct::new())
+    }
+
+    pub fn do_something(&amp;self) {
+        self.0.do_something();
+    }
+}
+
+impl SomeTrait for Newtype {
+    fn action(&amp;self) {
+        self.do_something();
+    }
+}
+</code></pre>
+					</figure>
+					<figure class="file">
+						<figcaption>sub1/src/lib.rs</figcaption>
+<pre><code class="language-rust">
+pub struct SomeStruct();
+
+impl SomeStruct {
+    pub fn new() -&gt; Self {
+        Self()
+    }
+
+    pub fn do_something(&amp;self) {
+        println!("Something done.")
+    }
+}
+</code></pre>
+					</figure>
+					<figure class="file">
+						<figcaption>sub2/src/lib.rs</figcaption>
+<pre><code class="language-rust">
+pub trait SomeTrait {
+    fn action(&amp;self);
+}
+</code></pre>
+					</figure>
+				</div>
+			</section>
+		</section> <section>
+			<h1>コード量の問題</h1>
+			<p>
+Newtype パターンは有用だが、ラップ用のコードが大量に必要になる場合がある。例えば、数値型では四則演算用の関数のラップなども必要となるだろう。また、割と大きな型の全関数をラップすべきという状況も普通にありうる。
+			</p> 
+			<div class="sub">
+				<h2>対策と割り切り</h2>
+				<p>
+残念ながら、対策は後述の限定的なものしかない。そのため結局、Newtype パターンを使う場合、既存の型を転用するというよりかは、その名前が示す通り、新しい型を作成するのだと割り切って考えたほうが、精神衛生上は良さそうである。
+				</p> 
+			</div>
+			<div class="sub">
+				<h2>対策 1. マクロ</h2>
+				<p>
+マクロをうまく利用すれば、数値型の四則演算などは普遍的であるため、いくらかコードを省略できる。ただ、マクロは純粋に構文木変換用のフィルタであり、手続型マクロであっても、他クレートにある型のメタ情報などへはアクセスできない。そのため、関数の名前や引数の情報は得られず、原理的に全自動でのラップ処理は不可能である。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>対策 2. Deref 継承</h2>
+				<p>
+Deref 継承と呼ばれる方法を使えば、本来はスマートポインタのために使われる <code>Deref</code> トレイトを流用して、全処理をラップ先へと転送できる。ただ、これはアンチパターンの一種で、あまりお勧めできない。なぜなら、関数がラップ元とラップ先どちらにあるるかは、微妙だが本質的な使用感の違いになる場合があり、混乱を招きやすい。
+				</p> <p>
+				</p>
+			</div>
+		</section>
+	</body>
+</html>
