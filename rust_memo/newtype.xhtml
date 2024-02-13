@@ -18,19 +18,19 @@ Rust での Newtype パターンの適用方法について。
 			<p>
 Newtype パターンは既存の型をラップし、新しい型として使うデザインパターンである。
 			</p> <p>
-			Rust では既存の型 <code>Old</code> を新しい型 <code>New</code> でラップするには <code>sturuct New(Old);</code> と定義すればよい。そして、新しい型の self から既存の型にアクセスするには、<code>self.0</code> とする。なおこの場合、ラップによるオーバーヘッドはコンパイラの最適化によりゼロコストになる。
+なお、Rust で既存の型 <code>Old</code> を新しい型 <code>New</code> で単純にラップするには、<code>sturuct New(Old);</code> と定義すればよい (ラップ先からラップ元へのアクセスは <code>self.0</code> と記述)。これらは単純なラップのため、最適化によりゼロコストで実装できる。
 			</p>
 		</section> <section>
 			<h1>使用目的</h1>
 			<p>
-Newtype パターンの使用目的はだいたい二通りである。
+以下は主な Newtype パターンの使用目的。
 			</p>
 			<ul>
-				<li><a href="#specialiseType">汎用的な型の特化</a></li>
-				<li><a href="#editPublished">発行済の型の編集</a></li>
+				<li><a href="#specialiseType">汎用的な型の特殊化</a></li>
+				<li><a href="#editCompleted">完成済の型の再編集</a></li>
 			</ul>
 			<section>
-				<h1 id="specialiseType">汎用的な型の特化</h1>
+				<h1 id="specialiseType">汎用的な型の特殊化</h1>
 				<p>
 既存の型が汎用的すぎる場合、Newtype で特殊化するとよい。
 				</p> <p>
@@ -69,9 +69,9 @@ impl Add for Length {
 </code></pre>
 				</div>
 			</section> <section>
-				<h1 id="editPublished">発行済の型の編集</h1>
+				<h1 id="editCompleted">完成済の型の再編集</h1>
 				<p>
-既存の型が発行済で編集できない場合、Newtype で新しい型を作るとよい。
+既存の型が完成済で編集できない場合、Newtype で新しい型を作るとよい。
 				</p> <p>
 例えば、Rust には孤児ルールがあるため、他クレート由来の型に他クレート由来のトレイトを新たに実装できない。そこで、既存の型へと処理を移譲するだけの新しい型を自クレート内に作成し、このルールに抵触しないようにする。
 				</p>
