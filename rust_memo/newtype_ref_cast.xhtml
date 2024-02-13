@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Newtype パターンと参照型の変換</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+Newtype パターンにおける参照型の変換について。
+		</p> 
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+『<a href="newtype.xhtml">Newtype パターン</a>』では、既存の型をラップして新しい型を作る。これにより、汎用的な型の特殊化や、完成済の型の再編集が可能になる。なお、Rust で型 <code>Old</code> を型 <code>New</code> に単純にラップするには、<code>struct New(Old);</code> のように定義する。
+			</p>
+		</section> <section>
+			<h1>参照型の変換</h1>
+			<p>
+Newtype パターンでは、ラップ元の型の参照 <code>&amp;Old</code> からラップ先の型の参照 <code>&amp;New</code> への変換が便利になる場合がある。つまり、型システム的に区別してはいるが、ラップ元とラップ先の内容は元々は同じである事を利用する。これにより、ラップ元とラップ先とでアクセスは二重化される。
+			</p>
+			<div class="sub">
+				<h2>実現方法</h2>
+				<p>
+unsafe な機能 <a href="https://doc.rust-lang.org/std/mem/fn.transmute.html"><code>std::<wbr/>mem::<wbr/>transmute</code></a> が必要になる。これでラップ元の型への参照をラップ先の型への参照として強引に扱う。そして、内容が同じでも最適化の都合などでメモリ構造が変わる可能性があるので、ラップ先の型に属性 <code>#[repr(transparent)]</code> を指定する事も忘れてはならない。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>サンプルコード</h2>
+				<p>
+以下では、<code>use_ref</code> 関数が <code>&amp;i32</code> を <code>&amp;Newtype</code> に読み替えている。
+				</p>
+				<pre><code class="language-rust">
+fn main() {
+    let base = 1;
+    let newtype = Newtype::use_ref(&amp;base);
+    assert_eq!(newtype.value(), base);
+}
+
+#[repr(transparent)]
+pub struct Newtype(i32);
+
+impl Newtype {
+    pub fn value(&amp;self) -&gt; i32 {
+        self.0
+    }
+
+    pub fn use_ref(r: &amp;i32) -&gt; &amp;Self {
+        unsafe { std::mem::transmute(r) }
+    }
+}
+				</code></pre>
+			</div>
+		</section> <section>
+			<h1>クレート紹介</h1>
+			<dl class="normal">
+				<dt>
+<a href="https://crates.io/crates/ref-cast">ref-cast</a>
+				</dt>
+				<dd>
+					<p>
+参照型のキャストのための専用クレート。<code>&amp;T</code> から <code>&amp;U</code> へ変換できる事を示す <code>RefCast</code> トレイトを導入して、変換処理をいい感じに抽象化してくれるのが特徴。
+					</p>
+				</dd>
+			</dl>
+		</section>
+	</body>
+</html>
