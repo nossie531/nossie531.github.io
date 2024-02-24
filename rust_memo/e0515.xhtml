@@ -35,9 +35,12 @@
 				<dd>一時的な値。</dd>
 			</dl>
 			<section>
-				<h1 id="ptnA">パターン A.</h1>
+				<hgroup>
+					<h1 id="ptnA">パターン A.</h1>
+					<div class="subtitle">ローカル変数</div>
+				</hgroup>
 				<p>
-戻り値にローカル変数への参照が含まれるパターン。
+以下では、戻り値にローカル変数への参照が含まれている。
 				</p>
 <pre><code class="language-rust">
 fn test() -&gt; &amp;'static i32 {
@@ -53,9 +56,12 @@ fn test() -&gt; &amp;'static i32 {
 <mark class="info">  |</mark>     <mark class="error">^^^^ returns a reference to data owned by the current function</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnB">パターン B.</h1>
+				<hgroup>
+					<h1 id="ptnB">パターン B.</h1>
+					<div class="subtitle">関数の引数</div>
+				</hgroup>
 				<p>
-戻り値に引数への参照が含まれるパターン。
+以下では、戻り値に引数への参照が含まれている。
 				</p>
 <pre><code class="language-rust">
 fn test(arg: i32) -&gt; &amp;'static i32 {
@@ -70,9 +76,12 @@ fn test(arg: i32) -&gt; &amp;'static i32 {
 <mark class="info">  |</mark>     <mark class="error">^^^^ returns a reference to data owned by the current function</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnC">パターン C.</h1>
+				<hgroup>
+					<h1 id="ptnC">パターン C.</h1>
+					<div class="subtitle">一時的な値</div>
+				</hgroup>
 				<p>
-戻り値に一時的な値への参照が含まれるパターン。
+以下では、戻り値に一時的な値への参照が含まれている。
 				</p>
 <pre><code class="language-rust">
 fn test(arg: i32) -&gt; &amp;'static i32 {

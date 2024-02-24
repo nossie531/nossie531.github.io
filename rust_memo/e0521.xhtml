@@ -42,10 +42,11 @@
 				<dd>クロージャが関連。</dd>
 			</dl>
 			<section>
-				<h1 id="ptnA">パターン A</h1>
+				<hgroup>
+					<h1 id="ptnA">パターン A</h1>
+					<div class="subtitle">引数をそのまま使用</div>
+				</hgroup>
 				<p>
-参照引数をそのまま、関数外に持ち出そうとしたパターン。
-				</p> <p>
 以下では、匿名のライフタイムを持つ参照 <code>arg</code> を、それよりも広い <code>'static</code> ライフタイムを持つ参照として扱おうとしている。
 				</p>
 <pre><code class="language-rust">
@@ -72,10 +73,11 @@ fn use_static(_: &amp;'static i32) {
 <mark class="info">  |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnB">パターン B</h1>
+				<hgroup>
+					<h1 id="ptnB">パターン B</h1>
+					<div class="subtitle">引数を辿った別の参照を使用</div>
+				</hgroup>
 				<p>
-参照型の引数を辿って取得した参照を、関数外に持ち出そうとしたパターン。
-				</p> <p>
 前のパターンとほぼ同じだが、より間接的なため気付きにくくなる。
 				</p>
 <pre><code class="language-rust">
@@ -102,11 +104,12 @@ fn use_static(_: &amp;'static i32) {
 <mark class="info">  |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnC">パターン C</h1>
+				<hgroup>
+					<h1 id="ptnC">パターン C</h1>
+					<div class="subtitle">トレイトのライフタイム境界が関連</div>
+				</hgroup>
 				<p>
-トレイトのライフタイム境界が関係するパターン。
-				</p> <p>
-以下では、匿名のライフタイムを持つ参照 <code>arg</code> を、<code>Any</code> トレイトを持つものとして扱おうとしている。しかし、<code>Any</code> トレイトは <code>'static</code> ライフタイム境界を持つため、それまたはその内部により狭いライフタイムを持つ参照があってはならない。
+以下では、匿名のライフタイムを持つ参照 <code>arg</code> を、<a href="https://doc.rust-lang.org/std/any/trait.Any.html"><code>Any</code></a> トレイトを持つものとして扱おうとしている。しかし、<a href="https://doc.rust-lang.org/std/any/trait.Any.html"><code>Any</code></a> トレイトは <code>'static</code> ライフタイム境界を持つため、それまたはその内部により狭いライフタイムを持つ参照があってはならない。
 				</p>
 <pre><code class="language-rust">
 use std::any::Any;
@@ -134,7 +137,10 @@ fn use_any&lt;T: Any&gt;(_: T) {
 <mark class="info">  |</mark>     <mark class="error">argument requires that `'1` must outlive `'static`</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnD">パターン D</h1>
+				<hgroup>
+					<h1 id="ptnD">パターン D</h1>
+					<div class="subtitle">クロージャが関連</div>
+				</hgroup>
 				<p>
 クロージャが関係するパターン。
 				</p> <p>

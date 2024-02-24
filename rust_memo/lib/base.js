@@ -55,7 +55,7 @@ class Base {
 	}
 
 	/* Chrome は XHTML と ES Module の組合せに未対応のため自前でロード。
-	 - https://bugs.chromium.org/p/chromium/issues/detail?id=717643 */
+	 - https://issues.chromium.org/issues/40518469 */
 	#setupScripts() {
 		const scriptHolder = Base.#getCurrentScript().parentNode;
 		const navJs = Base.#createScriptElement("lib/nav/nav.js");
@@ -105,7 +105,6 @@ class Base {
 			return new URL(urlStr, "dummy://dummy/").protocol !== "dummy:";
 		}
 	}
-
 }
 
 Base.init();

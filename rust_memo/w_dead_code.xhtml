@@ -31,9 +31,12 @@
 				<dd>統合テストが関係。</dd>
 			</dl>
 			<section>
-				<h1 id="ptnA">パターン A.</h1>
+				<hgroup>
+					<h1 id="ptnA">パターン A.</h1>
+					<div class="subtitle">基本形</div>
+				</hgroup>
 				<p>
-基本形となるパターン。
+コードが実際にどこからも使われていないパターン。
 				</p>
 <pre><code class="language-rust">
 pub fn main() {
@@ -54,7 +57,10 @@ fn <mark class="warn">unused</mark>() {
 <mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnB">パターン B.</h1>
+				<hgroup>
+					<h1 id="ptnB">パターン B.</h1>
+					<div class="subtitle">使用元が未使用</div>
+				</hgroup>
 				<p>
 そのコードを使っているコードが使われていないパターン。
 				</p>
@@ -95,10 +101,11 @@ fn <mark class="warn">unused_sub</mark>() {
 <mark class="info">  |</mark>    <mark class="warn">^^^^^^^^^^</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnC">パターン C.</h1>
+				<hgroup>
+					<h1 id="ptnC">パターン C.</h1>
+					<div class="subtitle">単体テストが関係</div>
+				</hgroup>
 				<p>
-単体テストが絡むパターン。
-				</p> <p>
 対象のコードが単体テストからのみ使用されている場合に発生する。
 				</p> <p>
 解決するには、対象に <code>#[cfg(test)]</code> を付加すれば良い。
@@ -123,10 +130,10 @@ fn <mark class="warn">test_helper</mark>() {
 <mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnD">パターン D.</h1>
-				<p>
-統合テストが絡むパターン。
-				</p>
+				<hgroup>
+					<h1 id="ptnD">パターン D.</h1>
+					<div class="subtitle">統合テストが関係</div>
+				</hgroup>
 				<aside class="normal">
 					<p>
 バグの可能性。

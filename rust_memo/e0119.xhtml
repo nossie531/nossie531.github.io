@@ -31,9 +31,12 @@
 				<dt><a href="#ptnG">パターン G</a></dt> <dd>型パラメタが関連 <span class="nw">(パターン E と F の合成)</span>。 </dd>
 			</dl>
 			<section>
-				<h1 id="ptnA">パターン A.</h1>
+				<hgroup>
+					<h1 id="ptnA">パターン A.</h1>
+					<div class="subtitle">自明なパターン</div>
+				</hgroup>
 				<p>
-自明なパターン。全く同じ条件を指定している。
+全く同じ条件を指定している。
 				</p>
 <pre><code class="language-rust">
 struct SomeStruct {}
@@ -52,7 +55,10 @@ impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SomeStruct`</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnB">パターン B.</h1>
+				<hgroup>
+					<h1 id="ptnB">パターン B.</h1>
+					<div class="subtitle">実装が空のパターン</div>
+				</hgroup>
 				<p>
 前のパターンの変種。トレイトがマーカートレイト、または全てのトレイトメソッドがデフォルト実装を持つ場合、個別の実装が空になりうるが、この場合も同様である。
 				</p>
@@ -73,7 +79,10 @@ impl TargetTrait for SomeStruct {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SomeStruct`</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnC">パターン C.</h1>
+				<hgroup>
+					<h1 id="ptnC">パターン C.</h1>
+					<div class="subtitle">構造体へのブランケット実装が関連</div>
+				</hgroup>
 				<p>
 構造体とブランケット実装が同じトレイトを実装している。<br/>
 そして、その構造体はそのブランケット実装にも適合している。
@@ -95,7 +104,10 @@ impl TargetTrait for SomeStruct {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SomeStruct`</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnD">パターン D.</h1>
+				<hgroup>
+					<h1 id="ptnD">パターン D.</h1>
+					<div class="subtitle">共存するブランケット実装が関連</div>
+				</hgroup>
 				<p>
 あるトレイトについてのブランケット実装が複数ある。<br/>
 そして、それら複数に適合する型が作成可能になっている。
@@ -120,7 +132,10 @@ impl&lt;T&gt; TargetTrait for T where T: SomeTraitX {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnE">パターン E.</h1>
+				<hgroup>
+					<h1 id="ptnE">パターン E.</h1>
+					<div class="subtitle">型パラメタが関連 (境界側の型パラメタ)</div>
+				</hgroup>
 				<p>
 型パラメタがあるため、条件の重複に気付きにくいパターン。
 				</p> <p>
@@ -144,7 +159,10 @@ impl&lt;X: SomeTrait&gt; TargetTrait for X {}
 <mark class="info">  |</mark> <mark class="info">^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `i32`</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnF">パターン F.</h1>
+				<hgroup>
+					<h1 id="ptnF">パターン F.</h1>
+					<div class="subtitle">型パラメタが関連 (トレイト側の型パラメタ)</div>
+				</hgroup>
 				<p>
 型パラメタがあるため、トレイトの重複に気付きにくいパターン。
 				</p> <p>
@@ -168,9 +186,12 @@ impl&lt;T, X: SomeTrait&gt; TargetTrait&lt;X&gt; for T {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
 </samp></pre>
 			</section> <section>
-				<h1 id="ptnG">パターン G.</h1>
+				<hgroup>
+					<h1 id="ptnG">パターン G.</h1>
+					<div class="subtitle">型パラメタが関連 (パターン E と F の合成)</div>
+				</hgroup>
 				<p>
-パターン E と F の合成。条件とトレイトの両方に型パラメタがあるパターン。
+条件とトレイトの両方に型パラメタがあるパターン。
 				</p> <p>
 以下の例では、<code>TargetTrait</code> から <code>Box&lt;dyn TargetTrait&gt;</code> を作れるよう、<code>From</code> トレイトを実装しようとしている。しかし、<code>From</code> トレイトについて重複する実装がすでに Rust 組込の <code>std</code> クレート内で定義済のため、コンパイルエラーになる。
 				</p>
