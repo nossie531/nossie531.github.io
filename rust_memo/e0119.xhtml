@@ -287,7 +287,7 @@ impl&lt;T&gt; MyTrait for T {}
 					<p>
 修正の見込みについて。
 					</p> <p>
-2024 年現在、修正は延期中らしい。Github の投稿を見ていると、修正すべきではあるが、機能が増える事による影響範囲について見極めるべきだとの意見がある模様。
+2024 年現在、修正は延期中。Github の投稿によると、トレイトシステム全体の刷新が控えているらしく、また修正が及ぼす波及効果の検討も必要らしい。
 					</p>
 				</aside>
 				<div class="sub">
@@ -301,13 +301,6 @@ trait MyTrait { fn method(&amp;self) -&gt; &amp;str { "" } }
 
 impl&lt;T: HasType&lt;Type = i32&gt;&gt; MyTrait for T {}
 <mark class="error">impl&lt;T: HasType&lt;Type = i64&gt;&gt; MyTrait for T</mark> {}
-
-fn main() {
-    impl HasType for i32 { type Type = i32; }
-    impl HasType for i64 { type Type = i64; }
-    assert_eq!(0i32.method(), "i32");
-    assert_eq!(0i64.method(), "i32");
-}
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `MyTrait`
@@ -318,47 +311,6 @@ fn main() {
 <mark class="info">5 |</mark> impl&lt;T: HasType&lt;Type = i64&gt;&gt; MyTrait for T {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
 </samp></pre>
-				</div>
-				<div class="sub">
-					<h2>回避策</h2>
-					<p>
-条件側が区別されないため、代わりにトレイト側で区別する。
-					</p> <p>
-以下では、<code>MyTrait</code> の代役として <code>MyTraitT</code> が用意されており、これはダミーの型パラメタを持つ。ここでこのダミーの型パラメタは、対応する関連型を表すものとして運用する。そのため、<code>MyTraitT</code> は条件とトレイトの両指定を兼ねるようになる。そして最後に、それらの両指定がされた <code>MyTraitT</code> が <code>MyTrait</code> としても振る舞えるよう実装を行う。
-					</p>
-<pre><code class="language-rust">
-trait HasType { type Type; }
-trait MyTrait { fn method(&amp;self) -&gt; &amp;str { "" } }
-
-mod private {
-    use super::*;
-
-    pub trait MyTraitT&lt;T&gt; {
-        fn inner_method(&amp;self) -&gt; &amp;str;
-    }
-    
-    impl&lt;T: HasType&lt;Type = i32&gt;&gt; MyTraitT&lt;i32&gt; for T {
-        fn inner_method(&amp;self) -&gt; &amp;str { "i32" }
-    }
-    
-    impl&lt;T: HasType&lt;Type = i64&gt;&gt; MyTraitT&lt;i64&gt; for T {
-        fn inner_method(&amp;self) -&gt; &amp;str { "i64" }
-    }
-
-    impl&lt;T: HasType + MyTraitT&lt;T::Type&gt;&gt; MyTrait for T {
-        fn method(&amp;self) -&gt; &amp;str {
-            self.inner_method()
-        }
-    }
-}
-
-fn main() {
-    impl HasType for i32 { type Type = i32; }
-    impl HasType for i64 { type Type = i64; }
-    assert_eq!(0i32.method(), "i32");
-    assert_eq!(0i64.method(), "i64");
-}
-</code></pre>
 				</div>
 			</section>
 		</section>
