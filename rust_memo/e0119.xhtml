@@ -14,21 +14,50 @@
 <mark class="error">error[E0119]</mark>: conflicting implementations of trait `SomeTrait`
 </samp></pre>
 		<p>
-指定した条件に適合する型に対して、あるトレイトを実装しようとした。ところが、その条件と重複する条件で、すでにそのトレイトが実装されていた。そのため、コンパイラはどちらの実装を使えば良いか分からなかった。
+トレイト実装の指定が既存のものと衝突した。
 		</p>
 		<section>
+			<h1>基礎知識</h1>
+			<div class="sub">
+				<h2>トレイトの実装</h2>
+				<p>
+トレイト実装では以下の二つを指定する。
+				</p>
+				<dl class="normal">
+					<dt>トレイト</dt>
+					<dd>
+						<p>
+どのトレイトを実装するか。
+						</p>
+					</dd>
+					<dt>条件</dt>
+					<dd>
+						<p>
+どのような型に実装するか。
+						</p>
+					</dd>
+				</dl>
+			</div>
+			<div class="sub">
+				<h2>エラーの原因</h2>
+				<p>
+トレイト実装の指定どうしが衝突するのは、対象となるトレイトが同じで、かつ条件に重複がある場合である。そうなると、コンパイラは指定が重複している型に対して、どちらの実装を使えば良いか分からなくなる。
+				</p>
+			</div>
+		</section> <section>
 			<h1>パターン</h1>
 			<p>
-エラーには幾つかのパターンがある。
+エラーには幾つかパターンがある。
 			</p>
 			<dl class="normal lowProfile">
 				<dt><a href="#ptnA">パターン A</a></dt> <dd>自明なパターン。</dd>
 				<dt><a href="#ptnB">パターン B</a></dt> <dd>実装が空のパターン。</dd>
-				<dt><a href="#ptnC">パターン C</a></dt> <dd>構造体へのブランケット実装が関連。</dd>
-				<dt><a href="#ptnD">パターン D</a></dt> <dd>共存するブランケット実装が関連。 </dd>
-				<dt><a href="#ptnE">パターン E</a></dt> <dd>型パラメタが関連 <span class="nw">(境界側の型パラメタ)</span>。 </dd>
-				<dt><a href="#ptnF">パターン F</a></dt> <dd>型パラメタが関連 <span class="nw">(トレイト側の型パラメタ)</span>。 </dd>
-				<dt><a href="#ptnG">パターン G</a></dt> <dd>型パラメタが関連 <span class="nw">(パターン E と F の合成)</span>。 </dd>
+				<dt><a href="#ptnC">パターン C</a></dt> <dd>ブランケット実装との衝突。</dd>
+				<dt><a href="#ptnD">パターン D</a></dt> <dd>ブランケット実装どうしの衝突。 </dd>
+				<dt><a href="#ptnE">パターン E</a></dt> <dd>型パラメタの影響 <span class="nw">(条件側の型パラメタ)</span>。</dd>
+				<dt><a href="#ptnF">パターン F</a></dt> <dd>型パラメタの影響 <span class="nw">(トレイト側の型パラメタ)</span>。</dd>
+				<dt><a href="#ptnG">パターン G</a></dt> <dd>型パラメタの影響 <span class="nw">(パターン E と F の合成)</span>。</dd>
+				<dt><a href="#ptnH">パターン H</a></dt> <dd>関連型の影響 <span class="nw">(Rust の欠陥)</span>。</dd>
 			</dl>
 			<section>
 				<hgroup>
@@ -36,23 +65,23 @@
 					<div class="subtitle">自明なパターン</div>
 				</hgroup>
 				<p>
-全く同じ条件を指定している。
+全く同じトレイトと条件を指定している。
 				</p>
 <pre><code class="language-rust">
-struct SomeStruct {}
-trait TargetTrait { fn f(&amp;self); }
+struct MyType {}
+trait MyTrait { fn f(&amp;self); }
 
-impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
-<mark class="error">impl TargetTrait for SomeStruct</mark> { fn f(&amp;self) { /* ... */ } }
+impl MyTrait for MyType { fn f(&amp;self) { /* ... */ } }
+<mark class="error">impl MyTrait for MyType</mark> { fn f(&amp;self) { /* ... */ } }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `SomeStruct`
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `MyTrait` for type `MyType`
 <mark class="info"> --&gt;</mark> src\main.rs:5:1
 <mark class="info">  |</mark>
-<mark class="info">4 |</mark> impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
-<mark class="info">  |</mark> <mark class="info">------------------------------- first implementation here</mark>
-<mark class="info">5 |</mark> impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
-<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SomeStruct`</mark>
+<mark class="info">4 |</mark> impl MyTrait for MyType { fn f(&amp;self) { /* ... */ } }
+<mark class="info">  |</mark> <mark class="info">----------------------- first implementation here</mark>
+<mark class="info">5 |</mark> impl MyTrait for MyType { fn f(&amp;self) { /* ... */ } }
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `MyType`</mark>
 </samp></pre>
 			</section> <section>
 				<hgroup>
@@ -63,153 +92,153 @@ impl TargetTrait for SomeStruct { fn f(&amp;self) { /* ... */ } }
 前のパターンの変種。トレイトがマーカートレイト、または全てのトレイトメソッドがデフォルト実装を持つ場合、個別の実装が空になりうるが、この場合も同様である。
 				</p>
 <pre><code class="language-rust">
-struct SomeStruct {}
-trait TargetTrait {}
+struct MyType {}
+trait MyTrait {}
 
-impl TargetTrait for SomeStruct {}
-impl TargetTrait for SomeStruct {}
+impl MyTrait for MyType {}
+impl MyTrait for MyType {}
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `SomeStruct`
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `MyTrait` for type `MyType`
 <mark class="info"> --&gt;</mark> src\sub.rs:5:1
 <mark class="info">  |</mark>
-<mark class="info">4 |</mark> impl TargetTrait for SomeStruct {}
-<mark class="info">  |</mark> <mark class="info">------------------------------- first implementation here</mark>
-<mark class="info">5 |</mark> impl TargetTrait for SomeStruct {}
-<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SomeStruct`</mark>
+<mark class="info">4 |</mark> impl MyTrait for MyType {}
+<mark class="info">  |</mark> <mark class="info">----------------------- first implementation here</mark>
+<mark class="info">5 |</mark> impl MyTrait for MyType {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `MyType`</mark>
 </samp></pre>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnC">パターン C.</h1>
-					<div class="subtitle">構造体へのブランケット実装が関連</div>
+					<div class="subtitle">ブランケット実装との衝突</div>
 				</hgroup>
 				<p>
-構造体とブランケット実装が同じトレイトを実装している。<br/>
-そして、その構造体はそのブランケット実装にも適合している。
+ある型がブランケット実装と同じトレイトを実装している。<br/>
+そして、その型はそのブランケット実装にも適合している。
 				</p>
 <pre><code class="language-rust">
-struct SomeStruct {}
-trait TargetTrait {}
+struct MyType {}
+trait MyTrait {}
 
-impl TargetTrait for SomeStruct {}
-<mark class="error">impl&lt;T&gt; TargetTrait for T</mark> {}
+impl MyTrait for MyType {}
+<mark class="error">impl&lt;T&gt; MyTrait for T</mark> {}
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `SomeStruct`
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `MyTrait` for type `MyType`
 <mark class="info"> --&gt;</mark> src\sub.rs:5:1
 <mark class="info">  |</mark>
-<mark class="info">4 |</mark> impl TargetTrait for SomeStruct {}
-<mark class="info">  |</mark> <mark class="info">------------------------------- first implementation here</mark>
-<mark class="info">5 |</mark> impl&lt;T&gt; TargetTrait for T {}
-<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SomeStruct`</mark>
+<mark class="info">4 |</mark> impl MyTrait for MyType {}
+<mark class="info">  |</mark> <mark class="info">----------------------- first implementation here</mark>
+<mark class="info">5 |</mark> impl&lt;T&gt; MyTrait for T {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `MyType`</mark>
 </samp></pre>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnD">パターン D.</h1>
-					<div class="subtitle">共存するブランケット実装が関連</div>
+					<div class="subtitle">ブランケット実装どうしの衝突</div>
 				</hgroup>
 				<p>
 あるトレイトについてのブランケット実装が複数ある。<br/>
 そして、それら複数に適合する型が作成可能になっている。
 				</p> <p>
-以下の例では、対象に <code>TargetTrait</code> を実装する二つのブランケット実装があり、それぞれは対象が <code>SomeTraitX</code> か <code>SomeTraitY</code> を実装を持つ事を条件としている。そして、これら二つの実装を両方持つ型が作成可能になっている。
+以下では、二つのブランケット実装指定があり、トレイトはどちらも <code>MyTrait</code> を、条件はそれぞれ <code>TraitX</code> と <code>TraitY</code> の実装型を指定している。そして、これら二つの実装を両方持つ型が作成可能になっている。
 				</p>
 <pre><code class="language-rust">
-trait SomeTraitX {}
-trait SomeTraitY {}
-trait TargetTrait {}
+trait MyTrait {}
+trait TraitX {}
+trait TraitY {}
 
-impl&lt;T&gt; TargetTrait for T where T: SomeTraitX {}
-<mark class="error">impl&lt;T&gt; TargetTrait for T</mark> where T: SomeTraitY {}
+impl&lt;T&gt; MyTrait for T where T: TraitX {}
+<mark class="error">impl&lt;T&gt; MyTrait for T</mark> where T: TraitY {}
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait`
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `MyTrait`
 <mark class="info"> --&gt;</mark> src\main.rs:6:1
 <mark class="info">  |</mark>
-<mark class="info">5 |</mark> impl&lt;T&gt; TargetTrait for T where T: SomeTraitX {}
-<mark class="info">  |</mark> <mark class="info">------------------------- first implementation here</mark>
-<mark class="info">6 |</mark> impl&lt;T&gt; TargetTrait for T where T: SomeTraitY {}
-<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
+<mark class="info">5 |</mark> impl&lt;T&gt; MyTrait for T where T: TraitX {}
+<mark class="info">  |</mark> <mark class="info">--------------------- first implementation here</mark>
+<mark class="info">6 |</mark> impl&lt;T&gt; MyTrait for T where T: TraitY {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
 </samp></pre>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnE">パターン E.</h1>
-					<div class="subtitle">型パラメタが関連 (境界側の型パラメタ)</div>
+					<div class="subtitle">型パラメタの影響 (条件側の型パラメタ)</div>
 				</hgroup>
 				<p>
 型パラメタがあるため、条件の重複に気付きにくいパターン。
 				</p> <p>
-以下の例では、条件 <code>X</code> と <code>i32</code> は重複している。なぜなら、<code>X</code> には <code>SomeTrait</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>SomeTrait</code> が実装されている。
+以下では、条件 <code>X</code> と <code>i32</code> は重複している。なぜなら、<code>X</code> は <code>TraitX</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>TraitX</code> が実装されている。
 				</p>
 <pre><code class="language-rust">
-trait TargetTrait {}
-trait SomeTrait {}
-impl&lt;T&gt; SomeTrait for T {}
+trait MyTrait {}
+trait TraitX {}
+impl&lt;T&gt; TraitX for T {}
 
-impl&lt;X: SomeTrait&gt; TargetTrait for X {}
-<mark class="error">impl TargetTrait for i32</mark> {}
+impl&lt;X: TraitX&gt; MyTrait for X {}
+<mark class="error">impl MyTrait for i32</mark> {}
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait` for type `i32`
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `MyTrait` for type `i32`
 <mark class="info"> --&gt;</mark> src\main.rs:6:1
 <mark class="info">  |</mark>
-<mark class="info">5 |</mark> impl&lt;X: SomeTrait&gt; TargetTrait for X {}
-<mark class="info">  |</mark> <mark class="error">------------------------------------ first implementation here</mark>
-<mark class="info">6 |</mark> impl TargetTrait for i32 {}
-<mark class="info">  |</mark> <mark class="info">^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `i32`</mark>
+<mark class="info">5 |</mark> impl&lt;X: TraitX&gt; MyTrait for X {}
+<mark class="info">  |</mark> <mark class="info">----------------------------- first implementation here</mark>
+<mark class="info">6 |</mark> impl MyTrait for i32 {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `i32`</mark>
 </samp></pre>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnF">パターン F.</h1>
-					<div class="subtitle">型パラメタが関連 (トレイト側の型パラメタ)</div>
+					<div class="subtitle">型パラメタの影響 (トレイト側の型パラメタ)</div>
 				</hgroup>
 				<p>
 型パラメタがあるため、トレイトの重複に気付きにくいパターン。
 				</p> <p>
-以下の例では、トレイト <code>TargetTrait&lt;X&gt;</code> と <code>TargetTrait&lt;i32&gt;</code> は重複している。なぜなら、<code>X</code> には <code>SomeTrait</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>SomeTrait</code> が実装されている。
+以下では、トレイト <code>MyTrait&lt;X&gt;</code> と <code>MyTrait&lt;i32&gt;</code> は重複している。なぜなら、<code>X</code> には <code>TraitX</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>TraitX</code> が実装されている。
 				</p>
 <pre><code class="language-rust">
-trait TargetTrait&lt;T&gt; {}
-trait SomeTrait {}
-impl&lt;T&gt; SomeTrait for T {}
+trait MyTrait&lt;T&gt; {}
+trait TraitX {}
+impl&lt;T&gt; TraitX for T {}
 
-impl&lt;T, X: SomeTrait&gt; TargetTrait&lt;X&gt; for T {}
-<mark class="error">impl&lt;T&gt; TargetTrait&lt;i32&gt; for T</mark> {}
+impl&lt;T, X: TraitX&gt; MyTrait&lt;X&gt; for T {}
+<mark class="error">impl&lt;T&gt; MyTrait&lt;i32&gt; for T</mark> {}
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0119]</mark>: conflicting implementations of trait `TargetTrait&lt;i32&gt;`
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `MyTrait&lt;i32&gt;`
 <mark class="info"> --&gt;</mark> src\main.rs:6:1
 <mark class="info">  |</mark>
-<mark class="info">5 |</mark> impl&lt;T, X: SomeTrait&gt; TargetTrait&lt;X&gt; for T {}
-<mark class="info">  |</mark> <mark class="info">------------------------------------------ first implementation here</mark>
-<mark class="info">6 |</mark> impl&lt;T&gt; TargetTrait&lt;i32&gt; for T {}
-<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
+<mark class="info">5 |</mark> impl&lt;T, X: TraitX&gt; MyTrait&lt;X&gt; for T {}
+<mark class="info">  |</mark> <mark class="info">----------------------------------- first implementation here</mark>
+<mark class="info">6 |</mark> impl&lt;T&gt; MyTrait&lt;i32&gt; for T {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
 </samp></pre>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnG">パターン G.</h1>
-					<div class="subtitle">型パラメタが関連 (パターン E と F の合成)</div>
+					<div class="subtitle">型パラメタの影響 (パターン E と F の合成)</div>
 				</hgroup>
 				<p>
 条件とトレイトの両方に型パラメタがあるパターン。
 				</p> <p>
-以下の例では、<code>TargetTrait</code> から <code>Box&lt;dyn TargetTrait&gt;</code> を作れるよう、<code>From</code> トレイトを実装しようとしている。しかし、<code>From</code> トレイトについて重複する実装がすでに Rust 組込の <code>std</code> クレート内で定義済のため、コンパイルエラーになる。
+以下では、<code>MyTrait</code> から <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code> を作れるよう、<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> トレイトを実装しようとしている。しかし、<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> トレイトについて重複する実装がすでに Rust 組込の <a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> クレート内で定義済のため、コンパイルエラーになる。
 				</p>
 <pre><code class="language-rust">
-trait TargetTrait {}
-impl&lt;T&gt; TargetTrait for T {}
+trait MyTrait {}
+impl&lt;T&gt; MyTrait for T {}
 
-<mark class="error">impl&lt;T: TargetTrait&gt; From&lt;T&gt; for Box&lt;dyn TargetTrait&gt;</mark> {
+<mark class="error">impl&lt;T: MyTrait&gt; From&lt;T&gt; for Box&lt;dyn MyTrait&gt;</mark> {
     fn from(value: T) -&gt; Self {
         Box::new(value)
     }
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0119]</mark>: conflicting implementations of trait `From&lt;Box&lt;(dyn TargetTrait + 'static)&gt;&gt;` for type `Box&lt;(dyn TargetTrait + 'static)&gt;`
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `From&lt;Box&lt;(dyn MyTrait + 'static)&gt;&gt;` for type `Box&lt;(dyn MyTrait + 'static)&gt;`
 <mark class="info"> --&gt;</mark> src\main.rs:4:1
 <mark class="info">  |</mark>
-<mark class="info">4 |</mark> impl&lt;T: TargetTrait&gt; From&lt;T&gt; for Box&lt;dyn TargetTrait&gt; {
+<mark class="info">4 |</mark> impl&lt;T: MyTrait&gt; From&lt;T&gt; for Box&lt;dyn MyTrait&gt; {
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
 <mark class="info">  |</mark>
 <mark class="info">  =</mark> note: conflicting implementation in crate `core`:
@@ -221,31 +250,117 @@ impl&lt;T&gt; TargetTrait for T {}
 				<ul>
 					<li>
 						<p>
-<code>impl&lt;T&gt; From&lt;T&gt; for T</code>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;T&gt; for T</code>
 						</p>
 					</li> <li>
 						<p>
-<code>impl&lt;T: TargetTrait&gt; From&lt;T&gt; for Box&lt;dyn TargetTrait&gt;</code>
+<code>impl&lt;T: MyTrait&gt; <a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;T&gt; for <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code>
 						</p>
 					</li>
 				</ul>
 				<p>
-ここで、条件とトレイトの両方が重複している。
+ここで、トレイトが同じで条件が重複している。
 				</p>
 				<dl class="normal">
-					<dt>条件の重複</dt>
+					<dt>条件</dt>
 					<dd>
 						<p>
 前者の条件 <code>T</code> は全ての型が適合するので、後者の条件が何であれ重複する。
 						</p>
 					</dd>
-					<dt>トレイトの重複</dt>
+					<dt>トレイト</dt>
 					<dd>
 						<p>
-前者と後者の <code>From&lt;T&gt;</code> の型パラメタ <code>T</code> は重複している。前者の <code>T</code> には条件と同じ型である事が、後者の <code>T</code> には <code>TargetTrait</code> の実装が求められるが、全ての型は <code>TargetTrait</code> を実装するため、ここは <code>Box&lt;dyn TargetTrait&gt;</code> でも良い。そのため、後者も前者と同様、<code>T</code> には条件と同じ型が指定できてしまう。
+前者と後者はどちらも <code><a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;T&gt;</code> で、型パラメタ <code>T</code> も同じ内容を指している。前者の <code>T</code> には条件と同じ型である事が、後者の <code>T</code> には <code>MyTrait</code> の実装が求められるが、全ての型は <code>MyTrait</code> を実装するため、ここは <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code> でも良い。そのため、後者も前者と同様、<code>T</code> には条件と同じ型が指定できてしまう。
 						</p>
 					</dd>
 				</dl>
+			</section> <section>
+				<hgroup>
+					<h1 id="ptnH">パターン H.</h1>
+					<div class="subtitle">関連型の影響 (Rust の欠陥)。</div>
+				</hgroup>
+				<p>
+トレイト実装において、関連型が条件として区別されない<a href="https://github.com/rust-lang/rust/issues/20400">問題</a>がある。
+				</p>
+				<aside class="normal moan">
+					<p>
+修正の見込みについて。
+					</p> <p>
+2024 年現在、修正は延期中らしい。Github の投稿を見ていると、修正すべきではあるが、機能が増える事による影響範囲について見極めるべきだとの意見がある模様。
+					</p>
+				</aside>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>HasType&lt;Type = i32&gt;</code> と <code>HasType&lt;Type = i64&gt;</code> は重複しないはずだが、競合が検出されてしまう。
+					</p>
+<pre><code class="language-rust">
+trait HasType { type Type; }
+trait MyTrait { fn method(&amp;self) -&gt; &amp;str { "" } }
+
+impl&lt;T: HasType&lt;Type = i32&gt;&gt; MyTrait for T {}
+<mark class="error">impl&lt;T: HasType&lt;Type = i64&gt;&gt; MyTrait for T</mark> {}
+
+fn main() {
+    impl HasType for i32 { type Type = i32; }
+    impl HasType for i64 { type Type = i64; }
+    assert_eq!(0i32.method(), "i32");
+    assert_eq!(0i64.method(), "i32");
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0119]</mark>: conflicting implementations of trait `MyTrait`
+<mark class="info"> --&gt;</mark> src\main.rs:5:1
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark> impl&lt;T: HasType&lt;Type = i32&gt;&gt; MyTrait for T {}
+<mark class="info">  |</mark> <mark class="info">------------------------------------------ first implementation here</mark>
+<mark class="info">5 |</mark> impl&lt;T: HasType&lt;Type = i64&gt;&gt; MyTrait for T {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
+</samp></pre>
+				</div>
+				<div class="sub">
+					<h2>回避策</h2>
+					<p>
+条件側が区別されないため、代わりにトレイト側で区別するようにする。
+					</p>
+					<p>
+以下では、<code>MyTrait</code> にダミーの型パラメタを追加した <code>MyTraitT</code> を用意している。ダミーの型パラメタは関連型の代わりとして運用する。これで <code>MyTraitT</code> は条件とトレイトの両指定を兼ねるようになる。そして最後に、条件とトレイトの指定された <code>MyTraitT</code> が <code>MyTrait</code> として振る舞えるよう実装を行う。
+					</p>
+<pre><code class="language-rust">
+trait HasType { type Type; }
+trait MyTrait { fn method(&amp;self) -&gt; &amp;str { "" } }
+
+mod private {
+    use super::*;
+
+    pub trait MyTraitT&lt;T&gt; {
+        fn inner_method(&amp;self) -&gt; &amp;str;
+    }
+    
+    impl&lt;T: HasType&lt;Type = i32&gt;&gt; MyTraitT&lt;i32&gt; for T {
+        fn inner_method(&amp;self) -&gt; &amp;str { "i32" }
+    }
+    
+    impl&lt;T: HasType&lt;Type = i64&gt;&gt; MyTraitT&lt;i64&gt; for T {
+        fn inner_method(&amp;self) -&gt; &amp;str { "i64" }
+    }
+
+    impl&lt;T: HasType + MyTraitT&lt;T::Type&gt;&gt; MyTrait for T {
+        fn method(&amp;self) -&gt; &amp;str {
+            self.inner_method()
+        }
+    }
+}
+
+fn main() {
+    impl HasType for i32 { type Type = i32; }
+    impl HasType for i64 { type Type = i64; }
+    assert_eq!(0i32.method(), "i32");
+    assert_eq!(0i64.method(), "i64");
+}
+</code></pre>
+				</div>
 			</section>
 		</section>
 	</body>
