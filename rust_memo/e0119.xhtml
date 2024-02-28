@@ -322,10 +322,9 @@ fn main() {
 				<div class="sub">
 					<h2>回避策</h2>
 					<p>
-条件側が区別されないため、代わりにトレイト側で区別するようにする。
-					</p>
-					<p>
-以下では、<code>MyTrait</code> にダミーの型パラメタを追加した <code>MyTraitT</code> を用意している。ダミーの型パラメタは関連型の代わりとして運用する。これで <code>MyTraitT</code> は条件とトレイトの両指定を兼ねるようになる。そして最後に、条件とトレイトの指定された <code>MyTraitT</code> が <code>MyTrait</code> として振る舞えるよう実装を行う。
+条件側が区別されないため、代わりにトレイト側で区別する。
+					</p> <p>
+以下では、<code>MyTrait</code> の代役として <code>MyTraitT</code> が用意されており、これはダミーの型パラメタを持つ。ここで、このダミーの型パラメタは対応する関連型を表すものとして運用する。そのため、<code>MyTraitT</code> は条件とトレイトの両指定を兼ねるようになる。そして最後に、それらの両指定がされた <code>MyTraitT</code> が <code>MyTrait</code> としても振る舞えるよう実装を行う。
 					</p>
 <pre><code class="language-rust">
 trait HasType { type Type; }
