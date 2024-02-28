@@ -324,7 +324,7 @@ fn main() {
 					<p>
 条件側が区別されないため、代わりにトレイト側で区別する。
 					</p> <p>
-以下では、<code>MyTrait</code> の代役として <code>MyTraitT</code> が用意されており、これはダミーの型パラメタを持つ。ここで、このダミーの型パラメタは対応する関連型を表すものとして運用する。そのため、<code>MyTraitT</code> は条件とトレイトの両指定を兼ねるようになる。そして最後に、それらの両指定がされた <code>MyTraitT</code> が <code>MyTrait</code> としても振る舞えるよう実装を行う。
+以下では、<code>MyTrait</code> の代役として <code>MyTraitT</code> が用意されており、これはダミーの型パラメタを持つ。ここでこのダミーの型パラメタは、対応する関連型を表すものとして運用する。そのため、<code>MyTraitT</code> は条件とトレイトの両指定を兼ねるようになる。そして最後に、それらの両指定がされた <code>MyTraitT</code> が <code>MyTrait</code> としても振る舞えるよう実装を行う。
 					</p>
 <pre><code class="language-rust">
 trait HasType { type Type; }
