@@ -42,7 +42,7 @@ path#bookmark { fill: hsl(20, 60%, 50%); stroke: hsl(20, 60%, 30%); stroke-width
 			<feDropShadow dx="10" dy="10" stdDeviation="5" flood-opacity="0.5"/>
 		</filter>
 	</defs>
-	<g id="target" transform="translate(0, 90)">
+	<g id="target" transform="translate(0, 60)">
 		<!-- 本のカバー -->
 		<rect id="cover" x="5" y="5" width="290" height="200" rx="15"/>
 		<!-- ページの束 -->

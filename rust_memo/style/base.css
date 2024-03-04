@@ -265,11 +265,12 @@
 		background-color: var(--fill-color);
 
 		&::before {
+			--size: 2.2em;
 			content: "";
 			float: left;
-			width: 2.2em;
-			height: 2.2em;
-			margin-right: 0.5ch;
+			width: var(--size);
+			height: var(--size);
+			margin: calc((1lh + 1em - var(--size)) / 2) 0.5ch 0 0;
 			background-size: 2.2em;
 			background-image: url("img/book_light.svg");
 		}
