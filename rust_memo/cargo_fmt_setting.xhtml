@@ -60,9 +60,9 @@ brace_style = "AlwaysNextLine"
 fn main() {
     #[rustfmt::skip]
     let xor = |x, y| {
-        if x &amp;&amp; y { "T" } else
-        if !x &amp;&amp; !y { "T" } else
-        { "F" }
+        if x &amp;&amp; y { "F" } else
+        if !x &amp;&amp; !y { "F" } else
+        { "T" }
     };
 
     println!("XOR(T, F) = {}", xor(true, false));
