@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: cargo fmt と rustfmt の調整</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>cargo fmt</code> や <code>rustfmt</code> の整形を微調整する方法について。
+		</p> 
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+以下のコマンドは Rust のソースファイルを自動整形する。
+			</p>
+			<dl class="normal">
+				<dt><code>cargo fmt</code></dt>
+				<dd>
+					<p>
+ワークスペースの全ソースファイルを整形。
+					</p>
+				</dd>
+				<dt><code>rustfmt</code></dt>
+				<dd>
+					<p>
+ファイル名を指定して整形 (例: <code>rustfmt main.rs</code>)。
+					</p>
+				</dd>
+			</dl>
+		</section> <section>
+			<h1><code>rustfmt.toml</code> ファイル</h1>
+			<p>
+整形ルールは <code>rustfmt.toml</code> ファイルで指定できる。
+			</p> <p>
+殆どの場合、デフォルトの整形ルールで問題ないため、このファイルは不要である。しかし、整形ルールをプロジェクトの好みに合わせたい場合、このファイルを導入すると細かな設定が行える。設定項目の詳細は『<a href="https://rust-lang.github.io/rustfmt/?version=master&amp;search=">公式資料</a>』を参照。
+			</p> <p>
+以下は <code>rustfmt.toml</code> ファイルの一例。
+			</p>
+<pre><code class="language-toml">
+# 行の最大文字数を設定。
+max_width = 100
+
+# use 文のアルファベット順でのソートを禁止。
+reorder_imports = false
+
+# 波括弧は Allman スタイル。
+brace_style = "AlwaysNextLine"
+</code></pre>
+		</section> <section>
+			<h1><code>#[rustfmt::skip]</code> 属性</h1>
+			<p>
+ソースの一部のみ、自動整形でなく手動整形したい場合がある。そのような場合、該当部 (ファイル、関数、ブロックまたは文) に <code>#[rustfmt::skip]</code> 属性を付加するとよい。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    #[rustfmt::skip]
+    let xor = |x, y| {
+        if x &amp;&amp; y { "T" } else
+        if !x &amp;&amp; !y { "T" } else
+        { "F" }
+    };
+
+    println!("XOR(T, F) = {}", xor(true, false));
+}
+</code></pre>
+		</section>
+	</body>
+</html>
