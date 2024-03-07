@@ -12,7 +12,7 @@ class Base {
 		Base.#instance.#setupScripts();
 		document.addEventListener("DOMContentLoaded", () => {
 			Base.#instance.#setupCodes();
-			Base.#instance.#setupBlockquotes();
+			Base.#instance.#setupIframes();
 		});
 	}
 
@@ -59,9 +59,10 @@ class Base {
 	#setupScripts() {
 		const scriptHolder = Base.#getCurrentScript().parentNode;
 		const navJs = Base.#createScriptElement("lib/nav/nav.js");
+		const quoteJs = Base.#createScriptElement("lib/quote.js");
 		const prismJs = Base.#createScriptElement("lib/prism/prism.js");
 		prismJs.addEventListener("load", this.#setupPrismJs.bind(this));
-		scriptHolder.append(navJs, prismJs);
+		scriptHolder.append(navJs, quoteJs, prismJs);
 	}
 
 	/* Prism.js の tabindex の自動設定を無効化。
@@ -72,7 +73,7 @@ class Base {
 		});
 	}
 
-	/* ブロックコードをフォーカス可能に設定。*/
+	/* コードブロックをフォーカス可能に設定。*/
 	#setupCodes() {
 		const selector = "pre > code:only-child, pre > samp:only-child";
 		for (const target of document.querySelectorAll(selector)) {
@@ -80,29 +81,18 @@ class Base {
 		}
 	}
 
-	/* blockquote 要素内の a 要素の href 属性を調整。*/
-	#setupBlockquotes() {
-		const selector = "blockquote";
+	/* iframe の高さを内容に依存するよう設定。*/
+	#setupIframes() {
+		const selector = "iframe.autoHeight";
 		for (const target of document.querySelectorAll(selector)) {
-			for (const anchor of target.getElementsByTagName("a")) {
-				adjustAnchor(anchor, target);
-			}
+			exec(target);
+			target.addEventListener("load", () => exec(target));
+			target.contentWindow.addEventListener("resize", () => exec(target));
 		}
 
-		function adjustAnchor(anchor, blockquote) {
-			const cite = blockquote.getAttribute("cite");
-			const href = anchor.getAttribute("href");
-			if (cite && href && !isAbsUrl(href)) {
-				anchor.href = (new URL(href, cite)).toString();
-			}
-		}
-
-		/* URL が絶対かを判定。
-		JavaScript 標準の URL は相対から絶対へ解決可能だが相対 URL を持てない。
-		そのため、下記ではややまわりくどい解決策を取っている…。
-		 - https://github.com/whatwg/url/issues/531 */
-		function isAbsUrl(urlStr) {
-			return new URL(urlStr, "dummy://dummy/").protocol !== "dummy:";
+		function exec(target) {
+			const root = target.contentDocument.documentElement;
+			target.style.height = root.offsetHeight + "px";
 		}
 	}
 }

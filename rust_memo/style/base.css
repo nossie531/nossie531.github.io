@@ -10,30 +10,23 @@
 	precode,
 	ui,
 	util,
-	quote,
 	import_nav,
+	import_quote,
 	import_prism,
 	import_console_rustc,
 	custom_nav,
 	custom_prism;
 
 @import url("color.css") layer(import_color);
-@import url("../lib/nav/nav.css") layer(import_nav);
+@import url("lang.css") layer(import_lang);
+@import url("quote.css") layer(import_quort);
 @import url("prism.css") layer(import_prism);
 @import url("console_rustc.css") layer(import_console_rustc);
-
-@layer lang {
-	:root:lang(ja) {
-		line-height: 1.7;
-		text-justify: inter-character;
-	}
-}
+@import url("../lib/nav/nav.css") layer(import_nav);
 
 @layer root {
 	:root {
 		--base-width: 42rem;
-		--mt-font: "Consolas", "Meiryo", monospace;
-		font-family: "Meiryo", sans-serif;
 		font-size: 93%;
 		height: 100%;
 		padding: 0 0.5rem;
@@ -93,7 +86,7 @@
 	}
 
 	pre, samp, code {
-		font-family: var(--mt-font);
+		font-family: var(--mono-font);
 		hyphens: none;
 		tab-size: 4;
 		text-justify: none;
@@ -120,7 +113,7 @@
 	}
 
 	*.mt {
-		font-family: var(--mt-font);
+		font-family: var(--mono-font);
 	}
 
 	*.nw {
@@ -198,6 +191,11 @@
 		border-style: dashed none none;
 		border-width: thin;
 		margin: 1rem 0;
+	}
+
+	iframe[src^="quote/"] {
+		width: 100%;
+		border-style: none;
 	}
 
 	@media all and (width > calc(56rem)) {
@@ -366,7 +364,7 @@
 	}
 
 	figure.file {
-		font-family: var(--mt-font);
+		font-family: var(--mono-font);
 		margin: 1em 0;
 	}
 
@@ -421,48 +419,6 @@
 
 	*.todo {
 		color: var(--x-color);
-	}
-}
-
-@layer quote {
-	blockquote {
-		margin: 0;
-		padding: 0 1em;
-		border: thin dashed;
-
-		&::before, &::after {
-			content: "";
-			margin-top: 2ex;
-			display: block;
-		}
-
-		& * {
-			all: revert;
-		}
-
-		& code {
-			font-family: var(--mt-font);
-		}
-
-		& a:link, & a:visited {
-			color: var(--link-color);
-		}
-
-		&[cite^="https://doc.rust-lang.org/"] {
-			font-family: serif;
-		}
-	}
-
-	@media screen and (prefers-color-scheme: light) {
-		blockquote {
-			background: hsla(0, 0%, 100%, 0.3);
-		}
-	}
-
-	@media screen and (prefers-color-scheme: dark) {
-		blockquote {
-			background: hsla(0, 0%, 100%, 0.1);
-		}
 	}
 }
 

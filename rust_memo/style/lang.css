@@ -1,0 +1,40 @@
+@charset="utf-8";
+
+/* -- 日本語フォントでの斜体について --
+ *
+ * 日本語フォントファミリの一部には、欧文部を除いて斜体フォントのグリフが登録
+ * されていないものがある。これは日本語で斜体を使う慣習があまりないかららしい。
+ * 一部のブラウザは気転を効かせてグリフを合成してくれるが、Chrome はそうでない。
+ * これは外国語の引用翻訳などの用途では困る。そこで、グリフ合成の強制するために
+ * font-face からフォントを導入する。*/
+@font-face {
+	font-family: ja-sans-serif;
+	src: local('Meiryo');
+}
+
+@font-face {
+	font-family: ja-sans-serif;
+	font-weight:bold;
+	src: local('Meiryo Bold');
+}
+
+:root {
+	--mono-font: "Consolas", "ja-sans-serif", monospace;
+	--base-font: "ja-sans-serif", sans-serif;
+}
+
+:root:lang(ja) {
+	font-family: "ja-sans-serif", sans-serif;
+	text-justify: inter-character;
+	/* 日本語は欧文より縦方向に密なため行間を空ける。*/
+	line-height: 1.7;
+}
+
+p:lang(ja) {
+	text-align: justify;
+}
+
+blockquote:lang(ja) {
+	text-align: justify;
+}
+

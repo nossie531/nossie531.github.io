@@ -70,6 +70,8 @@
 	--header-color: var(--key0-color);
 	/* リンク色。*/
 	--link-color: var(--fg-em-color);
+	/* 不活性色。*/
+	--disable-color: hsl(0, 0%, 50%);
 	/* 要注意色。*/
 	--x-color: var(--fg-st-color);
 }

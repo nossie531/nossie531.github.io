@@ -1,0 +1,73 @@
+@import url("color.css");
+@import url("lang.css");
+
+:root > body.forQuote {
+	color: var(--fg-color);
+	font-size: 93%;
+	margin: 0;
+	padding: 0;
+}
+
+cite.info {
+	font-size: smaller;
+	font-style: normal;
+	color: var(--disable-color);
+
+	* {
+		text-decoration: none;
+		color: inherit;
+	}
+}
+
+@media screen {
+	cite.info {
+		float: right;
+		padding: 0.5ex 0.5em 0.5ex 1em;
+
+		& > span.url {
+			display: none;
+		}
+	}
+}
+
+@media print {
+	cite.info {
+		display: flex;
+	}
+}
+
+blockquote {
+	margin: 0;
+	padding: 0 1em;
+	border: thin dashed;
+
+	&::before, &::after {
+		content: "";
+		margin-top: 2ex;
+		display: block;
+	}
+
+	& code {
+		font-family: var(--mono-font);
+		margin: 0 -0.25ch;
+		padding: 0 0.25ch;
+		background-color: var(--shadow-color);
+	}
+
+	& a:link, & a:visited {
+		text-decoration: none;
+		color: var(--link-color);
+	}
+}
+
+@media screen and (prefers-color-scheme: light) {
+	blockquote {
+		background: hsla(0, 0%, 100%, 0.2);
+	}
+}
+
+@media screen and (prefers-color-scheme: dark) {
+	blockquote {
+		background: hsla(0, 0%, 100%, 0.1);
+	}
+}
