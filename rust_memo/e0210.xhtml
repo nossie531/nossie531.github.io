@@ -43,7 +43,7 @@
 			<p>
 トレイト実装の対象が型パラメタで表される場合、外部クレート由来の型も対象になる。そのため、孤児ルールを考慮しなければならない。
 			</p> <p>
-以下では、型パラメタ <code>T</code> にクレート <a href="https://doc.rust-lang.org/std/"><code>std</code></a> の <a href="https://doc.rust-lang.org/std/fmt/trait.Display.html">Display</a> トレイトを実装しようとしている。
+以下では、型パラメタ <code>T</code> にクレート <a href="https://doc.rust-lang.org/std/"><code>std</code></a> のトレイト <a href="https://doc.rust-lang.org/std/fmt/trait.Display.html"><code>Display</code></a> を実装しようとしている。
 			</p>
 <pre><code class="language-rust">
 use std::fmt::{self, Display, Formatter};
@@ -66,9 +66,6 @@ impl&lt;<mark class="error">T</mark>&gt; Display for T {
 </samp></pre>
 		</section> <section>
 			<h1>補足: 仕様詳細</h1>
-			<p>
-孤児ルールの詳細な仕様について。
-			</p>
 			<div>
 				<iframe class="autoHeight" src="quote/reference/item/implementations.xhtml"/>
 			</div>

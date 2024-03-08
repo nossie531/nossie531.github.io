@@ -37,7 +37,7 @@ cite.info {
 }
 
 blockquote {
-	margin: 0;
+	margin: 0 calc(var(--gap) * -1);
 	padding: 0 1em;
 	border: thin dashed;
 
@@ -58,6 +58,10 @@ blockquote {
 		text-decoration: none;
 		color: var(--link-color);
 	}
+}
+
+:root > body.forQuote blockquote {
+	margin: 0;
 }
 
 @media screen and (prefers-color-scheme: light) {
