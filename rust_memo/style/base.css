@@ -5,9 +5,9 @@
 	lang,
 	root,
 	default,
-	semantic,
 	normal,
-	precode,
+	semantic,
+	code_block,
 	ui,
 	util,
 	import_nav,
@@ -126,111 +126,6 @@
 	}
 }
 
-@layer semantic {
-	body > header > h1 {
-		display: table;
-		font-size: 1rem;
-		font-weight: normal;
-		margin-bottom: 2rem;
-		border: thin dashed red;
-		padding: 1ex 1em;
-	}
-
-	section, body > * {
-		max-width: calc(var(--base-width) + 1px);
-	}
-
-	section {
-		margin: 2rem 0 1rem;
-	}
-
-	section > h1,
-	section > hgroup > h1 {
-		font-size: 1.05em;
-		line-height: normal;
-		padding: 0.5ex 0.5em;
-		margin: 1rem calc(var(--gap) * -1);
-		background-color: var(--header-color);
-	}
-
-	section > section > h1::before,
-	section > section > hgroup > h1::before {
-		content: "> ";
-	}
-
-	section > section > section > h1::before,
-	section > section > section > hgroup > h1::before {
-		content: ">> ";
-	}
-
-	section > hgroup {
-		margin: 1rem 0;
-
-		> div.subtitle {
-			font-weight: bold;
-		}
-
-		> div.subtitle::before,
-		> div.subtitle::after {
-			content: " 〜 ";
-		}
-	}
-
-	div.sub {
-		margin: 1rem 0;
-
-		&:not(h1+*):has(> h2) {
-			border-top: thin dashed currentColor;
-		}
-
-		&:not(h2+*):has(> h3) {
-			border-top: thin dashed var(--base1-color);
-		}
-
-		h2, h3 {
-			font-size: 1rem;
-		}
-
-		h2::before {
-			content: "■ ";
-		}
-
-		h3::before {
-			content: "▶ ";
-		}
-	}
-
-
-
-	hr.split {
-		border-style: dashed none none;
-		border-width: thin;
-		margin: 1rem 0;
-	}
-
-	iframe[src^="quote/"] {
-		display: block;
-		box-sizing: border-box;
-		width: calc(100% + var(--gap) * 2);
-		margin: 1em calc(var(--gap) * -1);
-		border-style: none;
-	}
-
-	@media all and (width > calc(56rem)) {
-		section section {
-			margin-left: 1.5rem;
-			margin-right: -1.5rem;
-		}
-
-		section > section > h1::before,
-		section > section > hgroup > h1::before,
-		section > section > section > h1::before,
-		section > section > section > hgroup > h1::before {
-			content: none;
-		}
-	}
-}
-
 @layer normal {
 	dl.normal {
 		> dt::before {
@@ -314,16 +209,6 @@
 		}
 	}
 
-	figure.normal {
-		margin: 1rem 0;
-		text-align: center;
-
-		> object {
-			border: 1px dashed hsla(0, 0%, 0%, 0.25);
-			vertical-align: bottom;
-		}
-	}
-
 	@media screen and (prefers-color-scheme: dark) {
 		aside.normal {
 			&::before { 
@@ -338,7 +223,123 @@
 	}
 }
 
-@layer precode {
+@layer semantic {
+	body > header > h1 {
+		display: table;
+		font-size: 1rem;
+		font-weight: normal;
+		margin-bottom: 2rem;
+		border: thin dashed red;
+		padding: 1ex 1em;
+	}
+
+	section, body > * {
+		max-width: calc(var(--base-width) + 1px);
+	}
+
+	section {
+		margin: 2rem 0 1rem;
+	}
+
+	section > h1,
+	section > hgroup > h1 {
+		font-size: 1.05em;
+		line-height: normal;
+		padding: 0.5ex 0.5em;
+		margin: 1rem calc(var(--gap) * -1);
+		background-color: var(--header-color);
+	}
+
+	section > section > h1::before,
+	section > section > hgroup > h1::before {
+		content: "> ";
+	}
+
+	section > section > section > h1::before,
+	section > section > section > hgroup > h1::before {
+		content: ">> ";
+	}
+
+	section > hgroup {
+		margin: 1rem 0;
+
+		> div.subtitle {
+			font-weight: bold;
+		}
+
+		> div.subtitle::before,
+		> div.subtitle::after {
+			content: " 〜 ";
+		}
+	}
+
+	div.sub {
+		margin: 1rem 0;
+
+		&:not(h1+*):has(> h2) {
+			border-top: thin dashed currentColor;
+		}
+
+		&:not(h2+*):has(> h3) {
+			border-top: thin dashed var(--base1-color);
+		}
+
+		h2, h3 {
+			font-size: 1rem;
+		}
+
+		h2::before {
+			content: "■ ";
+		}
+
+		h3::before {
+			content: "▶ ";
+		}
+	}
+
+	hr.split {
+		border-style: dashed none none;
+		border-width: thin;
+		margin: 1rem 0;
+	}
+
+	iframe[src^="quote/"] {
+		display: block;
+		box-sizing: border-box;
+		width: calc(100% + var(--gap) * 2);
+		margin: 1em calc(var(--gap) * -1);
+		border-style: none;
+	}
+
+	@media all and (width > 56rem) {
+		section section {
+			margin-left: 1.5rem;
+			margin-right: -1.5rem;
+		}
+
+		section > section > h1::before,
+		section > section > hgroup > h1::before,
+		section > section > section > h1::before,
+		section > section > section > hgroup > h1::before {
+			content: none;
+		}
+	}
+}
+
+@layer code_block {
+	pre.command,
+	pre.directory,
+	pre > code:only-child,
+	pre > samp:only-child,
+	figure.file {
+		display: block;
+		margin: 1rem calc(var(--gap) * -1);
+		padding: var(--gap);
+		border-style: solid;
+		border-width: thin;
+		border-color: var(--edge-color);
+	}
+
 	pre {
 		&.command,
 		> code:only-child {
@@ -348,14 +349,9 @@
 		&.command,
 		> code:only-child,
 		> samp:only-child {
-			display: block;
-			padding: 0.5rem;
-			margin: 1rem calc(var(--gap) * -1);
-			border: thin solid;
+			background-color: var(--code-bg-color);
 			overflow: auto;
 			scrollbar-width: thin;
-			background-color: var(--code-bg-color);
-			border-color: var(--edge-color);
 		}
 
 		> code:only-child::before,
@@ -364,40 +360,37 @@
 			display: block;
 			margin-top: -1lh;
 		}
-	}
-
-	pre.directory {
-		line-height: normal;
-		padding: 0.5em 1em;
-		margin: 1rem calc(var(--gap) * -1);
-		border: thin solid;
-		border-color: var(--base0-color);
+		
+		&.directory {
+			line-height: normal;
+			border-color: var(--base0-color);
+		}
 	}
 
 	figure.file {
-		font-family: var(--mono-font);
-		margin: 1em 0;
-	}
-
-	figure.file > figcaption {
-		margin: 0 calc(var(--gap) * -1);
-		border: thin solid;
-		border-radius: 0.5rem 0.5rem 0 0;
-		padding: 0.5ex 1ch 0.5ex;
+		padding: 0;
+		border-radius: 0.5rem;
 		background-color: var(--path-bg-color);
-		border-color: var(--edge-color);
-	}
 
-	figure.file > pre,
-	figure.file > pre > code {
-		margin-top: 0;
-	}
+		> figcaption {
+			font-family: var(--mono-font);
+			padding: 0.5ex var(--gap);
+			border-bottom: solid thin;
+			border-bottom-color: var(--edge-color);
+		}
 
-	figure.file > pre > code {
-		width: auto;
-		border-top-style: none;
-		border-top-left-radius: 0;
-		border-top-right-radius: 0;
+		> pre,
+		> pre > code {
+			margin: 0;
+			border-style: none;
+		}
+
+		> pre > code {
+			width: auto;
+			border-top-style: none;
+			border-top-left-radius: 0;
+			border-top-right-radius: 0;
+		}
 	}
 }
 
