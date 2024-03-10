@@ -2,6 +2,8 @@
 
 @media (prefers-color-scheme: light) {
 	:root {
+		/* 枠外の色。*/
+		--ob-color: hsl(45, 5%, 85%);
 		/* アクセント色 (サイトイメージの強い彩色) */
 		--key0-color: hsl(45, 20%, 75%);
 		--key1-color: hsl(45, 20%, 50%);
@@ -9,10 +11,10 @@
 		--base0-color: hsl(45, 10%, 80%);
 		--base1-color: hsl(45, 10%, 75%);
 		--base2-color: hsl(45, 10%, 70%);
-		/* 枠外の色。*/
-		--ob-color: hsl(45, 5%, 85%);
-		/* 影 */
-		--shadow-color: hsla(0, 0%, 0%, 0.05);
+		/* マスク色 (基本諧調の反転)。*/
+		--mask-color: hsla(0, 0%, 0%, 0.05);
+		/* ライト色 (より明るくする)。*/
+		--light-color: hsla(0, 0%, 100%, 0.2);
 		/* 標準の前景色。*/
 		--fg-color: hsla(240, 50%, 10%, 0.8);
 		/* 標準の背景色。*/
@@ -32,6 +34,8 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
+		/* 枠外の色。*/
+		--ob-color: hsl(210, 10%, 10%);
 		/* アクセント色 (サイトイメージの強い彩色) */
 		--key0-color: hsl(210, 25%, 25%);
 		--key1-color: hsl(210, 25%, 35%);
@@ -39,10 +43,10 @@
 		--base0-color: hsl(210, 15%, 23%);
 		--base1-color: hsl(210, 15%, 28%);
 		--base2-color: hsl(210, 15%, 35%);
-		/* 枠外の色。*/
-		--ob-color: hsl(210, 10%, 10%);
-		/* 影 */
-		--shadow-color: hsla(0, 0%, 100%, 0.1);
+		/* マスク色 (基本諧調の反転)。*/
+		--mask-color: hsla(0, 0%, 100%, 0.1);
+		/* ライト色 (より明るくする)。*/
+		--light-color: hsla(0, 0%, 100%, 0.1);
 		/* 標準の前景色。*/
 		--fg-color: hsla(50, 10%, 75%, 0.8);
 		/* 標準の背景色。*/
@@ -71,7 +75,7 @@
 	/* リンク色。*/
 	--link-color: var(--fg-em-color);
 	/* 不活性色。*/
-	--disable-color: hsl(0, 0%, 50%);
+	--disable-color: hsla(0, 0%, 50%);
 	/* 要注意色。*/
 	--x-color: var(--fg-st-color);
 }

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: [dead_code] 使われていないコード</title>
+		<title>Rust メモ: [dead_code] 未使用の関数</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -14,7 +14,7 @@
 <mark class="title"><mark class="warn">warning</mark>: function `xxx` is never used</mark>
 </samp></pre>
 		<p>
-使われていないコードがあると警告が出る。
+未使用の関数があると警告が出る。
 		</p> <p>
 当然の機能なのだが、Rust 特有の落し穴がいくつかある。
 		</p>
@@ -22,13 +22,13 @@
 			<h1>パターン</h1>
 			<dl class="normal lowProfile">
 				<dt><a href="#ptnA">パターン A</a></dt>
-				<dd>基本形。</dd>
+				<dd>基本形</dd>
 				<dt><a href="#ptnB">パターン B</a></dt>
-				<dd>使用元が未使用。</dd>
+				<dd>使用元が未使用</dd>
 				<dt><a href="#ptnC">パターン C</a></dt>
-				<dd>単体テストが関係。</dd>
+				<dd>単体テストが関係</dd>
 				<dt><a href="#ptnD">パターン D</a></dt>
-				<dd>統合テストが関係。</dd>
+				<dd>統合テストが関係</dd>
 			</dl>
 			<section>
 				<hgroup>
@@ -36,8 +36,10 @@
 					<div class="subtitle">基本形</div>
 				</hgroup>
 				<p>
-コードが実際にどこからも使われていないパターン。
+関数が実際にどこからも呼ばれないパターン。
 				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
 <pre><code class="language-rust">
 pub fn main() {
 	// nop.
@@ -56,22 +58,25 @@ fn <mark class="warn">unused</mark>() {
 <mark class="info">  |</mark>
 <mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
 </samp></pre>
+				</div>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnB">パターン B.</h1>
 					<div class="subtitle">使用元が未使用</div>
 				</hgroup>
 				<p>
-そのコードを使っているコードが使われていないパターン。
+関数を呼んでいる関数がどこからも呼ばれていないパターン。
 				</p>
 				<aside class="normal">
 					<p>
 Rust の独特な仕様。
 					</p>
 					<p>
-Rust 以外の多くの言語では、こうした巻き添えのような警告は出力されない。Rust の方法は、網羅的だが本質的な警告が数に埋もれるため、筆者個人としては微妙な所である。
+Rust 以外の多くの言語では、こうした巻き添えのような警告はでない。Rust の方法は網羅的だが、本質的な警告が数に埋もれるため、筆者個人としては微妙な所である。
 					</p>
 				</aside>
+				<div class="sub">
+					<h2>サンプルコード</h2>
 <pre><code class="language-rust">
 pub fn main() {
     // nop.
@@ -100,16 +105,17 @@ fn <mark class="warn">unused_sub</mark>() {
 <mark class="info">9 |</mark> fn unused_sub() {
 <mark class="info">  |</mark>    <mark class="warn">^^^^^^^^^^</mark>
 </samp></pre>
+				</div>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnC">パターン C.</h1>
 					<div class="subtitle">単体テストが関係</div>
 				</hgroup>
 				<p>
-対象のコードが単体テストからのみ使用されている場合に発生する。
-				</p> <p>
-解決するには、対象に <code>#[cfg(test)]</code> を付加すれば良い。
+対象の関数が単体テストからのみ使用されている場合に発生する。
 				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
 <pre><code class="language-rust">
 #[test]
 fn test() {
@@ -129,11 +135,32 @@ fn <mark class="warn">test_helper</mark>() {
 <mark class="info">  |</mark>
 <mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
 </samp></pre>
+				</div>
+				<div class="sub">
+					<h2>解決策</h2>
+					<p>
+対象の関数に <code>#[cfg(test)]</code> 属性を付加すれば良い。
+					</p>
+<pre><code class="language-rust">
+#[test]
+fn test() {
+    test_helper();
+}
+
+#[cfg(test)]
+fn <mark class="warn">test_helper</mark>() {
+    // nop.
+}
+</code></pre>
+				</div>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnD">パターン D.</h1>
 					<div class="subtitle">統合テストが関係</div>
 				</hgroup>
+				<p>
+Rust の統合テストでは、<code>tests</code> ディレクトリ直下のファイルがそれぞれ独立したクレートとして認識される。そのため、テストヘルパ関数について、それが一部のファイルからは使われていても、他のファイルからは使われていない場合、クレート内に使われていない関数があると認識されてしまう。
+				</p>
 				<aside class="normal">
 					<p>
 バグの可能性。
@@ -141,20 +168,17 @@ fn <mark class="warn">test_helper</mark>() {
 2023 年現在、この現象はバグとして<a href="https://github.com/rust-lang/rust/issues/46379">報告</a>されているため、将来的には解決されるかも…。
 					</p>
 				</aside>
-				<p>
-Rust の統合テストでは、<code>tests</code> ディレクトリ直下のファイルがそれぞれ独立したクレートとして認識される。そのため、テストヘルパ部品について、それが一部のファイルからは使われていても、他のファイルからは使われていない場合、クレート内に使われていない部品があると認識されてしまう。
-				</p> <p>
-解決するには、面倒だが新しくテストヘルパ用のクレートを作るか、トリッキーだが部品を <code>pub use</code> でダミーとして公開するか (テストコードなので公開しても外部からは使えない)、くらいしか方法がない。
-				</p>
-				<figure class="file">
-					<figcaption>my_lib/tests/common/mod.rs</figcaption>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<figure class="file">
+						<figcaption>my_lib/tests/common.rs</figcaption>
 <pre><code class="language-rust">
 pub fn test_helper1() {}
 pub fn <mark class="warn">test_helper2</mark>() {}
 </code></pre>
-				</figure>
-				<figure class="file">
-					<figcaption>my_lib/tests/a.rs</figcaption>
+					</figure>
+					<figure class="file">
+						<figcaption>my_lib/tests/a.rs</figcaption>
 <pre><code class="language-rust">
 mod common;
 use common::*;
@@ -164,9 +188,9 @@ fn test() {
     test_helper1();
 }
 </code></pre>
-				</figure>
-				<figure class="file">
-					<figcaption>my_lib/tests/b.rs</figcaption>
+					</figure>
+					<figure class="file">
+						<figcaption>my_lib/tests/b.rs</figcaption>
 <pre><code class="language-rust">
 mod common;
 use common::*;
@@ -177,7 +201,7 @@ fn test() {
     test_helper2();
 }
 </code></pre>
-				</figure>
+					</figure>
 <pre><samp class="console-rustc">
 <mark class="title"><mark class="warn">warning</mark>: function `test_helper2` is never used</mark>
 <mark class="info"> --&gt;</mark> tests\common\mod.rs:2:8
@@ -187,6 +211,112 @@ fn test() {
 <mark class="info">  |</mark>
 <mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dead_code)]` on by default
 </samp></pre>
+				</div>
+				<div class="sub">
+					<h2>解決策</h2>
+					<p>
+お勧めは解決策 3 の方法。
+					</p>
+					<dl class="normal lowProfile">
+						<dt><a href="#sol1">解決策 1</a></dt> <dd>テストヘルパのクレート化</dd>
+						<dt><a href="#sol2">解決策 2</a></dt> <dd>テストヘルパのダミー公開</dd>
+						<dt><a href="#sol3">解決策 3</a></dt> <dd>ディレクトリ構成の変更</dd>
+					</dl>
+					<div class="sub">
+						<h3 id="sol1">テストヘルパのクレート化</h3>
+						<p>
+テストヘルパの関数を全て独立したクレートに移動する。
+						</p> <p>
+この方法は大げさでやや手間がかかるのが問題点。
+						</p>
+					</div>
+					<div class="sub">
+						<h3 id="sol2">テストヘルパのダミー公開</h3>
+						<p>
+使用していないテストヘルパを <code>pub use</code> で公開する。
+						</p> <p>
+テストコードは外部から使えないため、この公開は問題にならない。
+						</p> <p>
+この方法はその場しのぎだが手間はかからない。
+						</p>
+					</div>
+					<div class="sub">
+						<h3 id="sol3">ディレクトリ構成の変更</h3>
+						<p>
+ディレクトリ構成を変更してテストを一つのクレートにまとめる。
+						</p> <p>
+これには <code>tests</code> の中で <code>main.rs</code> を使えばよい (参考: パッケージ構成の<a href="https://doc.rust-lang.org/cargo/guide/project-layout.html">公式資料</a>)。
+						</p> <p>
+例えば、前述の例の場合、以下のようなディレクトリ構成に変更すればよい。
+						</p>
+<pre class="directory">my_lib
+├─ src
+│  └─ ...
+└─ tests
+   └─ it
+      ├─ main.rs
+      ├─ a.rs
+      ├─ b.rs
+      └─ common.rs</pre>
+					</div>
+				</div>
+			</section>
+		</section> <section>
+			<h1>警告の抑制</h1>
+			<p>
+本質的な方法ではないが、強制的に警告を抑制する方法がいくつかある。
+			</p>
+			<section>
+				<h1>アンダースコアの使用</h1>
+				<p>
+関数名をアンダースコア '<code>_</code>'で始めると警告がでなくなる。
+				</p>
+<pre><code class="language-rust">
+pub fn main() {
+    // nop.
+}
+
+#[allow(dead_code)]
+fn _unused() {
+    // nop.
+}
+</code></pre>
+			</section> <section>
+				<h1><code>#[allow(dead_code)]</code></h1>
+				<p>
+警告を抑制したい箇所に <code>#[allow(dead_code)]</code> を付加する。
+				</p>
+				<div class="sub">
+					<h2>個別指定</h2>
+					<p>
+関数ごとに個別指定する方法。
+					</p>
+<pre><code class="language-rust">
+pub fn main() {
+    // nop.
+}
+
+#[allow(dead_code)]
+fn unused() {
+    // nop.
+}
+</code></pre>
+				</div>
+				<div class="sub">
+					<h2>一括指定</h2>
+					<p>
+ファイルやモジュールに指定して所属する関数を一括指定する方法。
+					</p>
+<pre><code class="language-rust">
+fn main() {}
+
+#[allow(dead_code)]
+mod my_mod {
+    fn unused1() {}
+    fn unused2() {}
+}
+</code></pre>
+				</div>
 			</section>
 		</section>
 	</body>

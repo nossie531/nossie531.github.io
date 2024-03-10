@@ -40,6 +40,7 @@ blockquote {
 	margin: 0 calc(var(--gap) * -1);
 	padding: 0 1em;
 	border: thin dashed;
+	background: var(--light-color);
 
 	&::before, &::after {
 		content: "";
@@ -51,7 +52,7 @@ blockquote {
 		font-family: var(--mono-font);
 		margin: 0 -0.25ch;
 		padding: 0 0.25ch;
-		background-color: var(--shadow-color);
+		background-color: var(--mask-color);
 	}
 
 	& a:link, & a:visited {
@@ -64,14 +65,3 @@ blockquote {
 	margin: 0;
 }
 
-@media screen and (prefers-color-scheme: light) {
-	blockquote {
-		background: hsla(0, 0%, 100%, 0.2);
-	}
-}
-
-@media screen and (prefers-color-scheme: dark) {
-	blockquote {
-		background: hsla(0, 0%, 100%, 0.1);
-	}
-}
