@@ -51,7 +51,7 @@
 				</p>
 <pre><code class="language-rust">
 fn f(arg: &amp;i32) {
-	<mark class="error">use_static(arg)</mark>;
+    <mark class="error">use_static(arg)</mark>;
 }
 
 fn use_static(_: &amp;'static i32) {
@@ -115,7 +115,7 @@ fn use_static(_: &amp;'static i32) {
 use std::any::Any;
 
 fn f(arg: &amp;i32) {
-	<mark class="error">use_any(arg)</mark>;
+    <mark class="error">use_any(arg)</mark>;
 }
 
 fn use_any&lt;T: Any&gt;(_: T) {
@@ -151,7 +151,7 @@ fn use_any&lt;T: Any&gt;(_: T) {
 fn main() {
     let mut vec = Vec::&lt;&amp;i32&gt;::new();
     let _closure = |item: &amp;i32| {
-		<mark class="error">vec.push(item)</mark>;
+        <mark class="error">vec.push(item)</mark>;
     };
 }
 </code></pre>
