@@ -21,41 +21,41 @@ class Quote {
 
 	/* 引用情報を表示します。 */
 	#addCiteInfos() {
-		for (const target of document.getElementsByTagName("blockquote")) {
-			addCiteInfo(target);
+		for (const quote of document.getElementsByTagName("blockquote")) {
+			addCiteInfo(quote);
 		}
 
-		function addCiteInfo(blockquote) {
-			if(!blockquote.cite) {
+		function addCiteInfo(quote) {
+			if(!quote.cite) {
 				return;
 			}
 
 			const cite = document.createElement("cite");
 			cite.className = "info";
 			const a = document.createElement("a");
-			a.href = blockquote.cite;
+			a.href = quote.cite;
 			a.target = "_parent";
 			a.append(Quote.#CITE_TEXT);
 			const span = document.createElement("span");
 			span.className = "url";
-			span.append(` : ${blockquote.cite}`);
+			span.append(` : ${quote.cite}`);
 
 			cite.appendChild(a);
 			cite.appendChild(span);
-			blockquote.parentNode.insertBefore(cite, blockquote);
+			quote.parentNode.insertBefore(cite, quote);
 		}
 	}
 
 	// a 要素の href 属性を調整。
 	#adjustAnchors() {
-		for (const target of document.getElementsByTagName("blockquote")) {
-			for (const anchor of document.getElementsByTagName("a")) {
-				adjustAnchor(anchor, target);
+		for (const quote of document.getElementsByTagName("blockquote")) {
+			for (const anchor of quote.getElementsByTagName("a")) {
+				adjustAnchor(anchor, quote);
 			}
 		}
 
-		function adjustAnchor(anchor, blockquote) {
-			const cite = blockquote.getAttribute("cite");
+		function adjustAnchor(anchor, quote) {
+			const cite = quote.getAttribute("cite");
 			const href = anchor.getAttribute("href");
 
 			if (!cite && !href) {
