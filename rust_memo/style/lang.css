@@ -30,10 +30,6 @@
 	line-height: 1.7;
 }
 
-p:lang(ja) {
-	text-align: justify;
-}
-
 blockquote:lang(ja) {
 	text-align: justify;
 }
