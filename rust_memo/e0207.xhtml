@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0207 - 実装を構成しないジェネリクスパラメタ</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0207]</mark>: the type parameter `T` is not constrained by the impl trait, self type, or predicates
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0207]</mark>: the const parameter `N` is not constrained by the impl trait, self type, or predicates
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0207]</mark>: the lifetime parameter `'a` is not constrained by the impl trait, self type, or predicates
+</samp></pre>
+		<p>
+メッセージには型パラメタ版、定数パラメタ版、そしてライフタイムパラメタ版がある。
+		</p> <p>
+どれも似た内容のため、ここでは主に型パラメタ版について説明する。
+		</p>
+		<section>
+			<h1>概要</h1>
+			<p>
+<code>impl</code> ブロックの各ジェネリクスパラメタは、<code>impl</code> の対象となる型から、それぞれの具体的な内容が決まるよう、それぞれが適切に制約されていなければならない。
+			</p>
+			<div class="sub">
+				<h2>具体例</h2>
+				<p>
+以下はエラーになる (後述の<a href="#ptnC">パターン C</a>)。
+				</p>
+<pre><code class="language-rust">
+impl&lt;T, U&gt; MyType&lt;T&gt; where T: MyTrait&lt;U&gt;
+</code></pre>
+				<p>
+これが許されると、型がこの実装に適合しても、型パラメタ <code>U</code> の具体的な内容が決まらないパターンがでてきてしまう。例えば、この実装に適合する型 <code>MyType<wbr/>&lt;SomeType&gt;</code> において、<code>SomeType</code> は <code>MyTrait<wbr/>&lt;U&gt;</code> に適合する。しかしここで、<code>SomeType</code> は <code>MyTrait<wbr/>&lt;i32&gt;</code> と <code>MyTrait<wbr/>&lt;u32&gt;</code> に同時に適合するかもしれない。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>解決策</h2>
+				<p>
+殆どの場合、型やトレイトにダミーのジェネリクスパラメタを追加して、それらに問題のジェネリクスパラメタを指定するとよい。これはつまり、問題のジェネリクスパラメタの内容を明示的に指定できるようにしている。詳細は各パターンの解決策を参照。
+				</p>
+			</div>
+		</section> <section>
+			<h1>仕様</h1>
+			<p>
+以下は E0207 についての公式からの引用。
+			</p>
+			<blockquote cite="https://doc.rust-lang.org/error_codes/E0207.html">
+				<p>
+<code class="hljs">impl</code> の任意の型や定数パラメタは以下の基準の少なくともどれか一つを満たさなければならない:
+				</p>
+				<ul>
+					<li>
+impl が<em>実装する型</em>&#x2009;の中に表れる。<br/>
+例. <code class="hljs">impl&lt;T&gt; Foo&lt;T&gt;</code>
+					</li> <li>
+トレイト実装において、<em>実装されるトレイト</em>&#x2009;の中に表れる。<br/>
+例. <code class="hljs">impl&lt;T&gt; SomeTrait&lt;T&gt; for Foo</code>
+					</li> <li>
+関連型としてバインドされている。<br/>
+例. <code class="hljs">impl&lt;T, U&gt; SomeTrait for T where T: AnotherTrait&lt;AssocType=U&gt;</code>
+					</li>
+				</ul>
+				<p>
+ライフタイムパラメタが関連型として使われている場合、<code class="hljs">impl</code> での制限なしのライフタイムパラメタはサポートされない。
+				</p>
+			</blockquote>
+		</section> <section>
+			<h1>パターン</h1>
+			<dl class="normal lowProfile">
+				<dt><a href="#ptnA">パターン A</a></dt> <dd>基本形</dd>
+				<dt><a href="#ptnB">パターン B</a></dt> <dd>関連関数でのみ型パラメタを使用</dd>
+				<dt><a href="#ptnC">パターン C</a></dt> <dd><code>where</code> でのみ型パラメタを使用</dd>
+			</dl>
+			<section>
+				<hgroup>
+					<h1 id="ptnA">パターン A</h1>
+					<div class="subtitle">基本形</div>
+				</hgroup>
+				<p>
+以下では、型パラメタ <code>T</code> がどこにも使われていない。
+				</p>
+<pre><code class="language-rust">
+pub struct MyType();
+impl&lt;<mark class="error">T</mark>&gt; MyType {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0207]</mark><mark class="title">: the type parameter `T` is not constrained by the impl trait, self type, or predicates</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:6
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark> impl&lt;T&gt; MyType {}
+<mark class="info">  |</mark>      <mark class="error">^ unconstrained type parameter</mark>
+</samp></pre>
+				<div class="sub">
+					<h2>解決策</h2>
+					<p>
+ダミーの型パラメタを持たせるとよい。
+					</p>
+<pre><code class="language-rust">
+use std::marker::PhantomData;
+pub struct MyType&lt;T&gt;(PhantomData&lt;T&gt;);
+impl&lt;T&gt; MyType&lt;T&gt; {}
+</code></pre>
+				</div>
+			</section> <section>
+				<hgroup>
+					<h1 id="ptnB">パターン B</h1>
+					<div class="subtitle">関連関数でのみ型パラメタを使用</div>
+				</hgroup>
+				<p>
+以下では、関連関数で型パラメタを使っているが、やはりエラーになる。
+				</p>
+<pre><code class="language-rust">
+pub struct MyType();
+impl&lt;<mark class="error">T</mark>&gt; MyType {
+    pub fn f(_: T) {}
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0207]</mark><mark class="title">: the type parameter `T` is not constrained by the impl trait, self type, or predicates</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:6
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark> impl&lt;T&gt; MyType {
+<mark class="info">  |</mark>      <mark class="error">^ unconstrained type parameter</mark>
+</samp></pre>
+				<div class="sub">
+					<h2>解決策</h2>
+					<p>
+型パラメタの宣言を関連関数の側で行えばよい。
+					</p>
+<pre><code class="language-rust">
+pub struct MyType();
+impl MyType {
+    pub fn f&lt;T&gt;(_: T) {}
+}
+</code></pre>
+				</div>
+			</section> <section>
+				<hgroup>
+					<h1 id="ptnC">パターン C</h1>
+					<div class="subtitle"><code>where</code> でのみ型パラメタを使用</div>
+				</hgroup>
+				<p>
+以下では、<code>where</code> で型パラメタを使っているが、やはりエラーになる。
+				</p>
+<pre><code class="language-rust">
+pub struct MyType&lt;T&gt;(T);
+pub trait MyTrait&lt;T&gt; {}
+impl&lt;T, <mark class="error">U</mark>&gt; MyType&lt;T&gt; where T: MyTrait&lt;U&gt; {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0207]</mark><mark class="title">: the type parameter `U` is not constrained by the impl trait, self type, or predicates</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:10
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark> impl&lt;T, U&gt; MyType&lt;T&gt; where T: MyTrait&lt;U&gt; {}
+<mark class="info">  |</mark>         <mark class="error">^ unconstrained type parameter</mark>
+</samp></pre>
+				<div class="sub">
+					<h2>解決策</h2>
+					<p>
+ダミーの型パラメタを持たせるとよい。
+					</p>
+<pre><code class="language-rust">
+use std::marker::PhantomData;
+pub struct MyType&lt;T, U&gt;(T, PhantomData&lt;U&gt;);
+pub trait MyTrait&lt;T&gt; {}
+impl&lt;T, U&gt; MyType&lt;T, U&gt; where T: MyTrait&lt;U&gt; {}
+</code></pre>
+				</div>
+			</section>
+		</section>
+	</body>
+</html>
