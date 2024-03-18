@@ -1,9 +1,10 @@
 @import url("color.css");
+@import url("size.css");
 @import url("lang.css");
 
 :root > body.forQuote {
 	color: var(--fg-color);
-	font-size: 93%;
+	font-size: var(--root-font-size);
 	margin: 0;
 	padding: 0;
 }
@@ -22,11 +23,17 @@ cite.info {
 @media screen {
 	cite.info {
 		float: right;
-		margin: 0.5ex 0 0.5ex 1em;
+		margin-top: 0.5ex;
+		margin-bottom: 0.5ex;
+		margin-left: 1em;
 
 		& > span.url {
 			display: none;
 		}
+	}
+
+	body.forQuote > cite.info {
+		margin-right: var(--gap);
 	}
 }
 
@@ -38,13 +45,13 @@ cite.info {
 
 blockquote {
 	margin: 0 calc(var(--gap) * -1);
-	padding: 0 1em;
+	padding: 0 calc(var(--gap) * 2);
 	border: thin dashed;
 	background: var(--light-color);
 
 	&::before, &::after {
 		content: "";
-		margin-top: 2ex;
+		margin-top: calc(var(--gap) * 2);
 		display: block;
 	}
 

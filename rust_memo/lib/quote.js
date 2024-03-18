@@ -18,7 +18,6 @@ class Quote {
 		}
 	}
 
-
 	/* 引用情報を表示します。 */
 	#addCiteInfos() {
 		for (const quote of document.getElementsByTagName("blockquote")) {
