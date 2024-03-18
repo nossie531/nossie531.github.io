@@ -28,9 +28,11 @@
 	text-justify: inter-character;
 	/* 日本語は欧文より縦方向に密なため行間を空ける。*/
 	line-height: 1.7;
+
+	p {
+		text-align: justify;
+	}
 }
 
-blockquote:lang(ja) {
-	text-align: justify;
-}
+
 
