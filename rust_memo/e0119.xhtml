@@ -113,8 +113,8 @@ impl MyTrait for MyType {}
 					<div class="subtitle">ブランケット実装との衝突</div>
 				</hgroup>
 				<p>
-ある型がブランケット実装と同じトレイトを実装している。<br/>
-そして、その型はそのブランケット実装にも適合している。
+ある型とブランケット実装が同じトレイトを実装している。<br/>
+しかし、その型はそのブランケット実装にも適合している。
 				</p>
 <pre><code class="language-rust">
 struct MyType {}
@@ -139,9 +139,9 @@ impl MyTrait for MyType {}
 				</hgroup>
 				<p>
 あるトレイトについてのブランケット実装が複数ある。<br/>
-そして、それら複数に適合する型が作成可能になっている。
+しかし、それらの条件に重複して適合する型がありえる。
 				</p> <p>
-以下では、二つのブランケット実装指定があり、トレイトはどちらも <code>MyTrait</code> を、条件はそれぞれ <code>TraitX</code> と <code>TraitY</code> の実装型を指定している。そして、これら二つの実装を両方持つ型が作成可能になっている。
+以下では、トレイト <code>MyTrait</code> についてのブランケット実装が二つある。そして、条件としてそれぞれ <code>TraitX</code> と <code>TraitY</code> を実装する型を指定している。しかし、<code>TraitX</code> と <code>TraitY</code> の両方を実装する型もありえる。
 				</p>
 <pre><code class="language-rust">
 trait MyTrait {}
@@ -168,7 +168,7 @@ impl&lt;T&gt; MyTrait for T where T: TraitX {}
 				<p>
 型パラメタがあるため、条件の重複に気付きにくいパターン。
 				</p> <p>
-以下では、条件 <code>X</code> と <code>i32</code> は重複している。なぜなら、<code>X</code> は <code>TraitX</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>TraitX</code> が実装されている。
+以下では、条件 <code>X</code> と <code>i32</code> が重複している。なぜなら、<code>X</code> は <code>TraitX</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>TraitX</code> が実装されている。
 				</p>
 <pre><code class="language-rust">
 trait MyTrait {}
@@ -195,7 +195,7 @@ impl&lt;X: TraitX&gt; MyTrait for X {}
 				<p>
 型パラメタがあるため、トレイトの重複に気付きにくいパターン。
 				</p> <p>
-以下では、トレイト <code>MyTrait&lt;X&gt;</code> と <code>MyTrait&lt;i32&gt;</code> は重複している。なぜなら、<code>X</code> には <code>TraitX</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>TraitX</code> が実装されている。
+以下では、トレイト <code>MyTrait&lt;X&gt;</code> と <code>MyTrait&lt;i32&gt;</code> が重複している。なぜなら、<code>X</code> には <code>TraitX</code> の実装が求められるが、<code>i32</code> を含めた全ての型には <code>TraitX</code> が実装されている。
 				</p>
 <pre><code class="language-rust">
 trait MyTrait&lt;T&gt; {}
