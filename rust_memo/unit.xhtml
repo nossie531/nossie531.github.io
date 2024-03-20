@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 空のタプル (ユニット)</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+空のタプルは別名ユニット型 (<a href="https://doc.rust-lang.org/std/primitive.unit.html">unit</a> type) と呼ばれる。
+		</p> <p>
+これは一見すると使いようがないが、実は各所で利用されている。
+		</p>
+		<aside class="normal">
+			<p>
+<abbr>ZST</abbr> (Zero Sized Type) について。
+			</p>
+			<p>
+空のタプルは ZST、つまりサイズがゼロの型である。ZST にはその他にも空の構造体などがある。詳しくは『<a href="zst.xhtml">ZST (Zero Sized Type)</a>』を参照。
+			</p>
+		</aside>
+		<section>
+			<h1>暗黙的な利用</h1>
+			<p>
+空のタプル <code>()</code> がコード中に明示的に登場しないケースについて。
+			</p>
+			<section>
+				<h1>文 (セミコロンで終る式)</h1>
+				<p>
+文 (セミコロン &#x2018;<code>;</code>&#x2019; で終る式) は、ユニット型を生成する。
+				</p> <p>
+以下では、<code>f1</code> の呼出結果は数値になるが、<code>f2</code> の呼出結果はユニットになる。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let f1 = || { add_and_print(1, 1) };
+    let f2 = || { add_and_print(1, 1); };
+    assert_eq!(f1(), 2);
+    assert_eq!(f2(), ());
+}
+
+fn add_and_print(x: i32, y: i32) -&gt; i32 {
+    let result = x + y;
+    println!("{result}");
+    result
+}
+</code></pre>
+			</section> <section>
+				<h1>戻り値のない関数</h1>
+				<p>
+戻り値のない関数は、空のタプルを戻り値とする関数の糖衣構文である。
+				</p> <p>
+以下では、<code>do_something1</code> と <code>do_something2</code> は同じ意味になる。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    do_something1();
+    do_something2();
+}
+
+fn do_something1() {
+    println!("...");
+}
+
+fn do_something2() -&gt; () {
+    println!("...");
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>明示的な利用</h1>
+			<p>
+空のタプル <code>()</code> がコード中に明示的に登場するケースについて。
+			</p>
+			<section>
+				<h1>空の補足情報</h1>
+				<p>
+ユニット型により補足情報がない事を示す。
+				</p> <p>
+以下では、関数 <code>div</code> の成功時には計算結果を伴うものの、失敗時には補足情報がない。そのため、<a href="https://doc.rust-lang.org/std/result/enum.Result.html"><code>Result&lt;T, E&gt;</code></a> の型パラメタ <code>E</code> にユニット型を指定している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(div(7, 3), Ok(2));
+    assert_eq!(div(7, 0), Err(()));
+}
+
+fn div(x: i32, y: i32) -&gt; Result&lt;i32, ()&gt; {
+    if y != 0 {
+        Ok(x / y)
+    } else {
+        Err(())
+    }
+}
+</code></pre>
+			</section> <section>
+				<h1>型パラメタの無視</h1>
+				<p>
+ユニット型により不要な型パラメタを無視できる。
+				</p> <p>
+以下では、キーバリューマップである <a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html"><code>HashMap&lt;K, V&gt;</code></a> 型から、キーのみを管理するセット型 <code>KeySet</code> を実装している (つまり、<a href="https://doc.rust-lang.org/std/collections/struct.HashSet.html"><code>HashSet&lt;T&gt;</code></a> 風の機能を自前で実装している)。
+				</p>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+type KeySet&lt;K&gt; = HashMap&lt;K, ()&gt;;
+
+fn main() {
+    let mut set = KeySet::new();
+    set.insert(2, ());
+    set.insert(3, ());
+    set.insert(5, ());
+    assert!(set.contains_key(&amp;3));
+}
+</code></pre>
+			</section> <section>
+				<h1>コンストラクタの強制</h1>
+				<p>
+ユニット型によりフィールドのない型についても、コンストラクタの使用を強制できる。
+				</p> <p>
+以下では、<code>MyType</code> にユニット型のダミーフィールド <code>_private</code> を追加し、<code>new</code> 関数なしでその値を作成できないようにしている。これにより、<code>MyType {}</code> のようなコードが禁止され、将来的に <code>MyType</code> にフィールドが追加された時のエラーを予防できる。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let my_type = my::MyType::new();
+    my_type.do_something();
+}
+
+mod my {
+    pub struct MyType {
+        _private: ()
+    }
+
+    impl MyType {
+        pub fn new() -&gt; Self {
+            Self { _private: () }
+        }
+
+        pub fn do_something(&amp;self) {
+            println!("...");
+        }
+    }
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>

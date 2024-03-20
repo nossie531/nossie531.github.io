@@ -14,7 +14,7 @@
 サイズがゼロの型は ZST (Zero Sized Types) と呼ばれる。
 		</p>
 		<section>
-			<h1>ZST になる型</h1>
+			<h1>対象の型</h1>
 			<p>
 以下の型は ZST として扱われる。
 			</p>
@@ -29,30 +29,30 @@
 その他: フィールド全てが ZST の構造体など
 				</li>
 			</ul>
-なお、とりあえず ZST を利用したい場合、空のタプル <code>()</code> が使われる事が多い。
 		</section> <section>
 			<h1>利用方法</h1>
 			<p>
-ZST では何も記憶できないが、状況によっては役に立つ場合もある。
+とりあえず ZST を利用したい場合、空のタプル <code>()</code> が使われる事が多い。
+			</p> <p>
+より具体的な方法については『<a href="unit.xhtml">空のタプル (ユニット)</a>』を参照。
+			</p>
+		</section> <section>
+			<h1>補足: アドレスの確保</h1>
+			<p>
+おそらく滅多に使われない機能だと思われるが、気付いたので一応メモしておく。
+			</p> <p>
+ZST の読書時のサイズはゼロだが、アドレスは用意される場合がある。
 			</p>
 			<section>
-				<h1>型パラメタへの指定</h1>
+				<h1>変数の場合</h1>
 				<p>
-これが ZST の主な利用方法となる。
 				</p> <p>
-型パラメタに ZST を指定する事で、その型パラメタに関する全ての読書操作をスキップできる。これにより例えば、キーバリューマップを管理する <code>Dict&lt;K, V&gt;</code> 型から、キーのみを管理するキーセット型を <code>type KeySet&lt;K&gt; = Dict&lt;K, ()&gt;</code> のように実装できる。
-				</p>
-			</section> <section>
-				<h1>アドレスの確保 (通常編)</h1>
-				<p>
-おそらくこれは滅多に使われない機能だと思われる。
-				</p> <p>
-ZST の読書時のサイズはゼロだが、通常の変数として用意した場合、アドレスを識別するための最低限度のメモリ領域は確保される。
+ZST を通常の変数として用意した場合、アドレスを識別するための最低限度のメモリ領域が確保される。
 				</p>
 <pre><code class="language-rust">
 fn main() {
-    let zst1 = Zst {};
-    let zst2 = Zst {};
+    let zst1 = Zst;
+    let zst2 = Zst;
     dbg!(&amp;zst1 as *const _);
     dbg!(&amp;zst2 as *const _);
 }
@@ -81,7 +81,7 @@ pub struct Zst;
 </samp></pre>
 			</section> <section>
 				<h1>
-アドレスの確保 (<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> 編)
+<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> の場合
 				</h1>
 				<p>
 <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> と ZST の組合せは何の役にも立たない。
@@ -90,8 +90,8 @@ pub struct Zst;
 				</p>
 <pre><code class="language-rust">
 fn main() {
-    let zst1 = Box::new(Zst {});
-    let zst2 = Box::new(Zst {});
+    let zst1 = Box::new(Zst);
+    let zst2 = Box::new(Zst);
     dbg!(Box::into_raw(zst1));
     dbg!(Box::into_raw(zst2));
 }
@@ -104,7 +104,7 @@ pub struct Zst;
 </samp></pre>
 			</section> <section>
 				<h1>
-アドレスの確保 (<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> 編)
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> の場合
 				</h1>
 				<p>
 <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> と ZST の組合せも何の役にも立たない。
@@ -113,8 +113,8 @@ pub struct Zst;
 				</p>
 <pre><code class="language-rust">
 fn main() {
-    let vec1 = vec![Zst {}];
-    let vec2 = vec![Zst {}];
+    let vec1 = vec![Zst];
+    let vec2 = vec![Zst];
     dbg!(&amp;vec1.as_slice()[0] as *const _);
     dbg!(&amp;vec2.as_slice()[0] as *const _);
 }
