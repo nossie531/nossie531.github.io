@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: rustdoc でのフィーチャーの表示</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+rustdoc で各アイテムに必要なフィーチャーを表示する方法について。
+		</p>
+		<aside class="normal">
+			<p>
+この方法を推奨できる理由。
+			</p> <p>
+2024 年現在、この方法にはナイトリー版のツールチェーンが必須だが、すでに積極的に利用してもよい状態にある。なぜなら、この方法はオプトインでの利用ができる。また、<a href="https://docs.rs/">Docs.rs</a> (<a href="https://crates.io/">crates.io</a> へのクレート公開時にドキュメントをホストするサイト) への対応も僅かなコードで可能になっている。
+			</p>
+		</aside>
+		<section>
+			<h1>サンプルコード</h1>
+			<p>
+フィーチャ <code>my_feature</code> でのみ関数 <code>for_my_feature_only</code> を有効にする。
+			</p>
+			<div class="sub">
+				<h2>補足: ナイトリー機能のオプトイン</h2>
+				<p>
+以降のコードでは、ユーザ定義の属性名 <code>doc_feature</code> が何度か登場する。これはナイトリー版でのみ可能な <code>doc_cfg</code> の導入とそれによるフィーチャーの表示について、オプトインするためのフラグになっている。そして、このオプトインが必要な場合にのみ、rustdoc へ引数を追加する仕組となっている。
+				</p>
+			</div>
+			<div class="sub">
+				<h2>タスク 1</h2>
+				<ul>
+					<li>
+ローカルの <code>cargo doc</code> から起動する  <code>rustdoc</code> の引数を指定。
+					</li>
+				</ul>
+				<p>
+<code>doc_feature</code> はユーザ定義の属性名 (後述のオプトインの切替に使用)。
+				</p>
+				<figure class="file">
+					<figcaption>.cargo/config.toml</figcaption>
+<pre><code class="language-toml">
+[build]
+rustdocflags = ["--cfg", "doc_feature"]
+</code></pre>
+				</figure>
+			</div>
+			<div class="sub">
+				<h2>タスク 2</h2>
+				<ul>
+					<li>
+Docs.rs でのドキュメント公開時に起動する <code>rustdoc</code> の引数を指定。
+					</li> <li>
+フィーチャ <code>my_feature</code> を導入 (デフォルトでの使用有無も指定)。
+					</li>
+				</ul>
+				<figure class="file">
+					<figcaption>Cargo.toml</figcaption>
+<pre><code class="language-toml">
+# ...
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "doc_feature"]
+
+[features]
+default = [my_feature]
+my_feature = []
+
+# ...
+</code></pre>
+				</figure>
+			</div>
+			<div class="sub">
+				<h2>タスク 3</h2>
+				<ul>
+					<li>
+<code>main.rs</code> や <code>lib.rs</code> にて <code>doc_cfg</code> を有効化。
+					</li> <li>
+関数 <code>for_my_feature_only</code> とフィーチャー <code>my_feature</code> の関係を設定。
+					</li> <li>
+関数 <code>for_my_feature_only</code> とフィーチャー <code>my_feature</code> の関係を文書化。
+					</li>
+				</ul>
+				<figure class="file">
+					<figcaption>lib.rs</figcaption>
+<pre><code class="language-rust">
+#![cfg_attr(doc_feature, feature(doc_cfg))]
+
+#[cfg(feature = "my_feature")]
+#[cfg_attr(doc_feature, doc(cfg(feature = "my_feature")))]
+pub fn for_my_feature_only() {}
+</code></pre>
+				</figure>
+			</div>
+			<div class="sub">
+				<h2>タスク 4</h2>
+				<ul>
+					<li>
+ローカルでのドキュメント生成 (任意)。
+					</li>
+				</ul>
+<pre><code>
+cargo +nightly doc --open
+</code></pre>
+			</div>
+		</section>
+	</body>
+</html>
