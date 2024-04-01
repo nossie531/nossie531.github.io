@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: 拡張トレイトパターン</title>
+		<title>Rust メモ: Extension トレイトパターン</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,7 +11,7 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-拡張トレイトパターンは Rust でよく使われるデザインパターンである。
+Extension トレイトパターンは Rust でよく使われるデザインパターンである。
 		</p> <p>
 既存の型やトレイトに後付けでのメソッドの追加を可能にする。外部クレートが提供する型やトレイトに対し、その利用者が「こんなメソッドもあれば良かったのに…」と思うような補助目的のメソッドを追加するのによく使われる。
 		</p>
@@ -19,7 +19,7 @@
 			<p>
 名前の慣習について。
 			</p> <p>
-拡張トレイトの名前には、元の型やトレイトの名前に <code>Ext</code> の接尾辞をつける事が多い。
+拡張を行うトレイトの名前には、拡張される対象の名前に接尾辞 <code>Ext</code> をつける事が多い。
 			</p>
 		</aside>
 		<section>
