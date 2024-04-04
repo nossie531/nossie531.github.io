@@ -1,14 +1,3 @@
-@import url("color.css");
-@import url("size.css");
-@import url("lang.css");
-
-:root > body.forQuote {
-	color: var(--fg-color);
-	font-size: var(--root-font-size);
-	margin: 0;
-	padding: 0;
-}
-
 cite.info {
 	font-size: smaller;
 	font-style: normal;
@@ -17,29 +6,6 @@ cite.info {
 	* {
 		text-decoration: none;
 		color: inherit;
-	}
-}
-
-@media screen {
-	cite.info {
-		float: right;
-		margin-top: 0.5ex;
-		margin-bottom: 0.5ex;
-		margin-left: 1em;
-
-		& > span.url {
-			display: none;
-		}
-	}
-
-	body.forQuote > cite.info {
-		margin-right: var(--gap);
-	}
-}
-
-@media print {
-	cite.info {
-		display: flex;
 	}
 }
 
@@ -68,7 +34,22 @@ blockquote {
 	}
 }
 
-:root > body.forQuote blockquote {
-	margin: 0;
+@media print {
+	cite.info {
+		display: flex;
+	}
+}
+
+@media screen {
+	cite.info {
+		float: right;
+		margin-top: 0.5ex;
+		margin-bottom: 0.5ex;
+		margin-left: 1em;
+
+		& > span.url {
+			display: none;
+		}
+	}
 }
 

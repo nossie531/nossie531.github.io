@@ -1,0 +1,21 @@
+@import url("import/color.css");
+@import url("import/size.css");
+@import url("import/lang.css");
+@import url("import/quote.css");
+
+:root > body.forQuote {
+	color: var(--fg-color);
+	font-size: var(--root-font-size);
+	margin: 0;
+	padding: 0;
+
+	& blockquote {
+		margin: 0;
+	}
+}
+
+@media screen {
+	body.forQuote > cite.info {
+		margin-right: var(--gap);
+	}
+}

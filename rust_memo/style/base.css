@@ -3,7 +3,7 @@
 @layer
 	import_color,
 	import_size,
-	lang,
+	import_lang,
 	root,
 	default,
 	normal,
@@ -18,12 +18,12 @@
 	custom_nav,
 	custom_prism;
 
-@import url("color.css") layer(import_color);
-@import url("color.css") layer(import_size);
-@import url("lang.css") layer(import_lang);
-@import url("quote.css") layer(import_quort);
-@import url("prism.css") layer(import_prism);
-@import url("console_rustc.css") layer(import_console_rustc);
+@import url("import/color.css") layer(import_color);
+@import url("import/size.css") layer(import_size);
+@import url("import/lang.css") layer(import_lang);
+@import url("import/quote.css") layer(import_quote);
+@import url("import/prism.css") layer(import_prism);
+@import url("import/console_rustc.css") layer(import_console_rustc);
 @import url("../lib/nav/nav.css") layer(import_nav);
 
 @layer root {
