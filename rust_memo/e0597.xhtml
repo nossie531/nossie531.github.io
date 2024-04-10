@@ -20,15 +20,21 @@
 			<h1>パターン</h1>
 			<dl class="normal lowProfile">
 				<dt><a href="#ptnA">パターン A</a></dt>
-				<dd>スコープの違反。</dd>
+				<dd>スコープの違反</dd>
 				<dt><a href="#ptnB">パターン B</a></dt>
-				<dd>ライフタイムの違反。</dd>
-				<dt><a href="#ptnC">パターン C</a></dt>
-				<dd><code>Drop</code> トレイトの暗躍。</dd>
+				<dd>ライフタイムの違反</dd>
+				<dt><a href="#ptnC1">パターン C1</a></dt>
+				<dd>明示的な <code>Drop</code> トレイトとブロック末尾の式</dd>
+				<dt><a href="#ptnC2">パターン C2</a></dt>
+				<dd>暗黙的な <code>Drop</code> トレイトとブロック末尾の式</dd>
+				<dt><a href="#ptnD1">パターン D1</a></dt>
+				<dd>明示的な <code>Drop</code> トレイトとフィールド間の参照</dd>
+				<dt><a href="#ptnD2">パターン D2</a></dt>
+				<dd>暗黙的な <code>Drop</code> トレイトとフィールド間の参照</dd>
 			</dl>
 			<section>
 				<hgroup>
-					<h1 id="ptnA">パターン A.</h1>
+					<h1 id="ptnA">パターン A</h1>
 					<div class="subtitle">スコープの違反</div>
 				</hgroup>
 				<p>
@@ -63,7 +69,7 @@ fn main() {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnB">パターン B.</h1>
+					<h1 id="ptnB">パターン B</h1>
 					<div class="subtitle">ライフタイムの違反</div>
 				</hgroup>
 				<p>
@@ -71,9 +77,9 @@ fn main() {
 にも関わらず、ローカルライフタイムの参照 <code>&amp;local</code> を指定している。
 				</p>
 <pre><code class="language-rust">
-pub fn main() {
+fn main() {
     let local = 0;
-	use_static_ref(<mark class="error">&amp;local</mark>);
+    use_static_ref(<mark class="error">&amp;local</mark>);
 }
 
 fn use_static_ref(_: &amp;'static i32) {
@@ -96,75 +102,233 @@ fn use_static_ref(_: &amp;'static i32) {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnC">パターン C.</h1>
-					<div class="subtitle"><code>Drop</code> トレイトの暗躍</div>
+					<h1 id="ptnC1">パターン C1</h1>
+					<div class="subtitle">明示的な <code>Drop</code> トレイトとブロック末尾の式</div>
 				</hgroup>
 				<p>
-ブロック内のローカル変数と、ブロック末尾の式内にて生成される値とでは、前者が先に破棄される。そのため、後者が前者を参照していると、後者を破棄する時点ですでに後者は参照先を失っている。殆どの場合、それでも問題はないが、後者が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する場合、その状態で <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッドを実行するわけにもいかず、エラーとなる。
+型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装し、かつ参照を持つ場合について。その参照先を格納するブロックの末尾の式内に、その型の値があるとエラーになる。なぜなら、ブロック内のローカル変数はブロック末尾の式内の値よりも先に解放される。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先が存在しなくなってしまう。
 				</p>
 				<div class="sub">
 					<h2>エラーの解決方法</h2>
 					<p>
-後述のエラーメッセージの <q>help</q> にある通り、ブロック末尾の式をローカル変数として切り出せばよい。これにより、値が破棄される順序を逆転できる。
+後述のエラーメッセージの <q>help</q> にある通り、ブロック末尾の式をローカル変数として切り出せばよい。これにより、値を破棄する順序を逆転できる。
 					</p>
 				</div>
 				<div class="sub">
 					<h2>サンプルコード</h2>
 					<p>
-以下では、一時変数 <code>local<wbr/>.sub()</code> がローカル変数 <code>local</code> を参照している。そして、<code>local</code> は <code>local<wbr/>.sub()</code> より先に解放される。つまり、<code>local<wbr/>.sub()</code> で <code>Drop</code> が起動された時にはすでに参照先 <code>&amp;'a i32</code> は存在しない。
+以下では、<code>OnDrop(&amp;local)</code> がブロック末尾の式内にある。しかし、その解放時には <code>local</code> は解放済のため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時には参照先が存在しない状態になってしまっている。
 					</p>
-				</div>
 <pre><code class="language-rust">
-pub fn main() {
+fn main() {
     let val = {
-        let local = MyData(42);
-        f(&amp;<mark class="error">local.sub()</mark>)
+        let local = 42;
+        *OnDrop(<mark class="error">&amp;local</mark>).0
     };
 
     println!("{}", val);
 }
 
-fn f(arg: &amp;SubData) -&gt; i32 {
-    *arg.0
-}
-
-pub struct MyData(i32);
-impl MyData {
-    pub fn sub(&amp;self) -&gt; SubData&lt;'_&gt; {
-        SubData(&amp;self.0)
-    }
-}
-
-pub struct SubData&lt;'a&gt;(&amp;'a i32);
-impl Drop for SubData&lt;'_&gt; {
+struct OnDrop&lt;'a&gt;(&amp;'a i32);
+impl Drop for OnDrop&lt;'_&gt; {
     fn drop(&amp;mut self) {
-        // NOP.
+        println!("ID [{}] is drpoped.", self.0)
     }
 }
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0597]</mark><mark class="title">: `local` does not live long enough</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:4:12
+<mark class="info"> --&gt;</mark> src\main.rs:4:11
 <mark class="info">  |</mark>
-<mark class="info">3 |</mark>         let local = MyData(42);
+<mark class="info">3 |</mark>         let local = 42;
 <mark class="info">  |</mark>             <mark class="info">----- binding `local` declared here</mark>
-<mark class="info">4 |</mark>         f(&amp;local.sub())
-<mark class="info">  |</mark>            <mark class="error">^^^^^^^^^^^</mark>
-<mark class="info">  |</mark>            <mark class="error">|</mark>
-<mark class="info">  |</mark>            <mark class="error">borrowed value does not live long enough</mark>
-<mark class="info">  |</mark>            <mark class="error">a temporary with access to the borrow is created here ...</mark>
-<mark class="info">5 |</mark>     <mark class="error">}</mark>;
-<mark class="info">  |</mark>     <mark class="info">-- ... and the borrow might be used here, when that temporary is dropped and runs the `Drop` code for type `SubData`</mark>
+<mark class="info">4 |</mark>         *OnDrop(&amp;local).0
+<mark class="info">  |</mark>          <mark class="info">-------</mark><mark class="error">^^^^^^</mark><mark class="info">-</mark>
+<mark class="info">  |</mark>          <mark class="info">|</mark>      <mark class="error">|</mark>
+<mark class="info">  |</mark>          <mark class="info">|</mark>      <mark class="error">borrowed value does not live long enough</mark>
+<mark class="info">  |</mark>          <mark class="info">a temporary with access to the borrow is created here ...</mark>
+<mark class="info">5 |</mark>     };
+<mark class="info">  |</mark>     <mark class="info">-- ... and the borrow might be used here, when that temporary is dropped and runs the `Drop` code for type `OnDrop`</mark>
 <mark class="info">  |</mark>     <mark class="info">|</mark>
 <mark class="info">  |</mark>     <mark class="info">`local` dropped here while still borrowed</mark>
 <mark class="info">  |</mark>
 <mark class="info">  =</mark> <mark class="title">note</mark>: the temporary is part of an expression at the end of a block;
-<mark class="info"></mark>          consider forcing this temporary to be dropped sooner, before the block's local variables are dropped
+          consider forcing this temporary to be dropped sooner, before the block's local variables are dropped
 <mark class="info">help</mark>: for example, you could save the expression's value in a new local variable `x` and then make `x` be the expression at the end of the block
 <mark class="info">  |</mark>
-<mark class="info">4 |</mark>         <mark class="edit">let x =</mark> f(&amp;local.sub()); <mark class="edit">x</mark>
-<mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                <mark class="edit">+++</mark>
+<mark class="info">4 |</mark>         <mark class="edit">let x =</mark> *OnDrop(&amp;local).0<mark class="edit">; x</mark>
+<mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                  <mark class="edit">+++</mark>
 </samp></pre>
+				</div>
+			</section> <section>
+				<hgroup>
+					<h1 id="ptnC2">パターン C2</h1>
+					<div class="subtitle">暗黙的な <code>Drop</code> トレイトとブロック末尾の式</div>
+				</hgroup>
+				<p>
+基本は<a href="#ptnC1">パターン C1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化が静的か動的かは問わない。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>MyType(&amp;local).as_trait()</code> がブロック末尾の式内にある。しかし、その解放時には <code>local</code> は解放済のため、結果のトレイトの具象型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> を実装していた場合、その実行時には参照先が存在しない状態になってしまっている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let val = {
+        let local = 42;
+		MyType(<mark class="error">&amp;local</mark>).as_trait().val()
+    };
+
+    println!("{}", val);
+}
+
+trait MyTrait {
+    fn val(&amp;self) -&gt; i32;
+}
+
+struct MyType&lt;'a&gt;(&amp;'a i32);
+impl&lt;'a&gt; MyType&lt;'a&gt; {
+    fn as_trait(self) -&gt; impl MyTrait + 'a {
+        self
+    }
+}
+
+impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
+    fn val(&amp;self) -&gt; i32 {
+        *self.0
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `local` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:16
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>         let local = 42;
+<mark class="info">  |</mark>             <mark class="info">----- binding `local` declared here</mark>
+<mark class="info">4 |</mark>         MyType(&amp;local).as_trait().val()
+<mark class="info">  |</mark>         <mark class="info">-------</mark><mark class="error">^^^^^^</mark><mark class="info">-----------</mark>-
+<mark class="info">  |</mark>         <mark class="info">|</mark>      <mark class="error">|</mark>
+<mark class="info">  |</mark>         <mark class="info">|</mark>      <mark class="error">borrowed value does not live long enough</mark>
+<mark class="info">  |</mark>         <mark class="info">a temporary with access to the borrow is created here ...</mark>
+<mark class="info">5 |</mark>     };
+<mark class="info">  |</mark>     <mark class="info">-- ... and the borrow might be used here, when that temporary is dropped and runs the destructor for type `impl MyTrait + '_`</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="info">`local` dropped here while still borrowed</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: the temporary is part of an expression at the end of a block;
+          consider forcing this temporary to be dropped sooner, before the block's local variables are dropped
+<mark class="info">help: for example, you could save the expression's value in a new local variable `x` and then make `x` be the expression at the end of the block</mark>
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>         <mark class="edit">let x =</mark> MyType(&amp;local).as_trait().val()<mark class="edit">; x</mark>
+<mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                                <mark class="edit">+++</mark>
+</samp></pre>
+				</div>
+			</section> <section>
+				<hgroup>
+					<h1 id="ptnD1">パターン D1</h1>
+					<div class="subtitle">明示的な <code>Drop</code> トレイトとフィールド間の参照</div>
+				</hgroup>
+				<p>
+型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装し、かつ参照を持つ場合について。参照先に自身を包含するデータの一部を指定するとエラーになる。なぜなら、そのデータが参照先と参照元どちらを含むフィールドを先に解放するかの保証がないため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時には参照先が存在しないかもしれない (フィールドの解放順は定義順によるが、フィールドを逆順で定義するような型も同時に存在しうるため、フィールド側の型は解放順に依存できない)。
+				</p>
+				<div class="sub">
+					<h2>補足: <code>dropck_eyepatch</code></h2>
+					<p>
+上記の制約は <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッド内で参照を使用しない場合でも働く。これが不要な場合、2024 年現在まだ不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/dropck-eyepatch.html"><code>dropck_eyepatch</code></a> でそれを無視するようにもできる (具体的には参照のライフタイム指定子に <code>#[may_dangle]</code> を指定)。
+					</p>
+				</div> <div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>OnDrop</code> での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行に関連して、<code>data</code> に参照元である <code>OnDrop</code> と参照先である <code>&amp;data.id</code> の両方を格納できないようにされている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut data = MyData::default();
+    data.on_drop = Some(OnDrop(<mark class="error">&amp;data.id</mark>));
+}
+
+#[derive(Default)]
+struct MyData&lt;'a&gt; {
+    id: i32,
+    on_drop: Option&lt;OnDrop&lt;'a&gt;&gt;,
+}
+
+struct OnDrop&lt;'a&gt;(&amp;'a i32);
+impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `data.id` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:38
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let mut data = MyData::default();
+<mark class="info">  |</mark>         <mark class="info">-------- binding `data` declared here</mark>
+<mark class="info">3 |</mark>     data.on_drop = Some(OnDrop(&amp;data.id));
+<mark class="info">  |</mark>                                <mark class="error">^^^^^^^^ borrowed value does not live long enough</mark>
+<mark class="info">4 |</mark> }
+<mark class="info">  |</mark> <mark class="info">-</mark>
+<mark class="info">  |</mark> <mark class="info">|</mark>
+<mark class="info">  |</mark> <mark class="info">`data.id` dropped here while still borrowed</mark>
+<mark class="info">  |</mark> <mark class="info">borrow might be used here, when `data` is dropped and runs the destructor for type `MyData&lt;'_&gt;`</mark>
+</samp></pre>
+				</div>
+			</section> <section>
+				<hgroup>
+					<h1 id="ptnD2">パターン D2</h1>
+					<div class="subtitle">暗黙的な <code>Drop</code> トレイトとフィールド間の参照</div>
+				</hgroup>
+				<p>
+基本は<a href="#ptnD1">パターン D1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化は動的である (抽象化が静的ならば、全体を格納する型は各部での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> の実装有無を把握できるため)。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>MyTrait</code> で実行されうる <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> に関連して、<code>data</code> に参照元である <code>MyTrait</code> と参照先である <code>&amp;data.id</code> の両方を格納できないようにされている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut data = MyData::default();
+    data.my_trait = Some(Box::new(MyType(<mark class="error">&amp;data.id</mark>)));
+    data.my_trait.unwrap().print_id();
+}
+
+#[derive(Default)]
+struct MyData&lt;'a&gt; {
+    id: i32,
+    my_trait: Option&lt;Box&lt;dyn MyTrait&lt;'a&gt; + 'a&gt;&gt;,
+}
+
+trait MyTrait&lt;'a&gt; {
+    fn print_id(&amp;self); 
+}
+
+struct MyType&lt;'a&gt;(&amp;'a i32);
+impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
+    fn print_id(&amp;self) {
+        println!("ID is [{}].", self.0);
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `data.id` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:42
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let mut data = MyData::default();
+<mark class="info">  |</mark>         <mark class="info">-------- binding `data` declared here</mark>
+<mark class="info">3 |</mark>     data.my_trait = Some(Box::new(MyType(&amp;data.id)));
+<mark class="info">  |</mark>                                          <mark class="error">^^^^^^^^ borrowed value does not live long enough</mark>
+<mark class="info">4 |</mark>     data.my_trait.unwrap().print_id();
+<mark class="info">5 |</mark> }
+<mark class="info">  |</mark> <mark class="info">-</mark>
+<mark class="info">  |</mark> <mark class="info">|</mark>
+<mark class="info">  |</mark> <mark class="info">`data.id` dropped here while still borrowed</mark>
+<mark class="info">  |</mark> <mark class="info">borrow might be used here, when `data` is dropped and runs the destructor for type `MyData&lt;'_&gt;`</mark>
+</samp></pre>
+				</div>
 			</section>
 		</section>
 	</body>
