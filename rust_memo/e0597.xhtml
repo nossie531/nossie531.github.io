@@ -235,7 +235,7 @@ impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
 				<div class="sub">
 					<h2>補足: <code>dropck_eyepatch</code></h2>
 					<p>
-上記の制約は <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッド内で参照を使用しない場合でも働く。これが不要な場合、2024 年現在まだ不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/dropck-eyepatch.html"><code>dropck_eyepatch</code></a> でそれを無視するようにもできる (具体的には参照のライフタイム指定子に <code>#[may_dangle]</code> を指定)。
+上記の制約は <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッド内で参照を使用しない場合でも働く。これが不要な場合、<time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/dropck-eyepatch.html"><code>dropck_eyepatch</code></a> でそれを無視するようにもできる (具体的には参照のライフタイム指定子に <code>#[may_dangle]</code> を指定)。
 					</p>
 				</div> <div class="sub">
 					<h2>サンプルコード</h2>
