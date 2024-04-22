@@ -21,21 +21,10 @@
 		<section>
 			<h1>基礎知識</h1>
 			<p>
-<a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> トレイトはコンパイラにより自動実装されるマーカートレイトであり、対象となる型はスタック上で必要となるメモリサイズが予め決まっている型である。なお、そうでない型は <code>!Sized</code> としてマークされる。
+<a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> トレイトは固定メモリサイズの型 (型から参照されるヒープ領域のサイズなどは除外) に自動で付加されるマーカートレイトである。一方、そうでない型は <code>!Sized</code> とマークされ、それらは <abbr>DST</abbr> (Dynamically Sized Type) と呼ばれる。
 			</p>
-			<aside class="normal">
-				<p>
-<abbr>DST</abbr> (Dynamically Sized Type)。
-				</p>
-				<p>
-<code>!Sized</code> でマークされる型は DST やサイズなし型などと呼ばれる。
-				</p>
-			</aside>
 			<div class="sub">
-				<h2>自動実装の例</h2>
-				<p>
-以下は代表的な型について、<code>Sized</code> かどうかの一覧。
-				</p>
+				<h2>代表例</h2>
 				<dl class="normal">
 					<dt> <code>Sized</code> になる型 </dt>
 					<dd>
@@ -70,7 +59,7 @@
 					<p>
 <code>Sized</code> トレイトと構造体について。
 					</p> <p>
-構造体は最後のフィールドのみ <code>!Sized</code> にできる。そして、その場合に限って構造体は <code>!Sized</code> になる。ただし、こうした構造体の初期化にはアンセーフな機能が必要になるなど、取扱いがやや難しい。
+構造体は最後のフィールドのみ <code>!Sized</code> にできる。そして、その場合のみ構造体は <code>!Sized</code> になる。ただし、こうした構造体の初期化にはアンセーフな機能が必要になるなど、取扱がやや難しい。
 					</p>
 				</aside>
 			</div>
