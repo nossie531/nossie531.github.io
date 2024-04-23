@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: type エイリアス</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>type</code> による型の別名 (エイリアス) の定義方法について。
+		</p> 
+		<section>
+			<h1>用例</h1>
+			<p>
+以下は代表的な用例。
+			</p>
+			<dl class="normal lowProfile">
+				<dt><a href="#ex1">用例 1</a></dt> <dd>基本的な使い方</dd>
+				<dt><a href="#ex2">用例 2</a></dt> <dd>型パラメタの利用</dd>
+				<dt><a href="#ex3">用例 3</a></dt> <dd>関連型の導出</dd>
+			</dl>
+			<section>
+				<hgroup>
+					<h1 id="ex1">用例 1</h1>
+					<div class="subtitle">基本的な使い方</div>
+				</hgroup>
+				<p>
+<code>type Alias = SomeType;</code> とする事で、型 <code>SomeType</code> の別名 <code>Alias</code> を定義できる。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>Vec&lt;f32&gt;</code> に <code>MyVec</code> の別名を定義している。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let v = vec![3.0, 2.0];
+    println!("v = {}", get_vec_str(v));
+}
+
+type MyVec = Vec&lt;f32&gt;;
+
+fn get_vec_str(v: MyVec) -&gt; String {
+    let texts = v.iter().map(f32::to_string);
+    format!("({})", texts.collect::&lt;Vec&lt;_&gt;&gt;().join(", "))
+}
+</code></pre>
+				</div>
+			</section> <section>
+				<hgroup>
+					<h1 id="ex2">用例 2</h1>
+					<div class="subtitle">型パラメタの利用</div>
+				</hgroup>
+				<p>
+別名には型パラメタを含める事ができる。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、二つの同じ型からなるタプルを <code>Pair&lt;T&gt;</code> として定義している。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let pair = (40, 20);
+    println!("pair = {}", get_pair_str(pair));
+}
+
+type Pair&lt;T&gt; = (T, T);
+
+fn get_pair_str(p: Pair&lt;i32&gt;) -&gt; String {
+    format!("({}, {})", p.0, p.1)
+}
+</code></pre>
+				</div>
+			</section> <section>
+				<hgroup>
+					<h1 id="ex3">用例 3</h1>
+					<div class="subtitle">関連型の導出</div>
+				</hgroup>
+				<p>
+型パラメタから関連型を導出する型の関数としても利用できる。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>nth1</code> と <code>nth2</code> は全く同じ機能になる。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let samples = vec![1, 2, 3];
+    let item1 = nth1(samples.iter(), 2);
+    let item2 = nth2(samples.iter(), 2);
+    assert_eq!(item1, item2);
+}
+
+type ToItem&lt;T&gt; = &lt;T as Iterator&gt;::Item;
+
+fn nth1&lt;I: Iterator&gt;(mut iter: I, n: usize) -&gt; Option&lt;I::Item&gt; {
+    iter.nth(n)
+}
+
+fn nth2&lt;I: Iterator&gt;(mut iter: I, n: usize) -&gt; Option&lt;ToItem&lt;I&gt;&gt; {
+    iter.nth(n)
+}
+</code></pre>
+				</div>
+			</section>
+		</section> <section>
+			<h1>注意点</h1>
+			<dl class="normal lowProfile">
+				<dt><a href="#point1">注意点 1</a></dt> <dd>別名の互換性</dd>
+				<dt><a href="#point2">注意点 2</a></dt> <dd>初期化関数は利用不可</dd>
+				<dt><a href="#point3">注意点 3</a></dt> <dd><code>where</code> は利用不可</dd>
+			</dl>
+			<section>
+				<hgroup id="point1">
+					<h1>注意点 1</h1>
+					<div class="subtitle">別名の互換性</div>
+				</hgroup>
+				<p>
+<code>type</code> エイリアスによる別名は、新しい型として作られるわけではない。そのため、元の型や同じように作られた別名と良くも悪くも互換性がある (取り違えを防ぐ目的では、<a href="newtype.xhtml">Newtype パターン</a>が利用可能)。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>f32</code> に別名 <code>Length</code> と <code>Time</code> を定義しているが、それらを取り違えている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let length = 4000.0;
+    let time = 3600.0;
+    println!("speed = {}", speed(time, length));
+}
+
+type Length = f32;
+type Time = f32;
+
+fn speed(l: Length, t: Time) -&gt; f32 {
+    l / t
+}
+</code></pre>
+				</div>
+			</section> <section>
+				<hgroup id="point2">
+					<h1>注意点 2</h1>
+					<div class="subtitle">初期化関数は利用不可</div>
+				</hgroup>
+				<p>
+<code>type</code> エイリアスは型の別名を作るだけで、関数の別名までは作らない。そのため、タプルや構造体の別名を作っても、その初期化用関数の別名までは作られない。なお、<code>use Type as Alias;</code> での別名ではこれができる (ただし、こちらは型パラメタの利用に制限がある)。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+					<p>
+以下では、型 <code>Color</code> の別名 <code>Rgb</code> を定義しているが、初期化に別名は使えない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let gray = Color(0x80, 0x80, 0x80);
+    let blue = Triple(0x00, 0x00, 0xFF);
+	let aqua = <mark class="error">Rgb</mark>(0x00, 0xFF, 0xFF);
+    println!("gray = {}", get_color_str(gray));
+    println!("blue = {}", get_color_str(blue));
+    println!("aqua = {}", get_color_str(aqua));
+}
+
+struct Color(u8, u8, u8);
+use Color as Triple;
+type Rgb = Color;
+
+fn get_color_str(color: Color) -&gt; String {
+    format!("#{:02X?}{:02X?}{:02X?}", color.0, color.1, color.2)
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0423]</mark><mark class="title">: expected function, tuple struct or tuple variant, found type alias `Rgb`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:16
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     let aqua = Rgb(0x00, 0xFF, 0xFF);
+<mark class="info">  |</mark>                <mark class="error">^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: can't use a type alias as a constructor
+</samp></pre>
+				</div>
+			</section>
+			<section>
+				<hgroup id="point3">
+					<h1>注意点 3</h1>
+					<div class="subtitle"><code>where</code> は利用不可</div>
+				</hgroup>
+				<p>
+<time>2024 年現在</time>、<code>type</code> エイリアスの型パラメタは <code>where</code> で制限できない (エラーメッセージの <q>note</q> を見ると、GitHub へのリンクがあるので将来は変更されるかも…？)。
+				</p>
+				<div class="sub">
+					<h2>サンプルコード</h2>
+<pre><code class="language-rust">
+use std::fmt::Display;
+
+fn main() {
+    let pair = (40, 20);
+    println!("pair = {}", get_pair_str(pair));
+}
+
+type Pair&lt;T&gt; = (T, T) <mark class="error">where T: Display</mark>;
+
+fn get_pair_str&lt;T: Display&gt;(p: Pair&lt;T&gt;) -&gt; String {
+    format!("({}, {})", p.0, p.1)
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: where clauses are not allowed after the type for type aliases</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:8:23
+<mark class="info">  |</mark>
+<mark class="info">8 |</mark> type Pair&lt;T&gt; = (T, T) where T: Display;
+<mark class="info">  |</mark>                       <mark class="error">^^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: see issue #112792 &lt;<a href="https://github.com/rust-lang/rust/issues/112792">https://github.com/rust-lang/rust/issues/112792</a>&gt; for more information
+</samp></pre>
+				</div>
+			</section>
+		</section>
+	</body>
+</html>
