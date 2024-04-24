@@ -28,13 +28,13 @@ class Base {
 	static #createScriptElement(src) {
 		const result = document.createElement("script");
 		result.src = src;
+		result.async = true;
 		return result;
 	}
 
 	static #createGtagJs(src) {
 		const url = "https://www.googletagmanager.com/gtag/js?id=G-X01B3QVSC1";
 		const result = Base.#createScriptElement(url);
-		result.async = true;
 		return result;
 	}
 	
