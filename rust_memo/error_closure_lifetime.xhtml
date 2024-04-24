@@ -65,7 +65,7 @@ fn main() {
 			<section>
 				<hgroup>
 					<h1 id="solution1">解決策 1.</h1>
-					<div class="subtitle">不安定な機能</div>
+					<div class="subTitle">不安定な機能</div>
 				</hgroup>
 				<p>
 不安定な機能 <a href="https://rust-lang.github.io/rfcs/3216-closure-lifetime-binder.html">closure_lifetime_binder</a> を使う。
@@ -80,7 +80,7 @@ fn main() {
 			</section> <section>
 				<hgroup>
 					<h1 id="solution2">解決策 2.</h1>
-					<div class="subtitle">型指定</div>
+					<div class="subTitle">型指定</div>
 				</hgroup>
 				<p>
 クロージャ専用の機能を使っていなければ、関数として型指定すればよい。
@@ -95,7 +95,7 @@ fn main() {
 			</section> <section>
 				<hgroup>
 					<h1 id="solution3">解決策 3.</h1>
-					<div class="subtitle">関数化</div>
+					<div class="subTitle">関数化</div>
 				</hgroup>
 				<p>
 クロージャの代わりに関数を使えば、同じ構成でも問題にならない。
@@ -114,7 +114,7 @@ fn function(x: &amp;i32) -&gt; &amp;i32 {
 			</section> <section>
 				<hgroup>
 					<h1 id="solution4">解決策 4.</h1>
-					<div class="subtitle">高階関数</div>
+					<div class="subTitle">高階関数</div>
 				</hgroup>
 				<p>
 クロージャを生成する関数を利用すれば、関数のライフタイム規則を利用できる。

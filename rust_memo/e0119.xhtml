@@ -53,7 +53,7 @@
 			<section>
 				<hgroup>
 					<h1 id="ptnA">パターン A.</h1>
-					<div class="subtitle">自明なパターン</div>
+					<div class="subTitle">自明なパターン</div>
 				</hgroup>
 				<p>
 全く同じトレイトと条件を指定している。
@@ -77,7 +77,7 @@ impl MyTrait for MyType { fn f(&amp;self) { /* ... */ } }
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnB">パターン B.</h1>
-					<div class="subtitle">実装が空のパターン</div>
+					<div class="subTitle">実装が空のパターン</div>
 				</hgroup>
 				<p>
 前のパターンの変種。トレイトがマーカートレイト、または全てのトレイトメソッドがデフォルト実装を持つ場合、個別の実装が空になりうるが、この場合も同様である。
@@ -101,7 +101,7 @@ impl MyTrait for MyType {}
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnC">パターン C.</h1>
-					<div class="subtitle">ブランケット実装との衝突</div>
+					<div class="subTitle">ブランケット実装との衝突</div>
 				</hgroup>
 				<p>
 ある型とブランケット実装が同じトレイトを実装している。<br/>
@@ -126,7 +126,7 @@ impl MyTrait for MyType {}
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnD">パターン D.</h1>
-					<div class="subtitle">ブランケット実装どうしの衝突</div>
+					<div class="subTitle">ブランケット実装どうしの衝突</div>
 				</hgroup>
 				<p>
 あるトレイトについてのブランケット実装が複数ある。<br/>
@@ -154,7 +154,7 @@ impl&lt;T&gt; MyTrait for T where T: TraitX {}
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnE">パターン E.</h1>
-					<div class="subtitle">型パラメタの影響 (条件側の型パラメタ)</div>
+					<div class="subTitle">型パラメタの影響 (条件側の型パラメタ)</div>
 				</hgroup>
 				<p>
 型パラメタがあるため、条件の重複に気付きにくいパターン。
@@ -181,7 +181,7 @@ impl&lt;X: TraitX&gt; MyTrait for X {}
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnF">パターン F.</h1>
-					<div class="subtitle">型パラメタの影響 (トレイト側の型パラメタ)</div>
+					<div class="subTitle">型パラメタの影響 (トレイト側の型パラメタ)</div>
 				</hgroup>
 				<p>
 型パラメタがあるため、トレイトの重複に気付きにくいパターン。
@@ -208,7 +208,7 @@ impl&lt;T, X: TraitX&gt; MyTrait&lt;X&gt; for T {}
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnG">パターン G.</h1>
-					<div class="subtitle">型パラメタの影響 (パターン E と F の合成)</div>
+					<div class="subTitle">型パラメタの影響 (パターン E と F の合成)</div>
 				</hgroup>
 				<p>
 条件とトレイトの両方に型パラメタがあるパターン。
@@ -269,7 +269,7 @@ impl&lt;T&gt; MyTrait for T {}
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnH">パターン H.</h1>
-					<div class="subtitle">関連型の影響 (Rust の欠陥)。</div>
+					<div class="subTitle">関連型の影響 (Rust の欠陥)。</div>
 				</hgroup>
 				<p>
 トレイト実装において、関連型が条件として区別されない問題がある。

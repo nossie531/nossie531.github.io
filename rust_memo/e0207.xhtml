@@ -81,7 +81,7 @@ impl が<em>実装する型</em>&#x2009;の中に表れる。<br/>
 			<section>
 				<hgroup>
 					<h1 id="ptnA">パターン A</h1>
-					<div class="subtitle">基本形</div>
+					<div class="subTitle">基本形</div>
 				</hgroup>
 				<p>
 以下では、型パラメタ <code>T</code> がどこにも使われていない。
@@ -111,7 +111,7 @@ impl&lt;T&gt; MyType&lt;T&gt; {}
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnB">パターン B</h1>
-					<div class="subtitle">関連関数でのみ型パラメタを使用</div>
+					<div class="subTitle">関連関数でのみ型パラメタを使用</div>
 				</hgroup>
 				<p>
 以下では、関連関数で型パラメタを使っているが、やはりエラーになる。
@@ -144,7 +144,7 @@ impl MyType {
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnC">パターン C</h1>
-					<div class="subtitle"><code>where</code> でのみ型パラメタを使用</div>
+					<div class="subTitle"><code>where</code> でのみ型パラメタを使用</div>
 				</hgroup>
 				<p>
 以下では、<code>where</code> で型パラメタを使っているが、やはりエラーになる。

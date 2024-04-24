@@ -253,12 +253,12 @@
 	section > hgroup {
 		margin: 1rem 0;
 
-		> div.subtitle {
+		> div.subTitle {
 			font-weight: bold;
 		}
 
-		> div.subtitle::before,
-		> div.subtitle::after {
+		> div.subTitle::before,
+		> div.subTitle::after {
 			content: " 〜 ";
 		}
 	}
