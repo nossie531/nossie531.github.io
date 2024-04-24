@@ -18,7 +18,7 @@
 		</p>
 		<section>
 			<h1>基礎知識</h1>
-			<div class="sub">
+			<section>
 				<h2>トレイトの実装</h2>
 				<p>
 トレイト実装では以下の二つを指定する。
@@ -29,13 +29,12 @@
 					<dt>条件</dt>
 					<dd>どのような型に実装するか。</dd>
 				</dl>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>エラーの原因</h2>
 				<p>
 トレイト実装の指定どうしが衝突するのは、対象となるトレイトが同じで、かつ条件に重複がある場合である。そうなると、コンパイラは指定が重複している型に対して、どちらの実装を使えば良いか分からなくなる。
 				</p>
-			</div>
+			</section>
 		</section> <section>
 			<h1>パターン</h1>
 			<p>
@@ -282,7 +281,7 @@ impl&lt;T&gt; MyTrait for T {}
 <time>2024 年現在</time>、修正は延期中。<a href="https://github.com/rust-lang/rust/issues/20400">Github の投稿</a>によると、トレイトシステム全体の刷新が控えているらしく、また修正が及ぼす波及効果の検討も必要らしい。
 					</p>
 				</aside>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、<code>HasType&lt;Type = i32&gt;</code> と <code>HasType&lt;Type = i64&gt;</code> は重複しないはずだが、競合が検出されてしまう。
@@ -303,7 +302,7 @@ impl&lt;T: HasType&lt;Type = i32&gt;&gt; MyTrait for T {}
 <mark class="info">5 |</mark> impl&lt;T: HasType&lt;Type = i64&gt;&gt; MyTrait for T {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section>
 		</section>
 	</body>

@@ -236,27 +236,18 @@
 		max-width: calc(var(--base-width-size) + 1px);
 	}
 
-	section {
-		margin: 2rem 0 1rem;
+	section:has(> h1),
+	section:has(> hgroup > h1) {
+		margin-top: 2rem;
+		margin-bottom: 2rem;
 	}
 
-	section > h1,
-	section > hgroup > h1 {
-		font-size: 1.05em;
-		line-height: normal;
-		padding: 0.5ex 0.5em;
-		margin: 1rem calc(var(--gap) * -1);
-		background-color: var(--header-color);
-	}
-
-	section > section > h1::before,
-	section > section > hgroup > h1::before {
-		content: "> ";
-	}
-
-	section > section > section > h1::before,
-	section > section > section > hgroup > h1::before {
-		content: ">> ";
+	section:has(> h2),
+	section:has(> h3),
+	section:has(> hgroup > h2),
+	section:has(> hgroup > h3) {
+		margin-top: 1rem;
+		margin-bottom: 1rem;
 	}
 
 	section > hgroup {
@@ -272,28 +263,50 @@
 		}
 	}
 
-	div.sub {
-		margin: 1rem 0;
+	section > h1,
+	section > hgroup > h1 {
+		font-size: 1.05em;
+		line-height: normal;
+		margin: 1rem calc(var(--gap) * -1);
+		padding: 0.5ex var(--gap);
+		background-color: var(--header-color);
+	}
 
-		&:not(h1+*):has(> h2) {
-			border-top: thin dashed currentColor;
-		}
+	section > h2,
+	section > h3,
+	section > hgroup > h2,
+	section > hgroup > h3 {
+		font-size: 1rem;
+		margin: 1rem calc(var(--gap) * -1);
+		padding: 0 var(--gap);
+	}
 
-		&:not(h2+*):has(> h3) {
-			border-top: thin dashed var(--base1-color);
-		}
+	section:not(h1 + *, hgroup + *) > h2 {
+		padding-top: 1rem;
+		border-top: thin dashed var(--fg-color);
+	}
 
-		h2, h3 {
-			font-size: 1rem;
-		}
+	section:not(h2 + *, hgroup + *) > h3 {
+		padding-top: 1rem;
+		border-top: thin dashed var(--base1-color);
+	}
 
-		h2::before {
-			content: "■ ";
-		}
+	section > section > h1::before,
+	section > section > hgroup > h1::before {
+		content: "> ";
+	}
 
-		h3::before {
-			content: "▶ ";
-		}
+	section > section > section > h1::before,
+	section > section > section > hgroup > h1::before {
+		content: ">> ";
+	}
+
+	section > h2::before {
+		content: "■ ";
+	}
+
+	section > h3::before {
+		content: "▶ ";
 	}
 
 	hr.split {
@@ -311,7 +324,9 @@
 	}
 
 	@media all and (width > 56rem) {
-		section section {
+		section:has(> h1) section:has(> h1),
+		section:has(hgroup > h1) section:has(> h1),
+		section:has(hgroup > h1) section:has(hgroup > h1) {
 			margin-left: 1.5rem;
 			margin-right: -1.5rem;
 		}

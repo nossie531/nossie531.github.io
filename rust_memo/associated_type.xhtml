@@ -20,7 +20,7 @@
 			</p> <p>
 そして、トレイトの実装時に <code>type <var>Assoc</var> = <var>SomeType</var>;</code> のように指定する。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>サンプルコード</h2>
 				<p>
 以下では、トレイト <code>Sequence</code> からの生成値のために、関連型 <code>Value</code> を定義している。
@@ -49,7 +49,7 @@ impl Sequence for IntCounter {
     }
 }
 </code></pre>
-			</div>
+			</section>
 		</section> <section>
 			<h1>境界の指定</h1>
 			<p>
@@ -60,7 +60,7 @@ impl Sequence for IntCounter {
 				<p>
 関連型の定義時に境界を指定するには、<code>type <var>Assoc</var>: <var>Bounds</var></code> のように記述する。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下のコードは、直前の例と似たような構成だが、関連型 <code>Value</code> に境界 <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> がある。
@@ -97,13 +97,13 @@ impl Sequence for IntCounter {
     }
 }
 </code></pre>
-				</div>
+				</section>
 			</section> <section>
 				<h1>関連型の使用時の指定</h1>
 				<p>
 関連型の使用時に境界を指定するには、まずは型パラメタ <code>T</code> についてトレイト境界を設定、それからそのトレイトの関連型 <code>T::Assoc</code> について境界を設定する。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下のコードは、直前の例と同じ動作をする。ただし、関連型 <code>Value</code> の境界 <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> は、関連型の定義時でなく、外部の関数 <code>skip_to</code> での関連型の使用時に指定されている。
@@ -142,33 +142,31 @@ where
     }
 }
 </code></pre>
-				</div>
+				</section>
 			</section>
 		</section> <section>
 			<h1>ジェネリクス (GAT)</h1>
 			<p>
 関連型はジェネリクスパラメタを付加する事で、パラメトリックにできる。また必要ならば、それらのパラメタに対して、<code>where</code> による境界を設定できる。 
 			</p>
-			<div class="sub">
+			<section>
 				<h2>ジェネリクスによる制限</h2>
 				<p>
 この機能を使ったトレイトはトレイトオブジェクトになれない。<br/>
 (ジェネリクスパラメタを含む型を動的に処理できないため)。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>補足 (Rust の歴史と機能名)</h2>
 				<p>
 この機能は Rust 1.65 (<time>2022/11/03</time>) から正式に導入された。<br/>
 機能名は <abbr>GAT</abbr> (Generic Associated Types) と呼ばれている。
 				</p>
-			</div>
-			<section>
+			</section> <section>
 				<h1>型パラメタ</h1>
 				<p>
 関連型のジェネリクスパラメタに型パラメタを使うパターン。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、トレイト <code>ContainerBuilder</code> が生成するコンテナ型のために、ジェネリックな関連型 <code>Container&lt;T&gt;</code> が定義されている (<code>T</code> はコンテナの要素型)。
@@ -206,13 +204,13 @@ impl&lt;T&gt; Collection&lt;T&gt; for Vec&lt;T&gt; {
     }
 }
 </code></pre>
-				</div>
+				</section>
 			</section> <section>
 				<h1>ライフタイム</h1>
 				<p>
 関連型のジェネリクスパラメタにライフタイム指定子を使うパターン。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、トレイト <code>IntCollection</code> が生成するイテレータのために、ジェネリックな関連型 <code>IntStream&lt;'a&gt;</code> が定義されている。ここで、<code>'a</code> はイテレータのアイテムが所属するライフタイムで、<code>'a</code> は少なくとも <code>IntCollection</code> の生存中は有効でなければならない (<code>Self: 'a</code> の境界のため)。
@@ -238,8 +236,7 @@ impl IntCollection for Vec&lt;i32&gt; {
     }
 }
 </code></pre>
-				</div>
-				<div class="sub">
+				</section> <section>
 					<h2>補足 (HRTB)</h2>
 					<p>
 関連型のジェネリクスパラメタにライフタイム指定子を使うパターンでは、<abbr>HRTB</abbr> (Higher Ranked Trait Bound) がよく併用される。HRTB は境界の記述に先行して <code>for&lt;'<var>a</var>&gt;</code> の書式で表れ、任意のライフタイムに適合するプレースホルダになる。
@@ -254,7 +251,7 @@ where
     ints.int_stream().sum()
 }
 </code></pre>
-				</div>
+				</section>
 			</section>
 		</section>
 	</body>

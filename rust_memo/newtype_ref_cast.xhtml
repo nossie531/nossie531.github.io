@@ -23,13 +23,12 @@ Newtype パターンにおける参照型の変換について。
 			<p>
 Newtype パターンでは、ラップ元の型の参照 <code>&amp;Old</code> からラップ先の型の参照 <code>&amp;New</code> への変換が欲しくなる場合がある。つまり、型システム的に区別はしているが、ラップ元とラップ先の内容は元々は同じである事を利用する。これにより、ラップ元とラップ先とでアクセスが二重化される。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>実現方法</h2>
 				<p>
 unsafe な機能 <a href="https://doc.rust-lang.org/std/mem/fn.transmute.html"><code>std::<wbr/>mem::<wbr/>transmute</code></a> が必要になる。これでラップ元の型への参照をラップ先の型への参照として強引に扱う。そして、内容が同じでも最適化の都合などでメモリ構造が変わる可能性があるので、ラップ先の型に属性 <code>#[repr(transparent)]</code> を指定する事も忘れてはならない。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>サンプルコード</h2>
 				<p>
 以下では、<code>use_ref</code> 関数が <code>&amp;i32</code> を <code>&amp;Newtype</code> に読み替えている。
@@ -54,7 +53,7 @@ impl Newtype {
     }
 }
 				</code></pre>
-			</div>
+			</section>
 		</section> <section>
 			<h1>クレート紹介</h1>
 			<dl class="normal">

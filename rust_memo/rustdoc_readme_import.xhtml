@@ -65,7 +65,7 @@ pub fn f() {}
 			</p> <p>
 とは言え、共通部分も多いので流用は十分可能。なぜなら、Markdown には幾つかの方言があるが、どちらも <a href="https://spec.commonmark.org/current/">CommonMark</a> を採用している。また、そこからの互いの独自拡張にも同じものが多い。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>独自拡張の詳細</h2>
 				<dl class="normal lowProfile">
 					<dt>文書化コメント</dt>
@@ -77,13 +77,12 @@ pub fn f() {}
 <a href="https://github.github.com/gfm/"><abbr>GFM</abbr> (Github Flavored Markdown)</a>
 					</dd>
 				</dl>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>基本方針</h2>
 				<p>
 文書化コメント側を基準にしておくと上手くいく場合が多い。なぜなら、<code>README.md</code> で使われる GFM のほうが機能が多いため、そちらの書式を基準にしてしまうと、いざ流用した時にそれが機能していないという事態が多くなってしまう。
 				</p>
-			</div>
+			</section>
 		</section>
 	</body>
 </html>

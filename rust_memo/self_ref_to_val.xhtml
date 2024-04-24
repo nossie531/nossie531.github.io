@@ -28,7 +28,7 @@
 			</p> <p>
 この場合、<code>self</code> は参照型であるため、当然と言えば当然である。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>サンプルコード (参照型版)</h2>
 				<p>
 以下では、末尾の実装の <code>&amp;</code> の箇所が重要。
@@ -47,8 +47,7 @@ struct MyStruct {}
 
 impl MyTrait for &amp;MyStruct {}
 </code></pre>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>サンプルコード (型パラメタ版)</h2>
 				<p>
 以下では、型パラメタ <code>T</code> が参照型も含んでいる。
@@ -67,8 +66,7 @@ struct MyStruct {}
 
 impl&lt;T&gt; MyTrait for T {}
 </code></pre>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>補足</h2>
 				<p>
 以下は最初のサンプルの <code>for &amp;MyStruct</code> から <code>&amp;</code> を削った場合のエラー。
@@ -76,13 +74,13 @@ impl&lt;T&gt; MyTrait for T {}
 <pre><samp class="console-rustc">
 <mark class="error">error[E0507]</mark>: cannot move out of `*r` which is behind a shared reference
 </samp></pre>
-			</div>
+			</section>
 		</section> <section>
 			<h1>身近な例</h1>
 			<p>
 <a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> では、<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> の一部メソッドなどに利用例がある。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>関連する宣言</h2>
 				<p>
 以下は <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> の <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.count"><code>count</code></a> メソッド。
@@ -96,8 +94,7 @@ fn count(self) -&gt; usize where Self: Sized
 <pre><code class="language-rust">
 impl&lt;I: Iterator + ?Sized&gt; Iterator for &amp;mut I
 </code></pre>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>サンプルコード</h2>
 				<p>
 そのため、以下のようなコードが可能。
@@ -109,7 +106,7 @@ fn main() {
     assert_eq!(ir.count(), 3);
 }
 </code></pre>
-			</div>
+			</section>
 		</section> <section>
 			<h1>使い所</h1>
 			<p>

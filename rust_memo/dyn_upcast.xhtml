@@ -83,7 +83,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 				</p> <p>
 つまり、キャストの位置をトレイトの実装内へと移す。これにより、キャスト対象の静的型が分かっている箇所でキャストできるため、静的型から動的型へのキャストとなり、エラーにはならなくなる。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、<code>SomeTrait</code> にアップキャスト用のメソッド <code>as_base</code> を定義している。
@@ -112,7 +112,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {
     }
 }
 </code></pre>
-				</div>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1 id="way2">方法２</h1>
@@ -127,7 +127,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {
 				</p> <p>
 ただし、基底側が定義済だと使えない。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、<code>BaseTrait</code> にアップキャスト用のメソッド <code>as_base</code> を定義している。
@@ -156,7 +156,7 @@ trait SomeTrait: BaseTrait {}
 
 impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 </code></pre>
-				</div>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1 id="way3">方法３</h1>
@@ -171,7 +171,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 				</p> <p>
 また、基底側が定義済でも使える。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、定義済の <a href="https://doc.rust-lang.org/std/any/trait.Any.html"><code>Any</code></a> へのアップキャスト用に <code>AsAny</code> を用意している。
@@ -206,14 +206,14 @@ trait SomeTrait: Any + AsAny {
 
 impl&lt;T: Any&gt; SomeTrait for T {}
 </code></pre>
-				</div>
+				</section>
 			</section>
 		</section> <section>
 			<h1>発展形</h1>
 			<p>
 上記では、不変参照を通したアップキャストについて説明したが、他にも可変参照や <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> を通した関数があると便利 (<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> 以外のスマートポインタ、例えば <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> などは、<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> から <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> トレイトで変換できるため、事前に関数を用意しておく必要性は低い)。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>サンプルコード</h2>
 				<p>
 以下では、前述の『<a href="#way3">方法３</a>』のサンプルコードの <code>AsAny</code> を強化している。
@@ -239,7 +239,7 @@ impl&lt;T: Any&gt; AsAny for T {
     }
 }
 </code></pre>
-			</div>
+			</section>
 		</section>
 	</body>
 </html>

@@ -63,8 +63,8 @@ class Nav {
 
 	// スクロール時の動作を設定。
 	#setupScrollAction() {
+		const sections = getH1Sections();
 		const indexElm = this.#elements.root.querySelector("ul.index");
-		const sections = Array.from(document.getElementsByTagName("section"));
 		window.addEventListener("scroll", () => scrollCallback.call(this));
 		scrollCallback.call(this);
 
@@ -88,6 +88,11 @@ class Nav {
 				const bcr = elm.getBoundingClientRect();
 				return bcr.top <= 0 && bcr.bottom >= 0;
 			}
+		}
+
+		function getH1Sections() {
+			const query = "section:has(> h1), section:has(> hgroup > h1)";
+			return Array.from(document.querySelectorAll(query));
 		}
 
 		function getSectionRange() {

@@ -16,7 +16,7 @@
 		</p>
 		<section>
 			<h1>基本</h1>
-			<div class="sub">
+			<section>
 				<h2>適用対象ごとの効果</h2>
 				<dl class="normal lowProfile">
 					<dt>関数</dt>
@@ -30,8 +30,7 @@
 なお、注釈をトレイトの実装側の関数に適用した場合、無視される。<br/>
 つまり、トレイト側の関数の指定が適用される。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>警告のカスタマイズ</h2>
 				<p>
 警告のメッセージはカスタマイズできる。
@@ -43,8 +42,7 @@
 <code>#[must_use = "message"]</code> … カスタムのメッセージ。
 					</li>
 				</ul>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>使用例</h2>
 				<p>
 以下、デフォルトのメッセージによる警告の例。
@@ -72,7 +70,7 @@ fn must_use() -&gt; i32 {
 <mark class="info">2 |</mark>     <mark class="edit">let _ = </mark>must_use();
 <mark class="info">  |</mark>     <mark class="edit">+++++++</mark>
 </samp></pre>
-			</div>
+			</section>
 		</section> <section>
 			<h1>制限</h1>
 			<p>
@@ -125,7 +123,7 @@ fn must_use() -&gt; i32 {
 筆者の知識不足かもしれないが、これは仕様の不備に思える。
 					</p>
 				</aside>
-				<div class="sub">
+				<section>
 					<h2>調査結果</h2>
 					<p>
 いくつかピックアップした調査結果…。
@@ -243,7 +241,7 @@ fn must_use() -&gt; i32 {
 							</table>
 						</dd>
 					</dl>
-				</div>
+				</section>
 			</section>
 		</section>
 	</body>

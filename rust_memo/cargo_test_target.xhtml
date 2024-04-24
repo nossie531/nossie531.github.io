@@ -15,7 +15,7 @@
 		</p> 
 		<section>
 			<h1>基礎知識</h1>
-			<div class="sub">
+			<section>
 				<h2>コマンドの構文</h2>
 <pre class="command"><code>cargo test</code> [<var>options</var>] [<var>testname</var>] [<code>--</code> <var>test-options</var>]</pre>
 				<p>
@@ -30,8 +30,7 @@
 テスト対象の指定には両方の組合せが必要 (少し紛らわしい…)。
 					</p>
 				</aside>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2><code>cargo</code> オプション</h2>
 				<p>
 ビルド成果物を単位とした絞り込みを行う (<a href="https://doc.rust-lang.org/cargo/commands/cargo-test.html#options">公式資料</a>)。
@@ -54,8 +53,7 @@
 					<dt><code>--test <var>name</var></code></dt>
 					<dd>統合テストファイル指定</dd>
 				</dl>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2><code>libtest</code> オプション</h2>
 				<p>
 関数を単位とした絞り込みを行う (<a href="https://doc.rust-lang.org/rustc/tests/index.html#cli-arguments">公式資料</a>)。
@@ -67,36 +65,32 @@
 				</p> <p>
 なお、フィルタはデフォルトでは部分一致で行われるため注意。つまり、<code>hoge</code> や <code>foo_bar</code> は <code>hoge::<wbr/>piyo::<wbr/>fuga::<wbr/>foo_bar_baz()</code> メソッドを対象とする。そうではなく、完全一致が必要となる場合、<var class="mt">test-options</var> の箇所にて <code>--exact</code> オプションを指定すればよい。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>補足 (一意の指定)</h2>
 				<p>
 <code>cargo</code> 側で複数の対象が選択され、それらそれぞれに <code>libtest</code> 側の条件に該当するものがあった場合、その全てがテスト対象になる。そのため、一意に限定するには両方の条件による絞り込みが必要。
 				</p>
-			</div>
+			</section>
 		</section> <section>
 			<h1>ケーススタディ</h1>
-			<div class="sub">
+			<section>
 				<h2>ワークスペース全体</h2>
 <pre><code>
 cargo test --workspace
 </code></pre>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>ライブラリテストの範囲指定</h2>
 <pre><code>
 cargo test --lib <var>basic::api</var>
 </code></pre>
 				<p>
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>テスト関数の個別指定</h2>
 <pre><code>
 cargo test --package <var>my_crate</var> <var>funcPath</var> -- --exact
 </code></pre>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2 id="execSingleIT">結合テスト関数の指定</h2>
 <pre><code>
 cargo test --package <var>my_crate</var> --test <var>my_test_file</var> <var>funcPath</var> -- --exact
@@ -104,7 +98,7 @@ cargo test --package <var>my_crate</var> --test <var>my_test_file</var> <var>fun
 				<p>
 ※ 結合テストの場合、<code>funcPath</code> が関数名のみになる場合が多い。
 				</p>
-			</div>
+			</section>
 		</section> <section>
 			<h1>付録 (<code>launch.json</code>)</h1>
 			<p>

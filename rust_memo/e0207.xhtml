@@ -29,7 +29,7 @@
 			<p>
 <code>impl</code> ブロックの各ジェネリクスパラメタは、<code>impl</code> の対象となる型から、それぞれの具体的な内容が決まるよう、それぞれが適切に制約されていなければならない。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>具体例</h2>
 				<p>
 以下はエラーになる (後述の<a href="#ptnC">パターン C</a>)。
@@ -40,13 +40,12 @@ impl&lt;T, U&gt; MyType&lt;T&gt; where T: MyTrait&lt;U&gt;
 				<p>
 これが許されると、型がこの実装に適合しても、型パラメタ <code>U</code> の具体的な内容が決まらないパターンがでてきてしまう。例えば、この実装に適合する型 <code>MyType<wbr/>&lt;SomeType&gt;</code> において、<code>SomeType</code> は <code>MyTrait<wbr/>&lt;U&gt;</code> に適合する。しかしここで、<code>SomeType</code> は <code>MyTrait<wbr/>&lt;i32&gt;</code> と <code>MyTrait<wbr/>&lt;u32&gt;</code> に同時に適合するかもしれない。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>解決策</h2>
 				<p>
 殆どの場合、型やトレイトにダミーのジェネリクスパラメタを追加して、それらに問題のジェネリクスパラメタを指定するとよい。これはつまり、問題のジェネリクスパラメタの内容を明示的に指定できるようにしている。詳細は各パターンの解決策を参照。
 				</p>
-			</div>
+			</section>
 		</section> <section>
 			<h1>仕様</h1>
 			<p>
@@ -98,7 +97,7 @@ impl&lt;<mark class="error">T</mark>&gt; MyType {}
 <mark class="info">2 |</mark> impl&lt;T&gt; MyType {}
 <mark class="info">  |</mark>      <mark class="error">^ unconstrained type parameter</mark>
 </samp></pre>
-				<div class="sub">
+				<section>
 					<h2>解決策</h2>
 					<p>
 ダミーの型パラメタを持たせるとよい。
@@ -108,7 +107,7 @@ use std::marker::PhantomData;
 pub struct MyType&lt;T&gt;(PhantomData&lt;T&gt;);
 impl&lt;T&gt; MyType&lt;T&gt; {}
 </code></pre>
-				</div>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnB">パターン B</h1>
@@ -130,7 +129,7 @@ impl&lt;<mark class="error">T</mark>&gt; MyType {
 <mark class="info">2 |</mark> impl&lt;T&gt; MyType {
 <mark class="info">  |</mark>      <mark class="error">^ unconstrained type parameter</mark>
 </samp></pre>
-				<div class="sub">
+				<section>
 					<h2>解決策</h2>
 					<p>
 型パラメタの宣言を関連関数の側で行えばよい。
@@ -141,7 +140,7 @@ impl MyType {
     pub fn f&lt;T&gt;(_: T) {}
 }
 </code></pre>
-				</div>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnC">パターン C</h1>
@@ -162,7 +161,7 @@ impl&lt;T, <mark class="error">U</mark>&gt; MyType&lt;T&gt; where T: MyTrait&lt;
 <mark class="info">3 |</mark> impl&lt;T, U&gt; MyType&lt;T&gt; where T: MyTrait&lt;U&gt; {}
 <mark class="info">  |</mark>         <mark class="error">^ unconstrained type parameter</mark>
 </samp></pre>
-				<div class="sub">
+				<section>
 					<h2>解決策</h2>
 					<p>
 ダミーの型パラメタを持たせるとよい。
@@ -173,7 +172,7 @@ pub struct MyType&lt;T, U&gt;(T, PhantomData&lt;U&gt;);
 pub trait MyTrait&lt;T&gt; {}
 impl&lt;T, U&gt; MyType&lt;T, U&gt; where T: MyTrait&lt;U&gt; {}
 </code></pre>
-				</div>
+				</section>
 			</section>
 		</section>
 	</body>

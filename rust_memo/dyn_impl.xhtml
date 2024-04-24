@@ -18,13 +18,12 @@
 			<p>
 <code>impl dyn <var>MyTrait</var> { ... }</code> のスタイルで記載する。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>主な用途</h2>
 				<p>
 ダウンキャスト系のメソッドを実装する場合が多い。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>サンプルコード</h2>
 				<p>
 以下では、<code>dyn Animal</code> を <code>Dog</code> にダウンキャストしている。なお、ダウンキャスト用のメソッドは <code>dyn Any</code> にあるため、いったん <code>dyn Animal</code> から <code>dyn Any</code> へアップキャストしている (参考:『<a href="dyn_upcast.xhtml"><code>dyn</code> 型のアップキャスト</a>』)。
@@ -66,19 +65,18 @@ impl Animal for Dog {
     }
 }
 </code></pre>
-			</div>
+			</section>
 		</section> <section>
 			<h1>トレイトの実装</h1>
 			<p>
 <code>impl <var>SomeTrait</var> for dyn <var>MyTrait</var> { ... }</code> のスタイルで記載する。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>主な用途</h2>
 				<p>
 オブジェクトセーフでないトレイトを動的に活用できるようにする。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>サンプルコード</h2>
 				<p>
 以下では、<a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html"><code>PartialEq</code></a> トレイトの <a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html#tymethod.eq"><code>eq</code></a> メソッドにより、数値型または文字列型をとる <code>dyn Id</code> どうしを比較している。なお、<a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html#tymethod.eq"><code>eq</code></a> は比較先に <code>Self</code> を用いる。そのため、<a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html"><code>PartialEq</code></a> はこの手法なしでは、異なる型どうしの比較も、動的型の処理もできない (オブジェクトセーフの条件を満たせないため)。
@@ -111,7 +109,7 @@ impl Id for String {
     fn key(&amp;self) -&gt; String { format!("str: {self}") }
 }
 </code></pre>
-			</div>
+			</section>
 		</section> <section>
 			<h1>備考</h1>
 			<p>

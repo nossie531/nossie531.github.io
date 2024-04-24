@@ -24,7 +24,7 @@
 				</p>
 マップ系と異なり、セット系の型 (<a href="https://doc.rust-lang.org/std/collections/struct.HashSet.html"><code>HashSet</code></a> や <a href="https://doc.rust-lang.org/std/collections/struct.BTreeSet.html"><code>BTreeSet</code></a>) には、同様のメソッドが <time>2023 年現在</time>まだ存在していない。<a href="https://github.com/rust-lang/rfcs/issues/1490">提案</a>はされているので、そのうち導入されるかも…。
 			</aside>
-			<div class="sub">
+			<section>
 				<h2>メソッドとその周辺仕様</h2>
 				<p>
 以下は <a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html"><code>HashMap</code></a> の <a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html#method.entry"><code>entry</code></a> メソッドの宣言。
@@ -46,7 +46,7 @@ pub fn entry(&amp;mut self, key: K) -&gt; Entry&lt;'_, K, V&gt;
 <a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#variant.Occupied"><code>Ocupied</code></a> の場合、対象にキーが登録済。
 					</li>
 				</ul>
-			</div>
+			</section>
 		</section> <section>
 			<h1>応用例</h1>
 			<p>

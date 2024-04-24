@@ -42,7 +42,7 @@
 			</p> <p>
 そのため、<code>self: <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> のような指定も可能になる。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>サンプルコード</h2>
 				<p>
 以下では、<code>method</code> 関数の <code>self</code> 引数が <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> 型になっている。
@@ -61,12 +61,12 @@ impl Test {
     }
 }
 </code></pre>
-			</div> <div class="sub">
+			</section> <section>
 				<h2>この用法の使い所</h2>
 				<p>
 この用法を使わなくても、『<a href="dot_and_self.xhtml">メソッド呼出と型変換</a>』による自動型変換があるため、<wbr/><code>&amp;self</code> でも <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> 型の実引数を受けられる。そのため、この記法は <code>&amp;self</code> で受けられる他の型を除外し、<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> 型のみを扱いたい場合に役に立つ。
 				</p>
-			</div>
+			</section>
 		</section>
 	</body>
 </html>

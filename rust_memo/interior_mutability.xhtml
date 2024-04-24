@@ -24,19 +24,17 @@
 			<p>
 標準で提供される内部可変性のある型について。
 			</p>
-			<div class="sub">
+			<section>
 				<h2 id="UnsafeCell"><code>UnsafeCell</code></h2>
 				<p>
 <a href="https://doc.rust-lang.org/std/cell/struct.UnsafeCell.html"><code>UnsafeCell</code></a> は仕様上の特別な型で、ここで紹介しているその他の型の実装の基盤にもなっている。コンパイラはこの型でラップされた値については、たとえ不変とマークされていても、変更されうるものとして扱う。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2><code>UnsafeCell</code> 以外</h2>
 				<p>
 <a href="#UnsafeCell"><code>UnsafeCell</code></a> をそのまま使うのは、あまりお勧めできない。なぜなら、内部可変性は普段なら Rust が保証してくれる読込と書込の排他性、それから書込と書込の排他性を失わせる。そのため、バグを書きやすくなる。一方、<a href="#UnsafeCell"><code>UnsafeCell</code></a> を利用して実装された他の標準の型では、そうした問題をうまく回避できる理論的背景がある場合が多い。そのため、可能な限りそちらを採用した方がよい。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>代表的な型の一覧</h2>
 				<dl class="normal lowProfile">
 					<dt>
@@ -103,7 +101,7 @@
 				<p>
 ※ <a href="#LazyCell"><code>LazyCell</code></a> と <a href="#LazyLock"><code>LazyLock</code></a> は <time>2023 年現在</time>はナイトリー。
 				</p>
-			</div>
+			</section>
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>

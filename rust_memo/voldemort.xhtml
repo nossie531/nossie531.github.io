@@ -38,7 +38,7 @@ Voldemort は J. K. Rowling の小説『Harry Potter』の登場人物の名前�
 					</p>
 				</li>
 			</ul>
-			<div class="sub">
+			<section>
 				<h2>サンプルコード</h2>
 				<p>
 以下では、<code>my_lib</code> クレートの <code>MaginNo</code> 型が  Voldemort パターンの適用対象になる。
@@ -70,8 +70,7 @@ pub fn get_magic_no() -&gt; private::MagicNo {
 }
 </code></pre>
 				</figure>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>補足: 公開指定の意味</h2>
 				<p>
 Voldemort パターンでは、"非公開" モジュール内のアイテムが、名指しこそできなくとも、他クレートに "公開" されている。この文言の不一致はどう解釈すれば良いのだろうか？
@@ -80,19 +79,18 @@ Voldemort パターンでは、"非公開" モジュール内のアイテムが�
 				</p> <p>
 もちろん殆どの場合、公開するなら名指しも許可する運用となるが、Voldemort パターンはその数少ない例外となる。
 				</p>
-			</div>
+			</section>
 		</section> <section>
 			<h1>応用</h1>
 			<p>
 上で紹介した例の他にも、いくつか使い方がある。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>Sealed トレイトパターン</h2>
 				<p>
 トレイトの基底となるトレイトに Voldemort パターンを適用する事で、新たなトレイトの実装を禁止する。詳しくは『<a href="sealed_trait.xhtml">Sealed トレイトパターン</a>』を参照。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>仮想的な非公開化 (非推奨)</h2>
 				<p>
 Voldemort 型のダミー引数やダミー型引数を使えば、仮想的に非公開の関数を作れる。
@@ -101,7 +99,7 @@ Voldemort 型のダミー引数やダミー型引数を使えば、仮想的に�
 				</p> <p>
 ただし、この手法はトレイトのデフォルト実装から呼ばれる共通処理のそこそこ分かりやすい置場、くらいにしかならない。それに対し、欠点は多い。まず、無駄な引数があり気が散る。また、IDE の補完候補が信用できなくなる問題もある。
 				</p>
-			</div>
+			</section>
 		</section> <section>
 			<h1>rustdoc</h1>
 			<p>

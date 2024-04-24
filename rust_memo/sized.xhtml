@@ -23,7 +23,7 @@
 			<p>
 <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> トレイトは固定メモリサイズの型 (型から参照されるヒープ領域のサイズなどは除外) に自動で付加されるマーカートレイトである。一方、そうでない型は <code>!Sized</code> とマークされ、それらは <abbr>DST</abbr> (Dynamically Sized Type) と呼ばれる。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>代表例</h2>
 				<dl class="normal">
 					<dt> <code>Sized</code> になる型 </dt>
@@ -62,7 +62,7 @@
 構造体は最後のフィールドのみ <code>!Sized</code> にできる。そして、その場合のみ構造体は <code>!Sized</code> になる。ただし、こうした構造体の初期化にはアンセーフな機能が必要になるなど、取扱がやや難しい。
 					</p>
 				</aside>
-			</div>
+			</section>
 		</section> <section>
 			<h1>関係各所でのルール</h1>
 			<p>
@@ -87,7 +87,7 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 				<p>
 トレイトとその <code>Self</code> には特殊な扱いがされる。
 				</p>
-				<div class="sub">
+				<section>
 					<h2><code>Sized</code> を指定する方法</h2>
 					<p>
 <code>Self</code> は型パラメタの一種だが、トレイトの <code>Self</code> は暗黙の <code>Sized</code> 境界を持たない。
@@ -111,8 +111,7 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 							</p>
 						</li>
 					</ul>
-				</div>
-				<div class="sub">
+				</section> <section>
 					<h2><code>Sized</code> を指定した場合</h2>
 					<p>
 トレイトの <code>Self</code> における <code>Sized</code> は以下のように振る舞う。
@@ -138,7 +137,7 @@ rustdoc による API ドキュメントでは、型ごとに <q>Auto Trait Impl
 							</p>
 						</li>
 					</ul>
-				</div>
+				</section>
 			</section>
 		</section>
 	</body>

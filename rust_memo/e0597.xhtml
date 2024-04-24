@@ -108,13 +108,12 @@ fn use_static_ref(_: &amp;'static i32) {
 				<p>
 型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装し、かつ参照を持つ場合について。その参照先を格納するブロックの末尾の式内に、その型の値があるとエラーになる。なぜなら、ブロック内のローカル変数はブロック末尾の式内の値よりも先に解放される。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先が存在しなくなってしまう。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>エラーの解決方法</h2>
 					<p>
 後述のエラーメッセージの <q>help</q> にある通り、ブロック末尾の式をローカル変数として切り出せばよい。これにより、値を破棄する順序を逆転できる。
 					</p>
-				</div>
-				<div class="sub">
+				</section> <section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、<code>OnDrop(&amp;local)</code> がブロック末尾の式内にある。しかし、その解放時には <code>local</code> は解放済のため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時には参照先が存在しない状態になってしまっている。
@@ -159,7 +158,7 @@ impl Drop for OnDrop&lt;'_&gt; {
 <mark class="info">4 |</mark>         <mark class="edit">let x =</mark> *OnDrop(&amp;local).0<mark class="edit">; x</mark>
 <mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                  <mark class="edit">+++</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnC2">パターン C2</h1>
@@ -168,7 +167,7 @@ impl Drop for OnDrop&lt;'_&gt; {
 				<p>
 基本は<a href="#ptnC1">パターン C1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化が静的か動的かは問わない。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、<code>MyType(&amp;local).as_trait()</code> がブロック末尾の式内にある。しかし、その解放時には <code>local</code> は解放済のため、結果のトレイトの具象型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> を実装していた場合、その実行時には参照先が存在しない状態になってしまっている。
@@ -223,7 +222,7 @@ impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
 <mark class="info">4 |</mark>         <mark class="edit">let x =</mark> MyType(&amp;local).as_trait().val()<mark class="edit">; x</mark>
 <mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                                <mark class="edit">+++</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnD1">パターン D1</h1>
@@ -232,12 +231,12 @@ impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
 				<p>
 型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装し、かつ参照を持つ場合について。参照先に自身を包含するデータの一部を指定するとエラーになる。なぜなら、そのデータが参照先と参照元どちらを含むフィールドを先に解放するかの保証がないため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時には参照先が存在しないかもしれない (フィールドの解放順は定義順によるが、フィールドを逆順で定義するような型も同時に存在しうるため、フィールド側の型は解放順に依存できない)。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>補足: <code>dropck_eyepatch</code></h2>
 					<p>
 上記の制約は <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッド内で参照を使用しない場合でも働く。これが不要な場合、<time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/dropck-eyepatch.html"><code>dropck_eyepatch</code></a> でそれを無視するようにもできる (具体的には参照のライフタイム指定子に <code>#[may_dangle]</code> を指定)。
 					</p>
-				</div> <div class="sub">
+				</section> <section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、<code>OnDrop</code> での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行に関連して、<code>data</code> に参照元である <code>OnDrop</code> と参照先である <code>&amp;data.id</code> の両方を格納できないようにされている。
@@ -275,7 +274,7 @@ impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
 <mark class="info">  |</mark> <mark class="info">`data.id` dropped here while still borrowed</mark>
 <mark class="info">  |</mark> <mark class="info">borrow might be used here, when `data` is dropped and runs the destructor for type `MyData&lt;'_&gt;`</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnD2">パターン D2</h1>
@@ -284,7 +283,7 @@ impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
 				<p>
 基本は<a href="#ptnD1">パターン D1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化は動的である (抽象化が静的ならば、全体を格納する型は各部での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> の実装有無を把握できるため)。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>サンプルコード</h2>
 					<p>
 以下では、<code>MyTrait</code> で実行されうる <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> に関連して、<code>data</code> に参照元である <code>MyTrait</code> と参照先である <code>&amp;data.id</code> の両方を格納できないようにされている。
@@ -328,7 +327,7 @@ impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
 <mark class="info">  |</mark> <mark class="info">`data.id` dropped here while still borrowed</mark>
 <mark class="info">  |</mark> <mark class="info">borrow might be used here, when `data` is dropped and runs the destructor for type `MyData&lt;'_&gt;`</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section>
 		</section>
 	</body>

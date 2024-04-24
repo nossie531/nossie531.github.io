@@ -25,13 +25,12 @@ rustdoc で各アイテムに必要なフィーチャーを表示する方法に
 			<p>
 フィーチャ <code>my_feature</code> でのみ関数 <code>for_my_feature_only</code> を有効にする。
 			</p>
-			<div class="sub">
+			<section>
 				<h2>補足: ナイトリー機能のオプトイン</h2>
 				<p>
 以降のコードでは、ユーザ定義の属性名 <code>doc_feature</code> が何度か登場する。これはナイトリー版でのみ可能な <code>doc_cfg</code> の導入とそれによるフィーチャーの表示について、オプトインするためのフラグになっている。そして、このオプトインが必要な場合にのみ、rustdoc へ引数を追加する仕組となっている。
 				</p>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>タスク 1</h2>
 				<ul>
 					<li>
@@ -48,8 +47,7 @@ rustdoc で各アイテムに必要なフィーチャーを表示する方法に
 rustdocflags = ["--cfg", "doc_feature"]
 </code></pre>
 				</figure>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>タスク 2</h2>
 				<ul>
 					<li>
@@ -73,8 +71,7 @@ my_feature = []
 # ...
 </code></pre>
 				</figure>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>タスク 3</h2>
 				<ul>
 					<li>
@@ -95,8 +92,7 @@ my_feature = []
 pub fn for_my_feature_only() {}
 </code></pre>
 				</figure>
-			</div>
-			<div class="sub">
+			</section> <section>
 				<h2>タスク 4</h2>
 				<ul>
 					<li>
@@ -106,7 +102,7 @@ pub fn for_my_feature_only() {}
 <pre><code>
 cargo +nightly doc --open
 </code></pre>
-			</div>
+			</section>
 		</section>
 	</body>
 </html>

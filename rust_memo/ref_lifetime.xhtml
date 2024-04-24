@@ -50,7 +50,7 @@
 この制限はコーディングスタイルの道しるべにもなる。つまり、部分側の処理を終えてからでないと、全体側からの更新ができないため、処理内容によるコードの分離が促進される。
 					</p>
 				</aside>
-				<div class="sub">
+				<section>
 					<h2>コンパイルエラーになる例</h2>
 					<p>
 以下では、参照 <code>&amp;data</code> から参照 <code>sub_ref</code> を得ている。つまり、<code>sub_ref</code> への最後のアクセスまでは、<code>&amp;data</code> も維持され、それと衝突する操作は行えなくなる。
@@ -82,7 +82,7 @@ struct Data {
 <mark class="info">5 |</mark>     println!("{}", sub_ref);
 <mark class="info">  |</mark>                    <mark class="info">------- immutable borrow later used here</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section> <section>
 				<h1 id="mut_ref_to_ref">可変参照からの参照</h1>
 				<p>
@@ -99,7 +99,7 @@ struct Data {
 元の参照からの操作が全て禁止されるルールについて。厳しすぎるのでは？新しい参照が不変参照、かつ元の参照への操作が読取系の場合、問題はないのでは？と思われるかもしれない。これについては『<a href="#mut_ref_to_const_ref">可変参照からの不変参照</a>』を参照。
 					</p>
 				</aside>
-				<div class="sub">
+				<section>
 					<h2>コンパイルエラーになる例</h2>
 					<p>
 以下では、参照 <code>&amp;mut data</code> から <code>sub_ref</code> を得ている。そのため、<code>sub_ref</code> への最後のアクセスまでは、<code>&amp;mut data</code> も維持され、それと衝突する操作は行えなくなる。
@@ -131,7 +131,7 @@ struct Data {
 <mark class="info">5 |</mark>     println!("{}", sub_ref);
 <mark class="info">  |</mark>                    <mark class="info">------- mutable borrow later used here</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section> <section>
 				<h1 id="mut_ref_to_const_ref">可変参照からの不変参照</h1>
 				<p>
@@ -141,7 +141,7 @@ struct Data {
 				</p> <p>
 ただ、このパターンについてのよくある疑問があるため取り上げておく。
 				</p>
-				<div class="sub">
+				<section>
 					<h2>厳しすぎるルール？</h2>
 					<p>
 可変参照からの参照では、両者のライフタイムが同じなら、新しい参照が残っている間、元の参照からの操作は全て禁止されてしまう。ただ、可変参照からの不変参照の場合、このルールは少し厳しすぎるように<em>思える</em>。
@@ -150,8 +150,7 @@ struct Data {
 					</p> <p>
 しかし、この代案は以下のレアケースの考慮が漏れている。
 					</p>
-				</div>
-				<div class="sub">
+				</section> <section>
 					<h2>内部可変性による裏事情</h2>
 					<p>
 内部可変性のある型では、<code>get_mut</code>, <code>from_mut</code> 関数を持つものがある。これらは、内部可変型と可変参照型とを相互変換できる (参考:『<a href="interior_mutability_xxx_mut.xhtml">内部可変性と get_mut, from_mut 関数</a>』)。
@@ -160,8 +159,7 @@ struct Data {
 					</p> <p>
 つまり、元の参照への操作を全て禁止にするルールがここで必要になる。
 					</p> 
-				</div>
-				<div class="sub">
+				</section> <section>
 					<h2>コンパイルエラーになる例</h2>
 					<p>
 以下は <a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html"><code>RefCell</code></a> による例。不変参照中の値の更新をコンパイルエラーで予防している。
@@ -198,7 +196,7 @@ fn set_ref_cell_value(immutable_ref: &amp;RefCell&lt;i32&gt;, value: i32) {
 <mark class="info">9 |</mark>     assert_eq!(*immutable_ref, 0);
 <mark class="info">  |</mark>     <mark class="info">----------------------------- mutable borrow later used here</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section> <section>
 				<h1>特殊な入れ子の参照</h1>
 				<p>
@@ -220,7 +218,7 @@ fn set_ref_cell_value(immutable_ref: &amp;RefCell&lt;i32&gt;, value: i32) {
 <code>self</code> や <code>Self</code> などの型指定により、このパターンになっている事に気付きにくい場合がある。例えば、<code>SomeStruct&lt;'a&gt;</code> のような構造体で <code>&amp;'a self</code> のような引数型のメソッドがあれば、それはこのパターンに該当する。
 					</p>
 				</aside>
-				<div class="sub">
+				<section>
 					<h2>コンパイルエラーになる例</h2>
 					<p>
 以下では、参照 <code>&amp;mut data</code> と構造体の変数 <code>data</code> で問題の処理が発生する。そのため、<code>data</code> がある間は、参照 <code>&amp;mut data</code> も残り、それと衝突する操作は行えなくなる。
@@ -253,7 +251,7 @@ struct Data&lt;'a&gt; {
 <mark class="info">  |</mark>     <mark class="error">immutable borrow occurs here</mark>
 <mark class="info">  |</mark>     <mark class="error">mutable borrow later used here</mark>
 </samp></pre>
-				</div>
+				</section>
 			</section>
 		</section>
 	</body>
