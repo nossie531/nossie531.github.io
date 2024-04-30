@@ -17,8 +17,6 @@
 			nextLink: this.#createRelatedLink("next", "[→]"),
 		};
 
-		#setupHeaderIdsIter = null;
-
 		// 起動。
 		static exec() {
 			const nav = new Nav;
