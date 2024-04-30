@@ -366,7 +366,11 @@
 
 		// XHTML 文書をロード。
 		static async fetchXhtml(url) {
-			const response = await fetch(url);
+			const response = await fetch(url).catch(() => null);
+			if (!response) {
+				return null;
+			}
+
 			const text = await response.text();
 			return (new DOMParser()).parseFromString(text, "application/xhtml+xml");
 		}
