@@ -410,6 +410,8 @@
 
 @layer ui {
 	:root {
+		--firstHighlightAnim: firstHighlight 1.5s linear;
+
 		scroll-behavior: smooth;
 
 		/* -- 右スクロールバーは常に表示 --
@@ -422,7 +424,7 @@
 	}
 
 	*:target {
-		animation: firstHighlight 1.5s linear;
+		animation: var(--firstHighlightAnim);
 	}
 
 	@keyframes firstHighlight {

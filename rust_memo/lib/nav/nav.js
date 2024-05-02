@@ -7,6 +7,8 @@
 		static #openText = "[≡]";
 		static #closeText = "[×]";
 
+		#sectionToAnchors = new Map;
+
 		#elements = {
 			root: this.#createRoot(),
 			head: this.#createHead(),
@@ -21,7 +23,6 @@
 		static exec() {
 			const nav = new Nav;
 			const setupNav = nav.#setupNav.bind(nav);
-			Nav.#setupHeaderIds();
 			Util.addCallbackOnDomLoaded(setupNav);
 		}
 
@@ -78,6 +79,7 @@
 
 		// スクロール時の動作を設定。
 		#setupScrollAction() {
+			const self = this;
 			const sections = getH1Sections();
 			const indexElm = this.#elements.root.querySelector("ul.index");
 			window.addEventListener("scroll", () => scrollCallback.call(this));
@@ -133,8 +135,8 @@
 				if (sectionRange.isEmpty) {
 					indexElm.style.backgroundImage = "transparent";
 				} else {
-					const anchorMin = getAnchorElmFromSectionElm(sectionRange.min);
-					const anchorMax = getAnchorElmFromSectionElm(sectionRange.max);
+					const anchorMin = self.#sectionToAnchors.get(sectionRange.min);
+					const anchorMax = self.#sectionToAnchors.get(sectionRange.max);
 					const baseTop = indexElm.getBoundingClientRect().top;
 					const hlMin = anchorMin.getBoundingClientRect().top - baseTop;
 					const hlMax = anchorMax.getBoundingClientRect().bottom - baseTop;
@@ -215,9 +217,8 @@
 
 			const ul = document.createElement("ul");
 			for (const section of sections) {
-				const header = Nav.#getSectionHeader(section);
 				const children = this.#createIndex(section);
-				ul.append(this.#createIndexEntry(header, children));
+				ul.append(this.#createIndexEntry(section, children));
 			}
 
 			ul.classList.toggle("index", elm.tagName === "body");
@@ -225,12 +226,17 @@
 		}
 
 		// 目次の項目を一つ作成。
-		#createIndexEntry(header, children) {
+		#createIndexEntry(section, children) {
+			const header = Nav.#getSectionHeader(section);
 			const li = document.createElement("li");
 			const a = document.createElement("a");
 			const vHeader = Nav.#adjustForHeader(Util.cloneContents(header));
 			const vChildren = children || document.createDocumentFragment();
-			a.href = "#" + header.id;
+			const jumpTo = Nav.#jumpTo.bind(null, header);
+			this.#sectionToAnchors.set(section, a);
+			a.tabIndex = 0;
+			a.href = "javascript:;"
+			a.addEventListener("click", jumpTo);
 			a.append(vHeader);
 			li.append(a, vChildren);
 			return li;
@@ -251,6 +257,19 @@
 			return result;
 		}
 
+		// 指定した要素へジャンプします。
+		static #jumpTo(elm) {
+			Util.clearUrlHash();
+			elm.scrollIntoView();
+			animation("none");
+			window.requestAnimationFrame(animation.bind(null, "var(--firstHighlightAnim)"));
+			elm.addEventListener("animationend", animation.bind(null, ""), { once: true });
+
+			function animation(value) {
+				elm.style.animation = value;
+			}
+		}
+
 		// 要素の内容をヘッダ用にカスタマイズします。
 		static #adjustForHeader(elm) {
 			Util.removeAnchors(elm);
@@ -269,57 +288,6 @@
 				return fstElm?.tagName === tagName ? fstElm : null;
 			}
 		}
-
-		// 全セクションのヘッダ要素に ID を設定。
-		static #setupHeaderIds() {
-			const root = document.documentElement;
-			const tw = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-			const ctx = [{ elm: root, seq: null }];
-			const update = (function*(){})().next.bind(generateUpdate());
-			Util.addCallbackOnNewElement(update);
-			Util.addCallbackOnDomLoaded(update);
-
-			function *generateUpdate() {
-				for (let curr = tw.nextNode(); curr; curr = tw.nextNode(curr)) {
-					const level = getCtxLevel(curr);
-					const header = Nav.#getSectionHeader(curr);
-					ctx[level] = { elm: curr, seq: getSeq(curr) };
-					ctx.length = level + 1;
-					if (header) {
-						const seqs = ctx.map(x => x.seq).filter(x => x !== null);
-						header.id = header.id || "header" + seqs.join("-");
-					}
-				}
-
-				if (document.readyState === "loading") {
-					yield;
-				} else {
-					return;
-				}
-			}
-
-			function getSeq(elm) {
-				if (!Nav.#getSectionHeader(elm)) {
-					return null;
-				} else {
-					const level = getCtxLevel(elm);
-					const lastSibling = level < ctx.length ? ctx[level] : null;
-					return typeof(lastSibling?.seq) === "number" ? lastSibling.seq + 1 : 0;
-				}
-			}
-
-			function getCtxLevel(elm) {
-				if (elm.parentNode === ctx.at(-1).elm) {
-					return ctx.length;
-				} else {
-					return ctx.findLastIndex(x => x.elm.nextElementSibling === elm);
-				}
-			}
-
-			function getHeaderId(header, seqs) {
-				return header.id || "header" + seqs.join("-");
-			}
-		}
 	}
 
 	// ユーティリティクラス。
@@ -333,13 +301,6 @@
 			}
 		}
 
-		// 新要素の検出時にコールバック。
-		static addCallbackOnNewElement(f) {
-			const root = document.documentElement;
-			const observer = new MutationObserver(() => f());
-			observer.observe(root, { childList: true, subtree: true });
-		}
-
 		// 要素の内容をクローン。
 		static cloneContents(elm) {
 			const range = document.createRange();
@@ -347,21 +308,9 @@
 			return range.cloneContents();
 		}
 
-		// 次の要素を取得します。
-		static nextElement(elm) {
-			let curr = elm;
-
-			if (curr.firstElementChild) {
-				return curr.firstElementChild;
-			}
-
-			for (let ctx = curr; ctx ; ctx = ctx.parentNode) {
-				if (ctx.nextElementSibling) {
-					return ctx.nextElementSibling;
-				}
-			}
-
-			return null;
+		// 現在の URL からハッシュ部分を削除。
+		static clearUrlHash() {
+			history.replaceState(null, null, " ");
 		}
 
 		// XHTML 文書をロード。

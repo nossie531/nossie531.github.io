@@ -50,24 +50,31 @@ nav.forPage {
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		overflow: hidden;
+
+		&::before {
+			content: "\2022";
+			text-align: center;
+			display: inline-block;
+			width: 1em;
+			margin-right: 0.25em;
+		}
 	}
 
-	& li a code {
-		color: unset;
-		background-color: unset;
-	}
+	& li a {
+		cursor: pointer;
 
-	& li a:focus-visible {
-		outline: none;
-		text-decoration: underline;
-	}
+		&:hover {
+			text-decoration: underline;
+		}
 
-	& li::before {
-		content: "\2022";
-		text-align: center;
-		display: inline-block;
-		width: 1em;
-		margin-right: 0.25em;
+		&:focus-visible {
+			outline: none;
+		}
+
+		& code {
+			color: unset;
+			background-color: unset;
+		}
 	}
 }
 
