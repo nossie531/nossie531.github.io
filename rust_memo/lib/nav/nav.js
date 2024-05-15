@@ -4,6 +4,7 @@
 	// ナビゲーションの管理クラス。
 	class NavManager {
 		#mainNav;
+		#subNavs = new Array;
 		#elements = {
 			root: this.#createRoot(),
 			head: this.#createHead(),
@@ -16,13 +17,14 @@
 
 		// 各要素を構築。
 		constructor() {
+			this.#mainNav = new MainNavMaker();
 			this.#elements.root.append(this.#elements.head);
+			this.#elements.root.append(this.#mainNav.index);
 			this.#elements.head.append(this.#elements.prevLink);
 			this.#elements.head.append(this.#elements.nextLink);
 			this.#elements.head.append(this.#elements.upLink);
 			this.#elements.head.append(this.#elements.pageTopLink);
 			this.#elements.head.append(this.#elements.toggleLink);
-			this.#mainNav = new NavMaker(this.#elements.root);
 		}
 
 		// 起動。
@@ -40,18 +42,31 @@
 			const reader = new TreeStackReader(document.documentElement);
 			Util.addCallbackOnPageLoading(() => {
 				for (let act; act = reader.nextAction();) {
-					if (!NavUtil.getSectionHeader(act.elm)) {
-						continue;
-					}
+					if (act.elm.tagName === "nav" && act.elm.classList.contains("sub")) {
+						if (act.isPushed) {
+							const nav = act.elm;
+							const nm = new SubNavMaker();
+							nav.append(nm.index);
+							this.#subNavs.push(nm);
+						}
+					} else if (NavUtil.getSectionHeader(act.elm)) {
+						if (!this.#elements.root.parentElement) {
+							this.#insertMainNav();
+						}
 
-					if (!this.#elements.root.parentElement) {
-						this.#insertMainNav();
-					}
+						if (act.isPushed) {
+							this.#mainNav.pushSection(act.elm);
+							this.#subNavs.at(-1)?.pushSection(act.elm);
+						} else {
+							this.#mainNav.popSection();
+							this.#subNavs.at(-1)?.popSection();
+						}
 
-					if (act.isPushed) {
-						this.#mainNav.pushElm(act.elm);
-					} else {
-						this.#mainNav.popElm();
+						if (!act.isPushed && this.#subNavs.length > 0) {
+							if (this.#subNavs.at(-1).level < 0) {
+								this.#subNavs.pop();
+							}
+						}
 					}
 				}
 			});
@@ -128,17 +143,17 @@
 			window.addEventListener("scroll", refresh);
 
 			function refresh() {
-				if (!mainNav.rootIndex) {
+				if (!mainNav.index) {
 					return;
 				}
 
 				const sectionRange = getSectionRange(mainNav.sections);
 				if (!sectionRange) {
-					mainNav.rootIndex.style.backgroundImage = "transparent";
+					mainNav.index.style.backgroundImage = "transparent";
 				} else {
 					const anchorMin = mainNav.getAnchorFrom(sectionRange.min);
 					const anchorMax = mainNav.getAnchorFrom(sectionRange.max);
-					const baseTop = mainNav.rootIndex.getBoundingClientRect().top;
+					const baseTop = mainNav.index.getBoundingClientRect().top;
 					const hlMin = anchorMin.getBoundingClientRect().top - baseTop;
 					const hlMax = anchorMax.getBoundingClientRect().bottom - baseTop;
 					const colors = { st: "transparent", hl: "var(--nav-hl-color)" };
@@ -151,7 +166,7 @@
 						{ color: colors.st, position: `100%` },
 					];
 					const grad = stops.map((x) => `${x.color} ${x.position}`).join(",");
-					mainNav.rootIndex.style.backgroundImage = `linear-gradient(${grad})`;
+					mainNav.index.style.backgroundImage = `linear-gradient(${grad})`;
 				}
 			}
 
@@ -174,7 +189,16 @@
 				const nextRect = sectionPair[1]?.getBoundingClientRect();
 				const min = currRect.top;
 				const max = nextRect ? nextRect.top : currRect.bottom;
-				return min <= 0 && 0 <= max;
+				/* -- NOTE: Math.trunc の理由。
+				 * これがないと、目標要素へのページ内ジャンプの完了後、判定が微妙にずれる。
+				 * なぜなら、調査時点の一般的なブラウザでは、問題の操作の完了後、目標要素と
+				 * ビューポート両者の上辺は完全には一致せず、1 ピクセル未満の誤差が存在する
+				 * (特にスムーズスクロール時)。そのため、上側に範囲を少し広げる必要がある。*/
+				return Math.trunc(min) <= 0 && 0 < Math.trunc(max);
+			}
+
+			function vsSmoothScroll(x) {
+				return Math.round(x);
 			}
 		}
 
@@ -224,19 +248,20 @@
 		}
 	}
 
-	// 目次の生成装置。
-	class NavMaker {
+	// メイン目次の生成装置。
+	class MainNavMaker {
+		#index;
 		#target;
-		#rootIndex;
 		#sectionToAnchors = new Map;
 
-		constructor(root) {
-			this.#target = root;
+		constructor() {
+			this.#index = document.createElement("ul");
+			this.#target = this.#index;
 		}
 
 		// ルート要素。
-		get rootIndex() {
-			return this.#rootIndex;
+		get index() {
+			return this.#index;
 		}
 
 		// 対象セクションの配列。
@@ -249,37 +274,88 @@
 			return this.#sectionToAnchors.get(section);
 		}
 
-		// 文書要素のプッシュ。
-		pushElm(elm) {
-			if (elm.tagName !== "section") {
-				return;
-			}
-
+		// セクションをプッシュ。
+		pushSection(section) {
 			if (this.#target.tagName !== "ul") {
 				const ul = document.createElement("ul");
 				this.#target.append(ul);
 				this.#target = ul;
-				this.#rootIndex = this.#rootIndex || ul;
 			}
 
-			const header = NavUtil.getSectionHeader(elm);
-			const title = NavUtil.createTitlePart(header);
+			const header = NavUtil.getSectionHeader(section);
+			const title = NavUtil.cloneForLinkTitle(header);
 			const li = document.createElement("li");
 			const a = document.createElement("a");
-			const jumpTo = NavUtil.jumpTo.bind(null, header);
-			a.tabIndex = 0;
-			a.href = "javascript:;"
-			a.addEventListener("click", jumpTo);
+			NavUtil.setJump(a, header);
 			a.append(title);
 			li.append(a);
 			this.#target.append(li)
 			this.#target = li;
-			this.#sectionToAnchors.set(elm, a);
+			this.#sectionToAnchors.set(section, a);
+		}
+
+		// セクションをポップ。
+		popSection() {
+			if (this.#target.tagName === "ul") {
+				this.#target = this.#target.parentNode.parentNode;
+			} else if (this.#target.tagName === "li") {
+				this.#target = this.#target.parentNode;
+			}
+		}
+	}
+
+	// サブ目次の生成装置。
+	class SubNavMaker {
+		#index;
+		#target;
+		#level = 0;
+
+		constructor() {
+			this.#index = this.#createOuter();
+			this.#target = this.#index;
+		}
+
+		// レベルを取得。
+		get level() {
+			return this.#level;
+		}
+
+		// 目次要素を取得。
+		get index() {
+			return this.#index;
+		}
+
+		// 文書要素のプッシュ。
+		pushSection(section) {
+			this.#level++;
+			if (this.#level === 1) {
+				const mainHeader = NavUtil.getSectionHeader(section);
+				const subHeader = NavUtil.getSectionSubHeader(section);
+				const mainTitle = NavUtil.cloneForLinkTitle(mainHeader);
+				const subTitle = NavUtil.cloneForTextTitle(subHeader);
+				const dt = document.createElement("dt");
+				const dd = document.createElement("dd");
+				const a = document.createElement("a");
+				NavUtil.setJump(a, mainHeader);
+				a.append(mainTitle);
+				dt.append(a);
+				dd.append(subTitle);
+				this.#index.append(dt);
+				this.#index.append(dd);
+			}
 		}
 
 		// 文書要素のポップ。
-		popElm() {
-			this.#target = this.#target.parentNode;
+		popSection() {
+			this.#level--;
+		}
+
+		// リストの外側を生成。
+		#createOuter() {
+			const result = document.createElement("dl");
+			result.classList.add("normal");
+			result.classList.add("lowProfile");
+			return result;
 		}
 	}
 
@@ -288,10 +364,17 @@
 		static #openText = "[≡]";
 		static #closeText = "[×]";
 
-		// タイトル部を生成。
-		static createTitlePart(header) {
-			const contents = Util.cloneContents(header);
+		// リンクタイトル用の要素をクローン。
+		static cloneForLinkTitle(elm) {
+			const contents = Util.cloneContents(elm);
 			Util.removeAnchors(contents);
+			Util.trimTextNodes(contents);
+			return contents;
+		}
+
+		// テキストタイトル用の要素をクローン。
+		static cloneForTextTitle(elm) {
+			const contents = Util.cloneContents(elm);
 			Util.trimTextNodes(contents);
 			return contents;
 		}
@@ -313,7 +396,20 @@
 			}
 		}
 
-		// 指定した要素へジャンプします。
+		// セクション要素のサブ見出しを取得。
+		static getSectionSubHeader(elm) {
+			const header = NavUtil.getSectionHeader(elm);
+			return header.nextElementSibling;
+		}
+
+		// リンク要素にターゲット要素へのジャンプ動作を設定。
+		static setJump(anchorElm, targetElm) {
+			const jumpTo = NavUtil.jumpTo.bind(null, targetElm);
+			anchorElm.href = "javascript:;"
+			anchorElm.addEventListener("click", jumpTo);
+		}
+
+		// 指定した要素へジャンプ。
 		static jumpTo(elm) {
 			Util.clearUrlHash();
 			elm.scrollIntoView();

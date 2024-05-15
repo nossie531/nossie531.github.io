@@ -40,19 +40,10 @@
 			<p>
 エラーには幾つかパターンがある。
 			</p>
-			<dl class="normal lowProfile">
-				<dt><a href="#ptnA">パターン A</a></dt> <dd>自明なパターン。</dd>
-				<dt><a href="#ptnB">パターン B</a></dt> <dd>実装が空のパターン。</dd>
-				<dt><a href="#ptnC">パターン C</a></dt> <dd>ブランケット実装との衝突。</dd>
-				<dt><a href="#ptnD">パターン D</a></dt> <dd>ブランケット実装どうしの衝突。 </dd>
-				<dt><a href="#ptnE">パターン E</a></dt> <dd>型パラメタの影響 <span class="nw">(条件側の型パラメタ)</span>。</dd>
-				<dt><a href="#ptnF">パターン F</a></dt> <dd>型パラメタの影響 <span class="nw">(トレイト側の型パラメタ)</span>。</dd>
-				<dt><a href="#ptnG">パターン G</a></dt> <dd>型パラメタの影響 <span class="nw">(パターン E と F の合成)</span>。</dd>
-				<dt><a href="#ptnH">パターン H</a></dt> <dd>関連型の影響 <span class="nw">(Rust の欠陥)</span>。</dd>
-			</dl>
+			<nav class="sub"/>
 			<section>
 				<hgroup>
-					<h1 id="ptnA">パターン A.</h1>
+					<h1>パターン A</h1>
 					<div class="subTitle">自明なパターン</div>
 				</hgroup>
 				<p>
@@ -76,7 +67,7 @@ impl MyTrait for MyType { fn f(&amp;self) { /* ... */ } }
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnB">パターン B.</h1>
+					<h1>パターン B</h1>
 					<div class="subTitle">実装が空のパターン</div>
 				</hgroup>
 				<p>
@@ -100,7 +91,7 @@ impl MyTrait for MyType {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnC">パターン C.</h1>
+					<h1>パターン C</h1>
 					<div class="subTitle">ブランケット実装との衝突</div>
 				</hgroup>
 				<p>
@@ -125,7 +116,7 @@ impl MyTrait for MyType {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnD">パターン D.</h1>
+					<h1>パターン D</h1>
 					<div class="subTitle">ブランケット実装どうしの衝突</div>
 				</hgroup>
 				<p>
@@ -153,8 +144,8 @@ impl&lt;T&gt; MyTrait for T where T: TraitX {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnE">パターン E.</h1>
-					<div class="subTitle">型パラメタの影響 (条件側の型パラメタ)</div>
+					<h1>パターン E</h1>
+					<div class="subTitle">型パラメタの影響 <span class="nw">(条件側の型パラメタ)</span></div>
 				</hgroup>
 				<p>
 型パラメタがあるため、条件の重複に気付きにくいパターン。
@@ -180,8 +171,8 @@ impl&lt;X: TraitX&gt; MyTrait for X {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnF">パターン F.</h1>
-					<div class="subTitle">型パラメタの影響 (トレイト側の型パラメタ)</div>
+					<h1>パターン F</h1>
+					<div class="subTitle">型パラメタの影響 <span class="nw">(トレイト側の型パラメタ)</span></div>
 				</hgroup>
 				<p>
 型パラメタがあるため、トレイトの重複に気付きにくいパターン。
@@ -207,8 +198,8 @@ impl&lt;T, X: TraitX&gt; MyTrait&lt;X&gt; for T {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnG">パターン G.</h1>
-					<div class="subTitle">型パラメタの影響 (パターン E と F の合成)</div>
+					<h1>パターン G</h1>
+					<div class="subTitle">型パラメタの影響 <span class="nw">(パターン E と F の合成)</span></div>
 				</hgroup>
 				<p>
 条件とトレイトの両方に型パラメタがあるパターン。
@@ -268,8 +259,8 @@ impl&lt;T&gt; MyTrait for T {}
 				</dl>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnH">パターン H.</h1>
-					<div class="subTitle">関連型の影響 (Rust の欠陥)。</div>
+					<h1>パターン H</h1>
+					<div class="subTitle">関連型の影響 <span class="nw">(Rust の欠陥)</span></div>
 				</hgroup>
 				<p>
 トレイト実装において、関連型が条件として区別されない問題がある。

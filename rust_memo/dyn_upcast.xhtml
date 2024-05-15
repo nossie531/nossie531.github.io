@@ -60,20 +60,13 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 			<p>
 幾つか方法がある。
 			</p>
-			<dl class="normal lowProfile">
-				<dt><a href="#way1">方法１</a></dt>
-				<dd>基本となる戦略</dd>
-				<dt><a href="#way2">方法２</a></dt>
-				<dd>基底側でのアップキャスト</dd>
-				<dt><a href="#way3">方法３</a></dt>
-				<dd>アップキャスト用トレイト</dd>
-			</dl>
+			<nav class="sub"/>
 			<p>
-※ 方法３が最も汎用的なので迷ったらそれを選ぶとよい。
+※ 方法 3 が最も汎用的なので迷ったらそれを選ぶとよい。
 			</p>
 			<section>
 				<hgroup>
-					<h1 id="way1">方法１</h1>
+					<h1>方法 1</h1>
 					<div class="subTitle">
 						基本となる戦略
 					</div>
@@ -115,7 +108,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="way2">方法２</h1>
+					<h1>方法 2</h1>
 					<div class="subTitle">
 						基底側でのアップキャスト
 					</div>
@@ -159,7 +152,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="way3">方法３</h1>
+					<h1 id="way3">方法 3</h1>
 					<div class="subTitle">
 						アップキャスト用トレイト
 					</div>
@@ -216,7 +209,7 @@ impl&lt;T: Any&gt; SomeTrait for T {}
 			<section>
 				<h2>サンプルコード</h2>
 				<p>
-以下では、前述の『<a href="#way3">方法３</a>』のサンプルコードの <code>AsAny</code> を強化している。
+以下では、前述の『<a href="#way3">方法 3</a>』のサンプルコードの <code>AsAny</code> を強化している。
 				</p>
 <pre><code class="language-rust">
 trait AsAny: Any {

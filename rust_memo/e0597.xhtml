@@ -18,23 +18,10 @@
 		</p>
 		<section>
 			<h1>パターン</h1>
-			<dl class="normal lowProfile">
-				<dt><a href="#ptnA">パターン A</a></dt>
-				<dd>スコープの違反</dd>
-				<dt><a href="#ptnB">パターン B</a></dt>
-				<dd>ライフタイムの違反</dd>
-				<dt><a href="#ptnC1">パターン C1</a></dt>
-				<dd>明示的な <code>Drop</code> トレイトとブロック末尾の式</dd>
-				<dt><a href="#ptnC2">パターン C2</a></dt>
-				<dd>暗黙的な <code>Drop</code> トレイトとブロック末尾の式</dd>
-				<dt><a href="#ptnD1">パターン D1</a></dt>
-				<dd>明示的な <code>Drop</code> トレイトとフィールド間の参照</dd>
-				<dt><a href="#ptnD2">パターン D2</a></dt>
-				<dd>暗黙的な <code>Drop</code> トレイトとフィールド間の参照</dd>
-			</dl>
+			<nav class="sub"/>
 			<section>
 				<hgroup>
-					<h1 id="ptnA">パターン A</h1>
+					<h1>パターン A</h1>
 					<div class="subTitle">スコープの違反</div>
 				</hgroup>
 				<p>
@@ -69,7 +56,7 @@ fn main() {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnB">パターン B</h1>
+					<h1>パターン B</h1>
 					<div class="subTitle">ライフタイムの違反</div>
 				</hgroup>
 				<p>
@@ -161,7 +148,7 @@ impl Drop for OnDrop&lt;'_&gt; {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnC2">パターン C2</h1>
+					<h1>パターン C2</h1>
 					<div class="subTitle">暗黙的な <code>Drop</code> トレイトとブロック末尾の式</div>
 				</hgroup>
 				<p>
@@ -277,7 +264,7 @@ impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnD2">パターン D2</h1>
+					<h1>パターン D2</h1>
 					<div class="subTitle">暗黙的な <code>Drop</code> トレイトとフィールド間の参照</div>
 				</hgroup>
 				<p>

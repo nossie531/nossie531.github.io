@@ -45,11 +45,15 @@ nav.forPage {
 	}
 
 	& li {
-		margin: 0.5ex 0 0 0;
 		list-style-type: none;
+	}
+
+	& li > a {
+		display: block;
+		padding: 0.5ex 0 0 0;
+		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		overflow: hidden;
 
 		&::before {
 			content: "\2022";
@@ -57,18 +61,6 @@ nav.forPage {
 			display: inline-block;
 			width: 1em;
 			margin-right: 0.25em;
-		}
-	}
-
-	& li a {
-		cursor: pointer;
-
-		&:hover {
-			text-decoration: underline;
-		}
-
-		&:focus-visible {
-			outline: none;
 		}
 
 		& code {

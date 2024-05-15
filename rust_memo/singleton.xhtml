@@ -23,14 +23,7 @@ Singleton パターンとは、GoF 本に掲載されるデザインパターン
 			<p>
 状況に応じた手法がいくつかある。
 			</p>
-			<dl class="normal lowProfile">
-				<dt><a href="#sample1">サンプル 1</a></dt>
-				<dd>遅延初期化 (読取専用)。</dd>
-				<dt><a href="#sample2">サンプル 2</a></dt>
-				<dd>遅延初期化 (書込可能)。</dd>
-				<dt><a href="#sample3">サンプル 3</a></dt>
-				<dd>手動初期化。</dd>
-			</dl>
+			<nav class="sub"/>
 			<aside class="normal">
 				<p>
 以下では、<a href="https://crates.io/crates/once_cell"><code>once_cell</code></a> クレートを使用している。このクレートの機能は、Rust 1.70 で一部が標準化され、他は <time>2023 年現在</time>、ナイトリー版にて先行実装中である (注: アイテム名は標準版と異なるものもある)。
@@ -38,7 +31,7 @@ Singleton パターンとは、GoF 本に掲載されるデザインパターン
 			</aside>
 			<section>
 				<hgroup>
-					<h1 id="sample1">サンプル 1</h1>
+					<h1>サンプル 1</h1>
 					<div class="subTitle">
 						遅延初期化 (読取専用)
 					</div>
@@ -82,7 +75,7 @@ mod sample {
 </code></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="sample2">サンプル 2</h1>
+					<h1>サンプル 2</h1>
 					<div class="subTitle">
 						遅延初期化 (書込可能)
 					</div>
@@ -132,7 +125,7 @@ mod sample {
 </code></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="sample3">サンプル 3</h1>
+					<h1>サンプル 3</h1>
 					<div class="subTitle">
 						手動初期化
 					</div>

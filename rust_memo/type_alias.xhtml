@@ -18,14 +18,10 @@
 			<p>
 以下は代表的な用例。
 			</p>
-			<dl class="normal lowProfile">
-				<dt><a href="#ex1">用例 1</a></dt> <dd>基本的な使い方</dd>
-				<dt><a href="#ex2">用例 2</a></dt> <dd>型パラメタの利用</dd>
-				<dt><a href="#ex3">用例 3</a></dt> <dd>関連型の導出</dd>
-			</dl>
+			<nav class="sub"/>
 			<section>
 				<hgroup>
-					<h1 id="ex1">用例 1</h1>
+					<h1>用例 1</h1>
 					<div class="subTitle">基本的な使い方</div>
 				</hgroup>
 				<p>
@@ -52,7 +48,7 @@ fn get_vec_str(v: MyVec) -&gt; String {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="ex2">用例 2</h1>
+					<h1>用例 2</h1>
 					<div class="subTitle">型パラメタの利用</div>
 				</hgroup>
 				<p>
@@ -78,7 +74,7 @@ fn get_pair_str(p: Pair&lt;i32&gt;) -&gt; String {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="ex3">用例 3</h1>
+					<h1>用例 3</h1>
 					<div class="subTitle">関連型の導出</div>
 				</hgroup>
 				<p>
@@ -111,14 +107,10 @@ fn nth2&lt;I: Iterator&gt;(mut iter: I, n: usize) -&gt; Option&lt;ToItem&lt;I&gt
 			</section>
 		</section> <section>
 			<h1>注意点</h1>
-			<dl class="normal lowProfile">
-				<dt><a href="#point1">注意点 1</a></dt> <dd>別名の互換性</dd>
-				<dt><a href="#point2">注意点 2</a></dt> <dd>初期化関数は利用不可</dd>
-				<dt><a href="#point3">注意点 3</a></dt> <dd><code>where</code> は利用不可</dd>
-			</dl>
+			<nav class="sub"/>
 			<section>
 				<hgroup>
-					<h1 id="point1">注意点 1</h1>
+					<h1>注意点 1</h1>
 					<div class="subTitle">別名の互換性</div>
 				</hgroup>
 				<p>
@@ -146,7 +138,7 @@ fn speed(l: Length, t: Time) -&gt; f32 {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="point2">注意点 2</h1>
+					<h1>注意点 2</h1>
 					<div class="subTitle">初期化関数は利用不可</div>
 				</hgroup>
 				<p>
@@ -188,7 +180,7 @@ fn get_color_str(color: Color) -&gt; String {
 			</section>
 			<section>
 				<hgroup>
-					<h1 id="point3">注意点 3</h1>
+					<h1>注意点 3</h1>
 					<div class="subTitle"><code>where</code> は利用不可</div>
 				</hgroup>
 				<p>

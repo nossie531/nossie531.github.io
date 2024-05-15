@@ -24,7 +24,7 @@
 		</p> <p>
 どれも似た内容のため、ここでは主に関数版について説明する。<br/>
 		</p> <p>
-(クロージャ版には<a href="#ptnD">後述</a>の特殊事情あり。)
+(クロージャ版には<a href="#closureVer">後述</a>の特殊事情あり。)
 		</p>
 		<section>
 			<h1>エラーの概要</h1>
@@ -35,19 +35,10 @@
 			</p>
 		</section> <section>
 			<h1>パターン</h1>
-			<dl class="normal lowProfile">
-				<dt><a href="#ptnA">パターン A</a></dt>
-				<dd>引数をそのまま使用。</dd>
-				<dt><a href="#ptnB">パターン B</a></dt>
-				<dd>引数を辿った別の参照を使用。</dd>
-				<dt><a href="#ptnC">パターン C</a></dt>
-				<dd>トレイトのライフタイム境界が関連。</dd>
-				<dt><a href="#ptnD">パターン D</a></dt>
-				<dd>クロージャが関連。</dd>
-			</dl>
+			<nav class="sub"/>
 			<section>
 				<hgroup>
-					<h1 id="ptnA">パターン A</h1>
+					<h1>パターン A</h1>
 					<div class="subTitle">引数をそのまま使用</div>
 				</hgroup>
 				<p>
@@ -78,7 +69,7 @@ fn use_static(_: &amp;'static i32) {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnB">パターン B</h1>
+					<h1>パターン B</h1>
 					<div class="subTitle">引数を辿った別の参照を使用</div>
 				</hgroup>
 				<p>
@@ -109,7 +100,7 @@ fn use_static(_: &amp;'static i32) {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnC">パターン C</h1>
+					<h1>パターン C</h1>
 					<div class="subTitle">トレイトのライフタイム境界が関連</div>
 				</hgroup>
 				<p>
@@ -142,7 +133,7 @@ fn use_any&lt;T: Any&gt;(_: T) {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnD">パターン D</h1>
+					<h1 id="closureVer">パターン D</h1>
 					<div class="subTitle">クロージャが関連</div>
 				</hgroup>
 				<p>
