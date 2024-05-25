@@ -11,7 +11,7 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-マップの <code>entry</code> メソッドとその応用例をいくつか紹介する。
+マップの <code>entry</code> メソッドとその利用例をいくつか紹介する。
 		</p> 
 		<section>
 			<h1>基礎知識</h1>
@@ -22,7 +22,7 @@
 				<p>
 セット系について。
 				</p>
-マップ系と異なり、セット系の型 (<a href="https://doc.rust-lang.org/std/collections/struct.HashSet.html"><code>HashSet</code></a> や <a href="https://doc.rust-lang.org/std/collections/struct.BTreeSet.html"><code>BTreeSet</code></a>) には、同様のメソッドが <time>2023 年現在</time>まだ存在していない。<a href="https://github.com/rust-lang/rfcs/issues/1490">提案</a>はされているので、そのうち導入されるかも…。
+セット系の型 (<a href="https://doc.rust-lang.org/std/collections/struct.HashSet.html"><code>HashSet</code></a> や <a href="https://doc.rust-lang.org/std/collections/struct.BTreeSet.html"><code>BTreeSet</code></a>) では、マップ系と異なり、同様のメソッドが <time>2023 年現在</time>まだ存在していない。<a href="https://github.com/rust-lang/rfcs/issues/1490">提案</a>はされているので、そのうち導入されるかも…。
 			</aside>
 			<section>
 				<h2>メソッドとその周辺仕様</h2>
@@ -48,14 +48,14 @@ pub fn entry(&amp;mut self, key: K) -&gt; Entry&lt;'_, K, V&gt;
 				</ul>
 			</section>
 		</section> <section>
-			<h1>応用例</h1>
+			<h1>利用例</h1>
 			<p>
-代表的な応用例。
+代表的な利用例。
 			</p>
 			<nav class="sub"/>
 			<section>
 				<hgroup>
-					<h1>応用例 1</h1>
+					<h1>利用例 1</h1>
 					<div class="subTitle">
 キーが未登録なら、キーに対応する値を登録
 					</div>
@@ -76,7 +76,7 @@ fn main() {
 </code></pre>
 			</section> <section>
 				<hgroup>
-					<h1>応用例 2</h1>
+					<h1>利用例 2</h1>
 					<div class="subTitle">
 キーが登録済なら、キーに対応する値を更新
 					</div>
@@ -84,7 +84,7 @@ fn main() {
 				<p>
 以下、<a href="https://doc.rust-lang.org/std/collections/hash_map/enum.Entry.html#method.and_modify"><code>and_modify</code></a> メソッドを活用。
 				</p>
-				<pre><code class="language-rust">
+<pre><code class="language-rust">
 use std::collections::HashMap;
 
 fn main() {
@@ -94,10 +94,10 @@ fn main() {
     assert_eq!(map.get("A"), Some(&amp;true));
     assert_eq!(map.get("B"), None);
 }
-				</code></pre>
+</code></pre>
 			</section> <section>
 				<hgroup>
-					<h1>応用例 3</h1>
+					<h1>利用例 3</h1>
 					<div class="subTitle">
 キーに対応する値を設定後、値への参照を取得 (簡易版)
 					</div>
@@ -127,7 +127,7 @@ where
 </code></pre>
 			</section> <section>
 				<hgroup>
-					<h1>応用例 4</h1>
+					<h1>利用例 4</h1>
 					<div class="subTitle">
 キーに対応する値を設定後、値への参照を取得 (発展版)
 					</div>
