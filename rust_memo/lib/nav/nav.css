@@ -33,10 +33,6 @@ nav.forPage {
 
 	> ul {
 		margin: 0;
-		padding: 0.5ex 0.5em 1ex;
-		overflow-y: auto;
-		scrollbar-gutter: stable;
-		scrollbar-width: thin;
 	}
 
 	> ul ul {
@@ -70,6 +66,15 @@ nav.forPage {
 	}
 }
 
+@media screen {
+	nav.forPage > ul {
+		padding: 0.5ex 0.5em 1ex;
+		overflow-y: auto;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+	}
+}
+
 @media screen and (width <= 65rem) {
 	nav.forPage:not(.open) {
 		> div.head {
@@ -97,10 +102,6 @@ nav.forPage {
 
 @media print {
 	nav.forPage {
-		all: revert;
-	}
-
-	nav.forPage > div.head {
 		display: none;
 	}
 }

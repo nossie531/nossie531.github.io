@@ -50,10 +50,6 @@
 							this.#subNavs.push(nm);
 						}
 					} else if (NavUtil.getSectionHeader(act.elm)) {
-						if (!this.#elements.root.parentElement) {
-							this.#insertMainNav();
-						}
-
 						if (act.isPushed) {
 							this.#mainNav.pushSection(act.elm);
 							this.#subNavs.at(-1)?.pushSection(act.elm);
@@ -69,20 +65,22 @@
 						}
 					}
 				}
+
+				if (!this.#elements.root.parentElement) {
+					this.#setupMainNav();
+				}
 			});
 		}
 
-		// メイン目次の組込。
-		#insertMainNav() {
-			const fstSection = document.getElementsByTagName("section")[0];
-			if (fstSection) {
-				fstSection.before(this.#elements.root);
-			} else {
-				document.body.append(this.#elements.root);
+		// メイン目次の設定。
+		#setupMainNav() {
+			const fstHeader = document.getElementsByTagName("header")[0];
+			if (fstHeader) {
+				fstHeader.after(this.#elements.root);
 			}
 		}
 
-		// 縦方向移動系のリンクスタイルの更新。
+		// 縦方向移動系のリンクスタイルの設定。
 		#setupVerticalLinks() {
 			const self = this;
 			refresh();
@@ -133,7 +131,8 @@
 
 				const anchors = Array.from(indexDoc.getElementsByTagName("a"));
 				const currIndex = anchors.findIndex(x => x.href === document.URL);
-				return anchors[currIndex + offset]?.href || null;
+				const targetIndex = currIndex >= 0 ? currIndex + offset : -1;
+				return anchors[targetIndex]?.href || null;
 			}
 		}
 

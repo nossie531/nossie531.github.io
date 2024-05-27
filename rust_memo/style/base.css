@@ -265,7 +265,7 @@
 
 	section > h1,
 	section > hgroup > h1 {
-		font-size: 1.05em;
+		font-size: 1.05rem;
 		line-height: normal;
 		margin: 1rem calc(var(--gap) * -1);
 		padding: 0.5ex var(--gap);
