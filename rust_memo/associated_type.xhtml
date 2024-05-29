@@ -213,7 +213,7 @@ impl&lt;T&gt; Collection&lt;T&gt; for Vec&lt;T&gt; {
 				<section>
 					<h2>サンプルコード</h2>
 					<p>
-以下では、トレイト <code>IntCollection</code> が生成するイテレータのために、ジェネリックな関連型 <code>IntStream&lt;'a&gt;</code> が定義されている。ここで、<code>'a</code> はイテレータのアイテムが所属するライフタイムで、<code>'a</code> は少なくとも <code>IntCollection</code> の生存中は有効でなければならない (<code>Self: 'a</code> の境界のため)。
+以下では、トレイト <code>IntCollection</code> が生成するイテレータのために、ジェネリックな関連型 <code>IntStream&lt;'a&gt;</code> が定義されている。ここで、<code>'a</code> はイテレータのアイテムが所属するライフタイムで、<code>IntCollection</code> の生存中のみ有効である (<code>Self: 'a</code> の境界のため)。
 					</p>
 <pre><code class="language-rust">
 use std::slice::Iter;
