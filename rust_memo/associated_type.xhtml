@@ -11,14 +11,14 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-関連型 (Associated types) はトレイトのアイテムとして定義される。そして、トレイトを実装する型から、その関連型を通して、別の型を得られるようにする。つまり、トレイトの関連型 A は「トレイトを実装する型 X から、別の型 A(X) への写像」となる。
+関連型 (Associated types) はトレイトのアイテムとして定義される。そして、トレイトを実装する型から、その関連型を通して、別の型を得られるようにする。つまり、トレイトの関連型 A は「トレイトを実装する型 X から、別の型への写像 A(X)」となる。
 		</p>
 		<section>
 			<h1>基本</h1>
 			<p>
-関連型はトレイトにて <code>type <var>Assoc</var>;</code> のように定義する。
+トレイトの側では、<code>type <var>Assoc</var>;</code> のように定義する。
 			</p> <p>
-そして、トレイトの実装時に <code>type <var>Assoc</var> = <var>SomeType</var>;</code> のように指定する。
+トレイトの実装側では、<code>type <var>Assoc</var> = <var>SomeType</var>;</code> のように型を指定する。
 			</p>
 			<section>
 				<h2>サンプルコード</h2>
@@ -40,7 +40,6 @@ trait Sequence {
 }
 
 struct IntCounter(i32);
-
 impl Sequence for IntCounter {
     type Value = i32;
     fn next(&amp;mut self) -&gt; Self::Value {
@@ -56,9 +55,11 @@ impl Sequence for IntCounter {
 関連型に境界を指定する方法について。
 			</p>
 			<section>
-				<h1>関連型の定義時の指定</h1>
+				<h1>定義時の指定</h1>
 				<p>
-関連型の定義時に境界を指定するには、<code>type <var>Assoc</var>: <var>Bounds</var></code> のように記述する。
+<code>type <var>Assoc</var>: <var>Bounds</var></code> のように定義すると、境界が付加される。
+				</p> <p>
+これにより、実装側で <code><var>Assoc</var></code> として指定できる型に <code><var>Bounds</var></code> の制約がつく。
 				</p>
 				<section>
 					<h2>サンプルコード</h2>
@@ -70,22 +71,13 @@ impl Sequence for IntCounter {
 <pre><code class="language-rust">
 fn main() {
     let seq = &amp;mut IntCounter(0);
-    let seq = seq as &amp;mut dyn Sequence&lt;Value = i32&gt;;
-    seq.skip_to(3);
+    skip_to(seq, 3);
     assert_eq!(seq.next(), 4);
 }
 
 trait Sequence {
     type Value: Ord;
     fn next(&amp;mut self) -&gt; Self::Value;
-    fn skip_to(&amp;mut self, max: Self::Value) {
-        loop {
-            let val = self.next();
-            if val &gt;= max {
-                return
-            }
-        }
-    }
 }
 
 struct IntCounter(i32);
@@ -96,12 +88,26 @@ impl Sequence for IntCounter {
         self.0
     }
 }
+
+fn skip_to&lt;T&gt;(target: &amp;mut T, max: T::Value)
+where
+    T: Sequence
+{
+    loop {
+        let val = target.next();
+        if val &gt;= max {
+            return
+        }
+    }
+}
 </code></pre>
 				</section>
 			</section> <section>
-				<h1>関連型の使用時の指定</h1>
+				<h1>使用時の指定</h1>
 				<p>
-関連型の使用時に境界を指定するには、まずは型パラメタ <code>T</code> についてトレイト境界を設定、それからそのトレイトの関連型 <code>T::Assoc</code> について境界を設定する。
+定義時に指定した境界の他に、関連型の使用時にも境界を追加できる。
+				</p> <p>
+これには、型パラメタ <code>T</code> が関連型 <code>Assoc</code> を持つ場合、<code>T::<var>Assoc</var>: <var>Bounds</var></code> のようにする。
 				</p>
 				<section>
 					<h2>サンプルコード</h2>
@@ -116,7 +122,7 @@ fn main() {
 }
 
 trait Sequence {
-    type Value: Ord;
+    type Value;
     fn next(&amp;mut self) -&gt; Self::Value;
 }
 
