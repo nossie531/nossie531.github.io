@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: HRTB (Higher Ranked Trait Bound)</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<abbr>HRTB</abbr> (Higher Ranked Trait Bound) によるライフタイム注釈について。
+		</p>
+		<section>
+			<h1>基本</h1>
+			<p>
+HRTB によるライフタイム注釈は、任意のライフタイムへのプレースホルダとなる。
+			</p>
+			<aside class="normal">
+				<p>通常のライフタイム注釈との差異</p>
+				<p>
+HRTB を使わない通常のライフタイム注釈の場合、操作元のスコープからライフタイムを受け取る。型ならインスタンスの生成元から、関数なら呼出元からである。
+			</p> <p>
+そのため例えば、関数の引数にクロージャがあり、そのクロージャも引数を持つ場合、後者の引数のライフタイム注釈に通常のライフタイム注釈は使えない。
+				</p>
+			</aside>
+			<section>
+				<h2>書式</h2>
+				<p>
+トレイト境界の先頭で <code>for&lt;'<var>a</var>&gt;</code> のように宣言し、トレイト境界内で使用する。
+				</p> <p>
+(複数必要な場合、<code>for&lt;'<var>a</var>, '<var>b</var>&gt;</code> のようにカンマで区切る)。
+				</p>
+			</section> <section>
+				<h2>ライフタイム省略</h2>
+				<p>
+HRTB によるライフタイム注釈がクロージャの引数や返値に適用されるパターンでは、HRTB でない通常のライフタイム注釈が関数の引数や返値に適用される場合と同じ規則で、ライフタイム省略が可能 (例: ライフタイム注釈が一つしかない場合など) 。
+				</p>
+			</section>
+		</section> <section>
+			<h1>サンプル</h1>
+			<section>
+				<h1>クロージャ</h1>
+				<p>
+以下では、関数 <code>get_cmp_text</code> でクロージャを扱うために HRTB が使用されている。
+				</p> <p>
+なお、このパターンはライフタイムが一つしかないため HRTB ごと省略可能。
+				</p>
+<pre><code class="language-rust">
+use std::cmp::Ordering;
+
+fn main() {
+    let text = get_cmp_text(i32::cmp, 1, 2);
+    assert_eq!(text, "&lt;");
+}
+
+fn get_cmp_text&lt;F&gt;(cmp: F, x: i32, y: i32) -&gt; String
+where
+    F: for&lt;'a&gt; Fn(&amp;'a i32, &amp;'a i32) -&gt; Ordering
+{
+    match cmp(&amp;x, &amp;y) {
+        Ordering::Less =&gt; "&lt;",
+        Ordering::Equal =&gt; "=",
+        Ordering::Greater =&gt; "&gt;",
+    }.to_string()
+}
+</code></pre>
+			</section> <section>
+				<h1>GAT</h1>
+				<p>
+以下では、関数 <code>sum</code> で <a href="associated_type.xhtml#gat">GAT</a> を用いたトレイトについて HRTB を使用している。
+				</p>
+<pre><code class="language-rust">
+use std::slice::Iter;
+
+fn main() {
+    let vec = vec![1, 2, 3];
+    assert_eq!(sum(vec), 6);
+}
+
+trait IntCollection {
+    type IntStream&lt;'a&gt;: Iterator&lt;Item = &amp;'a i32&gt; where Self: 'a;
+    fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt;;
+}
+
+impl IntCollection for Vec&lt;i32&gt; {
+    type IntStream&lt;'a&gt; = Iter&lt;'a, i32&gt; where Self: 'a;
+    fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt; {
+        self.iter()
+    }
+}
+
+fn sum&lt;T&gt;(ints: T) -&gt; i32
+where
+    T: for&lt;'a&gt; IntCollection&lt;IntStream&lt;'a&gt; = Iter&lt;'a, i32&gt;&gt;
+{
+    ints.int_stream().sum()
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>

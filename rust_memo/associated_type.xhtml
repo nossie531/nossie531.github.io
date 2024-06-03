@@ -151,7 +151,7 @@ where
 				</section>
 			</section>
 		</section> <section>
-			<h1>ジェネリクス (GAT)</h1>
+			<h1 id="gat">ジェネリクス (GAT)</h1>
 			<p>
 関連型はジェネリクスパラメタを付加する事で、パラメトリックにできる。また必要ならば、それらのパラメタに対して、<code>where</code> による境界を設定できる。 
 			</p>
@@ -240,21 +240,6 @@ impl IntCollection for Vec&lt;i32&gt; {
     fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt; {
         self.iter()
     }
-}
-</code></pre>
-				</section> <section>
-					<h2>補足 (HRTB)</h2>
-					<p>
-関連型のジェネリクスパラメタにライフタイム指定子を使うパターンでは、<abbr>HRTB</abbr> (Higher Ranked Trait Bound) がよく併用される。HRTB は境界の記述に先行して <code>for&lt;'<var>a</var>&gt;</code> の書式で表れ、任意のライフタイムに適合するプレースホルダになる。
-					</p> <p>
-以下の関数は、上のサンプルで合計値を求める箇所で使える。
-					</p>
-<pre><code class="language-rust">
-fn sum&lt;T&gt;(ints: T) -&gt; i32
-where
-    T: for&lt;'a&gt; IntCollection&lt;IntStream&lt;'a&gt; = Iter&lt;'a, i32&gt;&gt;
-{
-    ints.int_stream().sum()
 }
 </code></pre>
 				</section>
