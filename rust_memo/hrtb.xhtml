@@ -16,7 +16,7 @@
 		<section>
 			<h1>基本</h1>
 			<p>
-HRTB によるライフタイム注釈は、任意のライフタイムへのプレースホルダとなる。
+HRTB によるライフタイム注釈は、それを宣言したトレイト境界の記述内でのみ使える。
 			</p>
 			<aside class="normal">
 				<p>通常のライフタイム注釈との差異</p>
@@ -29,8 +29,7 @@ HRTB を使わない通常のライフタイム注釈の場合、操作元のス
 			<section>
 				<h2>書式</h2>
 				<p>
-トレイト境界の先頭で <code>for&lt;'<var>a</var>&gt;</code> のように宣言し、トレイト境界内で使用する。
-				</p> <p>
+トレイト境界の左辺または右辺の先頭で <code>for&lt;'<var>a</var>&gt;</code> のように宣言する<br/>
 (複数必要な場合、<code>for&lt;'<var>a</var>, '<var>b</var>&gt;</code> のようにカンマで区切る)。
 				</p>
 			</section> <section>
@@ -68,7 +67,7 @@ where
 }
 </code></pre>
 			</section> <section>
-				<h1>GAT</h1>
+				<h1>GAT - 1</h1>
 				<p>
 以下では、関数 <code>sum</code> で <a href="associated_type.xhtml#gat">GAT</a> を用いたトレイトについて HRTB を使用している。
 				</p>
@@ -97,6 +96,41 @@ where
     T: for&lt;'a&gt; IntCollection&lt;IntStream&lt;'a&gt; = Iter&lt;'a, i32&gt;&gt;
 {
     ints.int_stream().sum()
+}
+</code></pre>
+			</section> <section>
+				<h1>GAT - 2</h1>
+				<p>
+以下では、関数 <code>average</code> で <a href="associated_type.xhtml#gat">GAT</a> を用いたトレイトについて HRTB を使用している。
+				</p>
+<pre><code class="language-rust">
+use std::slice::Iter;
+
+fn main() {
+    let vec = vec![1, 2, 3];
+    assert_eq!(average::&lt;Vec&lt;_&gt;&gt;(vec), 2.0);
+}
+
+trait IntCollection {
+    type IntStream&lt;'a&gt;: Iterator&lt;Item = &amp;'a i32&gt; where Self: 'a;
+    fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt;;
+}
+
+impl IntCollection for Vec&lt;i32&gt; {
+    type IntStream&lt;'a&gt; = Iter&lt;'a, i32&gt; where Self: 'a;
+    fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt; {
+        self.iter()
+    }
+}
+
+fn average&lt;T&gt;(ints: T) -&gt; f32
+where
+    T: IntCollection,
+    for&lt;'a&gt; T::IntStream&lt;'a&gt;: ExactSizeIterator
+{
+    let sum = ints.int_stream().sum::&lt;i32&gt;();
+    let len = ints.int_stream().len();
+    sum as f32 / len as f32
 }
 </code></pre>
 			</section>
