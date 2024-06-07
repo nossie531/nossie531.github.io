@@ -13,14 +13,17 @@ class Quote {
 		}
 
 		function exec() {
-			Quote.#instance.#adjustAnchors();
 			Quote.#instance.#addCiteInfos();
+			Quote.#instance.#adjustAnchors();
 		}
 	}
 
-	/* 引用情報を表示します。 */
+	// 引用情報を表示。
 	#addCiteInfos() {
-		for (const quote of document.getElementsByTagName("blockquote")) {
+		const quotes = document.getElementsByTagName("blockquote");
+		window.addEventListener("beforeprint", () => onPrint(true));
+		window.addEventListener("afterprint", () => onPrint(false));
+		for (const quote of quotes) {
 			addCiteInfo(quote);
 		}
 
@@ -42,6 +45,14 @@ class Quote {
 			cite.appendChild(a);
 			cite.appendChild(span);
 			quote.parentNode.insertBefore(cite, quote);
+		}
+
+		function onPrint(flag) {
+			for (const quote of quotes) {
+				const prev = quote.previousElementSibling;
+				const cite = prev.tagName === "cite" ? prev : null;
+				cite?.classList?.toggle("forPrint", flag);
+			}
 		}
 	}
 

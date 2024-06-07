@@ -1,3 +1,14 @@
+body.forQuote {
+	color: var(--fg-color);
+	font-size: var(--root-font-size);
+	margin: 0;
+	padding: 0;
+
+	& blockquote {
+		margin: 0;
+	}
+}
+
 cite.info {
 	font-size: smaller;
 	font-style: normal;
@@ -34,22 +45,22 @@ blockquote {
 	}
 }
 
-@media print {
-	cite.info {
-		display: flex;
+cite.info:not(.forPrint) {
+	float: right;
+	margin: 0.5ex 0.5em 0.5ex 1em;
+
+	& > span.url {
+		display: none;
 	}
 }
 
-@media screen {
-	cite.info {
-		float: right;
-		margin-top: 0.5ex;
-		margin-bottom: 0.5ex;
-		margin-left: 1em;
+cite.info.forPrint {
+	display: flex;
+	float: none;
+	margin: 0;
 
-		& > span.url {
-			display: none;
-		}
+	& > span.url {
+		all: revert;
 	}
 }
 
