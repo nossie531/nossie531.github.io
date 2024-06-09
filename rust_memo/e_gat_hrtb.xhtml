@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: GAT と HRTB の組合せによるエラー</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
+</samp></pre>
+		<p>
+エラー番号としては、<a href="e0597.xhtml"><code>E0597</code></a> や <a href="e0716.xhtml"><code>E0716</code></a> などで見られる (他にもあるかも…)。
+		</p> <p>
+2024 年現在、<a href="associated_type.xhtml#gat">GAT</a> と <a href="hrtb.xhtml">HRTB</a> の組合せには厄介な制限がある。この事は<a href="https://blog.rust-lang.org/2022/10/28/gats-stabilization.html#implied-static-requirement-from-higher-ranked-trait-bounds">公式ブログ</a>でも紹介されている。それによると、これは新機能である GAT の導入を急いだ結果らしく、将来的には改善される見込みらしい。
+		</p>
+		<section>
+			<h1>発生条件</h1>
+			<p>
+以下の条件が全て揃うとエラーになる。
+			</p>
+			<ul>
+				<li>
+トレイト <var class="mt">X</var> の関連型 <var class="mt">A</var> がライフタイム注釈 <var class="mt">a</var> を持つ (GAT)。 
+				</li> <li>
+トレイト <var class="mt">X</var> の実装型 <var class="mt">T</var> がライフタイム注釈 <var class="mt">t</var> を持つ。
+				</li> <li>
+関連型 <var class="mt">A</var> の境界条件により、<var class="mt">t</var> が <var class="mt">a</var> より長生きする。
+				</li> <li>
+アイテム <var class="mt">I</var> の <var class="mt">A</var> についての境界で、<var class="mt">a</var> に HRTB を適用。
+				</li> <li>
+アイテム <var class="mt">I</var> の使用時に、<var class="mt">a</var> が <code>'static</code> になれない。
+				</li>
+			</ul>
+			<section>
+				<h2>エラーまでの流れ</h2>
+				<p>
+唐突に <code>'static</code> が関係してくる理由について。
+				</p> <p>
+まず、GAT が関係しない場合について。この場合、HRTB によるライフタイム注釈は、常に任意のライフタイムを適用できなければならない。つまり、利用先の境界でライフタイムを縮小してはならない。ここで、<code>'static</code> が適用できた場合、ライフタイムの縮小がないと保証できる。この事がエラーの検出に流用されてきた。
+				</p> <p>
+次に、GAT が関係する場合について。この場合、HRTB によるライフタイム注釈は、もはや任意のライフタイムを適用できない状況もありうる。にも関わらず、<code>'static</code> による方法を使うと、そのライフタイムより長生きすると保証されるライフタイムも連鎖的に <code>'static</code> と解釈され、関係ない箇所でエラーになってしまう。
+				</p>
+			</section>
+		</section> <section>
+			<h1>サンプルコード</h1>
+<pre><code class="language-rust">
+use std::slice::Iter;
+
+fn main() {
+    let vec = vec![1, 2, 3];
+    let vp = IntVecPointer(<mark class="error">&amp;vec</mark>);
+    average::&lt;IntVecPointer&gt;(vp);
+}
+
+trait IntCollection {
+    type IntStream&lt;'a&gt;: Iterator&lt;Item = &amp;'a i32&gt; where Self: 'a;
+    fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt;;
+}
+
+struct IntVecPointer&lt;'v&gt;(&amp;'v Vec&lt;i32&gt;);
+impl&lt;'v&gt; IntCollection for IntVecPointer&lt;'v&gt; {
+    type IntStream&lt;'a&gt; = Iter&lt;'a, i32&gt; where Self: 'a;
+    fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt; {
+        self.0.iter()
+    }
+}
+
+fn average&lt;T&gt;(arg: T) -&gt; f32
+where
+    T: IntCollection,
+    for&lt;'a&gt; T::IntStream&lt;'a&gt;: ExactSizeIterator,
+{
+    let stream = arg.int_stream();
+    let len = stream.len();
+    let sum = stream.sum::&lt;i32&gt;();
+    sum as f32 / len as f32
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `vec` does not live long enough</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:5:28
+<mark class="info">   |</mark>
+<mark class="info">4  |</mark>     let vec = vec![1, 2, 3];
+<mark class="info">   |</mark>         <mark class="info">--- binding `vec` declared here</mark>
+<mark class="info">5  |</mark>     let vp = IntVecPointer(&amp;vec);
+<mark class="info">   |</mark>                            <mark class="error">^^^^ borrowed value does not live long enough</mark>
+<mark class="info">6  |</mark>     average::&lt;IntVecPointer&gt;(vp);
+<mark class="info">   |</mark>     <mark class="info">---------------------------- argument requires that `vec` is borrowed for `'static`</mark>
+<mark class="info">7  |</mark> }
+<mark class="info">   |</mark> <mark class="info">- `vec` dropped here while still borrowed</mark>
+<mark class="info">   |</mark>
+<mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
+<mark class="info">  --&gt;</mark> src\main.rs:25:31
+<mark class="info">   |</mark>
+<mark class="info">25 |</mark>     for&lt;'a&gt; T::IntStream&lt;'a&gt;: ExactSizeIterator,
+<mark class="info">   |</mark>                               <mark class="edit">^^^^^^^^^^^^^^^^^</mark>
+</samp></pre>
+		</section>
+	</body>
+</html>
