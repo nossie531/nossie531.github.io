@@ -219,7 +219,7 @@ impl&lt;T&gt; Collection&lt;T&gt; for Vec&lt;T&gt; {
 				<section>
 					<h2>サンプルコード</h2>
 					<p>
-以下では、トレイト <code>IntCollection</code> が生成するイテレータのために、ジェネリックな関連型 <code>IntStream&lt;'a&gt;</code> が定義されている。ここで、<code>'a</code> はイテレータのアイテムが所属するライフタイムで、<code>IntCollection</code> の生存中のみ有効である (<code>Self: 'a</code> の境界のため)。
+以下では、トレイト <code>IntCollection</code> が生成するイテレータのために、ジェネリックな関連型 <code>IntStream&lt;'a&gt;</code> が定義されている。ここで、<code>'a</code> はイテレータのアイテムが所属するライフタイムで、<code>IntCollection</code> を参照できなければならない (<code>Self: 'a</code> の境界のため)。
 					</p>
 <pre><code class="language-rust">
 use std::slice::Iter;
@@ -243,6 +243,16 @@ impl IntCollection for Vec&lt;i32&gt; {
 }
 </code></pre>
 				</section>
+			</section> <section>
+				<h1 id="gat_limitation">制限</h1>
+				<p>
+2024 年現在、GAT には厄介な制限がまだいくつかある。この事は<a href="https://blog.rust-lang.org/2022/10/28/gats-stabilization.html#when-gats-go-wrong---a-few-current-bugs-and-limitations">公式ブログ</a>でも紹介されている。それによると、これらは新機能である GAT の導入を急いだ結果らしく、将来的には改善される見込みらしい。
+				</p>
+				<ul>
+					<li>
+<a href="e_gat_hrtb.xhtml">GAT と HRTB の組合せによるエラー</a>
+					</li>
+				</ul>
 			</section>
 		</section>
 	</body>
