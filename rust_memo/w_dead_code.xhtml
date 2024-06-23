@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: [dead_code] 未使用の関数</title>
+		<title>Rust メモ: [dead_code] 未使用のアイテム</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -13,8 +13,14 @@
 <pre><samp class="console-rustc">
 <mark class="title"><mark class="warn">warning</mark>: function `xxx` is never used</mark>
 </samp></pre>
+<pre><samp class="console-rustc">
+<mark class="title"><mark class="warn">warning</mark>: struct `Xxx` is never used</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="title"><mark class="warn">warning</mark>: enum `Xxx` is never used</mark>
+</samp></pre>
 		<p>
-未使用の関数があると警告が出る。
+未使用のアイテムがあると警告が出る。
 		</p> <p>
 当然の機能なのだが、Rust 特有の落し穴がいくつかある。
 		</p>
@@ -27,7 +33,7 @@
 					<div class="subTitle">基本形</div>
 				</hgroup>
 				<p>
-関数が実際にどこからも呼ばれないパターン。
+そのアイテムが実際にどこからも使われていないパターン。
 				</p>
 				<section>
 					<h2>サンプルコード</h2>
@@ -56,7 +62,7 @@ fn <mark class="warn">unused</mark>() {
 					<div class="subTitle">使用元が未使用</div>
 				</hgroup>
 				<p>
-関数の呼出元の関数がどこからも呼ばれていないパターン。
+そのアイテムを使っているアイテムがどこからも使われていないパターン。
 				</p>
 				<aside class="normal">
 					<p>
@@ -103,7 +109,7 @@ fn <mark class="warn">unused_sub</mark>() {
 					<div class="subTitle">単体テストが関係</div>
 				</hgroup>
 				<p>
-対象の関数が単体テストからのみ使用されている場合に発生する。
+そのアイテムが単体テスト以外から使われていないと発生する。
 				</p>
 				<section>
 					<h2>サンプルコード</h2>
@@ -129,7 +135,7 @@ fn <mark class="warn">test_helper</mark>() {
 				</section> <section>
 					<h2>解決策</h2>
 					<p>
-対象の関数に <code>#[cfg(test)]</code> 属性を付加すれば良い。
+対象のアイテムに <code>#[cfg(test)]</code> 属性を付加すれば良い。
 					</p>
 <pre><code class="language-rust">
 #[test]
@@ -138,7 +144,7 @@ fn test() {
 }
 
 #[cfg(test)]
-fn <mark class="warn">test_helper</mark>() {
+fn test_helper() {
     // nop.
 }
 </code></pre>
@@ -149,13 +155,13 @@ fn <mark class="warn">test_helper</mark>() {
 					<div class="subTitle">統合テストが関係</div>
 				</hgroup>
 				<p>
-Rust の統合テストでは、<code>tests</code> ディレクトリ直下のファイルがそれぞれ独立したクレートとして認識される。そのため、テストヘルパ関数について、それが一部のファイルからは使われていても、他のファイルからは使われていない場合、クレート内に使われていない関数があると認識されてしまう。
+Rust の統合テストでは、<code>tests</code> ディレクトリ直下のファイルがそれぞれ独立したクレートとして認識される。そのため、テストヘルパ系のアイテムについては、<code>tests</code> ディレクトリ直下の全てのファイルから使われていないと、クレート内に使われていないアイテムがあると認識されてしまう。
 				</p>
 				<aside class="normal">
 					<p>
-バグの可能性。
+Rust の独特な仕様。
 					</p> <p>
-<time>2023 年現在</time>、この現象はバグとして<a href="https://github.com/rust-lang/rust/issues/46379">報告</a>されているため、将来的には解決されるかも…。
+Rust 以外の多くの言語では、こうしたファイルの認識のされ方はしない。後述の解決策さえ知っていれば何という事はないのだが、Github の<a href="https://github.com/rust-lang/rust/issues/46379">課題</a>を見ていると、筆者と同様、これを初見殺しだと感じる人は多いようだ。
 					</p>
 				</aside>
 				<section>
@@ -214,7 +220,7 @@ fn test() {
 					<section>
 						<h3 id="sol1">テストヘルパのクレート化</h3>
 						<p>
-テストヘルパの関数を全て独立したクレートに移動する。
+テストヘルパを全て独立したクレートに移動する。
 						</p> <p>
 この方法は大げさでやや手間がかかるのが問題点。
 						</p>
@@ -234,7 +240,7 @@ fn test() {
 						</p> <p>
 これには <code>tests</code> の中で <code>main.rs</code> を使えばよい (参考: パッケージ構成の<a href="https://doc.rust-lang.org/cargo/guide/project-layout.html">公式資料</a>)。
 						</p> <p>
-例えば、前述の例の場合、以下のようなディレクトリ構成に変更すればよい。
+例えば、前述の例の場合、以下のようなディレクトリ構成にすればよい。
 						</p>
 <pre class="directory">my_lib
 ├─ src
@@ -256,7 +262,7 @@ fn test() {
 			<section>
 				<h1>アンダースコアの使用</h1>
 				<p>
-関数名をアンダースコア '<code>_</code>' で始めると警告がでなくなる。
+アイテム名をアンダースコア '<code>_</code>' で始めると警告がでなくなる。
 				</p>
 <pre><code class="language-rust">
 pub fn main() {
@@ -275,7 +281,7 @@ fn _unused() {
 				<section>
 					<h2>個別指定</h2>
 					<p>
-関数ごとに個別指定する方法。
+アイテムごとに個別指定する方法。
 					</p>
 <pre><code class="language-rust">
 pub fn main() {
@@ -290,7 +296,7 @@ fn unused() {
 				</section> <section>
 					<h2>一括指定</h2>
 					<p>
-ファイルやモジュールに指定して所属する関数を一括指定する方法。
+ファイルやモジュールに所属するアイテムを一括指定する方法。
 					</p>
 <pre><code class="language-rust">
 fn main() {}
