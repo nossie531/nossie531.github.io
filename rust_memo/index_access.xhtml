@@ -41,7 +41,7 @@ let slice: &amp;[i32] = &amp;arr[(Bound::Excluded(2), Bound::Unbounded)]; // 3, 
 				<p>
 読取系の添字式を処理するトレイト。
 				</p> <p>
-型パラメタ <code>Idx</code> が添字型を、関連型 <a href="https://doc.rust-lang.org/std/ops/trait.Index.html#associatedtype.Output"><code>Output</code></a> が出力型を表す。
+型パラメタ <code>Idx</code> が添字の型を、関連型 <a href="https://doc.rust-lang.org/std/ops/trait.Index.html#associatedtype.Output"><code>Output</code></a> が出力の型を表す。
 				</p>
 <pre><code class="language-rust">
 pub trait Index&lt;Idx&gt;
@@ -77,7 +77,7 @@ where
 				<p>
 スライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> は <code><a href="https://doc.rust-lang.org/std/ops/trait.Index.html">Index</a>&lt;I&gt;</code> と <code><a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html">IndexMut</a>&lt;I&gt;</code> を実装している。
 				</p> <p>
-ここで、添字型 <code>I</code> には <code><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt;</code> トレイトの実装が必要。
+ここで、添字の型 <code>I</code> には <code><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;[T]&gt;</code> の実装が必要。
 				</p>
 <pre><code class="language-rust">
 impl&lt;T, I&gt; Index&lt;I&gt; for [T]
@@ -126,7 +126,7 @@ where
 		</section> <section>
 			<h1>添字</h1>
 			<p>
-前述の通り、スライスや配列の添字は <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> トレイトを持つ。これには <code>usize</code> 型や範囲型が該当する。そして、それらはそれぞれ対応する出力の型を持つ。前者は単一値、後者はスライスである。
+前述の通り、スライスや配列の添字は <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> トレイトを持つ。これには <code>usize</code> 型や範囲型が該当する。そして、それらはそれぞれ対応する出力の型を持つ。前者は要素の型、後者は要素のスライス型である。
 			</p>
 			<aside class="normal">
 				<p>
@@ -142,7 +142,7 @@ where
 				<p>
 スライスや配列の添字として使える型をまとめるトレイト。
 				</p> <p>
-<code><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;T&gt;</code> トレイトは型 <code>T</code> のための添字型として使われる。
+<code><a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html">SliceIndex</a>&lt;T&gt;</code> は型パラメタ <code>T</code> への添字として使える。
 				</p> 
 <pre><code class="language-rust">
 pub unsafe trait SliceIndex&lt;T&gt;: Sealed
@@ -159,7 +159,7 @@ where
 <a href="https://doc.rust-lang.org/std/primitive.usize.html"><code>usize</code></a>
 				</h1>
 				<p>
-添字が <a href="https://doc.rust-lang.org/std/primitive.usize.html"><code>usize</code></a> 型の場合、出力は単一の値 <code>T</code> になる。
+添字が <a href="https://doc.rust-lang.org/std/primitive.usize.html"><code>usize</code></a> 型の場合、出力は要素の型 <code>T</code> になる。
 				</p>
 <pre><code class="language-rust">
 unsafe impl&lt;T&gt; SliceIndex&lt;[T]&gt; for usize {
