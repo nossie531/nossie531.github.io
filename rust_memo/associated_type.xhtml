@@ -172,7 +172,7 @@ GAT への境界の指定はコロンによる方式の他に、<code>where</cod
 				<section>
 					<h2>サンプルコード</h2>
 					<p>
-以下では、トレイト <code>ContainerBuilder</code> が生成するコンテナ型のために、ジェネリックな関連型 <code>Container&lt;T&gt;</code> が定義されている (<code>T</code> はコンテナの要素型)。
+以下では、トレイト <code>CollectionBuilder</code> が生成するコレクションのために、ジェネリックな関連型 <code>Output&lt;T&gt;</code> が定義されている (<code>T</code> はコレクションの要素型)。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -181,10 +181,10 @@ fn main() {
     assert_eq!(vec, vec![42, 42, 42]);
 }
 
-trait ContainerBuilder {
-    type Container&lt;T&gt;: Default + Collection&lt;T&gt;;
-    fn build&lt;T: Clone&gt;(&amp;self, v: T, n: usize) -&gt; Self::Container&lt;T&gt; {
-        let mut result = &lt;Self::Container&lt;T&gt;&gt;::default();
+trait CollectionBuilder {
+    type Output&lt;T&gt;: Default + Collection&lt;T&gt;;
+    fn build&lt;T: Clone&gt;(&amp;self, v: T, n: usize) -&gt; Self::Output&lt;T&gt; {
+        let mut result = &lt;Self::Output&lt;T&gt;&gt;::default();
         for _ in 0..n {
             result.add(v.clone());
         }
@@ -197,8 +197,8 @@ trait Collection&lt;T&gt; {
 }
 
 struct VecBuilder();
-impl ContainerBuilder for VecBuilder {
-    type Container&lt;T&gt; = Vec&lt;T&gt;;
+impl CollectionBuilder for VecBuilder {
+    type Output&lt;T&gt; = Vec&lt;T&gt;;
 }
 
 impl&lt;T&gt; Collection&lt;T&gt; for Vec&lt;T&gt; {
