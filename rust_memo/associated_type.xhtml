@@ -153,19 +153,16 @@ where
 		</section> <section>
 			<h1 id="gat">ジェネリクス (GAT)</h1>
 			<p>
-関連型はジェネリクスパラメタを付加する事で、パラメトリックにできる。また必要ならば、それらのパラメタに対して、<code>where</code> による境界を設定できる。 
+関連型はジェネリクスパラメタを付加する事で、パラメトリックにできる。
+			</p> <p>
+この機能は <abbr>GAT</abbr> (Generic Associated Types) と呼ばれている。
 			</p>
 			<section>
-				<h2>ジェネリクスによる制限</h2>
+				<h2><code>where</code> による境界の指定</h2>
 				<p>
-この機能を使ったトレイトはトレイトオブジェクトになれない。<br/>
-(ジェネリクスパラメタを含む型を動的に処理できないため)。
-				</p>
-			</section> <section>
-				<h2>補足 (Rust の歴史と機能名)</h2>
-				<p>
-この機能は Rust 1.65 (<time>2022/11/03</time>) から正式に導入された。<br/>
-機能名は <abbr>GAT</abbr> (Generic Associated Types) と呼ばれている。
+GAT への境界の指定はコロンによる方式の他に、<code>where</code> による方式にも対応している。
+				</p> <p>
+これにより、GAT のパラメタへの境界の指定もできるようになっている。
 				</p>
 			</section> <section>
 				<h1>型パラメタ</h1>
@@ -219,7 +216,7 @@ impl&lt;T&gt; Collection&lt;T&gt; for Vec&lt;T&gt; {
 				<section>
 					<h2>サンプルコード</h2>
 					<p>
-以下では、トレイト <code>IntCollection</code> が生成するイテレータのために、ジェネリックな関連型 <code>IntStream&lt;'a&gt;</code> が定義されている。ここで、<code>'a</code> はイテレータのアイテムが所属するライフタイムで、<code>IntCollection</code> を参照できなければならない (<code>Self: 'a</code> の境界のため)。
+以下では、トレイト <code>IntCollection</code> が生成するイテレータのために、ジェネリックな関連型 <code>IntStream&lt;'a&gt;</code> が定義されている。ここで、<code>'a</code> はイテレータのアイテムが所属するライフタイムで、<code>IntCollection</code> は <code>'a</code> から参照できなければならない (<code>Self: 'a</code> の境界のため)。
 					</p>
 <pre><code class="language-rust">
 use std::slice::Iter;
@@ -246,11 +243,13 @@ impl IntCollection for Vec&lt;i32&gt; {
 			</section> <section>
 				<h1 id="gat_limitation">制限</h1>
 				<p>
-2024 年現在、GAT には厄介な制限がまだいくつかある。この事は<a href="https://blog.rust-lang.org/2022/10/28/gats-stabilization.html#when-gats-go-wrong---a-few-current-bugs-and-limitations">公式ブログ</a>でも紹介されている。それによると、これらは新機能である GAT の導入を急いだ結果らしく、将来的には改善される見込みらしい。
+2024 年現在、GAT には厄介な制限が複数ある。この事は<a href="https://blog.rust-lang.org/2022/10/28/gats-stabilization.html#when-gats-go-wrong---a-few-current-bugs-and-limitations">公式ブログ</a>でも紹介されている。それによると、これらは GAT の導入 (Rust 1.65: 2022/11/03) を急いだ結果らしく、将来的には改善される見込みらしい。
 				</p>
 				<ul>
 					<li>
 <a href="e_gat_hrtb.xhtml">GAT と HRTB の組合せによるエラー</a>
+					</li> <li>
+GAT を使ったトレイトは dyn を使用不可
 					</li>
 				</ul>
 			</section>
