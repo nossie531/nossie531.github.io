@@ -126,7 +126,7 @@ where
 		</section> <section>
 			<h1>添字</h1>
 			<p>
-前述の通り、スライスや配列の添字は <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> トレイトを持つ。これには <code>usize</code> 型や範囲型が該当する。そして、それらはそれぞれ対応する出力の型を持つ。前者は要素の型、後者は要素のスライス型である。
+前述の通り、スライスや配列の添字は <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> トレイトを持つ。<code>usize</code> 型や各種の範囲型が添字になれるのは、これを実装しているためである。そして、それぞれの関連型から出力の型が決まる。これは <code>usize</code> 型なら要素の型、範囲型なら要素のスライス型である。
 			</p>
 			<aside class="normal">
 				<p>
@@ -171,7 +171,7 @@ unsafe impl&lt;T&gt; SliceIndex&lt;[T]&gt; for usize {
 			</section> <section>
 				<h1>範囲型</h1>
 				<p>
-添字が範囲型の場合、出力はスライス <code>[T]</code> になる。
+添字が範囲型の場合、出力は要素のスライス型 <code>[T]</code> になる。
 				</p>
 <pre><code class="language-rust">
 unsafe impl&lt;T&gt; SliceIndex&lt;[T]&gt; for ops::Range&lt;usize&gt; {
