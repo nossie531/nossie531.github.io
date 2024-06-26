@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: GAT とループの組合せによるエラー</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0499]</mark><mark class="title">: cannot borrow `*self` as mutable more than once at a time</mark>
+</samp></pre>
+		<p>
+このエラーは 2024 年現在、<a href="associated_type.xhtml#gat_limitation">GAT に残る制限</a>の一つ。
+		</p>
+		<section>
+			<h1>発生条件</h1>
+			<p>
+以下の条件を全て満たすと、借用をループ外に保存したかのように、前回ループと今回ループの借用どうしが競合する (リターン文が保存と似た働きになってしまっている模様)。
+			</p>
+			<ul>
+				<li>
+関数の戻り値に GAT があり、可変参照の引数に由来するライフタイムを含む。
+				</li> <li>
+関数の中にループがあり、その中に条件分岐がある。
+				</li> <li>
+その条件分岐の中にリターン文がある。
+				</li>
+			</ul>
+		</section> <section>
+			<h1>サンプルコード</h1>
+<pre><code class="language-rust">
+use std::slice::Iter;
+
+fn main() {
+    let vec = vec![1, 2, 3];
+    let mut iter = MyIter(vec.iter());
+    let third = *iter.nth(2).unwrap();
+    assert_eq!(third, 3);
+}
+
+trait LendingIterator {
+    type Item&lt;'a&gt; where Self: 'a;
+
+    fn next(&amp;mut self) -&gt; Option&lt;Self::Item&lt;'_&gt;&gt;;
+
+    fn nth(&amp;mut self, n: usize) -&gt; Option&lt;Self::Item&lt;'_&gt;&gt; {
+        for i in 0..=n {
+            let item = <mark class="error">self</mark>.next();
+            if i == n {
+                return item;
+            }
+        }
+
+        None
+    }
+}
+
+struct MyIter&lt;'a, T&gt;(Iter&lt;'a, T&gt;);
+
+impl&lt;'s, T&gt; LendingIterator for MyIter&lt;'s, T&gt; {
+    type Item&lt;'a&gt; = &amp;'a T where Self: 'a;
+
+    fn next(&amp;mut self) -&gt; Option&lt;Self::Item&lt;'_&gt;&gt; {
+        (&amp;mut self.0 as &amp;mut dyn Iterator&lt;Item = &amp;T&gt;).next()
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0499]</mark><mark class="title">: cannot borrow `*self` as mutable more than once at a time</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:17:24
+<mark class="info">   |</mark>
+<mark class="info">15 |</mark>     fn nth(&amp;mut self, n: usize) -&gt; Option&lt;Self::Item&lt;'_&gt;&gt; {
+<mark class="info">   |</mark>            <mark class="info">- let's call the lifetime of this reference `'1`</mark>
+<mark class="info">16 |</mark>         for i in 0..=n {
+<mark class="info">17 |</mark>             let item = self.next();
+<mark class="info">   |</mark>                        <mark class="error">^^^^ `*self` was mutably borrowed here in the previous iteration of the loop</mark>
+<mark class="info">18 |</mark>             if i == n {
+<mark class="info">19 |</mark>                 return item;
+<mark class="info">   |</mark>                        <mark class="info">---- returning this value requires that `*self` is borrowed for `'1`</mark>
+</samp></pre>
+		</section> <section>
+			<h1>解決策</h1>
+			<p>
+アンセーフなコードを利用して参照の監視を止めればよい。
+			</p> <p>
+例えば、前述のサンプルコードの場合、<code>self.next()</code> の箇所を、<br/>
+<code>unsafe { &amp;mut *(self as *mut Self) }.next()</code> とするといい。
+			</p>
+		</section>
+	</body>
+</html>
