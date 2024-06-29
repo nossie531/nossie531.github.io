@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0562 - impl 抽象化の未対応箇所での使用</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0562]</mark><mark class="title">: `impl Trait` is not allowed in cast expression types</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0562]</mark><mark class="title">: `impl Trait` is not allowed in the type of variable bindings</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0562]</mark><mark class="title">: `impl Trait` is not allowed in const types</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0562]</mark><mark class="title">: `impl Trait` is not allowed in static types</mark>
+</samp></pre>
+		<p>
+<code>impl</code> 抽象化を未対応の箇所で使用した。
+		</p>
+		<section>
+			<h1>原因</h1>
+			<p>
+<time>2024 年現在</time>、<code>impl</code> 抽象化は関数の引数型と戻り値型でのみ使える。
+			</p> <p>
+それ以外、例えば変数バインドなどでの利用はまだ<a href="https://github.com/rust-lang/rust/issues/63065">開発段階</a>である。なお、過去には不安定な機能 <code>impl_trait_in_bindings</code> として実装されていたが、実装方法に問題があったらしく、現在その機能は<a href="https://github.com/rust-lang/rust/issues/86729">削除</a>されている。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+<pre><code class="language-rust">
+fn main() {
+    let x = 1 as <mark class="error">impl std::fmt::Display</mark>;
+    println!("{x}");
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0562]</mark><mark class="title">: `impl Trait` is not allowed in cast expression types</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:18
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let x = 1 as impl std::fmt::Display;
+<mark class="info">  |</mark>                  <mark class="error">^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: `impl Trait` is only allowed in arguments and return types of functions and methods
+</samp></pre>
+		</section> <section>
+			<h1>回避策</h1>
+			<p>
+キャストや変数バインドについてはマクロが使える。
+			</p>
+<pre><code class="language-rust">
+macro_rules! to_impl {
+    ($x:expr, $t:ty) =&gt; {{
+        fn f(x: $t) -&gt; $t {x}
+        f($x)
+    }};
+}
+
+fn main() {
+    let x = to_impl!(1, impl std::fmt::Display);
+    println!("{x}");
+}
+</code></pre>
+		</section>
+	</body>
+</html>
