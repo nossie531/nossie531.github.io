@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0308 - 型の不一致</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
+</samp></pre>
+		<p>
+値の型が期待されるのと異なっている。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<nav class="sub"/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+単純に期待されるのと異なる型を使っているパターン。
+				</p>
+				<section>
+					<h2>サンプルコード</h2>
+					<p>
+以下では、<code>i32</code> 型が期待される箇所で、<code>f32</code> 型の値を使っている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let x = 4.2 as f32;
+    let r = increment(<mark class="error">x</mark>);
+    println!("{x} + 1 = {r}");
+}
+
+fn increment(x: i32) -&gt; i32 {
+    x + 1
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:23
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let r = increment(x);
+<mark class="info">  |</mark>             <mark class="info">---------</mark> <mark class="error">^ expected `i32`, found `f32`</mark>
+<mark class="info">  |</mark>             <mark class="info">|</mark>
+<mark class="info">  |</mark>             <mark class="info">arguments to this function are incorrect</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: function defined here
+<mark class="info"> --&gt;</mark> src\main.rs:7:4
+<mark class="info">  |</mark>
+<mark class="info">7 |</mark> fn increment(x: i32) -&gt; i32 {
+<mark class="info">  |</mark>    <mark class="edit">^^^^^^^^^</mark> <mark class="info">------</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">型推論が関連</div>
+				</hgroup>
+				<p>
+型推論により導出される型パラメタの型は、HRTB によるライフタイムを含めない。
+				</p> <p>
+この制限はクロージャの境界において、その戻り値に引数由来のライフタイムが含まれるのを禁止するのに利用できる (例: <code><a href="https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://www.youtube.com/watch?v=Fp4OXZhNXAg">scan</a></code> のクロージャ引数)。なお、後述の解決策によりこの制限は解除できる。
+				</p>
+				<section>
+					<h2>サンプルコード</h2>
+					<p>
+以下では、関数 <code>identity</code> は戻り値に引数由来のライフタイムを持つ。また、関数 <code>callback</code> の境界 <code>F</code> では、クロージャの戻り値が型パラメタで定義されているため、引数由来のライフタイム <code>'a</code> を含む事ができない。そのため、<code>identity</code> はその戻り値の型のため、<code>callback</code> の引数になれない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let input = &amp;42;
+    let result = <mark class="error">callback(identity, input)</mark>;
+    assert_eq!(result, input);
+}
+
+fn identity(x: &amp;i32) -&gt; &amp;i32 {
+    x
+}
+
+fn callback&lt;F, I, O&gt;(f: F, input: &amp;I) -&gt; O
+where
+    F: for&lt;'a&gt; Fn(&amp;'a I) -&gt; O
+{
+    f(input)
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:3:18
+<mark class="info">   |</mark>
+<mark class="info">3  |</mark>     let result = callback(identity, input);
+<mark class="info">   |</mark>                  <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ one type is more general than the other</mark>
+<mark class="info">   |</mark>
+<mark class="info">   =</mark> note: expected reference `&amp;'a _`
+<mark class="info"></mark>              found reference `&amp;_`
+<mark class="edit">note</mark>: the lifetime requirement is introduced here
+<mark class="info">  --&gt;</mark> src\main.rs:13:29
+<mark class="info">   |</mark>
+<mark class="info">13 |</mark>     F: for&lt;'a&gt; Fn(&amp;'a I) -&gt; O
+<mark class="info">   |</mark>                             <mark class="edit">^</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策 1</h2>
+					<p>
+以下では、クロージャの戻り値の型について、型パラメタとして定義するのではなく、関連型を使って導出している。なお、<code>FnHelper</code> は <a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a> トレイトを通常のトレイトとして扱えるようにするためのヘルパートレイトである。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let input = &amp;42;
+    let result = callback(identity, input);
+    assert_eq!(result, input);
+}
+
+fn identity(x: &amp;i32) -&gt; &amp;i32 {
+    x
+}
+
+fn callback&lt;F, I&gt;(f: F, input: &amp;I) -&gt; &lt;F as FnHelper&lt;&amp;I&gt;&gt;::Output
+where
+    F: for&lt;'a&gt; FnHelper&lt;&amp;'a I&gt;
+{
+    f(input)
+}
+
+trait FnHelper&lt;I&gt;: Fn(I) -&gt; &lt;Self as FnHelper&lt;I&gt;&gt;::Output {
+    type Output;
+}
+
+impl&lt;F, I, O&gt; FnHelper&lt;I&gt; for F
+where
+    F: Fn(I) -&gt; O,
+{
+    type Output = O;
+}
+</code></pre>
+				</section> <section>
+					<h2>解決策 2</h2>
+					<p>
+以下でも、クロージャの戻り値の型について、型パラメタとして定義するのではなく、関連型を使って導出している。ただし、前の例とは異なり、<code>FnHelper</code> の代わりに <time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/nightly/unstable-book/language-features/unboxed-closures.html"><code>unboxed_closures</code></a> を利用している。
+					</p>
+<pre><code class="language-rust">
+#![feature(unboxed_closures)]
+
+fn main() {
+    let input = &amp;42;
+    let result = callback(identity, input);
+    assert_eq!(result, input);
+}
+
+fn identity(x: &amp;i32) -&gt; &amp;i32 {
+    x
+}
+
+fn callback&lt;F, I&gt;(f: F, input: &amp;I) -&gt; &lt;F as FnOnce&lt;(&amp;I,)&gt;&gt;::Output
+where
+    F: for&lt;'a&gt; Fn&lt;(&amp;'a I,)&gt;
+{
+    f(input)
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
