@@ -8,21 +8,25 @@ samp.console-rustc {
 	}
 
 	& mark.info {
+		font-weight: bold;
 		color: hsla(195, 90%, 40%, 0.8);
 		background-color: transparent;
 	}
 
 	& mark.warn {
+		font-weight: bold;
 		color: hsla(60, 50%, 40%, 0.8);
 		background-color: transparent;
 	}
 
 	& mark.error {
+		font-weight: bold;
 		color: hsla(5, 90%, 60%, 0.8);
 		background-color: transparent;
 	}
 
 	& mark.edit {
+		font-weight: bold;
 		color: hsla(156, 70%, 40%, 0.8);
 		background-color: transparent;
 	}

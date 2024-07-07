@@ -72,7 +72,7 @@ impl&lt;T&gt; MyTrait for T {}
 以下は最初のサンプルの <code>for &amp;MyStruct</code> から <code>&amp;</code> を削った場合のエラー。
 				</p>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0507]</mark>: cannot move out of `*r` which is behind a shared reference
+<mark class="error">error[E0507]</mark><mark class="title">: cannot move out of `*r` which is behind a shared reference</mark>
 </samp></pre>
 			</section>
 		</section> <section>

@@ -11,13 +11,13 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of function</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0521]</mark>: borrowed data escapes outside of method
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of method</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0521]</mark>: borrowed data escapes outside of closure
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of closure</mark>
 </samp></pre>
 		<p>
 メッセージには関数版、メソッド版、そしてクロージャ版がある。
@@ -54,7 +54,7 @@ fn use_static(_: &amp;'static i32) {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of function</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:2:5
 <mark class="info">  |</mark>
 <mark class="info">1 |</mark> fn f(arg: &amp;i32) {
@@ -85,7 +85,7 @@ fn use_static(_: &amp;'static i32) {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of function</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:2:5
 <mark class="info">  |</mark>
 <mark class="info">1 |</mark> fn f(arg: &amp;Box&lt;i32&gt;) {
@@ -118,7 +118,7 @@ fn use_any&lt;T: Any&gt;(_: T) {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0521]</mark>: borrowed data escapes outside of function
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of function</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:4:5
 <mark class="info">  |</mark>
 <mark class="info">3 |</mark> fn f(arg: &amp;i32) {
@@ -151,7 +151,7 @@ fn main() {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0521]</mark>: borrowed data escapes outside of closure
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of closure</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:4:9
 <mark class="info">  |</mark>
 <mark class="info">2 |</mark>     let mut vec = Vec::&lt;&amp;i32&gt;::new();

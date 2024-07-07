@@ -11,7 +11,7 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 <pre><samp class="console-rustc">
-<mark class="error">error</mark>: lifetime may not live long enough
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
 </samp></pre>
 		<p>
 <time>2024 年現在</time>、クロージャでのライフタイムの規則は関数のそれと異なる。
@@ -39,7 +39,7 @@ fn main() {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="title"><mark class="error">error</mark>: lifetime may not live long enough</mark>
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:2:40
 <mark class="info">  |</mark>
 <mark class="info">2 |</mark>     let _closure = |x: &amp;i32| -&gt; &amp;i32 { x };

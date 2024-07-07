@@ -11,10 +11,10 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
+<mark class="error">error[E0502]</mark><mark class="title">: cannot borrow `data` as mutable because it is also borrowed as immutable</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
+<mark class="error">error[E0502]</mark><mark class="title">: cannot borrow `data` as immutable because it is also borrowed as mutable</mark>
 </samp></pre>
 		<p>
 同じ参照先への不変参照と可変参照は共存できない。このルールはコンパイラによる静的解析や最適化に利用できるだけでなく、取得系操作と更新系操作の分離を促進することで、コードの可読性も高める。
@@ -70,7 +70,7 @@ fn main() {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0502]</mark>: cannot borrow `data` as mutable because it is also borrowed as immutable
+<mark class="error">error[E0502]</mark><mark class="title">: cannot borrow `data` as mutable because it is also borrowed as immutable</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:4:6
 <mark class="info">  |</mark>
 <mark class="info">3 |</mark>     let data_ref = &amp;data;
@@ -97,7 +97,7 @@ fn main() {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0502]</mark>: cannot borrow `data` as immutable because it is also borrowed as mutable
+<mark class="error">error[E0502]</mark><mark class="title">: cannot borrow `data` as immutable because it is also borrowed as mutable</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:4:20
 <mark class="info">  |</mark>
 <mark class="info">3 |</mark>     let data_mut = &amp;mut data;

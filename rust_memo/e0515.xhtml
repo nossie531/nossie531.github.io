@@ -11,13 +11,13 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0515]</mark>: cannot return value referencing local variable `var`
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return value referencing local variable `var`</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0515]</mark>: cannot return reference to function parameter `arg`
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to function parameter `arg`</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0515]</mark>: cannot return reference to temporary value
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to temporary value</mark>
 </samp></pre>
 		<p>
 関数からの戻り値となる参照の参照先は、関数からの復帰後も有効でなければならない。
@@ -42,7 +42,7 @@ fn test() -&gt; &amp;'static i32 {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0515]</mark>: cannot return reference to local variable `var`
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to local variable `var`</mark>
 <mark class="info"> --&gt;</mark> src\lib.rs:3:5
 <mark class="info">  |</mark>
 <mark class="info">3 |</mark>     &amp;var
@@ -62,7 +62,7 @@ fn test(arg: i32) -&gt; &amp;'static i32 {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0515]</mark>: cannot return reference to function parameter `arg`
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to function parameter `arg`</mark>
 <mark class="info"> --&gt;</mark> src\lib.rs:2:5
 <mark class="info">  |</mark>
 <mark class="info">2 |</mark>     &amp;arg
@@ -82,7 +82,7 @@ fn test(arg: i32) -&gt; &amp;'static i32 {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0515]</mark>: cannot return reference to temporary value
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to temporary value</mark>
 <mark class="info"> --&gt;</mark> src\lib.rs:2:5
 <mark class="info">  |</mark>
 <mark class="info">2 |</mark>     &amp;(arg + 1)
