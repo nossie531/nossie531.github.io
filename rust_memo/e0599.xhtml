@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0599 - 無効なメソッドの呼出</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: no method named `method` found for struct `MyType` in the current scope</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: the method `method` exists for struct `MyType&lt;Xxx&gt;`, but its trait bounds were not satisfied</mark>
+</samp></pre>
+		<p>
+無効なメソッドの呼出を行った。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<section>
+				<h1>基本形</h1>
+				<p>
+型にメソッドがないパターン。
+				</p>
+				<section>
+					<h2>サンプルコード</h2>
+					<p>
+以下では、型 <code>MyValue</code> にメソッド <code>method</code> が存在しない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let value = MyValue();
+    value.<mark class="error">method</mark>();
+}
+
+struct MyValue();
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: no method named `method` found for struct `MyValue` in the current scope</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:11
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     value.method();
+<mark class="info">  |</mark>           <mark class="error">^^^^^^ method not found in `MyValue`</mark>
+<mark class="info">...</mark>
+<mark class="info">6 |</mark> struct MyValue();
+<mark class="info">  |</mark> <mark class="info">-------------- method `method` not found for this struct</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<h1>境界への不適合</h1>
+				<p>
+型にメソッドはあるが境界に適合しないパターン。
+				</p>
+				<section>
+					<h2>サンプルコード</h2>
+					<p>
+以下では、型 <code>MyValue&lt;T&gt;</code> がメソッド <code>print_binary</code> を実装するのは、型パラメタ <code>T</code> がトレイト <code>UpperHex</code> を実装する場合のみである。そして、変数 <code>value</code> における <code>T</code> の型は <code>bool</code> でこれは <code>UpperHex</code> を実装しない。そのため、<code>print_binary</code> の呼出はエラーになる。
+					</p>
+<pre><code class="language-rust">
+use std::fmt::UpperHex;
+
+fn main() {
+    let value = MyValue(true);
+    value.<mark class="error">print_binary()</mark>;
+}
+
+struct MyValue&lt;T&gt;(T);
+impl&lt;T: UpperHex&gt; MyValue&lt;T&gt; {
+    fn print_binary(&amp;self) {
+        println!("{:X}", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: the method `print_binary` exists for struct `MyValue&lt;bool&gt;`, but its trait bounds were not satisfied</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:5:11
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark>     value.print_binary();
+<mark class="info">  |</mark>           <mark class="error">^^^^^^^^^^^^ method cannot be called on `MyValue&lt;bool&gt;` due to unsatisfied trait bounds</mark>
+<mark class="info">...</mark>
+<mark class="info">8 |</mark> struct MyValue&lt;T&gt;(T);
+<mark class="info">  |</mark> <mark class="info">----------------- method `print_binary` not found for this struct</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: trait bound `bool: UpperHex` was not satisfied
+<mark class="info"> --&gt;</mark> src\main.rs:9:9
+<mark class="info">  |</mark>
+<mark class="info">9 |</mark> impl&lt;T: UpperHex&gt; MyValue&lt;T&gt; {
+<mark class="info">  |</mark>         <mark class="edit">^^^^^^^^</mark>  <mark class="info">----------</mark>
+<mark class="info">  |</mark>         <mark class="edit">|</mark>
+<mark class="info">  |</mark>         <mark class="edit">unsatisfied trait bound introduced here</mark>
+</samp></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
