@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: 貸出イテレータ</title>
+		<title>Rust メモ: Lending Iterator パターン</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,12 +11,40 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-貸出イテレータ (Lending Iterator) はイテレータの変種である。通常のイテレータと違い、アイテムにイテレータへの参照が含まれる。そのため、イテレータが破棄されるとアイテムも使用できなくなる。
+Iterator パターンの変種、Lending Iterator パターンについて。
 		</p>
 		<section>
+			<h1><code>Iterator</code> の特徴</h1>
+			<p>
+標準機能のトレイト <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>std::iter::Iterator</code></a> について。
+			</p> <p>
+アイテムからはイテレータを参照できない制約がある。
+			</p> <p>
+その反面、イテレータを破棄してもアイテムの使用を続けられる。 
+			</p>
+		</section> <section>
+			<h1><code>LendingIterator</code> の特徴</h1>
+			<p>
+標準機能には Lending Iterator のためのトレイトはまだないので自分で定義する。
+			</p> <p>
+アイテム型にライフタイムパラメタがあるため、前述の制約がない。
+			</p> <p>
+その反面、イテレータを破棄するとアイテムの使用を続けられなくなる。
+			</p>
+		</section> <section>
+			<h1><code>LendingIterator</code> の実装例</h1>
+			<section>
+				<h2><code>WindowsMut</code></h2>
+				<p>
+このイテレータのアイテムは配列への可変スライスで、スライスの開始位置はアイテムの取得ごとに一歩ずつ前進し、スライスの長さは初期化時に指定された固定長になる。
+				</p> <p>
+なお、このイテレータは通常のイテレータと異なり、同じイテレータ由来の複数のアイテムが同時に存在できない。なぜなら、各アイテムは同じイテレータを可変参照しているため、借用チェッカーによる排他制御下にある。これにより、複数の可変スライスの範囲が重複して編集が競合するような事態を予防できる。
+				</p>
+			</section>
+		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-以下では、<code>WindowsMut</code> 型が <code>LendingIterator</code> を実装している。このイテレータのアイテムは配列の可変なスライスで、指定された長さとアイテムの取得ごとにずれる開始位置を持つ。ここで、アイテムが同時に存在すると編集が競合しうる。そのため、各アイテムの可変参照をイテレータ由来として排他制御する必要がある。
+以下では、トレイト <code>LendingIterator</code> を型 <code>WindowsMut</code> に実装している。
 			</p>
 <pre><code class="language-rust">
 fn main() {
