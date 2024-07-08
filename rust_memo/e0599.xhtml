@@ -58,7 +58,7 @@ struct MyValue();
 				<section>
 					<h2>サンプルコード</h2>
 					<p>
-以下では、型 <code>MyValue&lt;T&gt;</code> がメソッド <code>print_binary</code> を実装するのは、型パラメタ <code>T</code> がトレイト <code>UpperHex</code> を実装する場合のみである。そして、変数 <code>value</code> における <code>T</code> の型は <code>bool</code> でこれは <code>UpperHex</code> を実装しない。そのため、<code>print_binary</code> の呼出はエラーになる。
+以下では、変数 <code>value</code> は型 <code>MyValue&lt;T&gt;</code> ではあるが、メソッド <code>print_binary</code> を呼べない。なぜなら、型パラメタ <code>T</code> に割り当てられた型が <code>bool</code> であり、これは <code>T</code> が <code>UpperHex</code> を実装すべきとした <code>print_binary</code> 実装時の境界に違反する。
 					</p>
 <pre><code class="language-rust">
 use std::fmt::UpperHex;
@@ -93,6 +93,11 @@ impl&lt;T: UpperHex&gt; MyValue&lt;T&gt; {
 <mark class="info">  |</mark>         <mark class="edit">|</mark>
 <mark class="info">  |</mark>         <mark class="edit">unsatisfied trait bound introduced here</mark>
 </samp></pre>
+				</section> <section>
+					<h2>他エラーとの関係性</h2>
+					<p>
+型が境界に一致するかついて。『<a href="e0308.xhtml">E0308 - 型の不一致</a>』の<a href="e0308.xhtml#withTypeInference">パターン B</a> で取り上げたのと同じ型推論の影響を受ける。そのため、境界がクロージャについてのもので、それに型推論が絡む可能性がある場合、そちらの情報も参照してほしい。
+					</p>
 				</section>
 			</section>
 		</section>
