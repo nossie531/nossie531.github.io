@@ -96,7 +96,7 @@ impl&lt;T: UpperHex&gt; MyValue&lt;T&gt; {
 				</section> <section>
 					<h2>他エラーとの関係性</h2>
 					<p>
-型が境界に一致するかついて。『<a href="e0308.xhtml">E0308 - 型の不一致</a>』の<a href="e0308.xhtml#withTypeInference">パターン B</a> で取り上げたのと同じ型推論の影響を受ける。そのため、境界がクロージャについてのもので、それに型推論が絡む可能性がある場合、そちらの情報も参照してほしい。
+型が境界に一致するかついて。『<a href="e0308.xhtml">E0308 - 型の不一致</a>』の<a href="e0308.xhtml#withTypeInference">パターン B</a> で取り上げたのと同じ型推論の影響を受ける。そのため、境界がクロージャについてのもので、それに型推論や HRTB が絡みそうな場合、そちらの情報も参照してほしい。
 					</p>
 				</section>
 			</section>
