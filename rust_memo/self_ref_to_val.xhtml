@@ -29,7 +29,7 @@
 この場合、<code>self</code> は参照型であるため、当然と言えば当然である。
 			</p>
 			<section>
-				<h2>サンプルコード (参照型版)</h2>
+				<h2>サンプル (参照型版)</h2>
 				<p>
 以下では、末尾の実装の <code>&amp;</code> の箇所が重要。
 				</p>
@@ -48,7 +48,7 @@ struct MyStruct {}
 impl MyTrait for &amp;MyStruct {}
 </code></pre>
 			</section> <section>
-				<h2>サンプルコード (型パラメタ版)</h2>
+				<h2>サンプル (型パラメタ版)</h2>
 				<p>
 以下では、型パラメタ <code>T</code> が参照型も含んでいる。
 				</p>
@@ -95,7 +95,7 @@ fn count(self) -&gt; usize where Self: Sized
 impl&lt;I: Iterator + ?Sized&gt; Iterator for &amp;mut I
 </code></pre>
 			</section> <section>
-				<h2>サンプルコード</h2>
+				<h2>サンプル</h2>
 				<p>
 そのため、以下のようなコードが可能。
 				</p>

@@ -37,7 +37,7 @@ Newtype パターンは既存の型をラップし、新しい型として使う
 例えば、数値型から距離型と質量型を作れば、それらを取り違えるミスは減る。また、それらそれぞれに専用関数も用意できるようになる。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>f32</code> 型から <code>Length</code> 型を作り、専用関数 <code>from_km</code> を用意している。
 					</p>
@@ -76,7 +76,7 @@ impl Add for Length {
 例えば、Rust には孤児ルールがあるため、他クレート由来の型に他クレート由来のトレイトを新たに実装できない。そこで、既存の型へと処理を移譲するだけの新しい型を自クレート内に作成し、このルールに抵触しないようにする。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、クレート <code>sub1</code> の型 <code>SomeStruct</code> にクレート <code>sub2</code> のトレイト <code>SomeTrait</code> を直接は実装できないため、<code>SomeStruct</code> を <code>Newtype</code> 型でラップしている。
 					</p>

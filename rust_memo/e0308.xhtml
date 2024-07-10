@@ -28,7 +28,7 @@
 単純に期待されるのと異なる型を使っているパターン。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>i32</code> 型が期待される箇所で、<code>f32</code> 型の値を使っている。
 					</p>
@@ -73,7 +73,7 @@ fn increment(x: i32) -&gt; i32 {
 このエラーによる制限は、戻り値に引数由来のライフタイムが含まれるクロージャを禁止するのに利用できる (例: <code><a href="https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://www.youtube.com/watch?v=Fp4OXZhNXAg">scan</a></code> のクロージャ引数)。なお、この制限がいらない場合、後述の解決策で解除できる。
 					</p>
 				</section> <section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、関数 <code>callback</code> の境界 <code>F</code> が定義するクロージャは、戻り値が型パラメタで定義されるので、HRTB で定義された引数由来のライフタイムを含めない。一方、関数 <code>identity</code> は戻り値に引数由来のライフタイムを持つ。そのため、<code>identity</code> を <code>F</code> とすると、戻り値についてのエラーになる。
 					</p>

@@ -101,7 +101,7 @@ fn use_static_ref(_: &amp;'static i32) {
 後述のエラーメッセージの <q>help</q> にある通り、ブロック末尾の式をローカル変数として切り出せばよい。これにより、値を破棄する順序を逆転できる。
 					</p>
 				</section> <section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>OnDrop(&amp;local)</code> がブロック末尾の式内にある。しかし、その解放時には <code>local</code> は解放済のため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時には参照先が存在しない状態になってしまっている。
 					</p>
@@ -155,7 +155,7 @@ impl Drop for OnDrop&lt;'_&gt; {
 基本は<a href="#ptnC1">パターン C1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化が静的か動的かは問わない。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>MyType(&amp;local).as_trait()</code> がブロック末尾の式内にある。しかし、その解放時には <code>local</code> は解放済のため、結果のトレイトの具象型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> を実装していた場合、その実行時には参照先が存在しない状態になってしまっている。
 					</p>
@@ -224,7 +224,7 @@ impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
 上記の制約は <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッド内で参照を使用しない場合でも働く。これが不要な場合、<time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/dropck-eyepatch.html"><code>dropck_eyepatch</code></a> でそれを無視するようにもできる (具体的には参照のライフタイム指定子に <code>#[may_dangle]</code> を指定)。
 					</p>
 				</section> <section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>OnDrop</code> での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行に関連して、<code>data</code> に参照元である <code>OnDrop</code> と参照先である <code>&amp;data.id</code> の両方を格納できないようにされている。
 					</p>
@@ -271,7 +271,7 @@ impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
 基本は<a href="#ptnD1">パターン D1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化は動的である (抽象化が静的ならば、全体を格納する型は各部での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> の実装有無を把握できるため)。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>MyTrait</code> で実行されうる <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> に関連して、<code>data</code> に参照元である <code>MyTrait</code> と参照先である <code>&amp;data.id</code> の両方を格納できないようにされている。
 					</p>

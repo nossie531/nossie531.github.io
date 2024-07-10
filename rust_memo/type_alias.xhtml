@@ -28,7 +28,7 @@
 <code>type Alias = SomeType;</code> とする事で、型 <code>SomeType</code> の別名 <code>Alias</code> を定義できる。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>Vec&lt;f32&gt;</code> に <code>MyVec</code> の別名を定義している。
 					</p>
@@ -55,7 +55,7 @@ fn get_vec_str(v: MyVec) -&gt; String {
 別名には型パラメタを含める事ができる。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、二つの同じ型からなるタプルを <code>Pair&lt;T&gt;</code> として定義している。
 					</p>
@@ -81,7 +81,7 @@ fn get_pair_str(p: Pair&lt;i32&gt;) -&gt; String {
 型パラメタから関連型を導出する型の関数としても利用できる。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>nth1</code> と <code>nth2</code> は全く同じ機能になる。
 					</p>
@@ -117,7 +117,7 @@ fn nth2&lt;I: Iterator&gt;(mut iter: I, n: usize) -&gt; Option&lt;ToItem&lt;I&gt
 <code>type</code> エイリアスによる別名は、新しい型として作られるわけではない。そのため、元の型や同じように作られた別名と良くも悪くも互換性がある (取り違えを防ぐ目的では、<a href="newtype.xhtml">Newtype パターン</a>が利用可能)。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>f32</code> に別名 <code>Length</code> と <code>Time</code> を定義しているが、それらを取り違えている。
 					</p>
@@ -145,7 +145,7 @@ fn speed(l: Length, t: Time) -&gt; f32 {
 <code>type</code> エイリアスは型の別名を作るだけで、関数の別名までは作らない。そのため、タプルや構造体の別名を作っても、その初期化用関数の別名までは作られない。なお、<code>use Type as Alias;</code> での別名ではこれができる (ただし、こちらは型パラメタの利用に制限がある)。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、型 <code>Color</code> の別名 <code>Rgb</code> を定義しているが、初期化に別名は使えない。
 					</p>
@@ -187,7 +187,7 @@ fn get_color_str(color: Color) -&gt; String {
 <time>2024 年現在</time>、<code>type</code> エイリアスの型パラメタは <code>where</code> で制限できない (エラーメッセージの <q>note</q> を見ると、GitHub へのリンクがあるので将来は変更されるかも…？)。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 <pre><code class="language-rust">
 use std::fmt::Display;
 

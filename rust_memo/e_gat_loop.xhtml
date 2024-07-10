@@ -31,7 +31,7 @@
 				</li>
 			</ul>
 		</section> <section>
-			<h1>サンプルコード</h1>
+			<h1>サンプル</h1>
 <pre><code class="language-rust">
 use std::slice::Iter;
 
@@ -87,7 +87,7 @@ impl&lt;'s, T&gt; LendingIterator for MyIter&lt;'s, T&gt; {
 			<p>
 アンセーフなコードを利用して参照の監視を止めればよい。
 			</p> <p>
-例えば、前述のサンプルコードの場合、<code>self.next()</code> の箇所を、<br/>
+例えば、前述のサンプルの場合、<code>self.next()</code> の箇所を、<br/>
 <code>unsafe { &amp;mut *(self as *mut Self) }.next()</code> とするといい。
 			</p>
 		</section>

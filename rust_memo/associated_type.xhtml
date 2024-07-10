@@ -21,7 +21,7 @@
 トレイトの実装側では、<code>type <var>Assoc</var> = <var>SomeType</var>;</code> のように型を指定する。
 			</p>
 			<section>
-				<h2>サンプルコード</h2>
+				<h2>サンプル</h2>
 				<p>
 以下では、トレイト <code>Sequence</code> からの生成値のために、関連型 <code>Value</code> を定義している。
 			</p> <p>
@@ -62,7 +62,7 @@ impl Sequence for IntCounter {
 これにより、実装側で <code><var>Assoc</var></code> として指定できる型に <code><var>Bounds</var></code> の制約がつく。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下のコードは、直前の例と似たような構成だが、関連型 <code>Value</code> に境界 <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> がある。
 					</p> <p>
@@ -110,7 +110,7 @@ where
 これには、型パラメタ <code>T</code> が関連型 <code>Assoc</code> を持つ場合、<code>T::<var>Assoc</var>: <var>Bounds</var></code> のようにする。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下のコードは、直前の例と同じ動作をする。ただし、関連型 <code>Value</code> の境界 <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a> は、関連型の定義時でなく、外部の関数 <code>skip_to</code> での関連型の使用時に指定されている。
 					</p>
@@ -170,7 +170,7 @@ GAT への境界の指定はコロンによる方式の他に、<code>where</cod
 関連型のジェネリクスパラメタに型パラメタを使うパターン。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、トレイト <code>CollectionBuilder</code> が生成するコレクションのために、ジェネリックな関連型 <code>Output&lt;T&gt;</code> が定義されている (<code>T</code> はコレクションの要素型)。
 					</p>
@@ -214,7 +214,7 @@ impl&lt;T&gt; Collection&lt;T&gt; for Vec&lt;T&gt; {
 関連型のジェネリクスパラメタにライフタイム指定子を使うパターン。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、トレイト <code>IntCollection</code> が生成するイテレータのために、ジェネリックな関連型 <code>IntStream&lt;'a&gt;</code> が定義されている。ここで、<code>'a</code> はイテレータのアイテムが所属するライフタイムで、<code>IntCollection</code> は <code>'a</code> から参照できなければならない (<code>Self: 'a</code> の境界のため)。
 					</p>

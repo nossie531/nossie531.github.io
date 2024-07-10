@@ -29,7 +29,7 @@ Newtype パターンでは、ラップ元の型の参照 <code>&amp;Old</code> �
 unsafe な機能 <a href="https://doc.rust-lang.org/std/mem/fn.transmute.html"><code>std::<wbr/>mem::<wbr/>transmute</code></a> が必要になる。これでラップ元の型への参照をラップ先の型への参照として強引に扱う。そして、内容が同じでも最適化の都合などでメモリ構造が変わる可能性があるので、ラップ先の型に属性 <code>#[repr(transparent)]</code> を指定する事も忘れてはならない。
 				</p>
 			</section> <section>
-				<h2>サンプルコード</h2>
+				<h2>サンプル</h2>
 				<p>
 以下では、<code>use_ref</code> 関数が <code>&amp;i32</code> を <code>&amp;Newtype</code> に読み替えている。
 				</p>

@@ -27,7 +27,7 @@
 型にメソッドがないパターン。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、型 <code>MyValue</code> にメソッド <code>method</code> が存在しない。
 					</p>
@@ -56,7 +56,7 @@ struct MyValue();
 型にメソッドはあるが境界に適合しないパターン。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、変数 <code>value</code> は型 <code>MyValue&lt;T&gt;</code> ではあるが、メソッド <code>print_binary</code> を呼べない。なぜなら、型パラメタ <code>T</code> に割り当てられた型が <code>bool</code> であり、これは <code>T</code> が <code>UpperHex</code> を実装すべきとした <code>print_binary</code> 実装時の境界に違反する。
 					</p>

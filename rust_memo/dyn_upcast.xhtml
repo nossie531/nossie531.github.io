@@ -77,7 +77,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 つまり、キャストの位置をトレイトの実装内へと移す。これにより、キャスト対象の静的型が分かっている箇所でキャストできるため、静的型から動的型へのキャストとなり、エラーにはならなくなる。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>SomeTrait</code> にアップキャスト用のメソッド <code>as_base</code> を定義している。
 					</p>
@@ -121,7 +121,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {
 ただし、基底側が定義済だと使えない。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>BaseTrait</code> にアップキャスト用のメソッド <code>as_base</code> を定義している。
 					</p>
@@ -165,7 +165,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 また、基底側が定義済でも使える。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、定義済の <a href="https://doc.rust-lang.org/std/any/trait.Any.html"><code>Any</code></a> へのアップキャスト用に <code>AsAny</code> を用意している。
 					</p>
@@ -207,9 +207,9 @@ impl&lt;T: Any&gt; SomeTrait for T {}
 上記では、不変参照を通したアップキャストについて説明したが、他にも可変参照や <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> を通した関数があると便利 (<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> 以外のスマートポインタ、例えば <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> などは、<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html"><code>Box</code></a> から <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> トレイトで変換できるため、事前に関数を用意しておく必要性は低い)。
 			</p>
 			<section>
-				<h2>サンプルコード</h2>
+				<h2>サンプル</h2>
 				<p>
-以下では、前述の『<a href="#way3">方法 3</a>』のサンプルコードの <code>AsAny</code> を強化している。
+以下では、前述の『<a href="#way3">方法 3</a>』のサンプルの <code>AsAny</code> を強化している。
 				</p>
 <pre><code class="language-rust">
 trait AsAny: Any {

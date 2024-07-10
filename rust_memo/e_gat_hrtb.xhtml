@@ -61,7 +61,7 @@ HRTB によるライフタイムを使っている。
 エラー番号は <a href="e0597.xhtml"><code>E0597</code></a> や <a href="e0716.xhtml"><code>E0716</code></a> などで表れる (他にもあるかも…)。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、関数 <code>average</code> に HRTB によるライフタイム <code>'a</code> がある。そして、<code>'a</code> はトレイト <code>IntCollection</code> の関連型 <code>IntStream</code> の引数になる。ここで、<code>IntStream</code> の境界条件 <code>Self: 'a</code> により、<code>IntCollection</code> は <code>'a</code> から参照できなければならない。しかし、<code>'a</code> が <code>'static</code> で代用されると、<code>&amp;vec</code> を含む値は <code>'a</code> から参照できなくなる。
 					</p>
@@ -134,7 +134,7 @@ where
 また、関数の型パラメタについての指摘を、なぜか関数の宣言部ではなく本体部で受ける。
 				</p>
 				<section>
-					<h2>サンプルコード</h2>
+					<h2>サンプル</h2>
 					<p>
 					以下では、メソッド <code>all</code> に暗黙の HRTB によるライフタイムがある。そして、そのライフタイムがトレイト <code>Array</code> の関連型 <code>Element</code> の引数になる。ここで、<code>Element</code> の境界条件 <code>Self: 'a</code> により、<code>Array</code> は <code>'a</code> から参照できなければならない。しかし、<code>'a</code> が <code>'static</code> で代用されると、関数 <code>all_positive</code> の <code>T</code> には <code>'static</code> の境界がないためエラーになる (境界を追加するとエラーは解消する)。
 					</p>
