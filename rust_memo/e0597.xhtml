@@ -315,6 +315,19 @@ impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
 <mark class="info">  |</mark> <mark class="info">borrow might be used here, when `data` is dropped and runs the destructor for type `MyData&lt;'_&gt;`</mark>
 </samp></pre>
 				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン E</h1>
+					<div class="subTitle">GAT による制限</div>
+				</hgroup>
+<pre><samp class="console-rustc">
+<mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
+</samp></pre>
+				<p>
+このパターンはエラーメッセージに上記の特徴的な注釈が含まれる。
+				</p> <p>
+詳しくは『<a href="e_gat_hrtb.xhtml">GAT と HRTB の組合せによるエラー</a>』を参照。
+				</p>
 			</section>
 		</section>
 	</body>
