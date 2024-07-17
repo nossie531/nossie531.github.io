@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 意図的なパニック</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+意図的にパニックを発生させる標準機能について。
+		</p> 
+		<section>
+			<h1>目的</h1>
+			<p>
+主にテストや本番中の不変条件の確認に使われる。
+			</p>
+		</section> <section>
+			<h1>一覧</h1>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.panic.html"><code>panic!</code></a>
+				</dt>
+				<dd>
+単純にパニックを実行
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.assert.html"><code>assert!</code></a>
+				</dt>
+				<dd>
+第一引数が <code>true</code> である事を確認
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.assert_eq.html"><code>assert_eq!</code></a>
+				</dt>
+				<dd>
+第一引数と第二引数が等しい事を確認
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.assert_ne.html"><code>assert_ne!</code></a>
+				</dt>
+				<dd>
+第一引数と第二引数が異なる事を確認
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.debug_assert.html"><code>debug_assert!</code></a>
+				</dt>
+				<dd>
+<a href="https://doc.rust-lang.org/std/macro.assert.html"><code>assert!</code></a> のデバッグビルド専用版
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.debug_assert_eq.html"><code>debug_assert_eq!</code></a>
+				</dt>
+				<dd>
+<a href="https://doc.rust-lang.org/std/macro.assert_eq.html"><code>assert_eq!</code></a> のデバッグビルド専用版
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.debug_assert_ne.html"><code>debug_assert_ne!</code></a>
+				</dt>
+				<dd>
+<a href="https://doc.rust-lang.org/std/macro.assert_ne.html"><code>assert_ne!</code></a> のデバッグビルド専用版
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.todo.html"><code>todo!</code></a>
+				</dt>
+				<dd>
+<a href="https://doc.rust-lang.org/std/macro.panic.html"><code>panic!</code></a> と同じだが、コーディング途中である事を示唆
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.unimplemented.html"><code>unimplemented!</code></a>
+				</dt>
+				<dd>
+<a href="https://doc.rust-lang.org/std/macro.panic.html"><code>panic!</code></a> と同じだが、メソッドが継承できない事を示唆
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/macro.unreachable.html"><code>unreachable!</code></a>
+				</dt>
+				<dd>
+<a href="https://doc.rust-lang.org/std/macro.panic.html"><code>panic!</code></a> と同じだが、該当箇所に到達不可能な事を示唆
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/panic/fn.panic_any.html"><code>panic_any</code></a>
+				</dt>
+				<dd>
+パニックして任意の情報を保存
+				</dd>
+			</dl>
+			<section>
+				<h2>エラーメッセージ</h2>
+				<p>
+マクロで提供される機能はどれも、エラーメッセージの出力に対応している。
+				</p> <p>
+これには、必須の引数の以降に書式文字列と埋込値を指定すればよい。
+				</p>
+			</section> <section>
+				<h2>エラー情報</h2>
+				<p>
+<a href="https://doc.rust-lang.org/std/panic/fn.panic_any.html"><code>panic_any</code></a> では <a href="https://doc.rust-lang.org/std/macro.panic.html"><code>panic!</code></a> と異なり、エラーメッセージに文字列以外の任意の型が使える。
+				</p>
+				<p>
+なお、どちらの場合もエラー情報は <a href="https://doc.rust-lang.org/std/panic/struct.PanicInfo.html#method.payload"><code>PanicInfo::payload</code></a> から確認できる。
+				</p>
+			</section>
+		</section>
+	</body>
+</html>
