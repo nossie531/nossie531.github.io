@@ -17,7 +17,7 @@ rustdoc で各アイテムに必要なフィーチャーを表示する方法に
 			<p>
 この方法を推奨できる理由。
 			</p> <p>
-<time>2024 年現在</time>、この方法にはナイトリー版のツールチェーンが必須だが、すでに積極的に利用してもよい状態にある。なぜなら、この方法はオプトインでの利用ができる。また、<a href="https://docs.rs/">Docs.rs</a> (<a href="https://crates.io/">crates.io</a> へのクレート公開時にドキュメントをホストするサイト) への対応も僅かなコードで可能になっている。
+<time>2024 年現在</time>、この方法には不安定な機能が必要なため、ナイトリー版でのみ利用可能だが、すでに積極的に利用可能な状況にある。なぜなら、この方法はオプトインでの利用ができる。また、<a href="https://docs.rs/">Docs.rs</a> (<a href="https://crates.io/">crates.io</a> へのクレート公開時にドキュメントをホストするサイト) での公開にも対応している。
 			</p>
 		</aside>
 		<section>
@@ -28,7 +28,7 @@ rustdoc で各アイテムに必要なフィーチャーを表示する方法に
 			<section>
 				<h2>補足: ナイトリー機能のオプトイン</h2>
 				<p>
-以降のコードでは、ユーザ定義の属性名 <code>doc_feature</code> が何度か登場する。これはナイトリー版でのみ可能な <code>doc_cfg</code> の導入とそれによるフィーチャーの表示について、オプトインするためのフラグになっている。そして、このオプトインが必要な場合にのみ、rustdoc へ引数を追加する仕組となっている。
+以下では、Docs.rs との連携用の構成値 <a href="https://docs.rs/about/builds#detecting-docsrs"><code>docsrs</code></a> を、不安定な機能 <a href="https://doc.rust-lang.org/unstable-book/language-features/doc-cfg.html"><code>doc_cfg</code></a> を有効化するためのスイッチにしている。そして、Docs.rs とローカル環境では、<code>docsrs</code> を導入する方法がやや異なるため、それぞれ個別に指定している。
 				</p>
 			</section> <section>
 				<h2>タスク 1</h2>
@@ -44,7 +44,7 @@ rustdoc で各アイテムに必要なフィーチャーを表示する方法に
 					<figcaption>.cargo/config.toml</figcaption>
 <pre><code class="language-toml">
 [build]
-rustdocflags = ["--cfg", "doc_feature"]
+rustdocflags = ["--cfg", "docsrs"]
 </code></pre>
 				</figure>
 			</section> <section>
@@ -62,10 +62,10 @@ Docs.rs でのドキュメント公開時に起動する <code>rustdoc</code> �
 # ...
 
 [package.metadata.docs.rs]
-rustdoc-args = ["--cfg", "doc_feature"]
+rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
-default = [my_feature]
+default = ["my_feature"]
 my_feature = []
 
 # ...
@@ -85,10 +85,10 @@ my_feature = []
 				<figure class="file">
 					<figcaption>lib.rs</figcaption>
 <pre><code class="language-rust">
-#![cfg_attr(doc_feature, feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(feature = "my_feature")]
-#[cfg_attr(doc_feature, doc(cfg(feature = "my_feature")))]
+#[cfg_attr(docsrs, doc(cfg(feature = "my_feature")))]
 pub fn for_my_feature_only() {}
 </code></pre>
 				</figure>
