@@ -113,7 +113,8 @@
 
 			function adjustIframeHeight(iframe) {
 				const root = iframe.contentDocument.documentElement;
-				iframe.style.height = root.offsetHeight + "px";
+				const height = Math.ceil(root.getBoundingClientRect().height);
+				iframe.style.height = height + "px";
 			}
 		}
 	}
