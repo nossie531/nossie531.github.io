@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<script src="../../lib/quote.js"></script>
+		<link rel="stylesheet" href="../../style/quote_frame.css"/>
+	</head>
+	<body class="forQuote">
+		<blockquote cite="https://rust-lang.github.io/rustup/overrides.html">
+			<p>
+<code class="hljs">rustup</code> は <code class="hljs">rustc</code> などのインストールされたコマンドが実行されると、どの<a href="concepts/toolchains.html">ツールチェーン</a>を使うかを自動的に決定する。どのツールチェーンが使われるべきかを制御または上書するには幾つかの方法がある:
+			</p>
+			<ol>
+				<li>
+コマンドラインでの<a href="#toolchain-override-shorthand">ツールチェーン上書記法</a>、<code class="hljs">cargo +beta</code> のように使用。
+				</li> <li>
+<code class="hljs">RUSTUP_TOOLCHAIN</code> 環境変数。
+				</li> <li>
+<a href="#directory-overrides">ディレクトリの上書</a>、<code class="hljs">rustup override</code> コマンドにより設定。
+				</li> <li>
+<a href="#the-toolchain-file"><code class="hljs">rust-toolchain.toml</code></a> ファイル。
+				</li> <li>
+<a href="#default-toolchain">デフォルトツールチェーン</a>。
+				</li>
+			</ol>
+			<p>
+ツールチェーンは上記で示した順で選ばれ、最初に指定されたものが使われる。ただし、例外が一点: ディレクトリの上書と <code class="hljs">rust-toolchain.toml</code> ファイルではカレントディレクトリとの近さも優先される。つまり、これらの二つの上書の方式はディレクトリツリーをファイルシステムのルートに向かって上向きに歩いて発見されるので、カレントディレクトリに近い <code class="hljs">rust-toolchain.toml</code> ファイルはより遠くのディレクトリの上書よりも優先される。
+			</p> <p>
+どのツールチェーンがアクティブであるかの確認には、<code class="hljs">rustup show</code> が使用でき、それはもし現在のツールチェーンが上記のルールに従ってインストールされていない場合、対象のインストールも試行する。(問題 <a href="https://github.com/rust-lang/rustup/issues/1397">#1397</a> で詳しく説明されるように、この動作は変更される可能性があることに注意。)
+			</p>
+		</blockquote>
+	</body>
+</html>
+
