@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 参照型へのトレイト実装</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<link rel="stylesheet" href="style/must_use.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+トレイトの実装対象が参照型の場合について。
+		</p> <p>
+代表例は <code>impl <var>MyTrait</var> for &amp;<var>MyType</var></code> のようなコード。
+		</p> <p>
+注: コード内に参照型がなくても、型パラメタがあるとこのパターンになりうる。
+		</p>
+		<aside class="normal">
+			<p>
+このメモの背景。
+			</p> <p>
+この機能を使うと、トレイトメソッドにおいて <code>&amp;self</code> でなく <code>self</code> で参照を受けられるようになる。筆者はこの機能を知らずに <code>self</code> で参照を受けているコードを読み、『<a href="dot_and_self.xhtml">メソッド呼出による型変換</a>』の影響 (特に自動逆参照) だと考えていた。しかし、呼出形式をメソッド形式から関数形式に変えても有効だったため、ハテナ…となった。
+			</p>
+		</aside>
+		<section>
+			<h1>特徴</h1>
+			<section>
+				<h2>参照の消費</h2>
+				<p>
+<code>self</code> 引数により参照を消費する (参照の影響もなくなる)。
+				</p> <p>
+なお、この用法は後述のサンプルにて紹介する <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> トレイトの <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.count"><code>count</code></a> メソッドなどで見られる。このメソッドは要素数の確認のために、要素がつきるまでイテレータを走査する。そのため、値であれ参照であれ、以降はイテレータへのアクセスを提供するものは役に立たなくなるため、使用を禁止したほうがよい。
+				</p>
+			</section> <section>
+				<h2>値からの呼出</h2>
+				<p>
+メソッド呼出形式においては、参照型への実装のみで値型も自動サポートされる。
+				</p> <p>
+これは自動参照があるためで、<code>&amp;self</code> を使った場合の自動逆参照と似ている。
+				</p> <p>
+なお、必要になる事は少なそうだが、参照版と値版とで実装を二つ用意してもよい。
+				</p>
+			</section>
+		</section> <section>
+			<h1>用例</h1>
+			<nav class="sub"/>
+			<section>
+				<hgroup>
+					<h1>用例 1</h1>
+					<div class="subTitle">参照型版</div>
+				</hgroup>
+				<p>
+以下では、末尾の実装の <code>&amp;</code> の箇所が重要。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let r = &amp;MyType {};
+    r.with_self_value();
+}
+
+trait MyTrait {
+    fn with_self_value(self) where Self: Sized {}
+}
+
+struct MyType {}
+
+impl MyTrait for &amp;MyType {}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1>用例 2</h1>
+					<div class="subTitle">型パラメタ版</div>
+				</hgroup>
+				<p>
+以下では、型パラメタ <code>T</code> が参照型も含んでいる。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let r = &amp;MyType {};
+    r.with_self_value();
+}
+
+trait MyTrait {
+    fn with_self_value(self) where Self: Sized {}
+}
+
+struct MyType {}
+
+impl&lt;T&gt; MyTrait for T {}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1>用例 3</h1>
+					<div class="subTitle">身近な例</div>
+				</hgroup>
+				<p>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> の一部メソッドなどに利用例がある。
+				</p>
+				<section>
+					<h2>関連する宣言</h2>
+					<p>
+以下は <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> の <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.count"><code>count</code></a> メソッド。
+					</p>
+<pre><code class="language-rust">
+fn count(self) -&gt; usize where Self: Sized
+</code></pre>
+					<p>
+以下は <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> の参照に対する実装。
+					</p>
+<pre><code class="language-rust">
+impl&lt;I: Iterator + ?Sized&gt; Iterator for &amp;mut I
+</code></pre>
+				</section> <section>
+					<h2>呼出側のコード</h2>
+					<p>
+そのため、以下のようなコードが可能。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let vec = vec![1, 2, 3];
+    let iter = &amp;mut vec.iter();
+    assert_eq!(iter.count(), 3);
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>

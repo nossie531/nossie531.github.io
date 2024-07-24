@@ -12,12 +12,13 @@
 		</header>
 		<p>
 <code>dyn</code> 型 (トレイトオブジェクト) はそれ自体に実装を付加できる。
+		</p> <p>
+代表例は、<code>impl dyn <var>MyTrait</var> { ... }</code> のような固有機能の実装パターン。
+		</p> <p>
+または、<code>impl <var>SomeTrait</var> for dyn <var>MyTrait</var> { ... }</code> のようなトレイトの実装パターン。
 		</p>
 		<section>
 			<h1>固有機能の実装</h1>
-			<p>
-<code>impl dyn <var>MyTrait</var> { ... }</code> のスタイルで記載する。
-			</p>
 			<section>
 				<h2>主な用途</h2>
 				<p>
@@ -68,9 +69,6 @@ impl Animal for Dog {
 			</section>
 		</section> <section>
 			<h1>トレイトの実装</h1>
-			<p>
-<code>impl <var>SomeTrait</var> for dyn <var>MyTrait</var> { ... }</code> のスタイルで記載する。
-			</p>
 			<section>
 				<h2>主な用途</h2>
 				<p>
