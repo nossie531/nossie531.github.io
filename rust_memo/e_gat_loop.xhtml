@@ -38,7 +38,7 @@ use std::slice::Iter;
 fn main() {
     let vec = vec![1, 2, 3];
     let mut iter = MyIter(vec.iter());
-    let third = *iter.nth(2).unwrap();
+    let third = *iter.nth(3).unwrap();
     assert_eq!(third, 3);
 }
 
@@ -48,7 +48,7 @@ trait LendingIterator {
     fn next(&amp;mut self) -&gt; Option&lt;Self::Item&lt;'_&gt;&gt;;
 
     fn nth(&amp;mut self, n: usize) -&gt; Option&lt;Self::Item&lt;'_&gt;&gt; {
-        for i in 0..=n {
+        for i in 0..n {
             let item = <mark class="error">self</mark>.next();
             if i == n {
                 return item;
@@ -75,7 +75,7 @@ impl&lt;'s, T&gt; LendingIterator for MyIter&lt;'s, T&gt; {
 <mark class="info">   |</mark>
 <mark class="info">15 |</mark>     fn nth(&amp;mut self, n: usize) -&gt; Option&lt;Self::Item&lt;'_&gt;&gt; {
 <mark class="info">   |</mark>            <mark class="info">- let's call the lifetime of this reference `'1`</mark>
-<mark class="info">16 |</mark>         for i in 0..=n {
+<mark class="info">16 |</mark>         for i in 0..n {
 <mark class="info">17 |</mark>             let item = self.next();
 <mark class="info">   |</mark>                        <mark class="error">^^^^ `*self` was mutably borrowed here in the previous iteration of the loop</mark>
 <mark class="info">18 |</mark>             if i == n {
