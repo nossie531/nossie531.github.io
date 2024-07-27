@@ -318,7 +318,7 @@ impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
 			</section> <section>
 				<hgroup>
 					<h1>パターン E</h1>
-					<div class="subTitle">GAT による制限</div>
+					<div class="subTitle">HRTB の制限</div>
 				</hgroup>
 <pre><samp class="console-rustc">
 <mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
@@ -326,7 +326,7 @@ impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
 				<p>
 このパターンはエラーメッセージに上記の特徴的な注釈が含まれる。
 				</p> <p>
-詳しくは『<a href="e_gat_hrtb.xhtml">GAT と HRTB の組合せによるエラー</a>』を参照。
+詳しくは『<a href="e0597_hrtb_limit_type.xhtml">E0597 - HRTB の機能制限に適合しない型</a>』を参照。
 				</p>
 			</section>
 		</section>

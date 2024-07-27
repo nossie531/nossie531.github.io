@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: HRTB の機能制限に適合しない型パラメタ</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: `T` does not live long enough</mark>
+</samp></pre>
+		<p>
+このエラーの原理はおそらく『<a href="e0597_hrtb_limit_type.xhtml">E0597 - HRTB の機能制限に適合しない型</a>』と同じである。細かな違いとして、エラーメッセージにエラー番号や詳細が含まれないなどはあるが、基本は変わらない。そのため、概要についてはそちらを参照されたい。
+		</p>
+		<section>
+			<h1>発生条件</h1>
+			<p>
+基本は E0597 と同じである。ただし、本エラーではライフタイム境界に違反しているのは、具体的な型ではなく型パラメタである。そのため、型パラメタに新たな境界を追加すると修正できる場合がある。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、関数 <code>with_t</code> に <code>T: 'static</code> の制約を導入するとエラーが治る。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    with_t(&amp;1);
+}
+
+fn with_t&lt;T&gt;(x: T) {
+    <mark class="error">with_hrtb(x)</mark>;
+}
+
+fn with_hrtb&lt;T: for&lt;'a&gt; Referable&lt;'a&gt;&gt;(_: T) {
+    // nop.
+}
+
+trait Referable&lt;'a&gt; {}
+impl&lt;'a, T: 'a&gt; Referable&lt;'a&gt; for T {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: `T` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:6:5
+<mark class="info">  |</mark>
+<mark class="info">6 |</mark>     with_hrtb(x);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^</mark>
+</samp></pre>
+		</section>
+	</body>
+</html>

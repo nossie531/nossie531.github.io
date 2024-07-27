@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: HRTB によるライフタイムの機能制限エラー</title>
+		<title>Rust メモ: E0597 - HRTB の機能制限に適合しない型</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -14,7 +14,9 @@
 <mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
 </samp></pre>
 		<p>
-<time>2024 年現在</time>、<a href="hrtb.xhtml">HRTB</a> によるライフタイムには制限がある。
+エラー番号 E0597 にて上記の注釈を伴うパターンについて。
+		</p> <p>
+これは <time>2024 年現在</time>も残る <a href="hrtb.xhtml">HRTB</a> の機能制限が原因である。
 		</p>
 		<section>
 			<h1>発生条件</h1>
@@ -35,7 +37,7 @@ HRTB によるライフタイムがライフタイム境界として使われる
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-以下では、関数 <code>with_hrtb</code> の引数はトレイト <code>Referable&lt;'a&gt;</code> の実装が求められる。そしてここで、<code>'a</code> は HRTB によるライフタイムである。そのため、その引数は <code>'static</code> を含めてどこからでも参照できなければならない。しかし、実引数 <code>&amp;local</code> はそうではない。
+以下では、関数 <code>with_hrtb</code> の引数はトレイト <code>Referable&lt;'a&gt;</code> を実装すべきである。そしてここで、<code>'a</code> は HRTB によるライフタイムである。そのため、その引数は <code>'static</code> を含めてどこからでも参照できなければならない。しかし、実引数 <code>&amp;local</code> はそうではない。
 			</p>
 <pre><code class="language-rust">
 fn main() {
