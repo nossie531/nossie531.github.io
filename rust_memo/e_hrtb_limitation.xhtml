@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: HRTB によるライフタイムの機能制限エラー</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc" tabindex="0">
+<mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
+</samp></pre>
+		<p>
+<time>2024 年現在</time>、<a href="hrtb.xhtml">HRTB</a> によるライフタイムには制限がある。
+		</p>
+		<section>
+			<h1>発生条件</h1>
+			<p>
+HRTB によるライフタイムを <code>'static</code> で代用できないとエラーになる。
+			</p>
+			<section>
+				<h2>舞台裏 (<code>'static</code> の出所)</h2>
+				<p>
+<code>'static</code> は最も広いライフタイムである。そのため、ライフタイムに <code>'static</code> が指定できる場合、任意のライフタイムが使える確認になる。逆にそれがエラーとなる場合、その利用状況にライフタイムを狭める境界がある確認になる。つまり、現在の制限はこの性質を流用して実装されている。
+				</p>
+			</section> <section>
+				<h2>エラーの意味</h2>
+				<p>
+HRTB によるライフタイムがライフタイム境界として使われる場合、問題の状況になる場合がある。なぜなら現状、その境界は「どこかから参照可能」ではなく「どこからでも参照可能」を意味する。前者はほぼ境界なしと同じだが、後者はかなり厳しい境界になる。
+				</p>
+			</section>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、関数 <code>with_hrtb</code> の引数はトレイト <code>Referable&lt;'a&gt;</code> の実装が求められる。そしてここで、<code>'a</code> は HRTB によるライフタイムである。そのため、その引数は <code>'static</code> を含めてどこからでも参照できなければならない。しかし、実引数 <code>&amp;local</code> はそうではない。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let local = 1;
+    with_hrtb(<mark class="error">&amp;local</mark>);
+}
+
+fn with_hrtb&lt;T: for&lt;'a&gt; Referable&lt;'a&gt;&gt;(_: T) {
+    // nop.
+}
+
+trait Referable&lt;'a&gt; {}
+impl&lt;'a, T: 'a&gt; Referable&lt;'a&gt; for T {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `local` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:3:15
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let local = 1;
+<mark class="info">  |</mark>         <mark class="info">----- binding `local` declared here</mark>
+<mark class="info">3 |</mark>     with_hrtb(&amp;local);
+<mark class="info">  |</mark>     <mark class="info">----------</mark><mark class="error">^^^^^^</mark><mark class="info">-</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>         <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>         <mark class="error">borrowed value does not live long enough</mark>
+<mark class="info">  |</mark>     <mark class="info">argument requires that `local` is borrowed for `'static`</mark>
+<mark class="info">4 |</mark> }
+<mark class="info">  |</mark> <mark class="info">- `local` dropped here while still borrowed</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
+<mark class="info"> --&gt;</mark> src/main.rs:6:17
+<mark class="info">  |</mark>
+<mark class="info">6 |</mark> fn with_hrtb&lt;T: for&lt;'a&gt; Referable&lt;'a&gt;&gt;(_: T) {
+<mark class="info">  |</mark>                 <mark class="edit">^^^^^^^^^^^^^^^^^^^^^</mark>
+</samp></pre>
+		</section>
+	</body>
+</html>
