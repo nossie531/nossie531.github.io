@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: HRTB の機能制限に適合しない型パラメタ</title>
+		<title>Rust メモ: error - HRTB の機能制限</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -14,7 +14,7 @@
 <mark class="error">error</mark><mark class="title">: `T` does not live long enough</mark>
 </samp></pre>
 		<p>
-このエラーの原理はおそらく『<a href="e0597_hrtb_limit_type.xhtml">E0597 - HRTB の機能制限に適合しない型</a>』と同じである。細かな違いとして、エラーメッセージにエラー番号や詳細が含まれないなどはあるが、基本は変わらない。そのため、概要についてはそちらを参照されたい。
+このエラーは『<a href="e0597_hrtb_limitation.xhtml">E0597 - HRTB の機能制限</a>』と似ている。エラーメッセージにエラー番号や詳細が含まれないなど、細かな違いこそあるが、周辺事情は共通していると予想される。そのため、概要についてはそちらを参照されたい。
 		</p>
 		<section>
 			<h1>発生条件</h1>
