@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0597 - HRTB の機能制限と GAT</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
+</samp></pre>
+		<p>
+『<a href="e0597_hrtb_limitation.xhtml">E0597 - HRTB の機能制限</a>』は GAT との連携でよく問題になる。
+		</p>
+		<section>
+			<h1>詳細</h1>
+			<p>
+GAT のライフタイム引数は <code>Self</code> を境界づける場合が多い。そのため、このライフタイム引数が HRTB から与えられると、前述の HRTB の制限により、<code>Self</code> を <code>'static</code> から参照できなければならなくなる。これはとても厳しい制限となる。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、関数 <code>average</code> の <code>T::IntStream&lt;'a&gt;</code> の箇所で、GAT に HRTB が使われている。そして、<code>IntStream&lt;'a&gt;</code> は <code>Self: 'a</code> の境界を持つ。そのため、<code>T</code> は <code>'static</code> から参照できなければならない。しかし、変数 <code>vp</code> は <code>&amp;vec</code> を含んでおり、この境界を満足できない。
+			</p>
+<pre><code class="language-rust">
+use std::slice::Iter;
+
+fn main() {
+    let vec = vec![1, 2, 3];
+    let vp = IntVecPointer(<mark class="error">&amp;vec</mark>);
+    average::&lt;IntVecPointer&gt;(vp);
+}
+
+trait IntCollection {
+    type IntStream&lt;'a&gt;: Iterator&lt;Item = &amp;'a i32&gt; where Self: 'a;
+    fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt;;
+}
+
+struct IntVecPointer&lt;'v&gt;(&amp;'v Vec&lt;i32&gt;);
+impl&lt;'v&gt; IntCollection for IntVecPointer&lt;'v&gt; {
+    type IntStream&lt;'a&gt; = Iter&lt;'a, i32&gt; where Self: 'a;
+    fn int_stream(&amp;self) -&gt; Self::IntStream&lt;'_&gt; {
+        self.0.iter()
+    }
+}
+
+fn average&lt;T&gt;(arg: T) -&gt; f32
+where
+    T: IntCollection,
+    for&lt;'a&gt; T::IntStream&lt;'a&gt;: ExactSizeIterator,
+{
+    let stream = arg.int_stream();
+    let len = stream.len();
+    let sum = stream.sum::&lt;i32&gt;();
+    sum as f32 / len as f32
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `vec` does not live long enough</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:5:28
+<mark class="info">   |</mark>
+<mark class="info">4  |</mark>     let vec = vec![1, 2, 3];
+<mark class="info">   |</mark>         <mark class="info">--- binding `vec` declared here</mark>
+<mark class="info">5  |</mark>     let vp = IntVecPointer(&amp;vec);
+<mark class="info">   |</mark>                            <mark class="error">^^^^ borrowed value does not live long enough</mark>
+<mark class="info">6  |</mark>     average::&lt;IntVecPointer&gt;(vp);
+<mark class="info">   |</mark>     <mark class="info">---------------------------- argument requires that `vec` is borrowed for `'static`</mark>
+<mark class="info">7  |</mark> }
+<mark class="info">   |</mark> <mark class="info">- `vec` dropped here while still borrowed</mark>
+<mark class="info">   |</mark>
+<mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
+<mark class="info">  --&gt;</mark> src\main.rs:25:31
+<mark class="info">   |</mark>
+<mark class="info">25 |</mark>     for&lt;'a&gt; T::IntStream&lt;'a&gt;: ExactSizeIterator,
+<mark class="info">   |</mark>                               <mark class="edit">^^^^^^^^^^^^^^^^^</mark>
+</samp></pre>
+		</section>
+	</body>
+</html>

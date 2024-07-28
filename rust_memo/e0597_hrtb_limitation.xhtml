@@ -72,6 +72,20 @@ impl&lt;'a, T: 'a&gt; Referable&lt;'a&gt; for T {}
 <mark class="info">6 |</mark> fn with_hrtb&lt;T: for&lt;'a&gt; Referable&lt;'a&gt;&gt;(_: T) {
 <mark class="info">  |</mark>                 <mark class="edit">^^^^^^^^^^^^^^^^^^^^^</mark>
 </samp></pre>
+		</section> <section>
+			<h1>関連エラー</h1>
+			<p>
+以下のエラーはどれも本エラーと関連が深い。
+			</p>
+			<ul>
+				<li>
+<a href="e0597_hrtb_gat.xhtml">E0597 - HRTB の機能制限と GAT</a>
+				</li> <li>
+<a href="e_hrtb_limitation.xhtml">error - HRTB の機能制限</a>
+				</li> <li>
+<a href="e_hrtb_gat.xhtml">error - HRTB の機能制限と GAT</a>
+				</li>
+			</ul>
 		</section>
 	</body>
 </html>

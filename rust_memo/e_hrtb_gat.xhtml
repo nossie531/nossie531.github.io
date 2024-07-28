@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: error - HRTB の機能制限と GAT</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: `T` does not live long enough</mark>
+</samp></pre>
+		<p>
+『<a href="e_hrtb_limitation.xhtml">error - HRTB の機能制限</a>』は GAT との連携でよく問題になる。
+		</p>
+		<section>
+			<h1>詳細</h1>
+			<p>
+GAT のライフタイム引数は <code>Self</code> を境界づける場合が多い。そのため、このライフタイム引数が HRTB から与えられると、前述の HRTB の制限により、<code>Self</code> を <code>'static</code> から参照できなければならなくなる。これはとても厳しい制限となる。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、メソッド <code>all</code> の <code>Self::Element&lt;'_&gt;</code> の箇所で、GAT に暗黙の HRTB が使われている。そして、<code>Element&lt;'a&gt;</code> は境界条件 <code>Self: 'a</code> を持つ。そのため、<code>all</code> を実行する変数 <code>array</code> は <code>'static</code> から参照できなければならない。しかし、<code>array</code> の型 <code>T</code> はその境界を持たない (境界を追加するとエラーは解消する)。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    assert!(all_positive(vec![1, 2, 3]));
+}
+
+fn all_positive&lt;T&gt;(array: T) -&gt; bool
+where
+    T: for&lt;'a&gt; Array&lt;Element&lt;'a&gt; = &amp;'a i32&gt;,
+{
+    <mark class="error">array.all(|&amp;x| x &gt; 0)</mark>
+}
+
+trait Array {
+    type Element&lt;'a&gt; where Self: 'a;
+
+    fn get(&amp;self, index: usize) -&gt; Option&lt;Self::Element&lt;'_&gt;&gt;;
+
+    fn all&lt;F&gt;(&amp;self, f: F) -&gt; bool
+    where
+        F: Fn(Self::Element&lt;'_&gt;) -&gt; bool,
+    {
+        for i in 0.. {
+            let Some(elm) = self.get(i) else { return true };
+            if !f(elm) {
+                return false;
+            }
+        }
+
+        unreachable!();
+    }
+}
+
+impl Array for Vec&lt;i32&gt; {
+    type Element&lt;'a&gt; = &amp;'a i32 where Self: 'a;
+
+    fn get(&amp;self, index: usize) -&gt; Option&lt;Self::Element&lt;'_&gt;&gt; {
+        (self as &amp;[_]).get(index)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: `T` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:9:5
+<mark class="info">  |</mark>
+<mark class="info">9 |</mark>     array.all(|&amp;x| x &gt; 0)
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^^^^^^^</mark>
+</samp></pre>
+		</section>
+	</body>
+</html>

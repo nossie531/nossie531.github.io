@@ -241,15 +241,17 @@ impl IntCollection for Vec&lt;i32&gt; {
 </code></pre>
 				</section>
 			</section> <section>
-				<h1 id="gat_limitation">制限</h1>
+				<h1 id="gat_problem">問題点</h1>
 				<p>
-2024 年現在、GAT には厄介な制限が複数ある。この事は<a href="https://blog.rust-lang.org/2022/10/28/gats-stabilization.html#when-gats-go-wrong---a-few-current-bugs-and-limitations">公式ブログ</a>でも紹介されている。それによると、これらは GAT の導入 (Rust 1.65: 2022/11/03) を急いだ結果らしく、将来的には改善される見込みらしい。
+2024 年現在、GAT にはいくつか厄介な問題点が残っている。この事は<a href="https://blog.rust-lang.org/2022/10/28/gats-stabilization.html#when-gats-go-wrong---a-few-current-bugs-and-limitations">公式ブログ</a>でも紹介されている。それによると、これらは GAT の導入 (Rust 1.65: 2022/11/03) を急いだ結果らしく、将来的には改善される見込みらしい。
 				</p>
 				<ul>
 					<li>
 <a href="e0499_gat_loop.xhtml">[E0499] GAT とループの組合せ制限</a>
 					</li> <li>
-<a href="e_gat_hrtb.xhtml">GAT と HRTB の組合せによるエラー</a>
+<a href="e0597_hrtb_gat.xhtml">[E0597] HRTB の機能制限と GAT</a>
+					</li> <li>
+<a href="e_hrtb_gat.xhtml">[error] HRTB の機能制限と GAT</a>
 					</li> <li>
 GAT を使ったトレイトは dyn を使用不可
 					</li>
