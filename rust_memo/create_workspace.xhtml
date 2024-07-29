@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: ワークスペースの構築</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+ワークスペースの構築について。
+		</p> 
+		<aside class="normal moan">
+			<p>
+cargo の利用について。
+			</p> <p>
+<time>2024 年現在</time>、cargo ではワークスペースを作れない。配下の個々のクレートは作れるのに、それらをまとめるディレクトリを作れないのは、なんだか中途半端に思える…。<a href="https://github.com/rust-lang/cargo/issues/8365">提案</a>はされているようなので将来に期待したい。
+			</p>
+		</aside>
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+大きなプログラムは小さなクレートに分割して作るのが推奨される。
+			</p> <p>
+ワークスペースはそれらのクレートを管理するディレクトリである。
+			</p>
+		</section> <section>
+			<h1>ワークスペースの作成</h1>
+			<ul>
+				<li>
+適当なディレクトリを作成
+				</li> <li>
+<code>cargo.toml</code> ファイルを作成
+				</li>
+			</ul>
+			<section>
+				<h2><code>cargo.toml</code> ファイル</h2>
+				<p>
+以下は簡単なサンプル。
+				</p>
+<pre><code class="language-toml">
+[workspace]
+# 配下のクレートの一覧
+members = ["app", "util"]
+
+[workspace.dependencies]
+# 配下のクレートから共用される外部クレートの一覧
+external_crate_a = "1.0"
+external_crate_b = "1.0"
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>配下のクレートの作成</h1>
+			<section>
+				<h1>バイナリクレートの場合</h1>
+				<p>
+ワークスペースディレクトリにてコマンド <code>cargo new</code> を実行。
+				</p> <p>
+以下では、クレート <code>app</code> をバイナリモードで作成。
+				</p>
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo new app --bin
+</code></pre>
+				<section>
+					<h2><code>cargo.toml</code> ファイル</h2>
+					<p>
+前の <code>cargo new</code> で生成された <code>app/cargo.toml</code> ファイルを編集する。
+					</p> <p>
+以下は簡単なサンプル (クレートの提供方法と <code>dependecies</code> の記法の対応に注目)。
+					</p>
+<pre><code class="language-toml">
+[package]
+name = "app"
+edition = "2021"
+
+[dependencies]
+util = { path = "../util" }
+external_crate_a = { workspace = true } 
+external_crate_b = { workspace = true }
+external_crate_c = "1.0"
+</code></pre>
+				</section> <section>
+					<h2><code>main.rs</code> ファイル</h2>
+					<p>
+<code>cargo new</code> で生成された <code>app/main.rs</code> ファイルを編集する。
+					</p>
+<pre><code class="language-rust">
+use util::*;
+
+fn main() {
+
+	/* Do etc... */
+
+	println!("{}", hello());
+}
+</code></pre>
+				</section>
+			</section><section>
+				<h1>ライブラリクレートの場合</h1>
+				<p>
+ワークスペースディレクトリにてコマンド <code>cargo new</code> を実行。
+				</p> <p>
+以下では、クレート <code>util</code> をライブラリモードで作成。
+				</p>
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo new util --lib
+</code></pre>
+				<section>
+					<h2><code>cargo.toml</code> ファイル</h2>
+					<p>
+<code>cargo new</code> で生成された <code>util/cargo.toml</code> ファイルを編集する。
+					</p> <p>
+以下は簡単なサンプル (クレートの提供方法と <code>dependecies</code> の記法の対応に注目)。
+					</p>
+<pre><code class="language-toml">
+[package]
+name = "util"
+edition = "2021"
+
+[dependencies]
+external_crate_a = { workspace = true } 
+external_crate_b = { workspace = true }
+external_crate_d = "1.0"
+</code></pre>
+				</section> <section>
+					<h2><code>lib.rs</code> ファイル</h2>
+					<p>
+<code>cargo new</code> で生成された <code>util/lib.rs</code> ファイルを編集する。
+					</p>
+<pre><code class="language-rust">
+pub fn hello() -&gt; String {
+
+	/* Do etc... */
+
+	"hello".to_string()
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
