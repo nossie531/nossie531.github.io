@@ -75,25 +75,25 @@
 			<h1>ケーススタディ</h1>
 			<section>
 				<h2>ワークスペース全体</h2>
-<pre><code>
-cargo test --workspace
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo test --workspace
 </code></pre>
 			</section> <section>
 				<h2>ライブラリテストの範囲指定</h2>
-<pre><code>
-cargo test --lib <var>basic::api</var>
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo test --lib <var>basic::api</var>
 </code></pre>
 				<p>
 				</p>
 			</section> <section>
 				<h2>テスト関数の個別指定</h2>
-<pre><code>
-cargo test --package <var>my_crate</var> <var>funcPath</var> -- --exact
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo test --package <var>my_crate</var> <var>funcPath</var> -- --exact
 </code></pre>
 			</section> <section>
 				<h2 id="execSingleIT">結合テスト関数の指定</h2>
-<pre><code>
-cargo test --package <var>my_crate</var> --test <var>my_test_file</var> <var>funcPath</var> -- --exact
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo test --package <var>my_crate</var> --test <var>my_test_file</var> <var>funcPath</var> -- --exact
 </code></pre>
 				<p>
 ※ 結合テストの場合、<code>funcPath</code> が関数名のみになる場合が多い。

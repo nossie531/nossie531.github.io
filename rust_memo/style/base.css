@@ -381,6 +381,11 @@
 		}
 	}
 
+	pre > code[class|="console"] mark.prompt {
+		font-weight: bold;
+		background-color: initial;
+	}
+
 	figure.file {
 		padding: 0;
 		border-radius: 0.5rem;
