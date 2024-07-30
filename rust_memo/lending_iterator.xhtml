@@ -86,9 +86,7 @@ impl&lt;'arr, T&gt; LendingIterator for WindowsMut&lt;'arr, T&gt; {
 		</section> <section>
 			<h1>問題点</h1>
 			<p>
-上記のサンプルでは実装に <a href="associated_type.xhtml#gat">GAT</a> を利用している。
-			</p> <p>
-しかし、<time>2024 年現在</time>、GAT にはまだ<a href="associated_type.xhtml#gat_problem">問題点</a>が多い。
+上記のサンプルでは <a href="associated_type.xhtml#gat">GAT</a> を利用しているが、<time>2024 年現在</time>、GAT にはまだ<a href="associated_type.xhtml#gat_problem">問題点</a>が多い。
 			</p> <p>
 GAT のポリフィルではこうした問題点がないため、それを利用した <a href="https://crates.io/crates/lending-iterator"><code>lending-iterator</code></a> のようなクレートも存在するが、それらでは API がかなり複雑になっている。
 			</p>
