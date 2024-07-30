@@ -18,18 +18,18 @@ Iterator パターンの変種、Lending Iterator パターンについて。
 			<p>
 標準機能のトレイト <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>std::iter::Iterator</code></a> について。
 			</p> <p>
-アイテムからイテレータを参照できない。
+アイテムがイテレータとライフタイムを共有しない。
 			</p> <p>
-その反面、イテレータを破棄してもアイテムの使用を続けられる。 
+つまり、イテレータを破棄してもアイテムの使用を続けられる。 
 			</p>
 		</section> <section>
 			<h1><code>LendingIterator</code> の特徴</h1>
 			<p>
 標準機能には Lending Iterator のためのトレイトはまだないので自分で定義する。
 			</p> <p>
-アイテムからイテレータを参照できる (アイテム型にライフタイム引数がある)。
+アイテムがイテレータとライフタイムを共有する (アイテム型にライフタイム引数がある)。
 			</p> <p>
-その反面、イテレータを破棄するとアイテムの使用を続けられなくなる。
+つまり、イテレータを破棄するとアイテムの使用を続けられなくなる。
 			</p>
 		</section> <section>
 			<h1><code>LendingIterator</code> の実装例</h1>
@@ -83,6 +83,15 @@ impl&lt;'arr, T&gt; LendingIterator for WindowsMut&lt;'arr, T&gt; {
     }
 }
 </code></pre>
+		</section> <section>
+			<h1>問題点</h1>
+			<p>
+上記のサンプルでは実装に <a href="associated_type.xhtml#gat">GAT</a> を利用している。
+			</p> <p>
+しかし、<time>2024 年現在</time>、GAT にはまだ<a href="associated_type.xhtml#gat_problem">問題点</a>が多い。
+			</p> <p>
+GAT のポリフィルではこうした問題点がないため、それを利用した <a href="https://crates.io/crates/lending-iterator"><code>lending-iterator</code></a> のようなクレートも存在するが、それらでは API がかなり複雑になっている。
+			</p>
 		</section>
 	</body>
 </html>
