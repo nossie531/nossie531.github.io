@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 条件付きコンパイル</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+条件付きコンパイルについて。
+		</p>
+		<section>
+			<h1>条件の記述</h1>
+			<p>
+条件の記述方法には幾つかある。
+			</p>
+			<section>
+				<h1><code>cfg</code> マクロ</h1>
+				<p>
+<code>cfg</code> マクロは構成によって、<code>bool</code> 型の式に変換される。
+				</p> <p>
+以下では、OS が iOS か macOS かそれ以外かで、<code>if</code> 文を調節している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    println!("I am using '{}'.", os_name());
+}
+
+fn os_name() -&gt; &amp;'static str {
+    if cfg!(target_os = "ios") {
+        "iOS"
+    } else if cfg!(target_os = "macos") {
+        "macOS"
+    } else {
+        "non-Apple OS"
+    }
+}
+</code></pre>
+			</section> <section>
+				<h1><code>cfg</code> 属性</h1>
+				<p>
+<code>cfg</code> 属性は構成によって、直後のコードブロックのコンパイル有無が変更される。
+				</p> <p>
+以下では、OS が iOS か macOS かそれ以外かで、実装コードを分けている。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    println!("I am using '{}'.", os_name());
+}
+
+fn os_name() -&gt; &amp;'static str {
+    #[cfg(target_os = "ios")]
+    return "iOS";
+
+    #[cfg(target_os = "macos")]
+    return "macOS";
+
+    #[cfg(not(any(target_os = "ios", target_os = "macos")))]
+    return "non-Apple OS";
+}
+</code></pre>
+			</section> <section>
+				<h1><code>cfg_attr</code> 属性</h1>
+				<p>
+<code>cfg_attr</code> 属性は構成によって、直後のコードブロックへの属性の適用有無が変更される。
+				</p> <p>
+以下では、OS が iOS か macOS かそれ以外かで、実装ファイルを分けている。
+				</p>
+				<figure class="file">
+					<figcaption>main.rs</figcaption>
+<pre><code class="language-rust">
+#[cfg_attr(target_os = "ios", path = "ios.rs")]
+#[cfg_attr(target_os = "macos", path = "macos.rs")]
+#[cfg_attr(not(any(target_os = "ios", target_os = "macos")), path = "os.rs")]
+mod os;
+
+fn main() {
+    println!("I am using '{}'.", os::os_name());
+}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>ios.rs</figcaption>
+<pre><code class="language-rust">
+pub fn os_name() -&gt; &amp;'static str {
+    "iOS"
+}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>macos.rs</figcaption>
+<pre><code class="language-rust">
+pub fn os_name() -&gt; &amp;'static str {
+    "macOS"
+}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>os.rs</figcaption>
+<pre><code class="language-rust">
+pub fn os_name() -&gt; &amp;'static str {
+    "non-Apple OS"
+}
+</code></pre>
+				</figure>
+			</section>
+		</section> <section>
+			<h1>条件用の変数</h1>
+			<p>
+条件用の変数として様々な項目が用意されている。
+			</p>
+			<section>
+				<h1>構成オプション</h1>
+				<p>
+構成オプションにはキーのみのものとキーと値からなるものがある。
+				</p> <p>
+以下はそれらの抜粋 (詳細は<a href="https://doc.rust-lang.org/reference/conditional-compilation.html#set-configuration-options">公式資料</a>を参照)。
+				</p>
+				<dl class="normal">
+					<dt>キーのみ</dt>
+					<dd>
+						<dl class="normal lowProfile listLike">
+							<dt><code>test</code></dt>
+							<dd>テスト時のみ有効</dd>
+							<dt><code>debug_assertions</code></dt>
+							<dd>デバッグモード時のみ有効</dd>
+							<dt><code>unix</code></dt>
+							<dd><code>target_family = "unix"</code> と等価</dd>
+							<dt><code>windows</code></dt>
+							<dd><code>target_family = "windows"</code> と等価</dd>
+						</dl>
+					</dd>
+					<dt>キーと値</dt>
+					<dd>
+						<dl class="normal lowProfile listLike">
+							<dt><code>feature = "<var>value</var>"</code></dt>
+							<dd><a href="#feature">フィーチャー</a>を指定</dd>
+							<dt><code>target_os = "<var>value</var>"</code></dt>
+							<dd>OS を指定</dd>
+							<dt><code>target_family = "<var>value</var>"</code></dt>
+							<dd>OS ファミリを指定</dd>
+							<dt><code>target_endian = "<var>value</var>"</code></dt>
+							<dd>エンディアンを指定</dd>
+							<dt><code>target_pointer_width = "<var>value</var>"</code></dt>
+							<dd>ポインタサイズを指定</dd>
+						</dl>
+					</dd>
+				</dl>
+			</section> <section>
+				<h1 id="feature">フィーチャー</h1>
+				<p>
+<code>feature</code> は条件として使える独自定義できる変数である。
+				</p>
+				<section>
+					<h2>自クレートでのフィーチャーの定義</h2>
+					<p>
+クレートが対応する <code>feature</code> の値は <code>cargo.toml</code> ファイルで定義できる。 
+					</p> <p>
+フィーチャーはネストでき、あるフィーチャを有効にするとその配下も有効になる。
+					</p> <p>
+また、デフォルトで有効なフィーチャーは <code>default</code> フィーチャーの配下とする。
+					</p>
+<pre><code class="language-toml">
+[package]
+name = "my_crate"
+version = "0.1.0"
+
+[features]
+default = ["feature1"]
+feature1 = []
+feature2 = ["feature2_1", "feature2_2"]
+feature2_1 = []
+feature2_2 = []
+feature3 = ["feature3_1", "feature3_2"]
+feature3_1 = []
+feature3_2 = []
+</code></pre>
+				</section> <section>
+					<h2>自クレートで定義されたフィーチャーの利用</h2>
+					<p>
+<code>cargo build</code> に実行オプションを指定する。デフォルトのフィーチャーが不要なら <code>--no-default-features</code> を、全てのフィーチャーが必要なら <code>--all-features</code> を、個別指定するには <code>--features "feature1 feature2"</code> のようにする。
+					</p> <p>
+または、<code>.cargo/config.toml</code> ファイルの <code>rustflags</code> の項目を指定する。なお、<code>rustflags</code> の親項目は全体設定用の <code>build</code> の他に <code>target</code> 系があり、それらでは構成に応じたフィーチャの導入も可能 (詳しくは <code>config.toml</code> の<a href="https://doc.rust-lang.org/cargo/reference/config.html">公式資料</a>を参照)。
+					</p>
+<pre><code class="language-toml">
+[build]
+rustflags = ["--cfg", "feature2", "feature3"]
+</code></pre>
+				</section> <section>
+					<h2>他クレートで定義されたフィーチャーの利用</h2>
+					<p>
+<code>config.toml</code> ファイルで依存性の記述と同時に行う。
+					</p> <p>
+または、自クレートのフィーチャーを他クレートのフィーチャと連携させる。
+					</p>
+<pre><code class="language-toml">
+[package]
+name = "my_app"
+version = "0.1.0"
+
+[dependencies]
+extenal_crate1 = { version = "0.1.0", default-features=false }
+
+[dev-dependencies]
+extenal_crate2 = { version = "0.1.0", features=["dev"] }
+
+[features]
+default = ["feature1"]
+feature1 = ["extenal_crate3/feature_x"]
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>

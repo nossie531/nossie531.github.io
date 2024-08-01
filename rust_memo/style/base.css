@@ -146,6 +146,14 @@
 			white-space: nowrap;
 		}
 
+		&.lowProfile.listLike > dt::before {
+			content: "\2022";
+			display: inline-block;
+			width: 1em;
+			text-align: center;
+			margin-right: 0.5ch;
+		}
+
 		&.lowProfile > dd {
 			display: list-item;
 			margin-left: 1.5em;
