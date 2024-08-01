@@ -21,7 +21,7 @@
 			<section>
 				<h1><code>cfg</code> マクロ</h1>
 				<p>
-<code>cfg</code> マクロは構成によって、<code>bool</code> 型の式に変換される。
+条件によって <code>true</code> か <code>false</code> の値になる。
 				</p> <p>
 以下では、OS が iOS か macOS かそれ以外かで、<code>if</code> 文を調節している。
 				</p>
@@ -43,7 +43,7 @@ fn os_name() -&gt; &amp;'static str {
 			</section> <section>
 				<h1><code>cfg</code> 属性</h1>
 				<p>
-<code>cfg</code> 属性は構成によって、直後のコードブロックのコンパイル有無が変更される。
+条件によって直後のコードブロックのコンパイル有無を変更する。
 				</p> <p>
 以下では、OS が iOS か macOS かそれ以外かで、実装コードを分けている。
 				</p>
@@ -66,7 +66,7 @@ fn os_name() -&gt; &amp;'static str {
 			</section> <section>
 				<h1><code>cfg_attr</code> 属性</h1>
 				<p>
-<code>cfg_attr</code> 属性は構成によって、直後のコードブロックへの属性の適用有無が変更される。
+条件によって直後のコードブロックへの属性の適用有無を変更する。
 				</p> <p>
 以下では、OS が iOS か macOS かそれ以外かで、実装ファイルを分けている。
 				</p>
