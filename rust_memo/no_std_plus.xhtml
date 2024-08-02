@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: no_std 環境と std 環境の両対応</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+『<a href="conditional_compile.xhtml">条件付きコンパイル</a>』を使えば、<code>no_std</code> 環境に対応しつつ、かつ <code>std</code> 環境ではより便利になるクレートを作成できる。ここではサンプルを通してその作成手順を紹介する。
+		</p>
+		<aside class="normal">
+			<p>身近な例</p>
+			<p>
+クレート <a href="https://crates.io/crates/rand"><code>rand</code></a> は疑似乱数用のクレートである。このクレートは依存設定からデフォルト機能を無効にする事で、<code>no_std</code> 環境では使えない各機能をオプトアウトできる (関数 <a href="https://docs.rs/rand/0.8.5/rand/seq/index/fn.sample.html"><code>sample</code></a> や型 <a href="https://docs.rs/rand/0.8.5/rand/rngs/struct.ThreadRng.html"><code>ThreadRng</code></a> など)。
+			</p>
+		</aside>
+		<section>
+			<h1><code>cargo.toml</code> ファイル</h1>
+			<p>
+以下は関係する項目。
+			</p>
+			<dl class="normal">
+				<dt><code>package.categories</code></dt>
+				<dd>
+					<p>
+<a href="https://crates.io/">crates.io</a> などでクレートの検索に使われるカテゴリを指定する。<br/>
+no_std 環境用の値には <a href="https://crates.io/categories/no-std"><code>no-std</code></a> や <a href="https://crates.io/categories/no-std::no-alloc"><code>no-std::no-alloc</code></a> がある。
+					</p>
+				</dd>
+				<dt id="docsrs"><code>package.metadata.docs.rs</code></dt>
+				<dd>
+					<p>
+<a href="https://docs.rs/">Docs.rs</a> における <code>rustdoc</code> コマンドの引数を指定する。<br/>
+詳しくは『<a href="rustdoc_feature.xhtml">rustdoc でのフィーチャーの表示</a>』を参照。
+					</p>
+				</dd>
+				<dt><code>features</code></dt>
+				<dd>
+					<p>
+条件付きコンパイルのためのフィーチャーを定義する。よく見かける設定は、標準環境用のフィーチャー <code>std</code> をデフォルトとして作り、その配下をヒープメモリのためのフィーチャ <code>alloc</code> などで細分化していくパターンである。
+					</p>
+				</dd>
+			</dl>
+			<hr class="split"/>
+<pre><code class="language-toml">
+[package]
+name = "my_crate"
+version = "0.1.0"
+categories = ["no-std"]
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = ["std"]
+std = ["alloc"]
+alloc = []
+</code></pre>
+		</section> <section>
+			<h1><code>lib.rs</code> ファイル</h1>
+			<p>
+以下が必要になる場合が多い。
+			</p>
+			<ul>
+				<li>
+<code>std</code> クレートをデフォルトで無効化
+				</li> <li>
+<a href="#docsrs">前述</a>の rustdoc との連携を有効化
+				</li> <li>
+フィーチャーによるクレートのオプトイン
+				</li>
+			</ul>
+			<hr class="split"/>
+<pre><code class="language-rust">
+#![no_std]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
+#[cfg(feature = "std")] extern crate std;
+#[cfg(feature = "alloc")] extern crate alloc;
+
+// ... //
+</code></pre>
+		</section> <section>
+			<h1>条件付きコンパイル</h1>
+			<p>
+条件付きコンパイルを利用した各アイテムを記載する。
+			</p>
+			<section>
+				<h2>アイテム単位</h2>
+				<p>
+以下では、関数 <code>print_box</code> はフィーチャー <code>alloc</code> の有効時にのみ使用できる。
+				</p>
+<pre><code class="language-rust">
+pub fn print_val&lt;T: std::fmt::Display&gt;(arg: T) {
+    println!("{arg}")
+}
+
+#[cfg(feature = "alloc")]
+#[cfg_attr(docsrs, doc(cfg(feature = "alloc")))]
+pub fn print_box&lt;T: std::fmt::Display&gt;(arg: Box&lt;T&gt;) {
+    println!("`{0}` at '{0:p}'", arg);
+}
+</code></pre>
+			</section> <section>
+				<h2>ファイル単位</h2>
+				<p>
+以下でも、関数 <code>print_box</code> はフィーチャー <code>alloc</code> の有効時にのみ使用できる。<br/>
+なお、ここでの <code>path</code> 属性はファイル階層を少し分かりやすくする狙いがある。
+				</p>
+				<figure class="file">
+					<figcaption>some/mod.rs</figcaption>
+<pre><code class="language-rust">
+mod print_basic;
+pub use print_basic::*;
+
+#[doc(hidden)]
+#[cfg(feature = "alloc")]
+#[path = ""]
+mod with_alloc {
+    mod print_etc;
+    pub use print_etc::*;
+}
+
+#[cfg(feature = "alloc")]
+pub use with_alloc::*;
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>some/print_basic.rs</figcaption>
+<pre><code class="language-rust">
+pub fn print_val&lt;T: std::fmt::Display&gt;(arg: T) {
+    println!("{arg}")
+}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>some/print_etc.rs</figcaption>
+<pre><code class="language-rust">
+#[cfg_attr(docsrs, doc(cfg(feature = "alloc")))]
+pub fn print_box&lt;T: std::fmt::Display&gt;(arg: Box&lt;T&gt;) {
+    println!("`{0}` at '{0:p}'", arg);
+}
+</code></pre>
+				</figure>
+			</section>
+		</section>
+	</body>
+</html>
