@@ -202,13 +202,14 @@ version = "0.1.0"
 
 [dependencies]
 extenal_crate1 = { version = "0.1.0", default-features=false }
+extenal_crate2 = { version = "0.1.0", default-features=true }
 
 [dev-dependencies]
-extenal_crate2 = { version = "0.1.0", features=["deep_test"] }
+extenal_crate3 = { version = "0.1.0", features=["deep_test"] }
 
 [features]
 default = ["my_feature"]
-my_feature = ["extenal_crate3/your_feature"]
+my_feature = ["extenal_crate2/additional_feature"]
 </code></pre>
 				</section>
 			</section>
