@@ -14,16 +14,16 @@
 条件付きコンパイルについて。
 		</p>
 		<section>
-			<h1>条件分岐の方法</h1>
+			<h1>分岐方法</h1>
 			<p>
-条件分岐の方法には幾つかある。
+専用の分岐方法がいくつかある。
 			</p>
 			<section>
 				<h1><code>cfg</code> マクロ</h1>
 				<p>
 条件によって <code>true</code> か <code>false</code> の値になる。
 				</p> <p>
-以下では、OS が iOS か macOS かそれ以外かで、<code>if</code> 文を調節している。
+以下では、OS ごとに通常の <code>if</code> 文で分岐している。
 				</p>
 <pre><code class="language-rust">
 fn main() {
@@ -45,7 +45,7 @@ fn os_name() -&gt; &amp;'static str {
 				<p>
 条件によって直後のコードブロックのコンパイル有無を変更する。
 				</p> <p>
-以下では、OS が iOS か macOS かそれ以外かで、実装コードを分けている。
+以下では、OS ごとに実装コードを分けている。
 				</p>
 <pre><code class="language-rust">
 fn main() {
@@ -68,7 +68,7 @@ fn os_name() -&gt; &amp;'static str {
 				<p>
 条件によって直後のコードブロックへの属性の適用有無を変更する。
 				</p> <p>
-以下では、OS が iOS か macOS かそれ以外かで、実装ファイルを分けている。
+以下では、OS ごとに実装ファイルを分けている。
 				</p>
 				<figure class="file">
 					<figcaption>main.rs</figcaption>
@@ -109,9 +109,9 @@ pub fn os_name() -&gt; &amp;'static str {
 				</figure>
 			</section>
 		</section> <section>
-			<h1>条件用の変数</h1>
+			<h1>分岐フラグ</h1>
 			<p>
-条件用の変数として様々な項目が用意されている。
+専用の分岐フラグが多数用意されている。
 			</p>
 			<section>
 				<h1>構成オプション</h1>
@@ -162,7 +162,7 @@ pub fn os_name() -&gt; &amp;'static str {
 					</p> <p>
 フィーチャーはネストでき、あるフィーチャを有効にするとその配下も有効になる。
 					</p> <p>
-また、デフォルトで有効なフィーチャーは <code>default</code> フィーチャーの配下とする。
+デフォルトで有効にしたいフィーチャーは <code>default</code> フィーチャーの配下にする。
 					</p>
 <pre><code class="language-toml">
 [package]
@@ -193,9 +193,7 @@ rustflags = ["--cfg", "feature2", "feature3"]
 				</section> <section>
 					<h2>他クレートで定義されたフィーチャーの利用</h2>
 					<p>
-<code>config.toml</code> ファイルで依存性の記述と同時に行う。
-					</p> <p>
-または、自クレートのフィーチャーを他クレートのフィーチャと連携させる。
+<code>config.toml</code> ファイルで他クレートのフィーチャーを指定する。これには、他クレートへの依存と同時に記述する方法、そして自クレートのフィーチャーを他クレートのフィーチャと連携させる方法がある。
 					</p>
 <pre><code class="language-toml">
 [package]
@@ -206,11 +204,11 @@ version = "0.1.0"
 extenal_crate1 = { version = "0.1.0", default-features=false }
 
 [dev-dependencies]
-extenal_crate2 = { version = "0.1.0", features=["dev"] }
+extenal_crate2 = { version = "0.1.0", features=["deep_test"] }
 
 [features]
-default = ["feature1"]
-feature1 = ["extenal_crate3/feature_x"]
+default = ["my_feature"]
+my_feature = ["extenal_crate3/your_feature"]
 </code></pre>
 				</section>
 			</section>
