@@ -43,7 +43,7 @@
 			<nav class="sub"/>
 			<section>
 				<hgroup>
-					<h1>パターン A</h1>
+					<h1>パターン A1</h1>
 					<div class="subTitle">自明なパターン</div>
 				</hgroup>
 				<p>
@@ -67,7 +67,7 @@ impl MyTrait for MyType { fn f(&amp;self) { /* ... */ } }
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン B</h1>
+					<h1>パターン A2</h1>
 					<div class="subTitle">実装が空のパターン</div>
 				</hgroup>
 				<p>
@@ -91,7 +91,7 @@ impl MyTrait for MyType {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン C</h1>
+					<h1>パターン B1</h1>
 					<div class="subTitle">ブランケット実装との衝突</div>
 				</hgroup>
 				<p>
@@ -116,7 +116,7 @@ impl MyTrait for MyType {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン D</h1>
+					<h1>パターン B2</h1>
 					<div class="subTitle">ブランケット実装どうしの衝突</div>
 				</hgroup>
 				<p>
@@ -144,7 +144,7 @@ impl&lt;T&gt; MyTrait for T where T: TraitX {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン E</h1>
+					<h1>パターン C1</h1>
 					<div class="subTitle">型パラメタの影響 <span class="nw">(条件側の型パラメタ)</span></div>
 				</hgroup>
 				<p>
@@ -171,7 +171,7 @@ impl&lt;X: TraitX&gt; MyTrait for X {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン F</h1>
+					<h1>パターン C2</h1>
 					<div class="subTitle">型パラメタの影響 <span class="nw">(トレイト側の型パラメタ)</span></div>
 				</hgroup>
 				<p>
@@ -198,8 +198,8 @@ impl&lt;T, X: TraitX&gt; MyTrait&lt;X&gt; for T {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン G</h1>
-					<div class="subTitle">型パラメタの影響 <span class="nw">(パターン E と F の合成)</span></div>
+					<h1>パターン C3</h1>
+					<div class="subTitle">型パラメタの影響 <span class="nw">(パターン C1 と C2 の合成)</span></div>
 				</hgroup>
 				<p>
 条件とトレイトの両方に型パラメタがあるパターン。
@@ -259,7 +259,7 @@ impl&lt;T&gt; MyTrait for T {}
 				</dl>
 			</section> <section>
 				<hgroup>
-					<h1>パターン H</h1>
+					<h1>パターン D</h1>
 					<div class="subTitle">関連型の影響 <span class="nw">(Rust の欠陥)</span></div>
 				</hgroup>
 				<p>
