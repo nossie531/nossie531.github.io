@@ -122,11 +122,11 @@ impl&lt;T&gt; MyTrait for T where T: TraitX {}
 					<div class="subTitle">ジェネリクスの影響 <span class="nw">(型へのジェネリクス)</span></div>
 				</hgroup>
 				<p>
-ジェネリクスにより型の重複に気付きにくいパターン。
+ジェネリクス型どうしが同じになりうるパターン。
 				</p>
 				<hr class="split"/>
 				<p>
-以下では、<code>MyType&lt;i32&gt;</code> と <code>MyType&lt;T&gt;</code> は重複している。<br/>
+以下では、<code>MyType&lt;i32&gt;</code> と <code>MyType&lt;T&gt;</code> は同じになりうる。<br/>
 なぜなら、<code>i32</code> は <code>Common</code> を実装しているため <code>T</code> になれる。
 				</p>
 <pre><code class="language-rust">
@@ -153,11 +153,11 @@ impl MyTrait for MyType&lt;i32&gt; {}
 					<div class="subTitle">ジェネリクスの影響 <span class="nw">(トレイトへのジェネリクス)</span></div>
 				</hgroup>
 				<p>
-ジェネリクスによりトレイトの重複に気付きにくいパターン。
+ジェネリクストレイトどうしが同じになりうるパターン。
 				</p>
 				<hr class="split"/>
 				<p>
-以下では、<code>MyTrait&lt;i32&gt;</code> と <code>MyTrait&lt;T&gt;</code> は重複している。<br/>
+以下では、<code>MyTrait&lt;i32&gt;</code> と <code>MyTrait&lt;T&gt;</code> は同じになりうる。<br/>
 なぜなら、<code>i32</code> は <code>Common</code> を実装しているため <code>T</code> になれる。
 				</p>
 <pre><code class="language-rust">
@@ -211,7 +211,7 @@ impl&lt;T&gt; MyTrait for T {}
           - impl&lt;T&gt; From&lt;T&gt; for T;
 </samp></pre>
 				<p>
-エラーメッセージは以下の二つの競合を指摘している。
+エラーメッセージは以下の二つの衝突を指摘している。
 				</p>
 				<ul>
 					<li>
@@ -258,7 +258,7 @@ impl&lt;T&gt; MyTrait for T {}
 				</aside>
 				<hr class="split"/>
 				<p>
-以下では、<code>HasType&lt;Type = i32&gt;</code> と <code>HasType&lt;Type = i64&gt;</code> は重複しないはずだが、競合が検出されてしまう。
+以下では、<code>HasType&lt;Type = i32&gt;</code> と <code>HasType&lt;Type = i64&gt;</code> の範囲が重複していると取られてしまい、衝突が検出される。
 				</p>
 <pre><code class="language-rust">
 trait HasType { type Type; }
