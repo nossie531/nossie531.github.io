@@ -20,9 +20,9 @@
 <mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to temporary value</mark>
 </samp></pre>
 		<p>
-関数からの戻り値となる参照の参照先は、関数からの復帰後も有効でなければならない。
+関数が参照型を戻す場合、参照先は関数からの復帰後も有効でなければならない。
 		</p> <p>
-そのため、ローカル変数、関数の引数、一時的な値、これらは参照先になれない。
+そのため、ローカル変数、関数の引数、一時的な値、これらは戻り値にできない。
 		</p>
 		<section>
 			<h1>パターン</h1>
