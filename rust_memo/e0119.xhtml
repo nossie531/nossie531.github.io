@@ -60,7 +60,7 @@ impl MyTrait for MyType { fn f(&amp;self) { /* ... */ } }
 			</section> <section>
 				<hgroup>
 					<h1>パターン B1</h1>
-					<div class="subTitle">ブランケット実装との衝突</div>
+					<div class="subTitle">型パラメタ (ブランケット実装に対する衝突)</div>
 				</hgroup>
 				<p>
 同じトレイトについて、個別の型への実装と、ブランケット実装がある。<br/>
@@ -89,7 +89,7 @@ impl MyTrait for MyType {}
 			</section> <section>
 				<hgroup>
 					<h1>パターン B2</h1>
-					<div class="subTitle">ブランケット実装どうしの衝突</div>
+					<div class="subTitle">型パラメタ (ブランケット実装どうしの衝突)</div>
 				</hgroup>
 				<p>
 同じトレイトについて、ブランケット実装が複数ある。<br/>
@@ -118,8 +118,8 @@ impl&lt;T&gt; MyTrait for T where T: TraitX {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン C1</h1>
-					<div class="subTitle">ジェネリクスの影響 <span class="nw">(型へのジェネリクス)</span></div>
+					<h1>パターン B3</h1>
+					<div class="subTitle">型パラメタ <span class="nw">(ジェネリクス型での型パラメタ)</span></div>
 				</hgroup>
 				<p>
 ジェネリクス型どうしが同じになりうるパターン。
@@ -149,8 +149,8 @@ impl MyTrait for MyType&lt;i32&gt; {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン C2</h1>
-					<div class="subTitle">ジェネリクスの影響 <span class="nw">(トレイトへのジェネリクス)</span></div>
+					<h1>パターン B4</h1>
+					<div class="subTitle">型パラメタ <span class="nw">(ジェネリクストレイトでの型パラメタ)</span></div>
 				</hgroup>
 				<p>
 ジェネリクストレイトどうしが同じになりうるパターン。
@@ -180,21 +180,21 @@ impl MyTrait&lt;i32&gt; for MyType {}
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン C3</h1>
-					<div class="subTitle">ジェネリクスの影響 <span class="nw">(パターン C1 と C2 の合成)</span></div>
+					<h1>パターン B5</h1>
+					<div class="subTitle">型パラメタ <span class="nw">(型とトレイトで共有される型パラメタ)</span></div>
 				</hgroup>
 				<p>
-型とトレイトの両方がジェネリクスのパターン。
+型とトレイトに同じ型パラメタが含まれるパターン。
 				</p>
 				<hr class="split"/>
 				<p>
-以下では、<code>MyTrait</code> から <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code> を作れるよう、<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> トレイトを実装しようとしている。しかし、<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> トレイトについて重複する実装がすでに Rust 組込の <a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> クレート内で定義済のため、コンパイルエラーになる。
+以下では、<code>MyTrait</code> から <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code> を作れるよう、<a href="https://doc.rust-lang.org/core/convert/trait.From.html"><code>From</code></a> トレイトを実装しようとしている。しかし、<a href="https://doc.rust-lang.org/core/index.html"><code>core</code></a> クレートに元からある恒等変換のための <a href="https://doc.rust-lang.org/core/convert/trait.From.html"><code>From</code></a> トレイトの実装と衝突してしまっている。
 				</p>
 <pre><code class="language-rust">
 trait MyTrait {}
 impl&lt;T&gt; MyTrait for T {}
 
-<mark class="error">impl&lt;T: MyTrait&gt; From&lt;T&gt; for Box&lt;dyn MyTrait&gt;</mark> {
+<mark class="error">impl&lt;T: MyTrait + 'static&gt; From&lt;T&gt; for Box&lt;dyn MyTrait&gt;</mark> {
     fn from(value: T) -&gt; Self {
         Box::new(value)
     }
@@ -204,10 +204,10 @@ impl&lt;T&gt; MyTrait for T {}
 <mark class="error">error[E0119]</mark><mark class="title">: conflicting implementations of trait `From&lt;Box&lt;(dyn MyTrait + 'static)&gt;&gt;` for type `Box&lt;(dyn MyTrait + 'static)&gt;`</mark>
 <mark class="info"> --&gt;</mark> src\lib.rs:4:1
 <mark class="info">  |</mark>
-<mark class="info">4 |</mark> impl&lt;T: MyTrait&gt; From&lt;T&gt; for Box&lt;dyn MyTrait&gt; {
-<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">4 |</mark> impl&lt;T: MyTrait + 'static&gt; From&lt;T&gt; for Box&lt;dyn MyTrait&gt; {
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
 <mark class="info">  |</mark>
-<mark class="info">  =</mark> note: conflicting implementation in crate `core`:
+<mark class="info">  =</mark> <mark class="title">note</mark>: conflicting implementation in crate `core`:
           - impl&lt;T&gt; From&lt;T&gt; for T;
 </samp></pre>
 				<p>
@@ -216,11 +216,11 @@ impl&lt;T&gt; MyTrait for T {}
 				<ul>
 					<li>
 						<p>
-<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;T&gt; for T</code>
+<code>impl&lt;T&gt; <a href="https://doc.rust-lang.org/core/convert/trait.From.html">From</a>&lt;T&gt; for T</code>
 						</p>
 					</li> <li>
 						<p>
-<code>impl&lt;T: MyTrait&gt; <a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;T&gt; for <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code>
+<code>impl&lt;T: MyTrait + 'static&gt; <a href="https://doc.rust-lang.org/core/convert/trait.From.html">From</a>&lt;T&gt; for <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code>
 						</p>
 					</li>
 				</ul>
@@ -231,13 +231,13 @@ impl&lt;T&gt; MyTrait for T {}
 					<dt>型</dt>
 					<dd>
 						<p>
-前者の <code>T</code> は全ての型が適合するので、後者が何であれ同じになりうる。
+前者の <code>T</code> は全ての型を含む。後者の <code>Box&lt;dyn MyTrait&gt;</code> もこれに含まれる。
 						</p>
 					</dd>
 					<dt>トレイト</dt>
 					<dd>
 						<p>
-前者と後者はどちらも <code><a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;T&gt;</code> で、型パラメタ <code>T</code> も同じ内容を指している。前者の <code>T</code> にはその型そのものと同じ型である事が、後者の <code>T</code> には <code>MyTrait</code> の実装が求められるが、全ての型は <code>MyTrait</code> を実装するため、ここは <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code> でも良い。そのため、後者も前者と同様、<code>T</code> にはその型そのものを指定できてしまう。
+前者と後者はどちらも <code><a href="https://doc.rust-lang.org/core/convert/trait.From.html">From</a>&lt;T&gt;</code> である。そして、前者の <code>T</code> は実装対象の型と同じである。後者の <code>T</code> は <code>MyTrait</code> の実装を求められるが、全ての型は <code>MyTrait</code> を実装するため、ここは <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;dyn MyTrait&gt;</code> でも良く、これは実装対象の型と同じである。
 						</p>
 					</dd>
 				</dl>
