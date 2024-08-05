@@ -14,25 +14,34 @@
 Iterator パターンの変種、Lending Iterator パターンについて。
 		</p>
 		<section>
-			<h1><code>Iterator</code> の特徴</h1>
+			<h1>概要</h1>
 			<p>
-標準機能のトレイト <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>std::iter::Iterator</code></a> について。
-			</p> <p>
-アイテムがイテレータとライフタイムを共有しない。
-			</p> <p>
-つまり、イテレータを破棄してもアイテムの使用を続けられる。 
+Iterator と Lending Iterator の違いについて。
 			</p>
+			<section>
+				<h2>Iterator</h2>
+				<p>
+標準機能にトレイト <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>std::iter::Iterator</code></a> がある。
+				</p> <p>
+アイテムはイテレータとライフタイムを共有しない。
+				</p> <p>
+そのため、イテレータを破棄してもアイテムの使用を続けられる。 
+				</p>
+			</section> <section>
+				<h2>Lending Iterator</h2>
+				<p>
+標準機能にないため、外部クレートか自前実装が必要になる。
+				</p> <p>
+アイテムはイテレータとライフタイムを共有する。
+				</p> <p>
+そのため、イテレータを破棄するとアイテムの使用を続けられない。
+				</p>
+			</section>
 		</section> <section>
-			<h1><code>LendingIterator</code> の特徴</h1>
+			<h1>利用例</h1>
 			<p>
-標準機能には Lending Iterator のためのトレイトはまだないので自分で定義する。
-			</p> <p>
-アイテムがイテレータとライフタイムを共有する (アイテム型にライフタイム引数がある)。
-			</p> <p>
-つまり、イテレータを破棄するとアイテムの使用を続けられなくなる。
+Lending Iterator 系のトレイトを利用する型について。
 			</p>
-		</section> <section>
-			<h1><code>LendingIterator</code> の実装例</h1>
 			<section>
 				<h2><code>WindowsMut</code></h2>
 				<p>
@@ -42,10 +51,72 @@ Iterator パターンの変種、Lending Iterator パターンについて。
 				</p>
 			</section>
 		</section> <section>
-			<h1>サンプル</h1>
+			<h1>実装方式</h1>
 			<p>
-以下では、トレイト <code>LendingIterator</code> を型 <code>WindowsMut</code> に実装している。
+汎用性と <a href="associated_type.xhtml#gat">GAT</a> の取扱が焦点になる。
 			</p>
+			<section>
+				<h1>限定用法</h1>
+				<p>
+イテレートの対象を参照型に限定した実装について。
+				</p> <p>
+この場合、<code>next</code> メソッドの戻り値の型は、<code>&amp;Item</code> や <code>&amp;mut Item</code> になる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、トレイト <code>MutAddressIterator</code> が Lending Iterator になっている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut arr = [1, 2, 3];
+    let mut iter = WindowsMut::new(&amp;mut arr, 2);
+    assert_eq!(iter.next(), Some([1, 2].as_mut_slice()));
+    assert_eq!(iter.next(), Some([2, 3].as_mut_slice()));
+    assert_eq!(iter.next(), None);
+}
+
+trait MutAddressIterator {
+    type Item: ?Sized;
+    fn next(&amp;mut self) -&gt; Option&lt;&amp;mut Self::Item&gt;;
+}
+
+struct WindowsMut&lt;'arr, T&gt; {
+    slice: &amp;'arr mut [T],
+    size: usize,
+    pos: usize,
+}
+
+impl&lt;'arr, T&gt; WindowsMut&lt;'arr, T&gt; {
+    fn new(slice: &amp;'arr mut [T], size: usize) -&gt; Self {
+        assert_ne!(size, 0);
+        Self { slice, size, pos: 0 }
+    }
+}
+
+impl&lt;'arr, T&gt; MutAddressIterator for WindowsMut&lt;'arr, T&gt; {
+    type Item = [T];
+
+    fn next(&amp;mut self) -&gt; Option&lt;&amp;mut Self::Item&gt; {
+        let result = self.slice[self.pos..].get_mut(..self.size)?;
+        self.pos += 1;
+        Some(result)
+    }
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<h1>汎用用法 (GAT)</h1>
+				<p>
+イテレートの対象を参照型に限定しない実装について。
+				</p> <p>
+この場合、参照を含みうるアイテムが必要なため、<code>Item</code> 型が GAT になる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、トレイト <code>LendingIterator</code> が Lending Iterator になっている。
+					</p>
 <pre><code class="language-rust">
 fn main() {
     let mut arr = [1, 2, 3];
@@ -83,13 +154,36 @@ impl&lt;'arr, T&gt; LendingIterator for WindowsMut&lt;'arr, T&gt; {
     }
 }
 </code></pre>
+				</section>
+			</section> <section>
+				<h1>汎用用法 (GAT Polyfill)</h1>
+				<p>
+<time>2024 年現在</time>、GAT にはまだ<a href="associated_type.xhtml#gat_problem">問題点</a>が多い。
+				</p> <p>
+これらは GAT の代わりに <a href="https://crates.io/crates/nougat"><code>nougat</code></a> のような Polyfill を使うと解決できる。ただしその場合、API は通常の GAT のそれと似て非なるものになる。これらは通常の使用では問題にならない事が多いが、エラーメッセージやドキュメントをかなり難解にする欠点がある。
+				</p> <p>
+(サンプルは通常の GAT とあまり変わらないので割愛。)
+				</p>
+			</section>
 		</section> <section>
-			<h1>問題点</h1>
+			<h1>クレート紹介</h1>
 			<p>
-上記のサンプルでは <a href="associated_type.xhtml#gat">GAT</a> を利用しているが、<time>2024 年現在</time>、GAT にはまだ<a href="associated_type.xhtml#gat_problem">問題点</a>が多い。
-			</p> <p>
-GAT のポリフィルではこうした問題点がないため、それを利用した <a href="https://crates.io/crates/lending-iterator"><code>lending-iterator</code></a> のようなクレートも存在するが、それらでは API がかなり複雑になっている。
+以下、代表的なクレートとその実装方式。これらを使う事で、<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> トレイトにおける <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.filter"><code>filter</code></a> メソッドのような数多くのメソッドを自前で実装せずに済むようになる。
 			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://crates.io/crates/streaming-iterator"><code>streaming-iterator</code></a>
+				</dt>
+				<dd>限定用法</dd>
+				<dt>
+<a href="https://crates.io/crates/gat-lending-iterator"><code>gat-lending-iterator</code></a>
+				</dt>
+				<dd>汎用用法 (GAT) </dd>
+				<dt>
+<a href="https://crates.io/crates/lending-iterator"><code>lending-iterator</code></a>
+				</dt>
+				<dd>汎用用法 (GAT Polyfill) </dd>
+			</dl>
 		</section>
 	</body>
 </html>
