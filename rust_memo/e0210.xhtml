@@ -70,13 +70,15 @@ impl&lt;<mark class="error">T</mark>&gt; Display for T {
 			<p>
 この仕様はトレイトが型パラメタを持つ場合についても考慮している。
 			</p> <p>
-これはつまり、以下の実装のうち、前者を優先するために後者をエラーにする。
+つまり、以下の実装のうち、最後のものはエラーになる。
 			</p>
 			<ul>
 				<li>
-					<code>impl&lt;T&gt; ForeignTrait&lt;MyCover&lt;T&gt;, T&gt; for ForeginType</code>
+<code>impl&lt;T&gt; ForeignTrait&lt;LocalType, T&gt; for ForeginType</code>
 				</li> <li>
-					<code>impl&lt;T&gt; ForeignTrait&lt;T, MyCover&lt;T&gt;&gt; for ForeginType</code>
+<code>impl&lt;T&gt; ForeignTrait&lt;Cover&lt;T&gt;, LocalType&gt; for ForeginType</code>
+				</li> <li>
+<code>impl&lt;T&gt; ForeignTrait&lt;T, LocalType&gt; for ForeginType</code>
 				</li>
 			</ul>
 		</section>
