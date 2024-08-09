@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: From と Into</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+値型から値型への型変換を行う二つのトレイトについて。
+		</p> 
+		<section>
+			<h1><code>From</code> と <code>Into</code></h1>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From&lt;T&gt;</code></a>
+				</dt>
+				<dd>
+関数 <code><a href="https://doc.rust-lang.org/stable/std/convert/trait.From.html#tymethod.from">form</a>(T) -&gt; Self</code> を持つ。
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/convert/trait.Into.html"><code>Into&lt;T&gt;</code></a>
+				</dt>
+				<dd>
+関数 <code><a href="https://doc.rust-lang.org/stable/std/convert/trait.Into.html#tymethod.into">into</a>(self) -&gt; T</code> を持つ。
+				</dd>
+			</dl>
+			<section>
+				<h2>両者の関係</h2>
+				<p>
+以下の実装はどちらも、<code>TypeX</code> → <code>TypeY</code> 変換を表す。
+				</p>
+				<ul>
+					<li>
+<code>impl From&lt;TypeX&gt; for TypeY</code>
+					</li> <li>
+<code>impl Into&lt;TypeY&gt; for TypeX</code>
+					</li>
+				</ul>
+				<p>
+他方の実装があれば、もう一方の実装も期待される。
+				</p>
+			</section> <section>
+				<h2>自動的な実装</h2>
+				<p>
+<code>From</code> 側のみを実装すれば、<code>Into</code> 側は自動的に実装される。
+				</p> <p>
+これは以下のようなブランケット実装の<a href="https://doc.rust-lang.org/std/convert/trait.Into.html#impl-Into%3CU%3E-for-T">定義</a>で実現されている。
+				</p>
+<pre><code class="language-rust">
+impl&lt;T, U&gt; Into&lt;U&gt; for T where U: From&lt;T&gt; { /* ... */ }
+</code></pre>
+			</section> <section>
+				<h2>恒等変換</h2>
+				<p>
+あらゆる型に対して、恒等変換 (何もしない変換) の実装が存在する。
+				</p> <p>
+これは以下のようなブランケット実装の<a href="https://doc.rust-lang.org/std/convert/trait.Into.html#impl-Into%3CU%3E-for-T">定義</a>で実現されている。
+				</p>
+<pre><code class="language-rust">
+<code>impl&lt;T&gt; From&lt;T&gt; for T { /* ... */ }</code>
+</code></pre>
+			</section>
+		</section> <section>
+			<h1><code>from</code> と <code>into</code></h1>
+			<p>
+<code><a href="https://doc.rust-lang.org/stable/std/convert/trait.From.html">From</a>::<a href="https://doc.rust-lang.org/stable/std/convert/trait.From.html#tymethod.from">form</a></code> と <code><a href="https://doc.rust-lang.org/std/convert/trait.Into.html">Into</a>::<a href="https://doc.rust-lang.org/stable/std/convert/trait.Into.html#tymethod.into">into</a></code>、どちらを使っても構わない場合はよくある。ちなみに筆者は、コードを短くするため、型推論先があれば <code>into</code>、なければ <code>from</code> を選んでいる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let src = 1;
+
+    f(f64::from(src));
+    f(src.into());
+
+    g(f64::from(src));
+    g(&lt;i32 as Into&lt;f64&gt;&gt;::into(src));
+}
+
+fn f(_: f64) {}
+fn g&lt;T&gt;(_: T) {}
+</code></pre>
+		</section> <section>
+			<h1><code>From</code> の利用場面</h1>
+			<section>
+				<h2>変換の定義</h2>
+				<p>
+前述の通り、変換の定義は <code>From</code> 側で行う。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let val = MyType::from(42);
+    assert_eq!(val, 42.into());
+}
+
+#[derive(Debug, Eq, PartialEq)]
+struct MyType(i32);
+
+impl From&lt;i32&gt; for MyType {
+    fn from(value: i32) -&gt; Self {
+        Self(value)
+    }
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1><code>Into</code> の利用場面</h1>
+			<section>
+				<h2>引数の受入範囲</h2>
+				<p>
+引数型を <code>Into&lt;SomeType&gt;</code> とすると、<code>SomeType</code> そのままより受入範囲が広がる。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    show_float(4.2);
+    show_float(42);
+}
+
+fn show_float&lt;T: Into&lt;f64&gt;&gt;(x: T) {
+    println!("{}", x.into())
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
