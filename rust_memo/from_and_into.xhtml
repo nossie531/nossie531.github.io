@@ -62,7 +62,7 @@ impl&lt;T, U&gt; Into&lt;U&gt; for T where U: From&lt;T&gt; { /* ... */ }
 これは以下のようなブランケット実装の<a href="https://doc.rust-lang.org/std/convert/trait.Into.html#impl-Into%3CU%3E-for-T">定義</a>で実現されている。
 				</p>
 <pre><code class="language-rust">
-<code>impl&lt;T&gt; From&lt;T&gt; for T { /* ... */ }</code>
+impl&lt;T&gt; From&lt;T&gt; for T { /* ... */ }
 </code></pre>
 			</section>
 		</section> <section>
