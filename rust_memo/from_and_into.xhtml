@@ -20,13 +20,13 @@
 <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From&lt;T&gt;</code></a>
 				</dt>
 				<dd>
-関数 <code><a href="https://doc.rust-lang.org/stable/std/convert/trait.From.html#tymethod.from">form</a>(T) -&gt; Self</code> を持つ。
+関数 <code><a href="https://doc.rust-lang.org/std/convert/trait.From.html#tymethod.from">form</a>(T) -&gt; Self</code> を持つ。
 				</dd>
 				<dt>
 <a href="https://doc.rust-lang.org/std/convert/trait.Into.html"><code>Into&lt;T&gt;</code></a>
 				</dt>
 				<dd>
-関数 <code><a href="https://doc.rust-lang.org/stable/std/convert/trait.Into.html#tymethod.into">into</a>(self) -&gt; T</code> を持つ。
+関数 <code><a href="https://doc.rust-lang.org/std/convert/trait.Into.html#tymethod.into">into</a>(self) -&gt; T</code> を持つ。
 				</dd>
 			</dl>
 			<section>
@@ -68,7 +68,7 @@ impl&lt;T&gt; From&lt;T&gt; for T { /* ... */ }
 		</section> <section>
 			<h1><code>from</code> と <code>into</code></h1>
 			<p>
-<code><a href="https://doc.rust-lang.org/stable/std/convert/trait.From.html">From</a>::<a href="https://doc.rust-lang.org/stable/std/convert/trait.From.html#tymethod.from">form</a></code> と <code><a href="https://doc.rust-lang.org/std/convert/trait.Into.html">Into</a>::<a href="https://doc.rust-lang.org/stable/std/convert/trait.Into.html#tymethod.into">into</a></code>、どちらを使っても構わない場合はよくある。ちなみに筆者は、コードを短くするため、型推論先があれば <code>into</code>、なければ <code>from</code> を選んでいる。
+<code><a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>::<a href="https://doc.rust-lang.org/std/convert/trait.From.html#tymethod.from">form</a></code> と <code><a href="https://doc.rust-lang.org/std/convert/trait.Into.html">Into</a>::<a href="https://doc.rust-lang.org/std/convert/trait.Into.html#tymethod.into">into</a></code>、どちらを使っても構わない場合はよくある。ちなみに筆者は、コードを短くするため、型推論先があれば <code>into</code>、なければ <code>from</code> を選んでいる。
 			</p>
 <pre><code class="language-rust">
 fn main() {
@@ -124,6 +124,24 @@ fn show_float&lt;T: Into&lt;f64&gt;&gt;(x: T) {
     println!("{}", x.into())
 }
 </code></pre>
+			</section>
+		</section> <section>
+			<h1>補足: 変換対象</h1>
+			<section>
+				<h2>動的型には未対応</h2>
+				<p>
+<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> や <a href="https://doc.rust-lang.org/std/convert/trait.Into.html"><code>Into</code></a> はトレイトオブジェクトの変換には向かない。<br/>
+なぜなら、これらはどちらも <a href="https://doc.rust-lang.org/std/marker/trait.Sized.html"><code>Sized</code></a> の実装が前提になっている。
+				</p> <p>
+ちなみに、トレイトオブジェクトを扱う場合、<a href="https://doc.rust-lang.org/std/iter/trait.IntoIterator.html"><code>IntoIterator</code></a> が参考になる。<br/>
+(その逆変換 <a href="https://doc.rust-lang.org/std/iter/trait.FromIterator.html"><code>FromIterator</code></a> は <code>Sized</code> を実装している点に注意。)
+				</p>
+			</section> <section>
+				<h2>期待される変換対象</h2>
+				<p>
+以下は From の API ドキュメントからの抜粋。
+				</p>
+				<iframe class="autoHeight" src="quote/rustdoc/std/convert/trait_form.xhtml"/>
 			</section>
 		</section>
 	</body>
