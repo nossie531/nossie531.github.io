@@ -17,35 +17,27 @@ rustdoc で各アイテムに必要なフィーチャーを表示する方法に
 			<p>
 この方法を推奨できる理由。
 			</p> <p>
-<time>2024 年現在</time>、この方法には不安定な機能が必要なため、ナイトリー版でのみ利用可能だが、すでに積極的に利用可能な状況にある。なぜなら、この方法はオプトインでの利用ができる。また、<a href="https://docs.rs/">Docs.rs</a> (<a href="https://crates.io/">crates.io</a> へのクレート公開時にドキュメントをホストするサイト) での公開にも対応している。
+<time>2024 年現在</time>、この方法はナイトリー版によるオプトインで実現できる。つまり、安定版でもフィーチャーの表示がされないだけである。また、<a href="https://docs.rs/">Docs.rs</a> (<a href="https://crates.io/">crates.io</a> へのクレート公開時にドキュメントをホストするサイト) での公開にも対応している。
 			</p>
 		</aside>
 		<section>
+			<h1>オプトインの仕組</h1>
+			<p>
+Docs.rs との連携用の構成値 <a href="https://docs.rs/about/builds#detecting-docsrs"><code>docsrs</code></a> を、不安定な機能 <a href="https://doc.rust-lang.org/unstable-book/language-features/doc-cfg.html"><code>doc_cfg</code></a> を有効化する切替フラグとして利用する。なお、<code>docsrs</code> の導入方法は、Docs.rs とローカル環境で微妙に異なる。そのため、それぞれ個別に指定しなければならない。
+			</p>
+		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-フィーチャ <code>my_feature</code> でのみ関数 <code>for_my_feature_only</code> を有効にする。
+以下では、フィーチャー <code>my_feature</code> の有効時のみ、関数 <code>my_func</code> が利用可能になる。
+			</p> <p>
+そして、その事について API ドキュメントに掲載するようにしている。
 			</p>
+			<nav class="sub"/>
 			<section>
-				<h2>補足: 不安定な機能のオプトイン</h2>
-				<p>
-以下では、Docs.rs との連携用の構成値 <a href="https://docs.rs/about/builds#detecting-docsrs"><code>docsrs</code></a> を、不安定な機能 <a href="https://doc.rust-lang.org/unstable-book/language-features/doc-cfg.html"><code>doc_cfg</code></a> を有効化するためのスイッチにしている。そして、Docs.rs とローカル環境では、<code>docsrs</code> を導入する方法がやや異なるため、それぞれ個別に指定している。
-				</p>
-			</section> <section>
-				<h2>タスク 1</h2>
-				<ul>
-					<li>
-ローカルでの <code>rustdoc</code> コマンドの引数を指定。
-					</li>
-				</ul>
-				<figure class="file">
-					<figcaption>.cargo/config.toml</figcaption>
-<pre><code class="language-toml">
-[build]
-rustdocflags = ["--cfg", "docsrs"]
-</code></pre>
-				</figure>
-			</section> <section>
-				<h2>タスク 2</h2>
+				<hgroup>
+					<h1>手順 1</h1>
+					<div class="subTitle"><code>config.toml</code> ファイルの編集</div>
+				</hgroup>
 				<ul>
 					<li>
 Docs.rs での <code>rustdoc</code> コマンドの引数を指定。
@@ -69,14 +61,17 @@ my_feature = []
 </code></pre>
 				</figure>
 			</section> <section>
-				<h2>タスク 3</h2>
+				<hgroup>
+					<h1>手順 2</h1>
+					<div class="subTitle">Rust ソースファイルの編集</div>
+				</hgroup>
 				<ul>
 					<li>
 <code>main.rs</code> や <code>lib.rs</code> にて <code>doc_cfg</code> を有効化。
 					</li> <li>
-関数 <code>for_my_feature_only</code> とフィーチャー <code>my_feature</code> の関係を設定。
+関数 <code>my_func</code> とフィーチャー <code>my_feature</code> の関係を設定。
 					</li> <li>
-関数 <code>for_my_feature_only</code> とフィーチャー <code>my_feature</code> の関係を文書化。
+関数 <code>my_func</code> とフィーチャー <code>my_feature</code> の関係を文書化。
 					</li>
 				</ul>
 				<figure class="file">
@@ -86,19 +81,44 @@ my_feature = []
 
 #[cfg(feature = "my_feature")]
 #[cfg_attr(docsrs, doc(cfg(feature = "my_feature")))]
-pub fn for_my_feature_only() {}
+pub fn my_func() {}
 </code></pre>
 				</figure>
 			</section> <section>
-				<h2>タスク 4</h2>
-				<ul>
-					<li>
-ローカルでのドキュメント生成 (任意)。
-					</li>
-				</ul>
+				<hgroup>
+					<h1>手順 3</h1>
+					<div class="subTitle">コマンドの実行 (任意) </div>
+				</hgroup>
+				<p>
+ローカルでのドキュメント生成時、<code>docsrs</code> の有効化方法は二通りある。どちらが良いかは、そのプロジェクトにおける <code>config.toml</code> ファイルの取扱による。そしてもし、個人用の設定ファイルとして Git などのバージョン管理システムの対象外としているのなら、気軽に編集ができるので、ファイル経由がお勧めになる。
+				</p>
+				<section>
+					<h2>引数指定</h2>
+					<p>
+以下では、コマンドの実行時に引数で指定している。
+					</p>
 <pre><code class="console">
-<mark class="prompt">&gt;</mark> cargo +nightly doc --open
+<mark class="prompt">&gt;</mark> cargo +nightly --config 'build.rustdocflags = [\"--cfg\", \"docsrs\"]' doc
 </code></pre>
+				</section> <section>
+					<h2>ファイル経由</h2>
+					<p>
+以下では、予めファイルに引数の内容を指定している。
+					</p>
+					<figure class="file">
+						<figcaption>.cargo/config.toml</figcaption>
+<pre><code class="language-toml">
+[build]
+rustdocflags = ["--cfg", "docsrs"]
+</code></pre>
+					</figure>
+					<p>
+その場合、コマンドは単純になる。
+					</p>
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo +nightly doc
+</code></pre>
+				</section>
 			</section>
 		</section>
 	</body>
