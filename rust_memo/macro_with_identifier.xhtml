@@ -28,25 +28,23 @@
 以下では、マクロ <code>with_var_x</code> の定義側と利用側で識別子 <code>x</code> を共有していない。
 			</p>
 <pre><code class="language-rust">
-macro_rules! with_var_x {
-    {$($tt:tt)*} =&gt; {
+macro_rules! with_var {
+    ($block:block) =&gt; {
         let x = "hello";
-        $($tt)*
+        $block
     }
 }
 
 fn main() {
-    with_var_x! {
-        println!("{<mark class="error">x</mark>}");
-    }
+    with_var!({ println!("{<mark class="error">x</mark>}") });
 }
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0425]</mark><mark class="title">: cannot find value `x` in this scope</mark>
-<mark class="info">  --&gt;</mark> src/main.rs:10:20
-<mark class="info">   |</mark>
-<mark class="info">10 |</mark>         println!("{x}");
-<mark class="info">   |</mark>                    <mark class="error">^ not found in this scope</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:9:28
+<mark class="info">  |</mark>
+<mark class="info">9 |</mark>     with_var!({ println!("{x}") });
+<mark class="info">  |</mark>                            <mark class="error">^ not found in this scope</mark>
 </samp></pre>
 		</section> <section>
 			<h1>解決策</h1>
@@ -55,16 +53,14 @@ fn main() {
 			</p>
 <pre><code class="language-rust">
 macro_rules! with_var {
-    (($var:ident) {$($tt:tt)*}) =&gt; {
+    ($var:ident $block:block) =&gt; {
         let $var = "hello";
-        $($tt)*
+        $block
     }
 }
 
 fn main() {
-    with_var!((x) {
-        println!("{x}");
-    });
+    with_var!(x { println!("{x}") });
 }
 </code></pre>
 		</section>
