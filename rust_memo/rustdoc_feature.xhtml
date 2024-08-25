@@ -90,20 +90,20 @@ pub fn my_func() {}
 					<div class="subTitle">コマンドの実行 (任意) </div>
 				</hgroup>
 				<p>
-ローカルでのドキュメント生成時、<code>docsrs</code> の有効化方法は二通りある。どちらが良いかは、そのプロジェクトにおける <code>config.toml</code> ファイルの取扱による。そしてもし、個人用の設定ファイルとして Git などのバージョン管理システムの対象外としているのなら、気軽に編集ができるので、ファイル経由がお勧めになる。
+ローカルでのドキュメント生成時、<code>docsrs</code> の有効化方法は二通りある。どちらが良いかは、そのプロジェクトにおける <code>config.toml</code> ファイルの取扱による。もし、それが個人用の設定ファイル扱いで、Git などのバージョン管理システムの対象外なら、気軽に編集できるので、設定ファイル版がお勧めになる。
 				</p>
 				<section>
-					<h2>引数指定</h2>
+					<h2><code>docsrs</code> をコマンド引数から有効化</h2>
 					<p>
-以下では、コマンドの実行時に引数で指定している。
+以下では、<code>docsrs</code> をコマンド引数から有効化している。
 					</p>
 <pre><code class="console">
 <mark class="prompt">&gt;</mark> cargo +nightly --config 'build.rustdocflags = [\"--cfg\", \"docsrs\"]' doc
 </code></pre>
 				</section> <section>
-					<h2>ファイル経由</h2>
+					<h2><code>docsrs</code> を設定ファイルから有効化</h2>
 					<p>
-以下では、予めファイルに引数の内容を指定している。
+以下では、<code>docsrs</code> を設定ファイルから有効化している。
 					</p>
 					<figure class="file">
 						<figcaption>.cargo/config.toml</figcaption>
@@ -113,7 +113,7 @@ rustdocflags = ["--cfg", "docsrs"]
 </code></pre>
 					</figure>
 					<p>
-その場合、コマンドは単純になる。
+この場合、コマンドは単純になる。
 					</p>
 <pre><code class="console">
 <mark class="prompt">&gt;</mark> cargo +nightly doc
