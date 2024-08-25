@@ -23,7 +23,7 @@ rustdoc で各アイテムに必要なフィーチャーを表示する方法に
 		<section>
 			<h1>オプトインの仕組</h1>
 			<p>
-Docs.rs との連携用の構成値 <a href="https://docs.rs/about/builds#detecting-docsrs"><code>docsrs</code></a> を、不安定な機能 <a href="https://doc.rust-lang.org/unstable-book/language-features/doc-cfg.html"><code>doc_cfg</code></a> を有効化する切替フラグとして利用する。なお、<code>docsrs</code> の導入方法は、Docs.rs とローカル環境で微妙に異なる。そのため、それぞれ個別に指定しなければならない。
+Docs.rs との連携用の構成値 <a href="https://docs.rs/about/builds#detecting-docsrs"><code>docsrs</code></a> を、不安定な機能を有効化するためのフラグとして利用する。なお、<code>docsrs</code> の導入方法は、Docs.rs とローカル環境で少し異なる。そのため、それぞれ個別に指定しなければならない。
 			</p>
 		</section> <section>
 			<h1>サンプル</h1>
@@ -65,17 +65,36 @@ my_feature = []
 					<h1>手順 2</h1>
 					<div class="subTitle">Rust ソースファイルの編集</div>
 				</hgroup>
-				<ul>
-					<li>
-<code>main.rs</code> や <code>lib.rs</code> にて <code>doc_cfg</code> を有効化。
-					</li> <li>
-関数 <code>my_func</code> とフィーチャー <code>my_feature</code> の関係を設定。
-					</li> <li>
-関数 <code>my_func</code> とフィーチャー <code>my_feature</code> の関係を文書化。
-					</li>
-				</ul>
-				<figure class="file">
-					<figcaption>lib.rs</figcaption>
+				<p>
+フィーチャーを表示する方法は二通りある。
+				</p> <p>
+ただ、普段使いには一括指定の方法のみで十分だろう。
+				</p>
+				<section>
+					<h2>一括指定</h2>
+					<p>
+不安定な機能 <a href="https://doc.rust-lang.org/unstable-book/language-features/doc-auto-cfg.html"><code>doc_auto_cfg</code></a> を使用する。
+					</p> <p>
+この場合、<code>main.rs</code> や <code>lib.rs</code> で全体設定を行うだけでよい。
+					</p>
+					<figure class="file">
+						<figcaption>lib.rs</figcaption>
+<pre><code class="language-rust">
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
+#[cfg(feature = "my_feature")]
+pub fn my_func() {}
+</code></pre>
+					</figure>
+				</section> <section>
+					<h2>個別指定</h2>
+					<p>
+不安定な機能 <a href="https://doc.rust-lang.org/unstable-book/language-features/doc-cfg.html"><code>doc_cfg</code></a> を使用する。
+					</p> <p>
+この場合、関数などの各アイテムごとに設定が必要になる。
+					</p>
+					<figure class="file">
+						<figcaption>lib.rs</figcaption>
 <pre><code class="language-rust">
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
@@ -83,14 +102,17 @@ my_feature = []
 #[cfg_attr(docsrs, doc(cfg(feature = "my_feature")))]
 pub fn my_func() {}
 </code></pre>
-				</figure>
+					</figure>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>手順 3</h1>
 					<div class="subTitle">コマンドの実行 (任意) </div>
 				</hgroup>
 				<p>
-ローカルでのドキュメント生成時、<code>docsrs</code> の有効化方法は二通りある。どちらが良いかは、そのプロジェクトにおける <code>config.toml</code> ファイルの取扱による。もし、それが個人用の設定ファイル扱いで、Git などのバージョン管理システムの対象外なら、気軽に編集できるので、設定ファイル版がお勧めになる。
+ローカルのドキュメント生成コマンドで <code>docsrs</code> を有効化する方法は二通りある。
+				</p> <p>
+どちらが良いかは、そのプロジェクトにおける <code>config.toml</code> ファイルの取扱による。もし、それが個人用の設定ファイル扱いで、Git などのバージョン管理システムの対象外なら、気軽に編集できるので、設定ファイルから有効化するほうが楽になる。
 				</p>
 				<section>
 					<h2><code>docsrs</code> をコマンド引数から有効化</h2>
