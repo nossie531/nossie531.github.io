@@ -34,13 +34,13 @@ rustdoc で各アイテムに必要なフィーチャーを表示する方法に
 				<h2>タスク 1</h2>
 				<ul>
 					<li>
-ローカルの <code>cargo doc</code> から起動する  <code>rustdoc</code> の引数を指定。
+ローカルでの <code>rustdoc</code> コマンドの引数を指定。
 					</li>
 				</ul>
 				<figure class="file">
 					<figcaption>.cargo/config.toml</figcaption>
 <pre><code class="language-toml">
-[doc]
+[build]
 rustdocflags = ["--cfg", "docsrs"]
 </code></pre>
 				</figure>
@@ -48,7 +48,7 @@ rustdocflags = ["--cfg", "docsrs"]
 				<h2>タスク 2</h2>
 				<ul>
 					<li>
-Docs.rs でのドキュメント公開時に起動する <code>rustdoc</code> の引数を指定。
+Docs.rs での <code>rustdoc</code> コマンドの引数を指定。
 					</li> <li>
 フィーチャ <code>my_feature</code> を導入 (デフォルトでの使用有無も指定)。
 					</li>
