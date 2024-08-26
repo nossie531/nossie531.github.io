@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 自動テストでのコンパイルエラーの確認</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+コンパイルエラーとなるべきテスト項目の作成方法について。
+		</p> 
+		<section>
+			<h1>背景情報</h1>
+			<p>
+コンパイルエラーとなるかの確認は、型により自明なため、殆どの場合は不要である。
+			</p> <p>
+しかし稀に、誤用の検出確認、型の不用意な修正防止、などの目的で必要となる場合がある。特に Rustでは、マクロの引数の自由度が高いため、その対策に有用である。
+			</p>
+		</section> <section>
+			<h1>実現方法</h1>
+			<p>
+以下の知識を組み合わせる。
+			</p>
+			<ul>
+				<li>
+アンダースコアで始まる関数は未使用でも警告が出ない。
+				</li> <li>
+文書化出力のみを <code>#[doc(hidden)]</code> 属性で抑制できる。
+				</li> <li>
+文書化テストの <code>compile_fail</code> ブロックでコンパイルエラーを確認できる。
+				</li>
+			</ul>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>for_loop</code> マクロが for-in 構文を模倣している。ここでループアイテムは元の構文と同じくパターンで、それは論駁不可能でなければならない。関数 <code>_dummy_for_doc_test</code> の文書化テストでは、それについての確認が含まれている (もしマクロを while-let 構文で実装していれば、ここでエラーになっただろう)。
+			</p>
+<pre><code class="language-rust">
+/// For-loop macro.
+///
+/// ```
+/// # use rust_test::for_loop;
+/// let values = vec![Some(1), Some(2), None];
+/// let mut summary = 0;
+/// for_loop!((&amp;x in values.iter()) {
+///     summary += x.unwrap_or(0);
+/// });
+///
+/// assert_eq!(summary, 3);
+/// ```
+#[macro_export]
+macro_rules! for_loop {
+    (($item:pat in $iter:expr) $block:block) =&gt; {{
+        let mut iter = IntoIterator::into_iter($iter);
+        loop {
+            match Iterator::next(&amp;mut iter) {
+                None =&gt; break,
+                Some($item) =&gt; $block,
+            }
+        }
+    }};
+}
+
+/// Compilation error test.
+///
+/// Loop item should be irrefutable pattern.
+///
+/// ```compile_fail
+/// # use rust_test::for_loop;
+/// let values = vec![Some(1), Some(2), None];
+/// let mut summary = 0;
+/// for_loop!((&amp;Some(x) in values.iter()) {
+///     summary += x;
+/// });
+/// ```
+#[doc(hidden)]
+fn _dummy_for_doc_test() {
+    // nop.
+}
+</code></pre>
+		</section>
+	</body>
+</html>
