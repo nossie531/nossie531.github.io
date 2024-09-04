@@ -26,16 +26,16 @@
 		</section> <section>
 			<h1>バージョンの切替</h1>
 			<p>
-バージョンの切替方法には幾つかある。
+方法は幾つかあるが、ここではよく使うもののみを紹介する。
 			</p> <p>
-ここではその中からよく使う方法のみを紹介する。その他の方法の詳細および各方法の優先度については、後述の『<a href="#spec">補足: 仕様詳細</a>』やそのリンク先を参照。
+他の方法や優先順位については、後述の『<a href="#spec">補足: 仕様詳細</a>』を参照。
 			</p>
 			<section>
 				<h2>ディレクトリ単位の設定</h2>
 				<p>
 プロジェクトのルートディレクトリに <code>rust-toolchain.toml</code> を配置。
 				</p> <p>
-特に IDE と連携させる場合、この方法が必須になる。
+IDE と連携させる場合、この方法が必須になる。
 				</p>
 <pre><code class="language-toml">
 [toolchain]
@@ -58,7 +58,7 @@ channel = "nightly"
 			<section>
 				<h2>サンプル</h2>
 				<p>
-以下では、<code>stable</code> と <code>nightly</code> がインストールされていて、有効になっているバージョンは <code>rust-toolchain.toml</code> ファイルの影響により nightly である事が分かる。
+以下では、<code>stable</code> と <code>nightly</code> がインストールされており、選択されているのは後者で、またそれが <code>rust-toolchain.toml</code> ファイルの影響である事が分かる。
 				</p>
 <pre><code class="console">
 <mark class="prompt">&gt;</mark> rustup show
