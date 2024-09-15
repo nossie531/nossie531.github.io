@@ -11,84 +11,169 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-ワークスペースの構築について。
+ここではワークスペースの構築方法を紹介している。
 		</p> 
 		<aside class="normal moan">
 			<p>
 cargo の利用について。
 			</p> <p>
-<time>2024 年現在</time>、cargo ではワークスペースを作れない。配下の個々のクレートは作れるのに、それらをまとめるディレクトリを作れないのは、なんだか中途半端に思える…。<a href="https://github.com/rust-lang/cargo/issues/8365">提案</a>はされているようなので将来に期待したい。
+<time>2024 年現在</time>、cargo ではワークスペースを作れない。配下の個々のクレートは作れるのに、それらをまとめるアイテムを作れないのは、なんだか中途半端に思える…。<a href="https://github.com/rust-lang/cargo/issues/8365">提案</a>はされているようなので、将来に期待したい。
 			</p>
 		</aside>
 		<section>
 			<h1>基礎知識</h1>
 			<p>
-大きなプログラムは小さなクレートに分割して作るのが推奨される。
+大きなプログラムは小さなパッケージに分割して作るのが推奨される。
 			</p> <p>
-ワークスペースはそれらのクレートを管理するディレクトリである。
+ワークスペースはそれらのパッケージを管理するディレクトリである。
 			</p>
 		</section> <section>
 			<h1>ワークスペースの作成</h1>
-			<ul>
-				<li>
-適当なディレクトリを作成
-				</li> <li>
-<code>cargo.toml</code> ファイルを作成
-				</li>
-			</ul>
 			<section>
-				<h2><code>cargo.toml</code> ファイル</h2>
+				<h1><code>cargo.toml</code> とその設定項目</h1>
 				<p>
-以下は簡単なサンプル。
+ワークスペースディレクトリの直下には <code>cargo.toml</code> ファイルを置かなければならない。このファイルでは、ワークスペース全体のための設定、そして後述するルートパッケージがあればその設定、について記載する。
 				</p>
+				<section>
+					<h2>ワークスペース全体のための設定 (抜粋)</h2>
+					<dl class="normal lowProfile">
+						<dt><code>workspace.members</code></dt>
+						<dd>配下のクレートの一覧</dd>
+						<dt><code>workspace.dependencies</code></dt>
+						<dd>配下のクレートから共有される依存関係</dd>
+						<dt><code>workspace.resolver</code></dt>
+						<dd>互換性のための項目</dd>
+					</dl>
+				</section> <section>
+					<h2>ルートパッケージのための設定 (抜粋)</h2>
+					<dl class="normal lowProfile">
+						<dt><code>package</code></dt>
+						<dd>通常パッケージのそれと同じ</dd>
+						<dt><code>dependencies</code></dt>
+						<dd>通常パッケージのそれと同じ</dd>
+					</dl>
+				</section> <section>
+					<h2>補足: リゾルババージョン</h2>
+<code>workspace.resolver</code> には<a href="https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions">リゾルババージョン</a>を指定する。これは <code>package.edition</code> の指定がある場合は自動で導出されるが、そうでない場合は明示的な指定が推奨されている。
+				</section>
+			</section> <section>
+				<h1>ルートパッケージがある場合</h1>
+				<p>
+ワークスペースの主役になるパッケージがある場合、それをルートパッケージにすると良い。例えば、アプリの主要な実行ファイルを生成するパッケージや、ライブラリ群のコアになる必須ライブラリを生成するパッケージは、ルートパッケージとして適切だろう。
+				</p>
+				<section>
+					<h2>ディレクトリ構成</h2>
+					<p>
+ルートパッケージのアイテム、他パッケージのディレクトリ、これらが並んで配置される。
+					</p> <p>
+以下では、<code>src</code> と <code>tests</code> はルートパッケージ用で、<code>sub</code> は同名のパッケージ用である。
+					</p>
+<pre class="directory">my_app/
+├─ cargo.toml
+├─ src/...
+├─ tests/...
+└─ sub/...
+</pre>
+				</section> <section>
+					<h2><code>cargo.toml</code> ファイル</h2>
+					<p>
+ワークスペース用の項目の他、ルートパッケージ用の項目を指定する。
+					</p> <p>
+以下では、ルートパッケージと <code>sub</code> を配下のパッケージとして指定している。
+					</p>
+					<figure class="file">
+						<figcaption>my_app/cargo.toml</figcaption>
 <pre><code class="language-toml">
+[package]
+name = "my_app"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+sub = { path = "sub" }
+log = { workspace = true } 
+rand = "0.8"
+
 [workspace]
-# 配下のクレートの一覧
-members = ["app", "util"]
+members = ["sub"]
 
 [workspace.dependencies]
-# 配下のクレートから共用される外部クレートの一覧
-external_crate_a = "1.0"
-external_crate_b = "1.0"
+log = "0.4"
 </code></pre>
+					</figure>
+				</section>
+			</section> <section>
+				<h1>ルートパッケージがない場合</h1>
+				<p>
+適切なルートパッケージがない場合について。
+				</p>
+				<section>
+					<h2>ディレクトリ構成</h2>
+					<p>
+各パッケージのためのディレクトリはどれも並んで配置される。
+					</p> <p>
+以下では、<code>app</code> と <code>sub</code> はそれぞれ同名のパッケージ用である。
+					</p>
+<pre class="directory">my_app/
+├─ cargo.toml
+├─ app/...
+└─ sub/...
+</pre>
+				</section> <section>
+					<h2><code>cargo.toml</code> ファイル</h2>
+					<p>
+ワークスペースのための項目のみを指定する。
+					</p> <p>
+以下では、<code>app</code> と <code>sub</code> を配下のパッケージとして指定している。
+					</p>
+					<figure class="file">
+						<figcaption>my_app/cargo.toml</figcaption>
+<pre><code class="language-toml">
+[workspace]
+members = ["app", "sub"]
+resolver = "2"
+
+[workspace.dependencies]
+log = "0.4"
+</code></pre>
+					</figure>
+				</section>
 			</section>
 		</section> <section>
 			<h1>配下のクレートの作成</h1>
 			<section>
 				<h1>バイナリクレートの場合</h1>
 				<p>
-ワークスペースディレクトリにてコマンド <code>cargo new</code> を実行。
+まずは、ルートディレクトリにてコマンド <code>cargo new</code> をバイナリモードで実行する。
 				</p> <p>
-以下では、クレート <code>app</code> をバイナリモードで作成。
+例えば、前述の例で導入したパッケージ <code>app</code> を作成する場合、以下のようにする。
 				</p>
 <pre><code class="console">
 <mark class="prompt">&gt;</mark> cargo new app --bin
 </code></pre>
-				<section>
-					<h2><code>cargo.toml</code> ファイル</h2>
-					<p>
-前の <code>cargo new</code> で生成された <code>app/cargo.toml</code> ファイルを編集する。
-					</p> <p>
-以下は簡単なサンプル (クレートの提供方法と <code>dependecies</code> の記法の対応に注目)。
-					</p>
+				<p>
+続いて、生成されたディレクトリ内のファイルを雛形にコードを作成する。
+				</p> <p>
+例えば、以下ではワークスペース側から依存関係を流用したコードになっている。
+				</p>
+				<figure class="file">
+					<figcaption>my_app/app/cargo.toml</figcaption>
 <pre><code class="language-toml">
 [package]
 name = "app"
 edition = "2021"
+version = "0.1.0"
 
 [dependencies]
-util = { path = "../util" }
-external_crate_a = { workspace = true } 
-external_crate_b = { workspace = true }
-external_crate_c = "1.0"
+sub = { path = "../sub" }
+log = { workspace = true } 
+rand = "0.8"
 </code></pre>
-				</section> <section>
-					<h2><code>main.rs</code> ファイル</h2>
-					<p>
-<code>cargo new</code> で生成された <code>app/main.rs</code> ファイルを編集する。
-					</p>
+				</figure>
+				<figure class="file">
+					<figcaption>my_app/app/main.rs</figcaption>
 <pre><code class="language-rust">
-use util::*;
+use sub::*;
 
 fn main() {
 
@@ -97,39 +182,37 @@ fn main() {
 	println!("{}", hello());
 }
 </code></pre>
-				</section>
+				</figure>
 			</section><section>
 				<h1>ライブラリクレートの場合</h1>
 				<p>
-ワークスペースディレクトリにてコマンド <code>cargo new</code> を実行。
+まずは、ルートディレクトリにてコマンド <code>cargo new</code> をライブラリモードで実行する。
 				</p> <p>
-以下では、クレート <code>util</code> をライブラリモードで作成。
+例えば、前述の例で導入したパッケージ <code>sub</code> を作成する場合、以下のようにする。
 				</p>
 <pre><code class="console">
-<mark class="prompt">&gt;</mark> cargo new util --lib
+<mark class="prompt">&gt;</mark> cargo new sub --lib
 </code></pre>
-				<section>
-					<h2><code>cargo.toml</code> ファイル</h2>
-					<p>
-<code>cargo new</code> で生成された <code>util/cargo.toml</code> ファイルを編集する。
-					</p> <p>
-以下は簡単なサンプル (クレートの提供方法と <code>dependecies</code> の記法の対応に注目)。
-					</p>
+				<p>
+続いて、生成されたディレクトリ内のファイルを雛形にコードを作成する。
+				</p> <p>
+例えば、以下ではワークスペース側から依存関係を流用したコードになっている。
+				</p>
+				<figure class="file">
+					<figcaption>my_app/sub/cargo.toml</figcaption>
 <pre><code class="language-toml">
 [package]
-name = "util"
+name = "sub"
 edition = "2021"
+version = "0.1.0"
 
 [dependencies]
-external_crate_a = { workspace = true } 
-external_crate_b = { workspace = true }
-external_crate_d = "1.0"
+log = { workspace = true } 
+rand = "0.8"
 </code></pre>
-				</section> <section>
-					<h2><code>lib.rs</code> ファイル</h2>
-					<p>
-<code>cargo new</code> で生成された <code>util/lib.rs</code> ファイルを編集する。
-					</p>
+				</figure>
+				<figure class="file">
+					<figcaption>my_app/sub/lib.rs</figcaption>
 <pre><code class="language-rust">
 pub fn hello() -&gt; String {
 
@@ -138,7 +221,7 @@ pub fn hello() -&gt; String {
 	"hello".to_string()
 }
 </code></pre>
-				</section>
+				</figure>
 			</section>
 		</section>
 	</body>
