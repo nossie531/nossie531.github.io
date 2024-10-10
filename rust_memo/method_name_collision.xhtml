@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: メソッド名の衝突と解決</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+トレイトにより型に同名のメソッドが複数ある場合について。
+		</p>
+		<section>
+			<h1>メソッドの呼出記法</h1>
+			<p>
+メソッドの呼出記法には二通りある。
+			</p>
+			<dl class="normal">
+				<dt>通常記法</dt>
+				<dd>
+					<p>
+例: <code>target.method(arg1, arg2, ...)</code>
+					</p> <p>
+短く手軽だが、どのトレイトのメソッドか曖昧になりうる記法。
+					</p>
+				</dd>
+				<dt id="FullyQualifiedSyntax">完全修飾記法</dt>
+				<dd>
+					<p>
+例: <code>Trait::method(&amp;target, arg1, arg2, ...)</code>
+					</p> <p>
+長く煩雑だが、どのトレイトのメソッドか明確になる記法。
+					</p>
+				</dd>
+			</dl>
+		</section> <section>
+			<h1>トレイトどうしでの衝突</h1>
+			<p>
+候補がどれもトレイト由来の場合、通常記法ではエラーになる。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、型 <code>MyType</code> は二つのトレイト <code>TraitX</code> と <code>TraitY</code> を実装しており、そのどちらもがメソッド <code>method</code> を持つ。この場合、通常記法による呼出ではエラーになる。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let target = MyType();
+    assert_eq!(target.<mark class="error">method</mark>(), "XXX");
+    assert_eq!(TraitX::method(&amp;target), "TraitX");
+    assert_eq!(TraitY::method(&amp;target), "TraitY");
+}
+
+struct MyType();
+impl TraitX for MyType {}
+impl TraitY for MyType {}
+
+trait TraitX {
+    fn method(&amp;self) -&gt; &amp;str {
+        "TraitX"
+    }
+}
+
+trait TraitY {
+    fn method(&amp;self) -&gt; &amp;str {
+        "TraitY"
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0034]</mark><mark class="title">: multiple applicable items in scope</mark>
+<mark class="info">  --&gt;</mark> src/main.rs:3:20
+<mark class="info">   |</mark>
+<mark class="info">3  |</mark>     assert_eq!(target.method(), "XXX");
+<mark class="info">   |</mark>                       <mark class="error">^^^^^^ multiple `method` found</mark>
+<mark class="info">   |</mark>
+<mark class="edit">note</mark>: candidate #1 is defined in an impl of the trait `TraitX` for the type `MyType`
+<mark class="info">  --&gt;</mark> src/main.rs:13:5
+<mark class="info">   |</mark>
+<mark class="info">13 |</mark>     fn method(&amp;self) -&gt; &amp;str {
+<mark class="info">   |</mark>     <mark class="edit">^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">note</mark>: candidate #2 is defined in an impl of the trait `TraitY` for the type `MyType`
+<mark class="info">  --&gt;</mark> src/main.rs:19:5
+<mark class="info">   |</mark>
+<mark class="info">19 |</mark>     fn method(&amp;self) -&gt; &amp;str {
+<mark class="info">   |</mark>     <mark class="edit">^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">help</mark>: disambiguate the method for candidate #1
+<mark class="info">   |</mark>
+<mark class="info">3  |</mark>     assert_eq!(TraitX::method(&amp;target), "XXX");
+<mark class="info">   |</mark>                <mark class="edit">~~~~~~~~~~~~~~~~~~~~~~~</mark>
+<mark class="info">help</mark>: disambiguate the method for candidate #2
+<mark class="info">   |</mark>
+<mark class="info">3  |</mark>     assert_eq!(TraitY::method(&amp;target), "XXX");
+<mark class="info">   |</mark>                <mark class="edit">~~~~~~~~~~~~~~~~~~~~~~~</mark>
+</samp></pre>
+			</section>
+		</section> <section>
+			<h1>型とトレイトでの衝突</h1>
+			<p>
+候補に型由来のものがあれば、通常記法ではそれが優先される。
+			</p>
+			<aside class="normal moan">
+				<p>
+仕様の不備？
+				</p> <p>
+この仕様は後述の『<a href="#bigProblem">破滅的な問題</a>』の原因になる。筆者としては、トレイトどうしでの場合と同様、こちらもエラーにすれば良かったのに…と感じる。型由来を優先するのは分かりやすいかもしれないが、どうにもハイリスクローリターンに思える。
+				</p>
+			</aside>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、型 <code>MyType</code> がトレイト <code>MyTrait</code> を実装しており、そのどちらもがメソッド <code>method</code> を持つ。この場合、通常記法による呼出では前者のメソッドが優先される。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let target = MyType();
+    assert_eq!(target.method(), "MyType");
+    assert_eq!(MyType::method(&amp;target), "MyType");
+    assert_eq!(MyTrait::method(&amp;target), "MyTrait");
+}
+
+trait MyTrait {
+    fn method(&amp;self) -&gt; &amp;str;
+}
+
+struct MyType();
+
+impl MyTrait for MyType {
+    fn method(&amp;self) -&gt; &amp;str {
+        "MyTrait"
+    }
+}
+
+impl MyType {
+    pub fn method(&amp;self) -&gt; &amp;str {
+        "MyType"
+    }
+}
+</code></pre>
+			</section>
+			<section>
+				<h1 id="bigProblem">破滅的な問題</h1>
+				<p>
+この仕様はクレートのアップデートで型にメソッドが追加され、運悪く既存のものと引数などが同じだった場合、こっそりと呼出先が変更される大問題になりうる。
+				</p>
+				<section>
+					<h2>対症療法</h2>
+					<p>
+クレートの利用側で完全修飾構文を使えば、この問題を防げる。
+					</p> <p>
+しかし、クレートの定義側での対策はできない。また、必要な全ての箇所 (型を経由したトレイトメソッドの呼出箇所) でこれを行うと、地味に面倒でコードも長くなってしまう。
+					</p>
+				</section> <section>
+					<h2>公式の見解</h2>
+					<p>
+Cargo における SemVer 互換性の解説を見ると、これは意図された設計らしい。
+					</p>
+					<iframe class="autoHeight" src="quote/cargo/reference/semver.xhtml"/>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
