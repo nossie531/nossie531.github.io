@@ -18,7 +18,7 @@
 		<section>
 			<h1>基本</h1>
 			<p>
-<code>E1</code> が <code><a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;E2&gt;</code> を実装していると、<code>?</code> 演算子で <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T, E1&gt;</code> への <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T, E2&gt;</code> からの自動変換が行われる。
+<code>E1</code> が <code><a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;E2&gt;</code> を実装している場合、つまり <code>E1</code> ← <code>E2</code> と変換できる場合、<code>?</code> 演算子は <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T, E1&gt;</code> ← <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T, E2&gt;</code> と自動変換できる。
 			</p> 
 		</section> <section>
 			<h1>サンプル</h1>
@@ -56,7 +56,7 @@ fn open_and_parse_file(file_name: &amp;str) -&gt; Result&lt;i32, CliError&gt; {
 		</section> <section>
 			<h1>クレート紹介</h1>
 			<p>
-<a href="https://crates.io/crates/anyhow"><code>anyhow</code></a> は柔軟なエラー処理のためのクレートである。
+<a href="https://crates.io/crates/anyhow"><code>anyhow</code></a> は柔軟なエラー処理を可能にするクレートである。
 			</p> <p>
 このクレートの型 <a href="https://docs.rs/anyhow/1.0.89/anyhow/struct.Error.html"><code>anyhow::Error</code></a> はトレイト <a href="https://doc.rust-lang.org/std/error/trait.Error.html"><code>std::err::Error</code></a> を実装する型からの変換を受け付けている。これにより、エラー専用の型として設計された型ならどれでも、<code>anyhow</code> のエラーとしてまとめて扱えるようになっている。
 			</p>
