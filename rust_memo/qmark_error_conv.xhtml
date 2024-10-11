@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: ? 演算子とエラー型変換</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>?</code> 演算子ではエラー型の自動変換ができる。
+		</p> <p>
+これにより複数種のエラーをまとめて扱えるよう、
+		</p>
+		<section>
+			<h1>基本</h1>
+			<p>
+<code>E1</code> が <code><a href="https://doc.rust-lang.org/std/convert/trait.From.html">From</a>&lt;E2&gt;</code> を実装していると、<code>?</code> 演算子で <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T, E1&gt;</code> への <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T, E2&gt;</code> からの自動変換が行われる。
+			</p> 
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下は <a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> の API ドキュメントからの<a href="https://doc.rust-lang.org/std/convert/trait.From.html#examples">抜粋</a>。
+			</p>
+<pre><code class="language-rust">
+use std::fs;
+use std::io;
+use std::num;
+
+enum CliError {
+    IoError(io::Error),
+    ParseError(num::ParseIntError),
+}
+
+impl From&lt;io::Error&gt; for CliError {
+    fn from(error: io::Error) -&gt; Self {
+        CliError::IoError(error)
+    }
+}
+
+impl From&lt;num::ParseIntError&gt; for CliError {
+    fn from(error: num::ParseIntError) -&gt; Self {
+        CliError::ParseError(error)
+    }
+}
+
+fn open_and_parse_file(file_name: &amp;str) -&gt; Result&lt;i32, CliError&gt; {
+    let mut contents = fs::read_to_string(&amp;file_name)?;
+    let num: i32 = contents.trim().parse()?;
+    Ok(num)
+}
+</code></pre>
+		</section> <section>
+			<h1>クレート紹介</h1>
+			<p>
+<a href="https://crates.io/crates/anyhow"><code>anyhow</code></a> は柔軟なエラー処理のためのクレートである。
+			</p> <p>
+このクレートの型 <a href="https://docs.rs/anyhow/1.0.89/anyhow/struct.Error.html"><code>anyhow::Error</code></a> はトレイト <a href="https://doc.rust-lang.org/std/error/trait.Error.html"><code>std::err::Error</code></a> を実装する型からの変換を受け付けている。これにより、エラー専用の型として設計された型ならどれでも、<code>anyhow</code> のエラーとしてまとめて扱えるようになっている。
+			</p>
+		</section>
+	</body>
+</html>
