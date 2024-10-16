@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: Sealed トレイトパターン</title>
+		<title>Rust メモ: Sealed Trait パターン</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -11,7 +11,7 @@
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
 		<p>
-Sealed トレイトパターンは Rust でたまに使われるデザインパターンである。
+Sealed Trait パターンは Rust でたまに使われるデザインパターンである。
 		</p> <p>
 トレイトの基底を『<a href="voldemort.xhtml">Voldemort パターン</a>』で作成したトレイトにする事で、他クレートから使用はできるが、実装や派生はできないトレイトを作成する。
 		</p> 
@@ -48,7 +48,7 @@ impl SomeTrait for f64 {}
 				</section> <section>
 					<h2>パターンの利点</h2>
 					<p>
-Sealed トレイトパターンを使うと、トレイトの実装はクレート内で定義された種類に限定される。これにより、考察対象を減らす事ができる。
+Sealed Trait パターンを使うと、トレイトを実装する型をクレート内で定義された型のみに限定できる。これにより、考察対象を減らす事ができる。
 					</p>
 				</section>
 			</section> <section>
@@ -61,7 +61,7 @@ Sealed トレイトパターンを使うと、トレイトの実装はクレー�
 				</section> <section>
 					<h2>パターンの利点</h2>
 					<p>
-Sealed トレイトパターンを使うと、外部クレートにトレイトの実装がない事が保証される。そのため、気軽にメソッドを追加できる (追加以外、変更や削除では使用箇所への影響があるため、この限りでない)。
+Sealed Trait パターンを使うと、トレイトの実装が外部クレートには存在しない事が保証される。そのため、気軽にメソッドを追加できる (追加以外、変更や削除では使用箇所への影響があるため、この限りでない)。
 					</p>
 				</section>
 			</section>
