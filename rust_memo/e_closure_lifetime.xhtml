@@ -68,6 +68,8 @@ fn main() {
 欠点: <time>2024 年現在</time>、ナイトリー版でしか使えない。
 				</p>
 <pre><code class="language-rust">
+#![feature(closure_lifetime_binder)]
+
 fn main() {
     let _closure = for&lt;'a&gt; |x: &amp;'a i32| -&gt; &amp;'a i32 { x };
 }
