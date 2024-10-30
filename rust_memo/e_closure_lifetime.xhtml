@@ -14,20 +14,18 @@
 <mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
 </samp></pre>
 		<p>
-<time>2024 年現在</time>、クロージャでのライフタイムの規則は関数のそれと異なる。
+クロージャの引数は関数のそれとライフタイムの取扱が異なる。
 		</p> <p>
-この場合、ライフタイムの推測があまり働かず、また詳細な指定もできない。
-		</p> <p>
-これにより、やや不当に感じられるエラーになる事がある。
+これにより、関数の場合にはないエラーが発生する。
 		</p>
-		<aside class="normal moan">
+		<section>
+			<h1>背景情報</h1>
 			<p>
-仕様の不備？
+クロージャは関数と異なり、その代入先や実引数の型情報も型推論に利用できる。これを利用して、クロージャは引数のライフタイムについて、省略ルールではなく、そうした周辺情報から推論する戦略を取っている。
 			</p> <p>
-規則を関数と統一したほうが良いのでは？という<a href="https://github.com/rust-lang/rust/issues/86921">提案</a>はやはりある。<br/>
-ただ、既存のコードへの影響等、色々と難しい事情があるらしい。
+この戦略はだいたいうまくいくが、複数のライフタイムについての関係性 (等しいや含む) を示したい場合、『<a href="#solution">解決策</a>』で紹介する方法が必要で、こちらは少し面倒である。
 			</p>
-		</aside>
+		</section>
 		<section>
 			<h1>サンプル</h1>
 			<p>
@@ -49,7 +47,7 @@ fn main() {
 <mark class="info">  |</mark>                        <mark class="info">let's call the lifetime of this reference `'1`</mark>
 </samp></pre>
 		</section> <section>
-			<h1>解決策</h1>
+			<h1 id="solution">解決策</h1>
 			<p>
 解決策はいくつかある。
 			</p>
