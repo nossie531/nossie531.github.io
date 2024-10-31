@@ -55,7 +55,7 @@ impl Max&lt;'_&gt; {
 		</section> <section>
 			<h1 id="solution">解決策</h1>
 			<p>
-関係するライフタイムどうしの関係を明示するといい。
+ライフタイムどうしの関係を明示するといい。
 			</p>
 			<hr class="split"/>
 			<p>
@@ -64,16 +64,16 @@ impl Max&lt;'_&gt; {
 <pre><code class="language-rust">
 fn main() {
     let mut max = Max("");
-    max.swp("hoge");
-    max.swp("piyo");
-    max.swp("fuga");
+    max.swap("hoge");
+    max.swap("piyo");
+    max.swap("fuga");
     assert_eq!(max.0, "piyo");
 }
 
 struct Max&lt;'a&gt;(&amp;'a str);
 
 impl&lt;'a&gt; Max&lt;'a&gt; {
-    fn swp&lt;'x: 'a&gt;(&amp;mut self, x: &amp;'x str) {
+    fn swap&lt;'x: 'a&gt;(&amp;mut self, x: &amp;'x str) {
         if self.0 &lt; x {
             self.0 = x;
         }
