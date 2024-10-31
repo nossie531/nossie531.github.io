@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: error - ライフタイムの不足</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
+</samp></pre>
+		<p>
+長いライフタイムが必要な箇所に短いライフタイムの値を使用した。
+		</p>
+		<section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>str</code> のライフタイムは <code>self.0</code> より短いかもしれない。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut max = Max("");
+    max.swap("hoge");
+    max.swap("piyo");
+    max.swap("fuga");
+    assert_eq!(max.0, "piyo");
+}
+
+struct Max&lt;'a&gt;(&amp;'a str);
+
+impl Max&lt;'_&gt; {
+    fn swap&lt;'x&gt;(&amp;mut self, x: &amp;'x str) {
+        if self.0 &lt; x {
+            <mark class="error">self.0 = x</mark>;
+        }
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
+<mark class="info">  --&gt;</mark> src/main.rs:14:13
+<mark class="info">   |</mark>
+<mark class="info">12 |</mark>     fn swap&lt;'x&gt;(&amp;mut self, x: &amp;'x str) {
+<mark class="info">   |</mark>             <mark class="info">--  --------- has type `&amp;mut Max&lt;'1&gt;`</mark>
+<mark class="info">   |</mark>             <mark class="info">|</mark>
+<mark class="info">   |</mark>             <mark class="info">lifetime `'x` defined here</mark>
+<mark class="info">13 |</mark>         if self.0 &lt; x {
+<mark class="info">14 |</mark>             self.0 = x;
+<mark class="info">   |</mark>             <mark class="error">^^^^^^^^^^ assignment requires that `'x` must outlive `'1`</mark>
+</samp></pre>
+		</section> <section>
+			<h1 id="solution">解決策</h1>
+			<p>
+関係するライフタイムどうしの関係を明示するといい。
+			</p>
+			<hr class="split"/>
+			<p>
+以下では、<code>x</code> のライフタイムが <code>self.0</code> のライフタイムを囲むようにしている。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut max = Max("");
+    max.swp("hoge");
+    max.swp("piyo");
+    max.swp("fuga");
+    assert_eq!(max.0, "piyo");
+}
+
+struct Max&lt;'a&gt;(&amp;'a str);
+
+impl&lt;'a&gt; Max&lt;'a&gt; {
+    fn swp&lt;'x: 'a&gt;(&amp;mut self, x: &amp;'x str) {
+        if self.0 &lt; x {
+            self.0 = x;
+        }
+    }
+}
+</code></pre>
+		</section>
+	</body>
+</html>
