@@ -65,17 +65,20 @@ fn increment(x: i32) -&gt; i32 {
 					<div class="subTitle">型推論が関連</div>
 				</hgroup>
 				<p>
-型推論によって導出された型パラメタの型に、<a href="hrtb.xhtml">HRTB</a> によるライフタイムが含まれるとエラーになる (注: ライフタイム省略により <code>for&lt;...&gt;</code> 構文を使わない HRTB もありうる)。
+型推論により型パラメタが <a href="hrtb.xhtml">HRTB</a> を含む型だと期待されるとエラーになる。<br/>
+(注: ライフタイム省略により <code>for&lt;...&gt;</code> 構文を使わない HRTB もありうる)。
 				</p>
 				<section>
-					<h2>制限の利用</h2>
+					<h2>制限の利用と回避</h2>
 					<p>
-このエラーによる制限は、戻り値に引数由来のライフタイムが含まれるクロージャを禁止するのに利用できる (例: <code><a href="https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://www.youtube.com/watch?v=Fp4OXZhNXAg">scan</a></code> のクロージャ引数)。なお、この制限がいらない場合、後述の解決策で解除できる。
+多くの場合、この制限は有用である。例えば、<code><a href="https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html#method.scan">scan</a></code> のクロージャ引数では、この制限により戻り値に引数由来のライフタイムが含まれるのを禁止している。
+					</p> <p>
+そして、この制限が邪魔な場合、後述の解決策で解除できる。
 					</p>
 				</section> <section>
 					<h2>サンプル</h2>
 					<p>
-以下では、関数 <code>callback</code> の境界 <code>F</code> が定義するクロージャは、戻り値が型パラメタで定義されるので、HRTB で定義された引数由来のライフタイムを含めない。一方、関数 <code>identity</code> は戻り値に引数由来のライフタイムを持つ。そのため、<code>identity</code> を <code>F</code> とすると、戻り値についてのエラーになる。
+以下では、関数 <code>callback</code> の型パラメタ <code>F</code> の境界、そしてその実引数 <code>identity</code> の型から、型パラメタ <code>O</code> が <code>HRTB</code> によるライフタイム <code>'a</code> を含むと期待されてしまう。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -113,7 +116,7 @@ where
 				</section> <section>
 					<h2>解決策 1</h2>
 					<p>
-以下では、クロージャの戻り値の型について、型パラメタとして定義するのではなく、関連型を使って導出している。なお、<code>FnHelper</code> は <a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a> トレイトを通常のトレイトとして扱えるようにするためのヘルパートレイトである。
+以下では、推論すべき箇所を型パラメタではなく関連型で表現している。なお、<code>FnHelper</code> は <a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a> トレイトを通常のトレイトとして扱えるようにするためのヘルパトレイトである。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -141,13 +144,13 @@ impl&lt;F, I, O&gt; FnHelper&lt;I&gt; for F
 where
     F: Fn(I) -&gt; O,
 {
-    type Output = O;
+    type Output = F::Output;
 }
 </code></pre>
 				</section> <section>
 					<h2>解決策 2</h2>
 					<p>
-以下でも、クロージャの戻り値の型について、型パラメタとして定義するのではなく、関連型を使って導出している。ただし、前の例とは異なり、<code>FnHelper</code> の代わりに <time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/nightly/unstable-book/language-features/unboxed-closures.html"><code>unboxed_closures</code></a> を利用している。
+以下でも、推論すべき箇所を型パラメタではなく関連型で表現している。ただし、前の解決策とは異なり、<code>FnHelper</code> の代わりに <time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/nightly/unstable-book/language-features/unboxed-closures.html"><code>unboxed_closures</code></a> を利用している。
 					</p>
 <pre><code class="language-rust">
 #![feature(unboxed_closures)]
