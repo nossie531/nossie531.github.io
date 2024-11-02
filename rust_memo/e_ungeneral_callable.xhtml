@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: error - 汎用的でない呼出可能型</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: implementation of `FnOnce` is not general enough</mark>
+</samp></pre>
+		<p>
+呼出可能型 (<a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnMut.html"><code>FnMut</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnOnce.html"><code>FnOnce</code></a> の実装型) の引数に汎用性が足りない。
+		</p>
+		<section>
+			<h1>背景情報</h1>
+			<p>
+呼出可能型の指定において、<a href="hrtb.xhtml">HRTB</a> に対応すべき箇所がそうでないと、このエラーになる。<br/>
+(注: ライフタイム省略により <code>for&lt;...&gt;</code> 構文を使わない HRTB もありうる)。
+			</p>
+		</section> <section>
+			<h1>パターン</h1>
+			<nav class="sub"/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">クロージャ</div>
+				</hgroup>
+				<p>
+呼出可能型にクロージャを指定しているパターン。クロージャの引数型を省略した場合、型推論は HRTB を候補にしない。そのため、このエラーの一因になる事がある。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、関数 <code>callback</code> のコールバック引数 <code>f</code> は HRTB を含む引数をとる。<br/>
+しかし、クロージャ <code>nop</code> の引数 <code>_</code> は型推論されているため HRTB を含めない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let nop = |_| {};
+    callback(nop, &amp;42);
+}
+
+fn callback(f: impl FnOnce(&amp;i32), x: &amp;i32) {
+    f(&amp;x)
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: implementation of `FnOnce` is not general enough</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:3:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     callback(nop, &amp;42);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^^^^ implementation of `FnOnce` is not general enough</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: closure with signature `fn(&amp;'2 i32)` must implement `FnOnce&lt;(&amp;'1 i32,)&gt;`, for any lifetime `'1`...
+<mark class="info">  =</mark> <mark class="title">note</mark>: ...but it actually implements `FnOnce&lt;(&amp;'2 i32,)&gt;`, for some specific lifetime `'2`
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+問題を起こしている推論箇所を省略しないようにする。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let nop = |_: &amp;_| {};
+    callback(nop, &amp;42);
+}
+
+fn callback(f: impl FnOnce(&amp;i32), x: &amp;i32) {
+    f(&amp;x)
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">メソッド</div>
+				</hgroup>
+				<p>
+呼出可能型にメソッドを指定しているパターン。メソッドは引数だけでなく型そのものが持つライフタイムがあり、それは HRTB として扱えない。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、関数 <code>callback</code> のコールバック引数 <code>f</code> は HRTB を含む引数をとる。<br/>
+しかし、メソッド <code>MyRef::work</code> は <code>MyRef</code> の型パラメタ <code>'a</code> を HRTB として扱えない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let x = MyRef(&amp;42);
+    <mark class="error">callback(MyRef::work, x)</mark>;
+}
+
+fn callback(f: impl FnOnce(MyRef&lt;'_&gt;), x: MyRef&lt;'_&gt;) {
+    f(x);
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+
+impl&lt;'a&gt; MyRef&lt;'a&gt; {
+    fn work(self) {
+        dbg!(self.0);
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: implementation of `FnOnce` is not general enough</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:3:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     callback(MyRef::work, x);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^ implementation of `FnOnce` is not general enough</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: `fn(MyRef&lt;'2&gt;) {MyRef::&lt;'2&gt;::work}` must implement `FnOnce&lt;(MyRef&lt;'1&gt;,)&gt;`, for any lifetime `'1`...
+<mark class="info">  =</mark> <mark class="title">note</mark>: ...but it actually implements `FnOnce&lt;(MyRef&lt;'2&gt;,)&gt;`, for some specific lifetime `'2`
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+対象のメソッドの呼出を適切にラップする。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let x = MyRef(&amp;42);
+    callback(|x| MyRef::work(x), x);
+}
+
+fn callback(f: impl FnOnce(MyRef&lt;'_&gt;), x: MyRef&lt;'_&gt;) {
+    f(x);
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+
+impl&lt;'a&gt; MyRef&lt;'a&gt; {
+    fn work(self) {
+        dbg!(self.0);
+    }
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
