@@ -24,11 +24,6 @@ Singleton パターンとは、GoF 本に掲載されるデザインパターン
 状況に応じた手法がいくつかある。
 			</p>
 			<nav class="sub"/>
-			<aside class="normal">
-				<p>
-以下では、<a href="https://crates.io/crates/once_cell"><code>once_cell</code></a> クレートを使用している。このクレートの機能は、Rust 1.70 で一部が標準化され、他は <time>2023 年現在</time>、ナイトリー版にて先行実装中である (注: アイテム名は標準版と異なるものもある)。
-				</p>
-			</aside>
 			<section>
 				<hgroup>
 					<h1>サンプル 1</h1>
@@ -48,9 +43,9 @@ fn main() {
 }
 
 mod sample {
-    use once_cell::sync::Lazy;
+    use std::sync::LazyLock;
 
-    static SINGLETON: Lazy&lt;MyData&gt; = Lazy::new(||
+    static SINGLETON: LazyLock&lt;MyData&gt; = LazyLock::new(||
         MyData::new(42)
     );
 
@@ -60,7 +55,7 @@ mod sample {
     
     impl MyData {
         pub fn get() -&gt; &amp;'static MyData {
-            Lazy::force(&amp;SINGLETON)
+            LazyLock::force(&amp;SINGLETON)
         }
 
         pub fn val(&amp;self) -&gt; i32 {
@@ -93,10 +88,9 @@ fn main() {
 }
 
 mod sample {
-    use once_cell::sync::Lazy;
-    use std::sync::{Mutex, MutexGuard};
+    use std::sync::{LazyLock, Mutex, MutexGuard};
 
-    static SINGLETON: Lazy&lt;Mutex&lt;MyData&gt;&gt; = Lazy::new(||
+    static SINGLETON: LazyLock&lt;Mutex&lt;MyData&gt;&gt; = LazyLock::new(||
         Mutex::new(MyData::new(42))
     );
 
@@ -106,7 +100,7 @@ mod sample {
 
     impl MyData {
         pub fn get() -&gt; MutexGuard&lt;'static, MyData&gt; {
-            Lazy::force(&amp;SINGLETON).lock().unwrap()
+            LazyLock::force(&amp;SINGLETON).lock().unwrap()
         }
 
         pub fn val(&amp;self) -&gt; i32 {
@@ -142,9 +136,9 @@ fn main() {
 }
 
 mod sample {
-    use once_cell::sync::OnceCell;
+    use std::sync::OnceLock;
 
-    static SINGLETON: OnceCell&lt;MyData&gt; = OnceCell::new();
+    static SINGLETON: OnceLock&lt;MyData&gt; = OnceLock::new();
 
     #[derive(Debug)]
     pub struct MyData {
