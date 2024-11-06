@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 組込型の特権/アンサイズ</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+アンサイズ (<code>dyn</code> 抽象化や配列のスライス化など) について。
+		</p>
+		<section>
+			<h1>背景情報</h1>
+			<p>
+アンサイズまわりの挙動の説明のため、専用のトレイトが導入されている。
+			</p> <p>
+しかし、<time>2024 年現在</time>、これらはナイトリー版でのみ使える不安定な機能である。そのため、安定版においては、ユーザ定義の型では使えず、組込型の特権となっている。
+			</p>
+		</section> <section>
+			<h1>関連トレイト</h1>
+			<dl class="normal">
+				<dt>
+<a href="https://doc.rust-lang.org/std/marker/trait.Unsize.html"><code>Unsized</code></a>
+				</dt>
+				<dd>
+					<p>
+条件を満たす型にコンパイラが自動で付加する。
+					</p> <p>
+以下のような変換を可能にする。
+					</p>
+					<ul>
+						<li> <code>[T;n]</code> → <code>[T]</code> </li>
+						<li> <code>T</code> → <code>dyn U</code> </li>
+						<li> ... </li>
+					</ul>
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/ops/trait.CoerceUnsized.html"><code>CoerceUnsized</code></a>
+				</dt>
+				<dd>
+					<p>
+アンサイズ関連の変換に対応したい場合に付加する。
+					</p> <p>
+参照先がアンサイズ可能な型なら、参照先のアンサイズに対応する実装が多い。
+					</p> <p>
+例えば、組込型 (安定版ではこれが全て) では以下がある。
+					</p>
+					<ul>
+						<li> <code>&amp;T</code></li>
+						<li> <code>&amp;mut T</code></li>
+						<li> <code>Box&lt;T&gt;</code></li>
+						<li> <code>Rc&lt;T&gt;</code></li>
+						<li> <code>Weak&lt;T&gt;</code></li>
+						<li> <code>Cell&lt;T&gt;</code></li>
+						<li> <code>RefCell&lt;T&gt;</code></li>
+						<li> ...  </li>
+					</ul>
+				</dd>
+			</dl>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、ナイトリー版でのスマートポインタの実装例を示している。<br/>
+<code>MyPtr</code> は <code>CoerceUnsized</code> を実装しているため、参照先を <code>dyn</code> で抽象化できる。
+			</p>
+<pre><code class="language-rust">
+#![feature(unsize)]
+#![feature(coerce_unsized)]
+
+use std::marker::Unsize;
+use std::ops::{CoerceUnsized, Deref};
+
+fn main() {
+    let val = MyPtr(Box::new(42));
+    let val = val as MyPtr&lt;dyn ToString&gt;;
+    assert_eq!(val.to_string(), "42");
+}
+
+struct MyPtr&lt;T: ?Sized&gt;(Box&lt;T&gt;);
+
+impl&lt;T: ?Sized&gt; Deref for MyPtr&lt;T&gt; {
+    type Target = T;
+
+    fn deref(&amp;self) -&gt; &amp;Self::Target {
+        self.0.deref()
+    }
+}
+
+impl&lt;T, U&gt; CoerceUnsized&lt;MyPtr&lt;U&gt;&gt; for MyPtr&lt;T&gt;
+where
+    T: Unsize&lt;U&gt; + ?Sized,
+    U: ?Sized,
+{
+    // nop.
+}
+</code></pre>
+		</section>
+	</body>
+</html>
