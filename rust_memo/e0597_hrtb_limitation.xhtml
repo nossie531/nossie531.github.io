@@ -14,9 +14,11 @@
 <mark class="edit">note</mark>: due to current limitations in the borrow checker, this implies a `'static` lifetime
 </samp></pre>
 		<p>
-エラー番号 <a href="e0597.xhtml">E0597</a> にて上記の注釈を伴うパターンについて。
+『<a href="e0597.xhtml">E0597 - 参照中の参照先の破棄</a>』の <a href="hrtb.xhtml">HRTB</a> についての派生パターン。
 		</p> <p>
-これは <time>2024 年現在</time>も残る <a href="hrtb.xhtml">HRTB</a> の機能制限が原因である。
+このエラーは <time>2024 年現在</time>、HRTB に残る<a href="hrtb.xhtml#limitation">制限</a>の一つ。
+		</p> <p>
+エラーメッセージに上記の注釈が含まれるのが特徴になっている。
 		</p>
 		<section>
 			<h1>発生条件</h1>
@@ -73,18 +75,9 @@ impl&lt;'a, T: 'a&gt; Referable&lt;'a&gt; for T {}
 <mark class="info">  |</mark>                 <mark class="edit">^^^^^^^^^^^^^^^^^^^^^</mark>
 </samp></pre>
 		</section> <section>
-			<h1>関連エラー</h1>
-			<p>
-以下は同系統のエラーの一覧である。
-			</p>
+			<h1>派生パターン</h1>
 			<ul>
 				<li>
-<a href="e_hrtb_limitation.xhtml">error - HRTB の機能制限</a>
-				</li> <li>
-<a href="e_hrtb_gat.xhtml">error - HRTB の機能制限と GAT</a>
-				</li> <li>
-<a href="e0597_hrtb_limitation.xhtml" onclick="alert('This link is self link!'); return false;">E0597 - HRTB の機能制限</a> ← 現在地！
-				</li> <li>
 <a href="e0597_hrtb_gat.xhtml">E0597 - HRTB の機能制限と GAT</a>
 				</li>
 			</ul>

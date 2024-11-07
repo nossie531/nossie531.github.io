@@ -14,12 +14,14 @@
 <mark class="error">error</mark><mark class="title">: `T` does not live long enough</mark>
 </samp></pre>
 		<p>
-『<a href="e_hrtb_limitation.xhtml">error - HRTB の機能制限</a>』は GAT との連携でよく問題になる。
+『<a href="e_hrtb_limitation.xhtml">error - HRTB の機能制限</a>』の <a href="associated_type.xhtml#gat">GAT</a> についての派生パターン。
+		</p> <p>
+このエラーは <time>2024 年現在</time>、GAT に残る<a href="associated_type.xhtml#gat_problem">制限</a>の一つ。
 		</p>
 		<section>
 			<h1>詳細</h1>
 			<p>
-GAT のライフタイム引数は <code>Self</code> を境界づける場合が多い。そのため、このライフタイム引数が HRTB から与えられると、前述の HRTB の制限により、<code>Self</code> を <code>'static</code> から参照できなければならなくなる。これはとても厳しい制限となる。
+GAT のライフタイム引数は <code>Self</code> を境界づける場合が多い。そのため、このライフタイム引数が HRTB から与えられると、HRTB の制限により、<code>Self</code> を <code>'static</code> から参照できなければならなくなる。これはとても厳しい制限となる。
 			</p>
 		</section> <section>
 			<h1>サンプル</h1>
