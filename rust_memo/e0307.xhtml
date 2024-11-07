@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0307 - self に使えない型</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0307]</mark><mark class="title">: invalid `self` parameter type: `Xxxx`</mark>
+</samp></pre>
+		<p>
+<code>self</code> の型に許可されない型を使用した。
+		</p>
+		<section>
+			<h1>背景情報</h1>
+			<p>
+『<a href="self_type.xhtml">組込型の特権/self への型指定</a>』によると、<code>self</code> に許される型は、実装対象それ以外では、一部の組込型のみである。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、型 <code>MyType</code> の実装中に <code>self</code> の型に <code>i32</code> を指定している。
+			</p>
+<pre><code class="language-rust">
+fn main() {}
+
+struct MyType();
+impl MyType {
+    fn method(self: <mark class="error">i32</mark>) {
+        // nop.
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0307]</mark><mark class="title">: invalid `self` parameter type: `i32`</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:5:21
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark>     fn method(self: i32) {
+<mark class="info">  |</mark>                     <mark class="error">^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: type of `self` must be `Self` or a type that dereferences to it
+<mark class="info">  =</mark> <mark class="title">help</mark>: consider changing to `self`, `&amp;self`, `&amp;mut self`, `self: Box&lt;Self&gt;`, `self: Rc&lt;Self&gt;`, `self: Arc&lt;Self&gt;`, or `self: Pin&lt;P&gt;` (where P is one of the previous types except `Self`)
+</samp></pre>
+		</section>
+	</body>
+</html>

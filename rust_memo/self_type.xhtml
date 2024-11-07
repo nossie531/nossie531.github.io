@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: self への型指定</title>
+		<title>Rust メモ: 組込型の特権/self への型指定</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<link rel="stylesheet" href="style/must_use.css"/>
 		<script src="lib/base.js"></script>
@@ -15,38 +15,37 @@
 <code>self</code> 引数への型指定について。
 		</p>
 		<section>
-			<h1>型指定の省略</h1>
+			<h1>背景情報</h1>
 			<p>
-最も一般的な用法では、型指定は省略される。
+<code>self</code> 引数の記法は省略版がよく使われるが、型を明示した記法もある。
 			</p>
-			<dl class="normal lowProfile">
-				<dt><code>self</code></dt>
-				<dd>
-値渡し、<code>self: Self</code> の省略記法。
-				</dd>
-				<dt><code>&amp;self</code></dt>
-				<dd>
-不変参照渡し、<code>self: &amp;Self</code> の省略記法。
-				</dd>
-				<dt class="nw"><code>&amp;mut self</code></dt>
-				<dd>
-可変参照渡し、<code>self: &amp;mut Self</code> の省略記法。
-				</dd>
-			</dl>
-		</section> <section>
-			<h1>特殊な型指定</h1>
+			<table class="normal">
+				<thead>
+					<tr> <th>省略版</th> <th>詳細版</th> </tr>
+				</thead>
+				<tbody class="nw">
+					<tr> 
+						<td> <code>self</code> </td>
+						<td> <code>self: Self</code> </td>
+					</tr> <tr> 
+						<td> <code>&amp;self</code> </td>
+						<td> <code>self: &amp;Self</code> </td>
+					</tr> <tr> 
+						<td> <code>&amp;mut self</code> </td>
+						<td> <code>self: &amp;mut Self</code> </td>
+					</tr> <tr> 
+						<td rowspan="3" style="vertical-align: baseline;"> - 記述不可 - </td>
+						<td> <code>self: Box&lt;Self&gt;</code> </td>
+					</tr> <tr> 
+						<td> <code>self: Rc&lt;Self&gt;</code> </td>
+					</tr> <tr> 
+						<td> ... </td>
+					</tr>
+				</tbody>
+			</table>
 			<p>
-こちらは少しマイナーな用法。
-			</p> <p>
-<code>self</code> の型に指定できるのは、参照外しの反復で <code>Self</code> 型にできる型である。
-			</p> <p>
-そのため、<code>self: <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> のような指定も可能になる。
+以下は詳細版の例で、<code>method</code> 関数の <code>self</code> 引数が <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> 型になっている。
 			</p>
-			<section>
-				<h2>サンプル</h2>
-				<p>
-以下では、<code>method</code> 関数の <code>self</code> 引数が <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> 型になっている。
-				</p>
 <pre><code class="language-rust">
 fn main() {
     let bx = Box::new(Test {});
@@ -61,12 +60,21 @@ impl Test {
     }
 }
 </code></pre>
-			</section> <section>
-				<h2>この用法の使い所</h2>
-				<p>
-この用法を使わなくても、『<a href="dot_and_self.xhtml">メソッド呼出と型変換</a>』による自動型変換があるため、<wbr/><code>&amp;self</code> でも <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> 型の実引数を受けられる。そのため、この記法は <code>&amp;self</code> で受けられる他の型を除外し、<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;Self&gt;</code> 型のみを扱いたい場合に役に立つ。
-				</p>
-			</section>
+		</section> <section>
+			<h1>使用できる型</h1>
+			<p>
+<code>self</code> に許される型は、実装対象それ以外では、一部の組込型のみである。
+			</p> <p>
+他を指定すると『<a href="E0307.xhtml">E0307 - self に使えない型</a>』が発生する。
+			</p> <p>
+以下は使用できる型についての公式による説明。
+			</p>
+			<iframe class="autoHeight" src="quote/reference/item/associated-items.xhtml"/>
+		</section> <section>
+			<h1>型変換との差異</h1>
+			<p>
+『<a href="dot_and_self.xhtml">メソッド呼出と型変換</a>』によると、<code>Box&lt;Self&gt;</code> 型は <code>&amp;Self</code> 型と自動で型変換される。そのため、<code>Box&lt;Self&gt;</code> 型のメソッド引数が役立つのは、<code>&amp;Self</code> で受け入れられる型を除外したい場合に限られる。
+			</p>
 		</section>
 	</body>
 </html>
