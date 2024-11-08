@@ -62,7 +62,7 @@ impl Newtype {
 				</dt>
 				<dd>
 					<p>
-参照型のキャストのための専用クレート。<code>&amp;T</code> から <code>&amp;U</code> へ変換できる事を示す <code>RefCast</code> トレイトを導入して、変換処理をいい感じに抽象化してくれるのが特徴。
+参照型のキャストのための専用クレート。参照から参照への変換を提供する <code>RefCast</code> トレイトとその自動実装により、unsafe コードの記述を肩代わりしてくれる。
 					</p>
 				</dd>
 			</dl>
