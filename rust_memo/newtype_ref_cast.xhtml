@@ -31,12 +31,12 @@ unsafe な機能 <a href="https://doc.rust-lang.org/std/mem/fn.transmute.html"><
 			</section> <section>
 				<h2>サンプル</h2>
 				<p>
-以下では、<code>use_ref</code> 関数が <code>&amp;i32</code> を <code>&amp;Newtype</code> に読み替えている。
+以下では、<code>from_ref</code> 関数が <code>&amp;i32</code> を <code>&amp;Newtype</code> に変換している。
 				</p>
 				<pre><code class="language-rust">
 fn main() {
     let base = 1;
-    let newtype = Newtype::use_ref(&amp;base);
+    let newtype = Newtype::from_ref(&amp;base);
     assert_eq!(newtype.value(), base);
 }
 
@@ -48,7 +48,7 @@ impl Newtype {
         self.0
     }
 
-    pub fn use_ref(r: &amp;i32) -&gt; &amp;Self {
+    pub fn from_ref(r: &amp;i32) -&gt; &amp;Self {
         unsafe { std::mem::transmute(r) }
     }
 }
