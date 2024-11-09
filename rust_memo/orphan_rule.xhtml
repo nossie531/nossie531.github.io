@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 孤児ルール</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+孤児ルール (orphan rule) について。
+		</p>
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+『<a href="e0119.xhtml">E0119 - トレイト実装の衝突</a>』で紹介する通り、トレイト実装時に同じ型と同じトレイトの組合せですでに他に実装があると、それらが衝突してエラーになる。
+			</p>
+		</section> <section>
+			<h1>ルールの必要性</h1>
+			<p>
+もし仮に、この衝突が完成済のクレートどうしでも発生するなら、新しいクレートの導入のたびに既存のクレートとの相性確認が必要になってしまう。そのため、孤児ルールではそうした衝突が発生しないよう、各クレートが実装できる範囲を制限している。
+			</p>
+		</section> <section>
+			<h1>ルールの詳細</h1>
+			<p>
+孤児ルールでは、クレートが型にトレイトを実装する場合、型かトレイト、少なくともどちらかは、クレートがローカル定義したものである必要がある。つまり、型もトレートも所有していないクレートが、勝手に両者を紐づけてはならない。
+			</p>
+			<section>
+				<h2>公式資料</h2>
+				<div>
+					<iframe class="autoHeight" src="quote/reference/item/implementations.xhtml"/>
+				</div>
+				<p>
+この仕様はトレイトが型パラメタを持つ場合についても考慮している。
+				</p> <p>
+つまり、以下の実装のうち、最後のものはエラーになる。
+				</p>
+				<ul>
+					<li>
+<code>impl&lt;T&gt; ForeignTrait&lt;LocalType, T&gt; for ForeginType</code>
+					</li> <li>
+<code>impl&lt;T&gt; ForeignTrait&lt;Cover&lt;T&gt;, LocalType&gt; for ForeginType</code>
+					</li> <li>
+<code>impl&lt;T&gt; ForeignTrait&lt;T, LocalType&gt; for ForeginType</code>
+					</li>
+				</ul>
+			</section>
+		</section>
+	</body>
+</html>

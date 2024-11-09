@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: E0210 - 孤児ルールの違反</title>
+		<title>Rust メモ: E0210 - 孤児ルールに違反した型パラメタ</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
 	</head>
@@ -14,33 +14,20 @@
 <mark class="error">error[E0210]</mark><mark class="title">: type parameter `T` must be used as the type parameter for some local type (e.g., `MyStruct&lt;T&gt;`)</mark>
 </samp></pre>
 		<p>
-型パラメタと孤児ルールが絡んだエラー。
+<a href="orphan_rule.xhtml">孤児ルール</a>と型パラメタが絡んだエラー。
 		</p>
 		<section>
-			<h1>基礎知識</h1>
-			<section>
-				<h2>トレイト実装の衝突</h2>
-				<p>
-『<a href="e0119.xhtml">E0119 - トレイト実装の衝突</a>』で紹介する通り、トレイト実装時に同じ型と同じトレイトについての実装が他にもあると、どちらの実装を採用するべきか分からずエラーになる。
-				</p>
-			</section> <section>
-				<h2>追加の制限の必要性</h2>
-				<p>
-仮にもし、関連する制限が E0119 のみだった場合、外部クレートの導入時に問題がおきる。なぜなら、そこで定義されているトレイト実装が、他クレートのトレイト実装と衝突する可能性がある。つまり、クレートの導入時にいちいち相性確認が必要になってしまう。
-				</p>
-			</section> <section>
-				<h2>孤児ルールの基本</h2>
-				<p>
-上記のような問題を避けるために、孤児ルール (orphan rule) が導入される。このルールに従うと、クレートがトレイトを型に実装するには、トレイトか型の少なくとも一方をクレート自身が定義していなければならない。
-				</p> <p>
-これにより、クレート単位でのトレイト実装の衝突は、トレイトが所属するクレートのトレイト実装に、型が所属するクレートのトレイト実装が衝突する場合のみとなる。この衝突は型が所属するクレートのコーディングの時点で検出されるため、クレートの導入時には問題にならなくなる。
-				</p>
-			</section>
+			<h1>原因</h1>
+			<p>
+孤児ルールでは、クレート外部の型やトレイトが絡むトレイト実装が制限される。
+			</p> <p>
+一方、型パラメタの対象にはクレート外部の型もなりうる。
+			</p> <p>
+そのため、型パラメタが孤児ルールの制約になる事がある。
+			</p>
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-トレイト実装の対象が型パラメタで表される場合、外部クレート由来の型も対象になる。そのため、孤児ルールを考慮しなければならない。
-			</p> <p>
 以下では、型パラメタ <code>T</code> にクレート <a href="https://doc.rust-lang.org/std/"><code>std</code></a> のトレイト <a href="https://doc.rust-lang.org/std/fmt/trait.Display.html"><code>Display</code></a> を実装しようとしている。
 			</p>
 <pre><code class="language-rust">
@@ -62,25 +49,6 @@ impl&lt;<mark class="error">T</mark>&gt; Display for T {
 <mark class="info">  =</mark> <mark class="title">note</mark>: implementing a foreign trait is only possible if at least one of the types for which it is implemented is local
 <mark class="info">  =</mark> <mark class="title">note</mark>: only traits defined in the current crate can be implemented for a type parameter
 </samp></pre>
-		</section> <section>
-			<h1>補足: 仕様詳細</h1>
-			<div>
-				<iframe class="autoHeight" src="quote/reference/item/implementations.xhtml"/>
-			</div>
-			<p>
-この仕様はトレイトが型パラメタを持つ場合についても考慮している。
-			</p> <p>
-つまり、以下の実装のうち、最後のものはエラーになる。
-			</p>
-			<ul>
-				<li>
-<code>impl&lt;T&gt; ForeignTrait&lt;LocalType, T&gt; for ForeginType</code>
-				</li> <li>
-<code>impl&lt;T&gt; ForeignTrait&lt;Cover&lt;T&gt;, LocalType&gt; for ForeginType</code>
-				</li> <li>
-<code>impl&lt;T&gt; ForeignTrait&lt;T, LocalType&gt; for ForeginType</code>
-				</li>
-			</ul>
 		</section>
 	</body>
 </html>
