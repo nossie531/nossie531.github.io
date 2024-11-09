@@ -19,16 +19,16 @@
 		<section>
 			<h1>原因</h1>
 			<p>
-孤児ルールでは、クレート外部の型やトレイトが絡むトレイト実装が制限される。
+孤児ルールは、クレート外部の型やトレイトに厳しい。
 			</p> <p>
 一方、型パラメタの対象にはクレート外部の型もなりうる。
 			</p> <p>
-そのため、型パラメタが孤児ルールの制約になる事がある。
+そのため、型パラメタが孤児ルールのきっかけになる事がある。
 			</p>
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-以下では、型パラメタ <code>T</code> にクレート <a href="https://doc.rust-lang.org/std/"><code>std</code></a> のトレイト <a href="https://doc.rust-lang.org/std/fmt/trait.Display.html"><code>Display</code></a> を実装しようとしている。
+以下では、外部の型になりうる <code>T</code> に、外部のトレイト <a href="https://doc.rust-lang.org/std/fmt/trait.Display.html"><code>Display</code></a> を実装している。
 			</p>
 <pre><code class="language-rust">
 use std::fmt::{self, Display, Formatter};
