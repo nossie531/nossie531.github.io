@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Iterator::fuse と FusedIterator</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+Iterator::fuse と FusedIterator について。 
+		</p> 
+		<section>
+			<h1>背景情報</h1>
+			<section>
+				<h2>ヒューズ</h2>
+				<p>
+<code><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#tymethod.next">next</a></code> メソッドの挙動には二種類のパターンがある。
+				</p>
+				<dl class="normal">
+					<dt>ヒューズ形式</dt>
+					<dd>
+						<p>
+<code>None</code> を一度でも戻すと、その後はずっと <code>None</code> のみを戻す。
+						</p> <p>
+これは例えば、コレクションの読取などで使われる。ここで <code>None</code> は全ての要素の読取完了を表すため、それが検出された時点でイテレータはお役御免となる。
+						</p>
+					</dd>
+					<dt>非ヒューズ形式</dt>
+					<dd>
+						<p>
+<code>None</code> を戻した後でも、再び <code>Some</code> を戻す場合がある。
+						</p> <p>
+これは例えば、通信データの読取などで使われる。ここで <code>None</code> は通信終了を表すが、その後に <code>Some</code> で通信再開される場合もあるため、イテレータはまだ活躍できる。
+						</p>
+					</dd>
+				</dl>
+				<aside class="normal">
+					<p>
+"ヒューズ" の用語について。
+					</p> <p>
+この用語は電気回路の部品に由来する。電気回路におけるヒューズは、過電流が流れると自ら壊れて電流を遮断する。使い切られたイテレータの挙動は…言われてみると…壊れたヒューズと似ているかもしれない。
+					</p>
+				</aside>
+			</section>
+		</section> <section>
+			<h1>関連アイテム</h1>
+			<p>
+以下のアイテムにより、自作のイテレータをヒューズ形式だと宣言したり、非ヒューズ形式のイテレータをヒューズ形式に変換したりできる (これは例えば、通信データの読込イテレータを 1 ストリームの読込のみに制限できる)。
+			</p>
+			<section>
+				<h1>
+<code><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fuse">fuse</a></code>
+				</h1>
+				<p>
+<code>self</code> を <a href="#Fuse"><code>Fuse</code></a> でラップするメソッド。
+				</p>
+			</section> <section>
+				<h1 id="Fuse">
+<code><a href="https://doc.rust-lang.org/std/iter/struct.Fuse.html">Fuse</a>&lt;I&gt;</code>
+				</h1>
+				<p>
+イテレータを <a href="#FusedIterator"><code>FusedIterator</code></a> にするラッパー。
+				</p>
+			</section> <section>
+				<h1 id="FusedIterator">
+<a href="https://doc.rust-lang.org/std/iter/trait.FusedIterator.html"><code>FusedIterator</code></a>
+				</h1>
+				<p>
+イテレータをヒューズ形式であると宣言するマーカートレイト。
+				</p>
+			</section>
+		</section> <section>
+			<h1>実装のポイント</h1>
+			<p>
+<code>Fuse</code> のラップ先が元から <code>FusedIterator</code> を実装している場合、<code>Fuse</code> は何もせずただラップ先に処理を転送する実装となる。この配慮により、イテレータの処理は若干だが速くなり、ループの処理速度が地味に改善される事もあるだろう。ただ、この影響で <code>FusedIterator</code> と宣言したにも関わらず、実はその要件を守れていないとバグになる。
+			</p>
+			<aside class="normal">
+				<p>
+<code>Fuse</code> の舞台裏。
+				</p>
+				<p>
+上記の動作の実現には、ラップ先の静的型に応じて実装を特殊化しなければならない。<br/>
+これは <time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/min-specialization.html"><code>min_specialization</code></a> により実現されている。
+				</p>
+			</aside>
+		</section>
+	</body>
+</html>
