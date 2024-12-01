@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 配列の初期化</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+配列の初期化する各種の方法について。
+		</p> 
+		<section>
+			<h1>各要素を指定して初期化</h1>
+			<p>
+全ての要素の値を指定する。
+			</p> <p>
+この方法は <code>const</code> や <code>static</code> の初期化でも使える。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let arr = [0, 1, 2];
+    assert_eq!(arr, [0, 1, 2]);
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1><code>Copy</code> による初期化</h1>
+			<p>
+要素型が <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> を実装していれば、指定値のコピーで全要素を初期化できる。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let arr = [42; 3];
+    assert_eq!(arr, [42, 42, 42]);
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1><code>Default</code> による初期化</h1>
+			<p>
+要素型が <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> を実装していれば、既定値で全要素を初期化できる。
+			</p> <p>
+この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
+(<code><a href="https://doc.rust-lang.org/std/default/trait.Default.html">Default</a>::<a href="https://doc.rust-lang.org/std/default/trait.Default.html#tymethod.default">default</a></code> が <code>const</code> 関数でないため。)
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let arr = &lt;[i32; 3] as Default&gt;::default();
+    assert_eq!(arr, [0, 0, 0]);
+}
+</code></pre>
+			</section>
+			<aside class="normal moan">
+				<p>
+要素数の制限について。
+				</p> <p>
+要素数が 32 を超えるとこの方法は使えない。なぜなら、<code>Default</code> は <code class="nw">[T; 0]</code> から <code class="nw">[T; 32]</code> までしか<a href="https://doc.rust-lang.org/std/primitive.array.html#impl-Default-for-%5BT;+32%5D">実装</a>されていない。これは <a href="https://blog.rust-lang.org/2021/03/25/Rust-1.51.0.html">Rust 1.51.0</a> による <a href="https://doc.rust-lang.org/reference/items/generics.html#const-generics">Const Generics</a> の導入前、要素数をジェネリクスで一般化できなかった時代の名残りのように思えるが、<time>2024 年現在</time>も、まだ改善されていない。
+				</p>
+			</aside>
+		</section> <section>
+			<h1><code>array::map</code> による初期化</h1>
+			<p>
+メソッド <code><a href="https://doc.rust-lang.org/std/primitive.array.html">array</a>::<a href="https://doc.rust-lang.org/std/primitive.array.html#method.map">map</a></code> とラムダで各要素の値を生成して初期化する。
+			</p> <p>
+この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
+(<code>array::map</code> が <code>const</code> 関数でないため。)
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut i = 0;
+    let arr = [(); 3].map(|_| { let ret = i; i += 1; ret });
+    assert_eq!(&amp;arr, &amp;[0, 1, 2]);
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1 id="MaybeUninit"><code>MaybeUninit</code> による初期化</h1>
+			<p>
+共用体 <a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html"><code>MaybeUninit</code></a> とアンセーフで各要素の値を変更して初期化する。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::mem::{self, MaybeUninit};
+
+fn main() {
+    let mut arr = [const { MaybeUninit::&lt;i32&gt;::uninit() }; 3];
+
+    let mut i = 0;
+    while i &lt; arr.len() {
+        arr[i] = MaybeUninit::new(i as i32);
+        i += 1;
+    }
+
+    let arr = unsafe { mem::transmute::&lt;_, [i32; 3]&gt;(arr) };
+    assert_eq!(&amp;arr, &amp;[0, 1, 2]);
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>配列全体を関数で初期化</h1>
+			<p>
+関数で配列全体を生成して初期化する。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、簡単にするためこっそりと <code>Copy</code> トレイトに依存している。<br/>
+(『<a href="#MaybeUninit"><code>MaybeUninit</code> による初期化</a>』と併用すれば、その依存もなくせる。)
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    const ARR: [i32; 3] = create_arr();
+    assert_eq!(ARR, [0, 1, 2]);
+}
+
+const fn create_arr() -&gt; [i32; 3] {
+    let mut ret = [0; 3];
+    let mut i = 0;
+    while i &lt; ret.len() {
+        ret[i] = i as i32;
+        i += 1;
+    }
+
+    ret
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
