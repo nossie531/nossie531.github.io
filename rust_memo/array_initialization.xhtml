@@ -81,7 +81,7 @@ fn main() {
 fn main() {
     let mut i = 0;
     let arr = [(); 3].map(|_| { let ret = i; i += 1; ret });
-    assert_eq!(&amp;arr, &amp;[0, 1, 2]);
+    assert_eq!(arr, [0, 1, 2]);
 }
 </code></pre>
 			</section>
@@ -105,7 +105,7 @@ fn main() {
     }
 
     let arr = unsafe { mem::transmute::&lt;_, [i32; 3]&gt;(arr) };
-    assert_eq!(&amp;arr, &amp;[0, 1, 2]);
+    assert_eq!(arr, [0, 1, 2]);
 }
 </code></pre>
 			</section>
