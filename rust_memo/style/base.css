@@ -300,14 +300,22 @@
 		padding: 0 var(--gap);
 	}
 
+	section:not(h1 + *, hgroup + *) > h2,
+	section:not(h2 + *, hgroup + *) > h3 {
+		border-top-style: dashed;
+		border-top-width: thin;
+
+		&:not(.noTitle) {
+			padding-top: 1rem;
+		}
+	}
+
 	section:not(h1 + *, hgroup + *) > h2 {
-		padding-top: 1rem;
-		border-top: thin dashed var(--fg-color);
+		border-color: var(--fg-color);
 	}
 
 	section:not(h2 + *, hgroup + *) > h3 {
-		padding-top: 1rem;
-		border-top: thin dashed var(--base1-color);
+		border-color: var(--base1-color);
 	}
 
 	section > section > h1::before,
@@ -320,11 +328,11 @@
 		content: ">> ";
 	}
 
-	section > h2::before {
+	section > h2:not(.noTitle)::before {
 		content: "■ ";
 	}
 
-	section > h3::before {
+	section > h3:not(.noTitle)::before {
 		content: "▶ ";
 	}
 
