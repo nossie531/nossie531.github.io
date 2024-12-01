@@ -13,8 +13,12 @@
 		<p>
 配列を初期化する各種の方法について。
 		</p> 
+		<nav class="sub"/>
 		<section>
-			<h1>各要素を指定して初期化</h1>
+			<hgroup>
+				<h1>方法 1</h1>
+				<div class="subTitle">各要素を指定</div>
+			</hgroup>
 			<p>
 全ての要素の値を指定する。
 			</p> <p>
@@ -30,23 +34,14 @@ fn main() {
 </code></pre>
 			</section>
 		</section> <section>
-			<h1><code>Copy</code> による初期化</h1>
+			<hgroup>
+				<h1>方法 2</h1>
+				<div class="subTitle">
+<a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> トレイトの利用
+				</div>
+			</hgroup>
 			<p>
-要素型が <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> を実装していれば、指定値のコピーで全要素を初期化できる。
-			</p>
-			<section>
-				<h2>サンプル</h2>
-<pre><code class="language-rust">
-fn main() {
-    let arr = [42; 3];
-    assert_eq!(arr, [42, 42, 42]);
-}
-</code></pre>
-			</section>
-		</section> <section>
-			<h1><code>Default</code> による初期化</h1>
-			<p>
-要素型が <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> を実装していれば、既定値で全要素を初期化できる。
+既定値で全要素を初期化する。
 			</p> <p>
 この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
 (<code><a href="https://doc.rust-lang.org/std/default/trait.Default.html">Default</a>::<a href="https://doc.rust-lang.org/std/default/trait.Default.html#tymethod.default">default</a></code> が <code>const</code> 関数でないため。)
@@ -59,36 +54,124 @@ fn main() {
     assert_eq!(arr, [0, 0, 0]);
 }
 </code></pre>
-			</section>
-			<aside class="normal moan">
-				<p>
+			</section> <section>
+				<h2 class="noTitle"></h2>
+				<aside class="normal moan">
+					<p>
 要素数の制限について。
-				</p> <p>
+					</p> <p>
 要素数が 32 を超えるとこの方法は使えない。なぜなら、<code>Default</code> は <code class="nw">[T; 0]</code> から <code class="nw">[T; 32]</code> までしか<a href="https://doc.rust-lang.org/std/primitive.array.html#impl-Default-for-%5BT;+32%5D">実装</a>されていない。これは <a href="https://blog.rust-lang.org/2021/03/25/Rust-1.51.0.html">Rust 1.51.0</a> による <a href="https://doc.rust-lang.org/reference/items/generics.html#const-generics">Const Generics</a> の導入前、要素数をジェネリクスで一般化できなかった時代の名残りのように思えるが、<time>2024 年現在</time>も、まだ改善されていない。
-				</p>
-			</aside>
+					</p>
+				</aside>
+			</section>
 		</section> <section>
-			<h1><code>array::map</code> による初期化</h1>
+			<hgroup>
+				<h1 id="copy">方法 3</h1>
+				<div class="subTitle">
+<a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトの利用
+				</div>
+			</hgroup>
 			<p>
-メソッド <code><a href="https://doc.rust-lang.org/std/primitive.array.html">array</a>::<a href="https://doc.rust-lang.org/std/primitive.array.html#method.map">map</a></code> とラムダで各要素の値を生成して初期化する。
-			</p> <p>
-この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
-(<code>array::map</code> が <code>const</code> 関数でないため。)
+指定値のコピーで全要素を初期化する。
 			</p>
 			<section>
 				<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
-    let mut i = 0;
-    let arr = [(); 3].map(|_| { let ret = i; i += 1; ret });
+    let arr = [42; 3];
+    assert_eq!(arr, [42, 42, 42]);
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<hgroup>
+				<h1>方法 4</h1>
+				<div class="subTitle">
+<a href="https://doc.rust-lang.org/reference/expressions/block-expr.html#const-blocks"><code>const</code></a> ブロックの利用
+				</div>
+			</hgroup>
+			<p>
+固定値で全要素を初期化する。
+			</p> <p>
+なお、この方法には <code>Vec::&lt;i32&gt;::new()</code> なども指定できる。<br/>
+(<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.new">new</a></code> が <code>const</code> 関数のため。)
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では､『<a href="#copy">Copy トレイトの利用</a>』との差別化のため要素型 <code>CopyNg</code> を用いている。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let arr = [const { CopyNg::new(42) }; 3];
+    assert_eq!(arr, [CopyNg::new(42), CopyNg::new(42), CopyNg::new(42)]);
+}
+
+#[derive(Debug, Eq, PartialEq)]
+struct CopyNg(i32);
+impl CopyNg {
+    pub const fn new(value: i32) -&gt; Self {
+        Self(value)
+    }
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<hgroup>
+				<h1>方法 5</h1>
+				<div class="subTitle">
+<a href="https://doc.rust-lang.org/std/array/fn.from_fn.html"><code>array::from_fn</code></a> 関数の利用
+				</div>
+			</hgroup>
+			<p>
+ラムダで各要素の値を生成して初期化する。
+			</p> <p>
+この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
+(<code>array::from_fn</code> が <code>const</code> 関数でないため。)
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::array;
+
+fn main() {
+    let arr = array::from_fn::&lt;_, 3, _&gt;(|i| i as i32);
     assert_eq!(arr, [0, 1, 2]);
 }
 </code></pre>
 			</section>
 		</section> <section>
-			<h1 id="MaybeUninit"><code>MaybeUninit</code> による初期化</h1>
+			<hgroup>
+				<h1>方法 6</h1>
+				<div class="subTitle">
+<code><a href="https://doc.rust-lang.org/std/primitive.array.html">[T; N]</a>::<a href="https://doc.rust-lang.org/std/primitive.array.html#method.map">map</a></code> メソッドの利用
+				</div>
+			</hgroup>
 			<p>
-共用体 <a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html"><code>MaybeUninit</code></a> とアンセーフで各要素の値を変更して初期化する。
+ラムダで既存の配列を基に初期化する。
+			</p> <p>
+この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
+(<code>[T; N]::map</code> が <code>const</code> 関数でないため。)
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let arr_src = [0, 1, 2];
+    let arr = arr_src.map(|x| x + 1);
+    assert_eq!(arr, [1, 2, 3]);
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<hgroup>
+				<h1>方法 7</h1>
+				<div class="subTitle">
+<a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html"><code>MaybeUninit</code></a> 共用体の利用
+				</div>
+			</hgroup>
+			<p>
+未初期化の配列を初期化後、アンセーフ機能で通常の配列へと転用する。
 			</p>
 			<section>
 				<h2>サンプル</h2>
@@ -110,15 +193,18 @@ fn main() {
 </code></pre>
 			</section>
 		</section> <section>
-			<h1>配列全体を関数で初期化</h1>
+			<hgroup>
+				<h1>方法 8</h1>
+				<div class="subTitle">配列全体を関数で作成</div>
+			</hgroup>
 			<p>
-関数で配列全体を生成して初期化する。
+配列全体を関数で生成して初期化する。
 			</p>
 			<section>
 				<h2>サンプル</h2>
 				<p>
 以下では、簡単にするためこっそりと <code>Copy</code> トレイトに依存している。<br/>
-(『<a href="#MaybeUninit"><code>MaybeUninit</code> による初期化</a>』と併用すれば、その依存もなくせる。)
+(他の方法と併用すれば、その依存もなくせる。)
 				</p>
 <pre><code class="language-rust">
 fn main() {
