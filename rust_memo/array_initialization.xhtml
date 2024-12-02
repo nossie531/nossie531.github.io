@@ -21,8 +21,6 @@
 			</hgroup>
 			<p>
 全ての要素の値を指定する。
-			</p> <p>
-この方法は <code>const</code> や <code>static</code> の初期化でも使える。
 			</p>
 			<section>
 				<h2>サンプル</h2>
@@ -42,11 +40,15 @@ fn main() {
 			</hgroup>
 			<p>
 既定値で全要素を初期化する。
-			</p> <p>
-この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
-(<code><a href="https://doc.rust-lang.org/std/default/trait.Default.html">Default</a>::<a href="https://doc.rust-lang.org/std/default/trait.Default.html#tymethod.default">default</a></code> が <code>const</code> 関数でないため。)
 			</p>
 			<section>
+				<h2>定数配列には使用不可</h2>
+				<p>
+この方法は <code>const</code> や <code>static</code> で宣言する配列には使用できない。
+				</p> <p>
+これは <code><a href="https://doc.rust-lang.org/std/default/trait.Default.html">Default</a>::<a href="https://doc.rust-lang.org/std/default/trait.Default.html#tymethod.default">default</a></code> が <code>const</code> 関数でないため。
+				</p>
+			</section> <section>
 				<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
@@ -93,8 +95,7 @@ fn main() {
 			<p>
 <code>const</code> 宣言した変数や <code>const</code> ブロック式の値で全要素を初期化する。
 			</p> <p>
-なお、この方法には <code>Vec::&lt;i32&gt;::new()</code> なども指定できる。<br/>
-(<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.new">new</a></code> が <code>const</code> 関数のため。)
+<code>Vec::&lt;i32&gt;::new()</code> なども値として指定可能 (<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.new">new</a></code> が <code>const</code> 関数のため)。
 			</p>
 			<section>
 				<h2>サンプル</h2>
@@ -125,11 +126,15 @@ impl CopyNg {
 			</hgroup>
 			<p>
 各要素の値をラムダで生成して初期化する。
-			</p> <p>
-この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
-(<code>array::from_fn</code> が <code>const</code> 関数でないため。)
 			</p>
 			<section>
+				<h2>定数配列には使用不可</h2>
+				<p>
+この方法は <code>const</code> や <code>static</code> で宣言する配列には使用できない。
+				</p> <p>
+これは <code>array::from_fn</code> が <code>const</code> 関数でないため。
+				</p>
+			</section> <section>
 				<h2>サンプル</h2>
 <pre><code class="language-rust">
 use std::array;
@@ -149,11 +154,15 @@ fn main() {
 			</hgroup>
 			<p>
 既存の配列をラムダで変換して初期化する。
-			</p> <p>
-この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
-(<code>[T; N]::map</code> が <code>const</code> 関数でないため。)
 			</p>
 			<section>
+				<h2>定数配列には使用不可</h2>
+				<p>
+この方法は <code>const</code> や <code>static</code> で宣言する配列には使用できない。
+				</p> <p>
+これは <code>[T; N]::map</code> が <code>const</code> 関数でないため。
+				</p>
+			</section> <section>
 				<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
@@ -177,12 +186,19 @@ fn main() {
 			</p>
 			<ul>
 				<li>
-<a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a> が実装する <code><a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html">TryFrom</a>::<a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html#tymethod.try_from">try_from</a></code> メソッド
+<a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a> が実装する <code><a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html">TryFrom</a>&lt;<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>&gt;::<a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html#tymethod.try_from">try_from</a></code> メソッド
 				</li> <li>
-<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> が実装する <code><a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html">TryInto</a>::<a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html#tymethod.try_into">try_into</a></code> メソッド
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> が実装する <code><a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html">TryInto</a>&lt;<a href="https://doc.rust-lang.org/std/primitive.array.html">[T; N]</a>&gt;::<a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html#tymethod.try_into">try_into</a></code> メソッド
 				</li>
 			</ul>
 			<section>
+				<h2>定数配列には使用不可</h2>
+				<p>
+この方法は <code>const</code> や <code>static</code> で宣言する配列には使用できない。
+				</p> <p>
+これは <code>try_from</code> や <code>try_into</code> が <code>const</code> 関数でないため。
+				</p>
+			</section> <section>
 				<h2>サンプル 1</h2>
 				<p>
 以下では、<code>try_from</code> を利用している。
