@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0379 - トレイトでの const 関数</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0379]</mark><mark class="title">: functions in traits cannot be declared const</mark>
+</samp></pre>
+		<p>
+トレイトで <code>const</code> 関数を宣言した。
+		</p>
+		<section>
+			<h1>原因</h1>
+			<p>
+これは <time>2024 年現在</time>の Rust の制限である。
+			</p> <p>
+本来はトレイトに <code>const</code> 関数があっても特に問題はないはずである。
+			</p> <p>
+その証拠に、不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/const-trait-impl.html"><code>const_trait_impl</code></a> では、この制限を緩和しようとしている。ただし、現在この機能は仕様がまだあまり定まっていない (使用例を記載してもすぐに陳腐化しそうなため割愛)。
+			</p>
+		</section> <section>
+			<h1>影響</h1>
+			<p>
+以下は <code>const</code> 文脈でよくある状況。
+			</p> 
+			<ul>
+				<li>
+					<p>
+<a href="https://doc.rust-lang.org/std/ops/trait.Add.html"><code>Add</code></a> などの四則演算トレイトが使えない。
+					</p> <p>
+これにより、複素数型のような Rust 標準にない型の定数が計算しにくくなる。
+					</p>
+				</li> <li>
+					<p>
+<a href="https://doc.rust-lang.org/std/iter/trait.IntoIterator.html"><code>IntoIterator</code></a> などのトレイトが使えない。
+					</p> <p>
+これにより、for-in ループ構文までもが使えなくなる。
+					</p>
+				</li>
+			</ul>
+		</section> <section>
+			<h1>サンプル</h1>
+<pre><code class="language-rust">
+fn main() {
+    const FLAG: bool = MyType(1).<mark class="error">is_ok()</mark>;
+    assert!(FLAG);
+}
+
+trait Flag {
+    <mark class="error">const</mark> fn is_ok(&amp;self) -&gt; bool;
+}
+
+struct MyType(i32);
+impl Flag for MyType {
+    <mark class="error">const</mark> fn is_ok(&amp;self) -&gt; bool {
+        self.0 != 0
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0379]</mark><mark class="title">: functions in traits cannot be declared const</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:7:5
+<mark class="info">  |</mark>
+<mark class="info">7 |</mark>     const fn is_ok(&amp;self) -&gt; bool;
+<mark class="info">  |</mark>     <mark class="error">^^^^^</mark><mark class="info">-</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="error">functions in traits cannot be const</mark>
+<mark class="info">  |</mark>     <mark class="info">help: remove the `const`</mark>
+
+<mark class="error">error[E0379]</mark><mark class="title">: functions in trait impls cannot be declared const</mark>
+<mark class="info">  --&gt;</mark> src/main.rs:12:5
+<mark class="info">   |</mark>
+<mark class="info">12 |</mark>     const fn is_ok(&amp;self) -&gt; bool {
+<mark class="info">   |</mark>     <mark class="error">^^^^^</mark><mark class="info">-</mark>
+<mark class="info">   |</mark>     <mark class="info">|</mark>
+<mark class="info">   |</mark>     <mark class="error">functions in trait impls cannot be const</mark>
+<mark class="info">   |</mark>     <mark class="info">help: remove the `const`</mark>
+
+<mark class="error">error[E0015]</mark><mark class="title">: cannot call non-const fn `&lt;MyType as Flag&gt;::is_ok` in constants</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:2:34
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     const FLAG: bool = MyType(1).is_ok();
+<mark class="info">  |</mark>                                  <mark class="error">^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: calls in constants are limited to constant functions, tuple structs and tuple variants
+</samp></pre>
+		</section>
+	</body>
+</html>
