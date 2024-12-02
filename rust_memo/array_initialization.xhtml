@@ -87,11 +87,11 @@ fn main() {
 			<hgroup>
 				<h1>方法 4</h1>
 				<div class="subTitle">
-<a href="https://doc.rust-lang.org/reference/expressions/block-expr.html#const-blocks"><code>const</code></a> ブロックの利用
+<a href="https://doc.rust-lang.org/std/keyword.const.html"><code>const</code></a> キーワードの利用
 				</div>
 			</hgroup>
 			<p>
-固定値で全要素を初期化する。
+<code>const</code> 宣言した変数や <code>const</code> ブロック式の値で全要素を初期化する。
 			</p> <p>
 なお、この方法には <code>Vec::&lt;i32&gt;::new()</code> なども指定できる。<br/>
 (<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.new">new</a></code> が <code>const</code> 関数のため。)
@@ -124,7 +124,7 @@ impl CopyNg {
 				</div>
 			</hgroup>
 			<p>
-ラムダで各要素の値を生成して初期化する。
+各要素の値をラムダで生成して初期化する。
 			</p> <p>
 この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
 (<code>array::from_fn</code> が <code>const</code> 関数でないため。)
@@ -148,7 +148,7 @@ fn main() {
 				</div>
 			</hgroup>
 			<p>
-ラムダで既存の配列を基に初期化する。
+既存の配列をラムダで変換して初期化する。
 			</p> <p>
 この方法は <code>const</code> や <code>static</code> の初期化では使えない。<br/>
 (<code>[T; N]::map</code> が <code>const</code> 関数でないため。)
@@ -166,6 +166,50 @@ fn main() {
 		</section> <section>
 			<hgroup>
 				<h1>方法 7</h1>
+				<div class="subTitle">
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> 型の利用
+				</div>
+			</hgroup>
+			<p>
+ベクタを配列へと変換する。サイズが合わないとエラーになる。
+			</p> <p>
+変換方法は以下の二通りがあり、どちらも同じ結果になる。
+			</p>
+			<ul>
+				<li>
+<a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a> が実装する <code><a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html">TryFrom</a>::<a href="https://doc.rust-lang.org/std/convert/trait.TryFrom.html#tymethod.try_from">try_from</a></code> メソッド
+				</li> <li>
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a> が実装する <code><a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html">TryInto</a>::<a href="https://doc.rust-lang.org/std/convert/trait.TryInto.html#tymethod.try_into">try_into</a></code> メソッド
+				</li>
+			</ul>
+			<section>
+				<h2>サンプル 1</h2>
+				<p>
+以下では、<code>try_from</code> を利用している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let vec = vec![0, 1, 2];
+    let arr = &lt;[_; 3]&gt;::try_from(vec).unwrap();
+    assert_eq!(arr, [0, 1, 2]);
+}
+</code></pre>
+			</section> <section>
+				<h2>サンプル 2</h2>
+				<p>
+以下では、<code>try_into</code> を利用している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let vec = vec![0, 1, 2];
+    let arr: [i32; 3] = vec.try_into().unwrap();
+    assert_eq!(arr, [0, 1, 2]);
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<hgroup>
+				<h1>方法 8</h1>
 				<div class="subTitle">
 <a href="https://doc.rust-lang.org/std/mem/union.MaybeUninit.html"><code>MaybeUninit</code></a> 共用体の利用
 				</div>
@@ -194,7 +238,7 @@ fn main() {
 			</section>
 		</section> <section>
 			<hgroup>
-				<h1>方法 8</h1>
+				<h1>方法 9</h1>
 				<div class="subTitle">配列全体を関数で作成</div>
 			</hgroup>
 			<p>
