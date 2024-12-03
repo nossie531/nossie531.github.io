@@ -11,6 +11,9 @@
 		--base0-color: hsl(45, 10%, 80%);
 		--base1-color: hsl(45, 10%, 75%);
 		--base2-color: hsl(45, 10%, 70%);
+		/* 無彩色 (色味がほぼ分からない色)。*/
+		--neutral0-color: hsl(25, 20%, 95%);
+		--neutral1-color: hsl(25, 20%, 90%);
 		/* マスク色 (基本諧調の反転)。*/
 		--mask-color: hsla(0, 0%, 0%, 0.05);
 		/* ライト色 (より明るくする)。*/
@@ -21,10 +24,6 @@
 		--bg-color: hsl(40, 30%, 92%);
 		/* 弱い強調色。*/
 		--bg-em-color: hsl(60, 50%, 90%);
-		/* パス領域背景色。*/
-		--path-bg-color: hsl(25, 20%, 90%);
-		/* コード領域背景色。*/
-		--code-bg-color: hsl(25, 20%, 95%);
 		/* 弱い前景強調色。*/
 		--fg-em-color: hsla(25, 50%, 25%, 0.8);
 		/* 強い前景強調色。*/
@@ -43,6 +42,9 @@
 		--base0-color: hsl(210, 15%, 23%);
 		--base1-color: hsl(210, 15%, 28%);
 		--base2-color: hsl(210, 15%, 35%);
+		/* 無彩色 (色味がほぼ分からない色)。*/
+		--neutral0-color: hsl(0, 0%, 7%);
+		--neutral1-color: hsl(0, 0%, 20%);
 		/* マスク色 (基本諧調の反転)。*/
 		--mask-color: hsla(0, 0%, 100%, 0.1);
 		/* ライト色 (より明るくする)。*/
@@ -53,10 +55,6 @@
 		--bg-color: hsl(210, 15%, 15%);
 		/* 弱い強調色。*/
 		--bg-em-color: hsl(60, 50%, 10%);
-		/* パス領域背景色。*/
-		--path-bg-color: hsl(0, 0%, 15%);
-		/* コード領域背景色。*/
-		--code-bg-color: hsl(0, 0%, 7%);
 		/* 弱い前景強調色。*/
 		--fg-em-color: hsla(60, 50%, 75%, 0.8);
 		/* 強い前景強調色。*/
@@ -74,6 +72,8 @@
 	--header-color: var(--key0-color);
 	/* リンク色。*/
 	--link-color: var(--fg-em-color);
+	/* コード色。*/
+	--code-bg-color: var(--neutral0-color);
 	/* 不活性色。*/
 	--disable-color: hsla(0, 0%, 50%);
 	/* 要注意色。*/

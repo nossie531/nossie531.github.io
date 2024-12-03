@@ -13,7 +13,7 @@ body.forQuote {
 	padding: 0;
 	overflow: hidden;
 
-	& blockquote {
+	& > blockquote {
 		margin: 0 1px 0 0;
 	}
 }
@@ -41,13 +41,6 @@ blockquote {
 		display: block;
 	}
 
-	& pre > code {
-		display: block;
-		padding: 1ch 0.5em;
-		line-height: 1.4;
-		background-color: var(--mask-color);
-	}
-
 	& code {
 		font-family: var(--mono-font);
 		margin: 0 -0.25ch;
@@ -55,9 +48,27 @@ blockquote {
 		background-color: var(--mask-color);
 	}
 
+	& pre > code {
+		display: block;
+		margin: revert;
+		padding: 1ch 0.5em;
+		line-height: 1.4;
+		background-color: var(--mask-color);
+	}
+
 	& a:link, & a:visited {
 		text-decoration: none;
 		color: var(--link-color);
+	}
+
+	& blockquote {
+		border: revert;
+		margin: 0 ;
+		overflow: hidden;
+		background: var(--neutral1-color);
+		&::before, &::after {
+			all: revert;
+		}
 	}
 }
 
