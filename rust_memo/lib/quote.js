@@ -58,7 +58,7 @@ class Quote {
 
 	// a 要素の href 属性を調整。
 	#adjustAnchors() {
-		for (const quote of document.getElementsByTagName("blockquote")) {
+		for (const quote of document.querySelectorAll("body > blockquote")) {
 			for (const anchor of quote.getElementsByTagName("a")) {
 				adjustAnchor(anchor, quote);
 			}
@@ -68,7 +68,7 @@ class Quote {
 			const cite = quote.getAttribute("cite");
 			const href = anchor.getAttribute("href");
 
-			if (!cite && !href) {
+			if (!cite || !href) {
 				return;
 			}
 
