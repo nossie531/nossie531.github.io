@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: main 関数の戻り値</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+<code>main</code> 関数には戻り値を設定できる。
+		</p> 
+		<section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>?</code> 演算子が使えるよう戻り値の型を <code>Result</code> にしている。
+			</p>
+<pre><code class="language-rust">
+use std::error::Error;
+
+fn main() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
+    let num_str1 = "1";
+    let num_str2 = "2";
+    let num1 = num_str1.parse::&lt;i32&gt;()?;
+    let num2 = num_str2.parse::&lt;i32&gt;()?;
+    let answer = num1 + num2;
+    assert_eq!(answer, 3);
+    Ok(())
+}
+</code></pre>
+		</section> <section>
+			<h1>仕様</h1>
+			<div>
+<iframe class="autoHeight" src="quote/reference/crates-and-source-files.xhtml"/>
+			</div>
+		</section>
+	</body>
+</html>
