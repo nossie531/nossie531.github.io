@@ -102,7 +102,7 @@ fn stuff&lt;T&gt;(_x: T) {
 				</section> <section>
 					<h2>偽陽性の例 2</h2>
 					<p>
-以下では、<code>map</code> の編集が <code>value</code> の存在のためエラーになる。なお、この位置では <code>value</code> はすでに不要のはずだが、<code>map</code> のライフタイムから生成されているため、そのライフタイムに影響を与えてしまう。
+以下では、<code>map</code> の編集が <code>value</code> の存在のためエラーになる。なお、この位置では <code>value</code> はすでに不要のはずだが、最初の分岐アームの要求から、<code>map</code> のライフタイムの借用対象となってしまっている。
 					</p>
 <pre><code class="language-rust">
 use std::collections::HashMap;
