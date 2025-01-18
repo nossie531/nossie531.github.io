@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 借用チェッカーの制限</title>
+		<link rel="_up" href="index.xhtml"/>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+借用チェッカーの <time>2025 年現在</time>の制限と改善の歴史。
+		</p>
+		<section>
+			<h1>歴史</h1>
+			<ul>
+				<li>
+					<p>
+偽陰性 (メモリ安全でないコードがコンパイルできるパターン) ⇒ 昔から皆無
+					</p>
+				</li> <li>
+					<p>
+偽陽性 (メモリ安全なコードなのにコンパイルできないパターン) ⇒ 徐々に改善中
+					</p>
+				</li>
+			</ul>
+			<section>
+				<h1>初期</h1>
+				<p>
+参照のライフタイムを字句スコープ  ('<code>{</code>' から '<code>}</code>' まで) に対応させて管理する方式。
+				</p> <p>
+この方式は単純で理解しやすい。しかし、スコープが終了する位置と参照が不要になる位置は一般には一致しない (スコープの最後のコードが参照へのアクセスでもない限り、参照はより早くお役御免となる)。そのため、ライフタイムが無駄に延長され偽陽性につながりやすい。そして、これを避けるには冗長なスコープがそのつど必要になる。
+				</p>
+				<aside class="normal">
+					<p>
+考古学的存在に…。
+					</p> <p>
+現在のコンパイラでは、この方式はもはや現役時代のエディション Rust 2015 を指定しても使用されない。これは次期バージョンが完全な上位互換となったため<a href="https://blog.rust-lang.org/2022/08/05/nll-by-default.html">らしい</a>。
+					</p>
+				</aside>
+			</section> <section>
+				<hgroup>
+					<h1>現在 <time class="navNone">(2025 年)</time></h1>
+					<div class="subTitle"> <abbr>NLL</abbr> <span>(Non-lexical lifetimes)</span> </div>
+				</hgroup>
+				<p>
+参照のライフタイムをそれが必要なコード位置の集合として管理する方式。
+				</p> <p>
+前のバージョンと比べると、不要になった参照からの制限がより素早く解除される。ただし、条件分岐があるとライフタイムは各分岐の要求の和で作られる。これは条件分岐内で参照が不要となるパターンにおいて、直感と異なるチェック基準となりやすい。
+				</p>
+				<section>
+					<h2>偽陽性の例 1</h2>
+					<p>
+以下では、最後の <code>r1</code> の使用が <code>r2</code> の存在のためエラーになる。なお、この位置では本来 <code>r2</code> はすでに不要なはずだが、条件分岐内の要求などから、<code>r2</code> のライフタイムは以下のように判断されてしまっている。
+					</p>
+					<ul>
+						<li>
+<code>r2</code> に <code>r1</code> を代入するため [<code>r1</code> のライフタイム] ⊆ [<code>r2</code> のライフタイム] が必要
+						</li> <li>
+<code>r1</code> と <code>r2</code> の起源のため [<code>r1</code> のライフタイム] ⊇ [<code>r2</code> のライフタイム] が必要
+						</li> <li>
+上記を同時に満たすには [<code>r1</code> のライフタイム] ＝ [<code>r2</code> のライフタイム] が必要
+						</li>
+					</ul>
+<pre><code class="language-rust">
+fn main() {
+    let mut x = 42;
+    let mut r1 = &amp;mut x;
+    let r2 = &amp;mut *r1;
+
+    if condition() {
+        r1 = r2;
+    }
+
+    stuff(<mark class="error">*r1</mark>);
+}
+
+fn condition() -&gt; bool {
+    true
+}
+
+fn stuff&lt;T&gt;(_x: T) {
+    // nop.
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0503]</mark><mark class="info">: cannot use `*r1` because it was mutably borrowed</mark>
+<mark class="info">  --&gt;</mark> src/main.rs:10:11
+<mark class="info">   |</mark> 
+<mark class="info">4  |</mark>     let r2 = &amp;mut *r1;
+<mark class="info">   |</mark>              <mark class="info">-------- `*r1` is borrowed here</mark>
+<mark class="info">...</mark>
+<mark class="info">10 |</mark>     stuff(*r1);
+<mark class="info">   |</mark>           <mark class="error">^^^</mark>
+<mark class="info">   |</mark>           <mark class="error">|</mark>
+<mark class="info">   |</mark>           <mark class="error">use of borrowed `*r1`</mark>
+<mark class="info">   |</mark>           <mark class="error">borrow later used here</mark>
+</samp></pre>
+				</section> <section>
+					<h2>偽陽性の例 2</h2>
+					<p>
+以下では、<code>map</code> の編集が <code>value</code> の存在のためエラーになる。なお、この位置では <code>value</code> はすでに不要のはずだが、<code>map</code> のライフタイムから生成されているため、そのライフタイムに影響を与えてしまう。
+					</p>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+
+fn main() {
+    let mut map = HashMap::new();
+    let val = or_default(&amp;mut map, 42);
+    assert_eq!(*val, 0);
+}
+
+fn or_default(map: &amp;mut HashMap&lt;i32, i32&gt;, key: i32) -&gt; &amp;mut i32 {
+    match map.get_mut(&amp;key) {
+        Some(value) =&gt; value,
+        None =&gt; {
+            <mark class="error">map</mark>.insert(key, i32::default());
+            <mark class="error">map</mark>.get_mut(&amp;key).unwrap()
+        }
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0499]</mark><mark class="title">: cannot borrow `*map` as mutable more than once at a time</mark>
+<mark class="info">  --&gt;</mark> src/main.rs:13:13
+<mark class="info">   |</mark>
+<mark class="info">9  |</mark>   fn or_default(map: &amp;mut HashMap&lt;i32, i32&gt;, key: i32) -&gt; &amp;mut i32 {
+<mark class="info">   |</mark>                      <mark class="info">- let's call the lifetime of this reference `'1`</mark>
+<mark class="info">10 |</mark>       match map.get_mut(&amp;key) {
+<mark class="info">   |</mark> <mark class="info">      -     --- first mutable borrow occurs here</mark>
+<mark class="info">   |</mark> <mark class="info"> _____|</mark>
+<mark class="info">   |</mark> <mark class="info">|</mark>
+<mark class="info">11 |</mark> <mark class="info">|</mark>         Some(value) =&gt; value,
+<mark class="info">12 |</mark> <mark class="info">|</mark>         None =&gt; {
+<mark class="info">13 |</mark> <mark class="info">|</mark>             map.insert(key, i32::default());
+<mark class="info">   |</mark> <mark class="info">|</mark>             <mark class="error">^^^ second mutable borrow occurs here</mark>
+<mark class="info">14 |</mark> <mark class="info">|</mark>             map.get_mut(&amp;key).unwrap()
+<mark class="info">15 |</mark> <mark class="info">|</mark>         }
+<mark class="info">16 |</mark> <mark class="info">|</mark>     }
+<mark class="info">   |</mark> <mark class="info">|_____- returning this value requires that `*map` is borrowed for `'1`</mark>
+
+<mark class="error">error[E0499]</mark><mark class="title">: cannot borrow `*map` as mutable more than once at a time</mark>
+<mark class="info">  --&gt;</mark> src/main.rs:14:13
+<mark class="info">   |</mark>
+<mark class="info">9  |</mark>   fn or_default(map: &amp;mut HashMap&lt;i32, i32&gt;, key: i32) -&gt; &amp;mut i32 {
+<mark class="info">   |</mark>                      <mark class="info">- let's call the lifetime of this reference `'1`</mark>
+<mark class="info">10 |</mark>       match map.get_mut(&amp;key) {
+<mark class="info">   |</mark> <mark class="info">      -     --- first mutable borrow occurs here</mark>
+<mark class="info">   |</mark> <mark class="info"> _____|</mark>
+<mark class="info">   |</mark> <mark class="info">|</mark>
+<mark class="info">11 |</mark> <mark class="info">|</mark>         Some(value) =&gt; value,
+<mark class="info">12 |</mark> <mark class="info">|</mark>         None =&gt; {
+<mark class="info">13 |</mark> <mark class="info">|</mark>             map.insert(key, i32::default());
+<mark class="info">14 |</mark> <mark class="info">|</mark>             map.get_mut(&amp;key).unwrap()
+<mark class="info">   |</mark> <mark class="info">|</mark>             <mark class="error">^^^ second mutable borrow occurs here</mark>
+<mark class="info">15 |</mark> <mark class="info">|</mark>         }
+<mark class="info">16 |</mark> <mark class="info">|</mark>     }
+<mark class="info">   |</mark> <mark class="info">|_____- returning this value requires that `*map` is borrowed for `'1`</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>将来</h1>
+					<div class="subTitle"> Polonius </div>
+				</hgroup>
+				<p>
+参照と借用を個別に追跡する方式。
+				</p> <p>
+前のバージョンにあった不自然な偽陽性がなくなっている。
+				</p>
+				<section>
+					<h2>お試しでの使用</h2>
+					<p>
+開発中の Polonius を試用する場合、以下が必要になる。
+					</p>
+					<ul>
+						<li>
+							<p>
+『<a href="switch_version.xhtml">バージョンの切替</a>』を参考にナイトリー版を有効化。
+							</p>
+						</li>
+						<li>
+							<p>
+ビルド時のコマンドライン引数で Polonius を有効化。<br/>
+(以下は引数を <code>.cargo/config.toml</code> ファイルから指定する場合。)
+							</p>
+<pre><code class="language-toml">
+[build]
+rustflags = ["-Zpolonius"]
+</code></pre>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>

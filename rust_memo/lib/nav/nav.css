@@ -1,5 +1,11 @@
 @charset "utf-8";
 
+nav {
+	.navNone {
+		display: none;
+	}
+}
+
 nav.forPage { 
 	position: fixed;
 	display: flex;
