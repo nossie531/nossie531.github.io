@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0503 - 可変借用中の使用</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0503]</mark><mark class="title">: cannot use `val` because it was mutably borrowed</mark>
+</samp></pre>
+		<p>
+可変借用中のアイテムをその借用外から使用した。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<nav class="sub"/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+以下では、<code>mut_val</code> での <code>val</code> の可変借用中に <code>val</code> を使用している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut val = 42;
+    let mut_val = &amp;mut val;
+    work(<mark class="error">val</mark>);
+    work(mut_val);
+}
+
+fn work&lt;T&gt;(_x: T) {
+    // nop.
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0503]</mark><mark class="title">: cannot use `val` because it was mutably borrowed</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:4:10
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let mut_val = &amp;mut val;
+<mark class="info">  |</mark>                   <mark class="info">-------- `val` is borrowed here</mark>
+<mark class="info">4 |</mark>     work(val);
+<mark class="info">  |</mark>          <mark class="error">^^^ use of borrowed `val`</mark>
+<mark class="info">5 |</mark>     work(mut_val);
+<mark class="info">  |</mark>          <mark class="info">------- borrow later used here</mark>
+</samp></pre>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">NLL の制限</div>
+				</hgroup>
+				<p>
+2025 年現在の借用チェッカー NLL の偽陽性が原因になっている。
+				</p> <p>
+詳しくは『<a href="e_borrow_checker_limitation.xhtml">借用チェッカーの制限</a> - <a href="e_borrow_checker_limitation.xhtml#nll_fp1">偽陽性の例 1</a>』を参照。
+				</p>
+			</section>
+		</section>
+	</body>
+</html>
