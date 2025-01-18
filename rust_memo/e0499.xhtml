@@ -77,12 +77,23 @@ fn main() {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン C</h1>
-					<div class="subTitle">GAT の制限</div>
+					<h1 id="nll_fp">パターン C</h1>
+					<div class="subTitle">NLL の偽陽性</div>
 				</hgroup>
 				<p>
-詳しくは『<a href="e0499_gat_loop.xhtml">E0499 - GAT とループの組合せ制限</a>』を参照。
+2025 年現在の借用チェッカー NLL の偽陽性が原因になっている。
+				</p> <p>
+詳しくは『<a href="e_borrow_checker_limitation.xhtml">借用チェッカーの制限</a> - <a href="e_borrow_checker_limitation.xhtml#nll_fp2">偽陽性の例 2</a>』を参照。
 				</p>
+				<section>
+					<h2>GAT との相性</h2>
+					<p>
+この動作は <a href="associated_type.xhtml#gat">GAT</a> と相性が悪い。
+					</p>
+					<p>
+詳しくは『<a href="e0499_nll_gat.xhtml">E0499 - NLL の偽陽性と GAT</a>』を参照。
+					</p>
+				</section>
 			</section>
 		</section>
 	</body>
