@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 演算子オーバーロードと参照型</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+演算子オーバーロードにおける参照型の考慮について。
+		</p> 
+		<section>
+			<h1>基礎知識</h1>
+			<section>
+				<h2>演算子オーバーロード</h2>
+				<p>
+演算子オーバーロードと使うと、型に対する演算子の挙動を定義できる。
+				</p> <p>
+例えば、組込の数値型 <code>i32</code> などは <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> などが定義されている。
+				</p> <p>
+そして、ユーザが作成した独自型についても、組込型と同様、これらを定義できる。
+				</p>
+			</section>
+		</section> <section>
+			<h1>参照型の考慮</h1>
+			<p>
+組込の数値型の場合、その参照型についても演算子オーバーロードがされている。これにより例えば、組込の数値型どうしの加算だけでなく、その参照どうしの加算でも、同じ結果が得られるようになっている。
+			</p>
+			<section>
+				<h2>左辺と右辺</h2>
+				<p>
+<code>+</code> 演算子のような二項演算子では、左辺と右辺それぞれが値または参照になりうる。
+				</p> <p>
+そのため、組込型をまねるなら、演算子オーバーロードも四回必要になる。
+				</p>
+			</section> <section>
+				<h2>サンプル</h2>
+				<p>
+以下では、三次元座標型 <code>P3</code> とその参照について、四通りの <code>+</code> 演算子を定義している。
+				</p>
+<pre><code class="language-rust">
+use std::ops::Add;
+
+fn main() {
+    let r1 = P3([1, 2, 3]) + P3([4, 5, 6]);
+    let r2 = P3([1, 2, 3]) + &amp;P3([4, 5, 6]);
+    let r3 = &amp;P3([1, 2, 3]) + P3([4, 5, 6]);
+    let r4 = &amp;P3([1, 2, 3]) + &amp;P3([4, 5, 6]);
+    assert!([r1, r2, r3, r4].iter().all(|x| *x == P3([5, 7, 9])));
+}
+
+#[derive(Eq, PartialEq)]
+struct P3([i32; 3]);
+
+impl Add for P3 {
+    type Output = Self;
+    fn add(self, rhs: Self) -&gt; Self::Output {
+        &amp;self + &amp;rhs
+    }
+}
+
+impl Add&lt;&amp;Self&gt; for P3 {
+    type Output = Self;
+    fn add(self, rhs: &amp;Self) -&gt; Self::Output {
+        &amp;self + rhs
+    }
+}
+
+impl Add&lt;P3&gt; for &amp;P3 {
+    type Output = P3;
+    fn add(self, rhs: P3) -&gt; Self::Output {
+        self + &amp;rhs
+    }
+}
+
+impl&lt;'r&gt; Add&lt;&amp;'r P3&gt; for &amp;P3 {
+    type Output = P3;
+    fn add(self, rhs: &amp;'r P3) -&gt; Self::Output {
+        let arr = self.0.iter().enumerate().map(|(i, x)| x + rhs.0[i]);
+        P3(arr.collect::&lt;Vec&lt;_&gt;&gt;().try_into().unwrap())
+    }
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
