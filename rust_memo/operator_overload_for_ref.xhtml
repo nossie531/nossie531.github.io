@@ -18,7 +18,7 @@
 			<section>
 				<h2>演算子オーバーロード</h2>
 				<p>
-演算子オーバーロードと使うと、型に対する演算子の挙動を定義できる。
+演算子オーバーロードを使うと、型に対する演算子の挙動を定義できる。
 				</p> <p>
 例えば、組込の数値型 <code>i32</code> では <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> などが定義されている。
 				</p> <p>
@@ -26,7 +26,7 @@
 				</p>
 			</section>
 		</section> <section>
-			<h1>参照型の考慮</h1>
+			<h1>参照型への対応</h1>
 			<p>
 組込の数値型の場合、その参照型についても演算子オーバーロードがされている。これにより例えば、組込の数値型どうしの加算だけでなく、その参照どうしの加算でも、同じ結果が得られるようになっている。
 			</p>
@@ -52,6 +52,87 @@ fn main() {
     let r4 = &amp;P3([1, 2, 3]) + &amp;P3([4, 5, 6]);
     assert!([r1, r2, r3, r4].iter().all(|x| *x == P3([5, 7, 9])));
 }
+
+#[derive(Eq, PartialEq)]
+struct P3([i32; 3]);
+
+impl Add for P3 {
+    type Output = Self;
+    fn add(self, rhs: Self) -&gt; Self::Output {
+        &amp;self + &amp;rhs
+    }
+}
+
+impl Add&lt;&amp;Self&gt; for P3 {
+    type Output = Self;
+    fn add(self, rhs: &amp;Self) -&gt; Self::Output {
+        &amp;self + rhs
+    }
+}
+
+impl Add&lt;P3&gt; for &amp;P3 {
+    type Output = P3;
+    fn add(self, rhs: P3) -&gt; Self::Output {
+        self + &amp;rhs
+    }
+}
+
+impl&lt;'r&gt; Add&lt;&amp;'r P3&gt; for &amp;P3 {
+    type Output = P3;
+    fn add(self, rhs: &amp;'r P3) -&gt; Self::Output {
+        let arr = self.0.iter().enumerate().map(|(i, x)| x + rhs.0[i]);
+        P3(arr.collect::&lt;Vec&lt;_&gt;&gt;().try_into().unwrap())
+    }
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>トレイトの定義</h1>
+			<p>
+トレイト境界に演算子用のトレイトを指定すれば、同種の演算子が使える型をまとめられる。これにより例えば、数値型と座標型の加算を同じソースコードで扱えるようになる。
+			</p> <p>
+ただし、コンパイラの<a href="https://github.com/rust-lang/rust/issues/37748">バグ</a>により、一つのトレイト境界だけでは型とその参照型の両方を制限できないため、トレイトが二つ必要になる。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、前のサンプルで定義したのと同じ型 <code>P3</code> を二つのトレイトで抽象化している。ここでトレイト <code>Value</code> は <code>+</code> 演算子の左辺が値型の場合を、トレイト <code>ValueRef</code> は <code>+</code> 演算子の左辺が参照型の場合を処理する。
+				</p>
+<pre><code class="language-rust">
+use std::ops::Add;
+
+fn main() {
+    let def = P3([0, 0, 0]);
+    let ret = add(Some(P3([1, 2, 3])), Some(P3([4, 5, 6])), &amp;def);
+    assert!(ret == P3([5, 7, 9]));
+}
+
+fn add&lt;T&gt;(x: Option&lt;T&gt;, y: Option&lt;T&gt;, def: &amp;T) -&gt; T
+where
+    T: Value,
+    for&lt;'a&gt; &amp;'a T: ValueRef&lt;T&gt;
+{
+    match (x, y) {
+        (None, None) =&gt; def + def,
+        (None, Some(y)) =&gt; def + y,
+        (Some(x), None) =&gt; x + def,
+        (Some(x), Some(y)) =&gt; x + y,
+    }
+}
+
+trait Value: Sized
+where Self: Add&lt;Output = Self&gt; + for&lt;'a&gt; Add&lt;&amp;'a Self, Output = Self&gt; {}
+
+impl&lt;T&gt; Value for T
+where T: Add&lt;Output = Self&gt; + for&lt;'a&gt; Add&lt;&amp;'a Self, Output = Self&gt; {}
+
+trait ValueRef&lt;V&gt;: Sized
+where Self: Add&lt;V, Output = V&gt; + for&lt;'a&gt; Add&lt;&amp;'a V, Output = V&gt; {}
+
+impl&lt;T, V&gt; ValueRef&lt;V&gt; for T
+where T: Add&lt;V, Output = V&gt; + for&lt;'a&gt; Add&lt;&amp;'a V, Output = V&gt; {}
+
+// -- `P3` definition -- //
 
 #[derive(Eq, PartialEq)]
 struct P3([i32; 3]);
