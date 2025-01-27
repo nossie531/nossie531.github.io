@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0275 - トレイト確認の無限再帰</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0275]</mark><mark class="title">: overflow evaluating the requirement `Xxx&lt;Xxx&lt;Xxx&lt;Xxx&lt;Xxx&lt;Xxx&lt;Xxx&lt;...&gt;&gt;&gt;&gt;&gt;&gt;&gt;: Food`</mark>
+</samp></pre>
+		<p>
+トレイトの確認作業が無限再帰になってしまった。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<nav class="sub"/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+トレイト実装の確認において、その境界条件から同じトレイト実装の確認がまた必要となり、これが無限再帰する。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>T</code> が <code>MyTrait</code> になるには、<code>Wrap&lt;T&gt;</code> が <code>MyTrait</code> であればよい。<br/>
+そして、<code>Wrap&lt;T&gt;</code> が <code>MyTrait</code> になるには、<code>Wrap&lt;Wrap&lt;T&gt;&gt;</code> が <code>MyTrait</code> であればよい。<br/>
+さらに、……と続いて永遠に確認が終らない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    with_t(0);
+}
+
+fn with_t&lt;T: <mark class="error">MyTrait</mark>&gt;(_: T) {}
+
+trait MyTrait {}
+impl&lt;T&gt; MyTrait for T where Wrap&lt;T&gt;: <mark class="error">MyTrait</mark> {}
+
+struct Wrap&lt;T&gt;(T);
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0275]</mark><mark class="title">: overflow evaluating the requirement `Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;...&gt;&gt;&gt;&gt;&gt;&gt;&gt;: MyTrait`</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:5:14
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> fn with_t&lt;T: MyTrait&gt;(_: T) {}
+<mark class="info">  |</mark>              <mark class="error">^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]` attribute to your crate (`rust_test`)
+<mark class="edit">note</mark>: required for `Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;...&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;` to implement `MyTrait`
+<mark class="info"> --&gt;</mark> src/main.rs:8:9
+<mark class="info">  |</mark>
+<mark class="info">8 |</mark> impl&lt;T&gt; MyTrait for T where Wrap&lt;T&gt;: MyTrait {}
+<mark class="info">  |</mark>         <mark class="edit">^^^^^^^     ^</mark>                <mark class="info">------- unsatisfied trait bound introduced here</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: 126 redundant requirements hidden
+<mark class="info">  =</mark> <mark class="title">note</mark>: required for `T` to implement `MyTrait`
+<mark class="info">  =</mark> <mark class="title">note</mark>: the full name for the type has been written to 'D:\dev\rust_test\target\debug\deps\rust_test-6b3b9ca234395a90.long-type-387083807051803833.txt'    
+<mark class="info">  =</mark> <mark class="title">note</mark>: consider using `--verbose` to print the full type name to the console
+<mark class="info"></mark>
+<mark class="error">error[E0275]</mark><mark class="title">: overflow evaluating the requirement `Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;...&gt;&gt;&gt;&gt;&gt;&gt;&gt;: MyTrait`</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:8:38
+<mark class="info">  |</mark>
+<mark class="info">8 |</mark> impl&lt;T&gt; MyTrait for T where Wrap&lt;T&gt;: MyTrait {}
+<mark class="info">  |</mark>                                      <mark class="error">^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]` attribute to your crate (`rust_test`)
+<mark class="edit">note</mark>: required for `Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;...&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;` to implement `MyTrait`
+<mark class="info"> --&gt;</mark> src/main.rs:8:9
+<mark class="info">  |</mark>
+<mark class="info">8 |</mark> impl&lt;T&gt; MyTrait for T where Wrap&lt;T&gt;: MyTrait {}
+<mark class="info">  |</mark>         <mark class="edit">^^^^^^^     ^</mark>                <mark class="title">------- unsatisfied trait bound introduced here</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: 126 redundant requirements hidden
+<mark class="info">  =</mark> <mark class="title">note</mark>: required for `Wrap&lt;T&gt;` to implement `MyTrait`
+<mark class="info">  =</mark> <mark class="title">note</mark>: the full name for the type has been written to 'D:\dev\rust_test\target\debug\deps\rust_test-6b3b9ca234395a90.long-type-3390070394551464438.txt'   
+<mark class="info">  =</mark> <mark class="title">note</mark>: consider using `--verbose` to print the full type name to the console
+<mark class="info"></mark>
+<mark class="title">For more information about this error, try `rustc --explain E0275`.</mark>
+<mark class="error">error</mark>: could not compile `rust_test` (bin "rust_test") due to 2 previous errors
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="bug">パターン B</h1>
+					<div class="subTitle">バグ</div>
+				</hgroup>
+				<p>
+<time>2025 年現在</time>まだ修正されていないコンパイラの<a href="https://github.com/rust-lang/rust/issues/37748">バグ</a>が原因。
+				</p> <p>
+このパターンでは無限再帰しないはずだが、誤動作しているらしい。
+				</p> <p>
+条件は基本形と似ている。まず、基本形と同様、実装対象の型と境界の型は、型パラメタ部分以外の型の構造とトレイトが同じになる。ただし、基本形では実装対象の型のパラメタ部分を他の型で包含したのが境界の型になるが、このパターンではそれが逆になる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>MyTrait</code> の実装対象の型 <code>&amp;'a Wrap&lt;T&gt;</code> に境界の型 <code>&amp;'a T</code> がある。ここで、両者はどちらも <code>MyTrait</code> を実装し、前者は後者の <code>T</code> を <code>Wrap</code> で包含しており、バグの条件を満たしている。なお、<code>MyTrait</code> の実装型には <code>&amp;'a i32</code> もあるが、トレイト実装どうしが衝突するのを予防するため、エラーとなる側も確認されてしまう。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    <mark class="error">with_t(0i32)</mark>;
+}
+
+fn with_t&lt;T&gt;(_: T) where for&lt;'a&gt; &amp;'a T: MyTrait {}
+
+trait MyTrait {}
+impl&lt;'a&gt; MyTrait for &amp;'a i32 {}
+impl&lt;'a, T&gt; MyTrait for &amp;'a Wrap&lt;T&gt; where &amp;'a T: MyTrait {}
+
+#[allow(dead_code)]
+struct Wrap&lt;T&gt;(T);
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0275]</mark><mark class="title">: overflow evaluating the requirement `&amp;Wrap&lt;_&gt;: MyTrait`</mark>
+<mark class="info"> --&gt;</mark> src/main.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     with_t(0i32);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]` attribute to your crate (`rust_test`)
+<mark class="edit">note</mark>: required for `&amp;Wrap&lt;Wrap&lt;_&gt;&gt;` to implement `MyTrait`
+<mark class="info"> --&gt;</mark> src/main.rs:9:13
+<mark class="info">  |</mark>
+<mark class="info">9 |</mark> impl&lt;'a, T&gt; MyTrait for &amp;'a Wrap&lt;T&gt; where &amp;'a T: MyTrait {}
+<mark class="info">  |</mark>             <mark class="edit">^^^^^^^     ^^^^^^^^^^^</mark>              <mark class="info">------- unsatisfied trait bound introduced here</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: 126 redundant requirements hidden
+<mark class="info">  =</mark> <mark class="title">note</mark>: required for `&amp;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;Wrap&lt;...&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;` to implement `for&lt;'a&gt; MyTrait`
+<mark class="edit">note:</mark> required by a bound in `with_t`
+<mark class="info"> --&gt;</mark> src/main.rs:5:48
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> fn with_t&lt;T&gt;(_: T) where for&lt;'a&gt; &amp;'a T: MyTrait {}
+<mark class="info">  |</mark>                                         <mark class="edit">^^^^^^^ required by this bound in `with_t`</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: the full name for the type has been written to 'D:\dev\rust_test\target\debug\deps\rust_test-6b3b9ca234395a90.long-type-12800731075102081934.txt'  
+<mark class="info">  =</mark> <mark class="title">note</mark>: consider using `--verbose` to print the full type name to the console
+<mark class="info"></mark>
+<mark class="title">For more information about this error, try `rustc --explain E0275`.</mark>
+<mark class="error">error</mark><mark class="title">:</mark> could not compile `rust_test` (bin "rust_test") due to 1 previous error
+</samp></pre>
+				</section> <section>
+					<h2>新しいトレイトソルバー</h2>
+					<p>
+開発中のトレイトソルバーではこの問題が発生しない。
+					</p> <p>
+試用手順は以下の通り。
+					</p>
+					<ul>
+						<li>
+							<p>
+ナイトリー版を有効化<br/>
+(具体的な方法は『<a href="switch_version.xhtml">バージョンの切替</a>』を参照)
+							</p>
+						</li> <li>
+							<p>
+ビルド時のコマンドライン引数で新しいトレイトソルバーを有効化。<br/>
+(以下は <code>.cargo/config.toml</code> ファイルからの引数の指定方法)
+							</p>
+<pre><code class="language-toml">
+[build]
+rustflags = ["-Znext-solver"]
+</code></pre>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
