@@ -100,7 +100,7 @@ fn stuff&lt;T&gt;(_x: T) {
 <mark class="info">   |</mark>           <mark class="error">borrow later used here</mark>
 </samp></pre>
 				</section> <section>
-					<h2>偽陽性の例 2</h2>
+					<h2 id="nll_fp2">偽陽性の例 2</h2>
 					<p>
 以下では、<code>map</code> の編集が <code>value</code> の存在のためエラーになる。なお、この位置では <code>value</code> はすでに不要のはずだが、最初の分岐アームの要求から、<code>map</code> のライフタイムの借用対象となってしまっている。
 					</p>
