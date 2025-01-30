@@ -31,7 +31,7 @@
 			const meta = document.createElement("meta");
 			meta.name = "viewport";
 			meta.content = "width=device-width,initial-scale=1,minimum-scale=1";
-			document.head.insertBefore(meta, document.head.firstElement);
+			document.head.insertBefore(meta, document.head.firstElementChild);
 		}
 
 		/* Chrome は XHTML と ES Module の組合せに未対応のため自前でロード。
