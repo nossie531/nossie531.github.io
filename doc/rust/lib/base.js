@@ -34,42 +34,13 @@
 			document.head.insertBefore(meta, document.head.firstElement);
 		}
 
-		// Google Analytics との連携を設定。
-		#setupGoogleAnalytics() {
-			const scriptHolder = document.currentScript.parentNode;
-			scriptHolder.append(this.#createGtagJs());
-			window.dataLayer = window.dataLayer || [];
-			gtag('js', new Date());
-			gtag('config', 'G-X01B3QVSC1');
-			function gtag() {
-				dataLayer.push(arguments);
-			}
-		}
-
-		// Google 連携用の script 要素を構築。
-		#createGtagJs(src) {
-			const url = "https://www.googletagmanager.com/gtag/js?id=G-X01B3QVSC1";
-			const result = this.#createScriptElement(url);
-			return result;
-		}
-
-		// script 要素を構築。
-		#createScriptElement(src) {
-			const result = document.createElement("script");
-			result.src = src;
-			result.async = true;
-			return result;
-		}
-
 		/* Chrome は XHTML と ES Module の組合せに未対応のため自前でロード。
 		 - https://issues.chromium.org/issues/40518469 */
 		#setupScripts() {
 			const scriptHolder = document.currentScript.parentNode;
-			const navJs = this.#createScriptElement("../../lib/nav/nav.js");
-			const quoteJs = this.#createScriptElement("../../lib/quote.js");
-			const prismJs = this.#createScriptElement("../../lib/prism/prism.js");
-			prismJs.addEventListener("load", this.#setupPrismJs.bind(this));
-			scriptHolder.append(navJs, quoteJs, prismJs);
+			import("../../../lib/nav/nav.js");
+			import("../../../lib/quote.js");
+			import("../../../lib/prism/prism.js").then(() => this.#setupPrismJs());
 		}
 
 		/* Prism.js の tabindex の自動設定を無効化。
@@ -85,6 +56,26 @@
 			const selector = "pre > code:only-child, pre > samp:only-child";
 			for (const target of document.querySelectorAll(selector)) {
 				target.setAttribute("tabindex", 0);
+			}
+		}
+
+		// Google Analytics との連携を設定。
+		#setupGoogleAnalytics() {
+			const gtagId = "G-X01B3QVSC1";
+			createGtagJs();
+			setDataLayer();
+
+			function createGtagJs() {
+				const scriptHolder = document.currentScript.parentNode;
+				const script = document.createElement("script");
+				script.src = `https://www.googletagmanager.com/gtag/js?id=${gtagId}`;
+				scriptHolder.append(script);
+			}
+
+			function setDataLayer() {
+				window.dataLayer = window.dataLayer || [];
+				window.dataLayer.push("js", new Date());
+				window.dataLayer.push("config", gtagId);
 			}
 		}
 
