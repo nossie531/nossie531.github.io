@@ -64,10 +64,10 @@
 			const gtagId = "G-X01B3QVSC1";
 			window.gtag = gtag;
 			window.dataLayer = window.dataLayer || [];
-			createGtagJs();
+			setGtagJs();
 			setDataLayer();
 
-			function createGtagJs() {
+			function setGtagJs() {
 				const scriptHolder = document.currentScript.parentNode;
 				const script = document.createElement("script");
 				script.src = `https://www.googletagmanager.com/gtag/js?id=${gtagId}`;
