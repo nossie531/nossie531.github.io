@@ -73,9 +73,10 @@
 			}
 
 			function setDataLayer() {
+				const gtag = () => window.dataLayer.push(arguments);
 				window.dataLayer = window.dataLayer || [];
-				window.dataLayer.push("js", new Date());
-				window.dataLayer.push("config", gtagId);
+				gtag("js", new Date());
+				gtag("config", gtagId);
 			}
 		}
 
