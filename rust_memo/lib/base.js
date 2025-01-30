@@ -65,9 +65,9 @@
 		 - https://issues.chromium.org/issues/40518469 */
 		#setupScripts() {
 			const scriptHolder = Util.getCurrentScript().parentNode;
-			const navJs = this.#createScriptElement("lib/nav/nav.js");
-			const quoteJs = this.#createScriptElement("lib/quote.js");
-			const prismJs = this.#createScriptElement("lib/prism/prism.js");
+			const navJs = this.#createScriptElement("../lib/nav/nav.js");
+			const quoteJs = this.#createScriptElement("../lib/quote.js");
+			const prismJs = this.#createScriptElement("../lib/prism/prism.js");
 			prismJs.addEventListener("load", this.#setupPrismJs.bind(this));
 			scriptHolder.append(navJs, quoteJs, prismJs);
 		}

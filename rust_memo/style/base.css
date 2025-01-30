@@ -24,7 +24,7 @@
 @import url("import/quote.css") layer(import_quote);
 @import url("import/prism.css") layer(import_prism);
 @import url("import/console_rustc.css") layer(import_console_rustc);
-@import url("../lib/nav/nav.css") layer(import_nav);
+@import url("../../lib/nav/nav.css") layer(import_nav);
 
 @layer root {
 	:root {
