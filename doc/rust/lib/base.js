@@ -23,7 +23,7 @@
 
 		// 現在実行中のスクリプトの直後にタイトルを追加。
 		static insertTitle() {
-			Util.getCurrentScript().parentNode.append(document.title);
+			document.currentScript.parentNode.append(document.title);
 		}
 		
 		// ビューポートを設定。
@@ -36,7 +36,7 @@
 
 		// Google Analytics との連携を設定。
 		#setupGoogleAnalytics() {
-			const scriptHolder = Util.getCurrentScript().parentNode;
+			const scriptHolder = document.currentScript.parentNode;
 			scriptHolder.append(this.#createGtagJs());
 			window.dataLayer = window.dataLayer || [];
 			gtag('js', new Date());
@@ -64,7 +64,7 @@
 		/* Chrome は XHTML と ES Module の組合せに未対応のため自前でロード。
 		 - https://issues.chromium.org/issues/40518469 */
 		#setupScripts() {
-			const scriptHolder = Util.getCurrentScript().parentNode;
+			const scriptHolder = document.currentScript.parentNode;
 			const navJs = this.#createScriptElement("../../lib/nav/nav.js");
 			const quoteJs = this.#createScriptElement("../../lib/quote.js");
 			const prismJs = this.#createScriptElement("../../lib/prism/prism.js");
@@ -121,12 +121,6 @@
 
 	// ユーティリティクラス。
 	class Util {
-		// 現在実行中のスクリプトを取得。
-		static getCurrentScript() {
-			const scripts = document.getElementsByTagName("script");
-			return scripts[scripts.length - 1];
-		}
-
 		// iframe のロード後にコールバックを設定。
 		static afterIframeLoaded(iframe, callback) {
 			const exec = () => callback(iframe);
