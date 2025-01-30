@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<script src="../../../../../lib/quote.js"></script>
+		<link rel="stylesheet" href="../../../../../style/quote_frame.css"/>
+	</head>
+	<body class="forQuote">
+		<blockquote cite="https://doc.rust-lang.org/reference/items/implementations.html#orphan-rules">
+			<h4 id="orphan-rules">
+				<a class="header" href="#orphan-rules">孤児ルール</a>
+			</h4>
+			<p>
+<code>impl&lt;P1..=Pn&gt; Trait&lt;T1..=Tn&gt; for T0</code> があるとすると、<code class="hljs">impl</code> は最低でも以下のどれか一つが真の場合にのみ妥当になる。
+			</p>
+			<ul>
+				<li>
+<code class="hljs">Trait</code> が<a href="../glossary.html#local-trait">ローカルトレイト</a>である。
+				</li> <li>
+以下を全て満たす。
+					<ul>
+						<li>
+最低でも <code class="hljs">T0..=Tn</code> のどれか一つの型は<a href="../glossary.html#local-type">ローカル型</a>でなければならない。<code class="hljs">Ti</code> をそうした最初の型だとする。
+						</li> <li>
+<code class="hljs">T0..Ti</code> (<code class="hljs">Ti</code> は含まない) に<a href="../glossary.html#uncovered-type">カバーなしの型</a>パラメタ <code class="hljs">P1..=Pn</code> が表れない。
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+<em>カバーなし</em>&#x2009;の型パラメタの出現のみが制限される。コヒーレンスの観点では<a href="../glossary.html#fundamental-type-constructors">基本型</a>は特別である点に注意。<code class="hljs">Box&lt;T&gt;</code> 内の <code class="hljs">T</code> はカバーありだとは見なされず、<code class="hljs">Box&lt;LocalType&gt;</code> もローカルだと見なされる。
+			</p>
+		</blockquote>
+	</body>
+</html>
+

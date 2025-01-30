@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<script src="../../../../../lib/quote.js"></script>
+		<script src="../../../../../lib/prism/prism.js"></script>
+		<link rel="stylesheet" href="../../../../../style/quote_frame.css"/>
+	</head>
+	<body class="forQuote">
+		<blockquote cite="https://doc.rust-lang.org/stable/reference/items/associated-items.html#methods">
+			<h3 id="methods">
+<a class="header" href="#methods">メソッド</a>
+			</h3>
+			<p>
+最初のパラメタの名前が <code>self</code> の関連関数は<em>メソッド</em>と呼ばれ、通常の関数呼出記法と同様に、<a href="../expressions/method-call-expr.html">メソッド呼出演算子</a>からも起動できる、これは例えば <code>x.foo()</code> のようになる。
+			</p> <p>
+<code>self</code> パラメタに型を指定する場合、それは以下の文法で生成されるどれかに解決できる型に制限される (ここで <code>'lt</code> は任意のライフタイムを表す):
+			</p>
+<pre><code class="language-text">P = &amp;'lt S | &amp;'lt mut S | Box&lt;S&gt; | Rc&lt;S&gt; | Arc&lt;S&gt; | Pin&lt;P&gt;
+S = Self | P
+</code></pre>
+			<p>
+この文法での <code>Self</code> 終端子は実装中の型へと解決される型を表す。これには、文脈上その型の別名となる <code>Self</code> や、他の型の別名、または実装型へと解決される関連型の写像も含まれる。
+			</p>
+<pre><code class="language-rust">// Examples of methods implemented on struct `Example`.
+struct Example;
+type Alias = Example;
+trait Trait { type Output; }
+impl Trait for Example { type Output = Example; }
+impl Example {
+    fn by_value(self: Self) {}
+    fn by_ref(self: &amp;Self) {}
+    fn by_ref_mut(self: &amp;mut Self) {}
+    fn by_box(self: Box&lt;Self&gt;) {}
+    fn by_rc(self: Rc&lt;Self&gt;) {}
+    fn by_arc(self: Arc&lt;Self&gt;) {}
+    fn by_pin(self: Pin&lt;&amp;Self&gt;) {}
+    fn explicit_type(self: Arc&lt;Example&gt;) {}
+    fn with_lifetime&lt;'a&gt;(self: &amp;'a Self) {}
+    fn nested&lt;'a&gt;(self: &amp;mut &amp;'a Arc&lt;Rc&lt;Box&lt;Alias&gt;&gt;&gt;) {}
+    fn via_projection(self: &lt;Example as Trait&gt;::Output) {}
+}
+</code></pre>
+		</blockquote>
+	</body>
+</html>
+

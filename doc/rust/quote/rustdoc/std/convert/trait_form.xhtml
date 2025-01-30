@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<script src="../../../../../../lib/quote.js"></script>
+		<link rel="stylesheet" href="../../../../../../style/quote_frame.css"/>
+		<link rel="stylesheet" href="../../base.css"/>
+	</head>
+	<body class="forQuote">
+		<blockquote cite="https://doc.rust-lang.org/std/convert/trait.From.html#when-to-implement-from">
+			<p>
+<code>From</code> の実装を使って行える変換に技術的制約はないが、一般的な期待としては変換はおおむね以下のように制限される。
+			</p>
+			<ul>
+				<li>
+					<p>
+変換は<em>失敗しない</em> : もし変換が失敗しうるなら、代わりに <a href="trait.TryFrom.html" title="trait std::convert::TryFrom"><code>TryFrom</code></a> を使え; パニックする <code>From</code> を提供するな。
+					</p>
+				</li> <li>
+					<p>
+変換は<em>情報を欠落させない</em> : 意味論として、情報を失ったり破棄したりすべきでない。例えば、<code>i32: From&lt;u16&gt;</code> では、元の値は <code>u16: TryFrom&lt;i32&gt;</code> を使って復元できる。また、<code>String: From&lt;&amp;str&gt;</code> では、元の値と同等のものが <code>Deref</code> 経由で取得できる。しかし、<code>From</code> は <code>u32</code> から <code>u16</code> への変換には使えない、なぜならこれは情報の欠落なしには成しえない。(ここで意味論に関係のない情報については余地がある。例えば、<code>Box&lt;[T]&gt;: From&lt;Vec&lt;T&gt;&gt;</code> では、容量が違っても二つのベクターが等しくなりうるように、容量を維持しないかもしれない。)
+					</p>
+				</li> <li>
+					<p>
+変換は<em>値を維持する</em> : Rust の型と技術的表現が異なっても、概念的な種類と結果値の意味は同じになる。例えば、<code>as</code> でキャストを戻せば元の値を復元できるため、<code>-1_i8 as u8</code> は<em>情報を欠落させない</em>が、<code>-1</code> と <code>255</code> は概念的に異なる値であるため (技術的には同じビットパターンだが) その変換は <code>From</code> を通しては<em>利用できない</em>。ただし <code>f32: From&lt;i16&gt;</code> は <code>1_i16</code> と <code>1.0_f32</code> は概念的に同じ実数であるため (技術的には全く異なるビットパターンだが) <em>利用できる</em>。<code>String: From&lt;char&gt;</code> はどちらも<em>テキスト</em>なので利用できるが、<code>String: From&lt;u32&gt;</code> は <code>1</code> (数) と <code>"1"</code> (テキスト) があまりに異なるために<em>利用できない</em>。(値のテキストへの変換は代わりに <a href="../fmt/trait.Display.html" title="trait std::fmt::Display"><code>Display</code></a> トレイトによりカバーされる。)
+					</p>
+				</li> <li>
+					<p>
+変換は<em>明確になる</em> : それは二つの型の間の唯一の合理的変換である。そうでなければ、<a href="../primitive.str.html#method.as_bytes" title="method str::as_bytes"><code>str::as_bytes</code></a> がメソッドであるように、また整数がメソッド <a href="../primitive.u32.html#method.from_ne_bytes" title="associated function u32::from_ne_bytes"><code>u32::from_ne_bytes</code></a>, <a href="../primitive.u32.html#method.from_le_bytes" title="associated function u32::from_le_bytes"><code>u32::from_le_bytes</code></a>, そして <a href="../primitive.u32.html#method.from_be_bytes" title="associated function u32::from_be_bytes"><code>u32::from_be_bytes</code></a> を持ち、そのどれもが <code>From</code> を実装していないように、名前付きのメソッドやコンストラクタを持った方が良い。一方で <a href="../net/struct.Ipv6Addr.html" title="struct std::net::Ipv6Addr"><code>Ipv6Addr</code></a> を <a href="../net/enum.IpAddr.html" title="enum std::net::IpAddr"><code>IpAddr</code></a> にラップするには唯一の合理的な方法があり、そのため <code>IpAddr: From&lt;Ipv6Addr&gt;</code> がある。
+					</p>
+				</li>
+			</ul>
+		</blockquote>
+	</body>
+</html>
+
