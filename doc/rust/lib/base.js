@@ -62,6 +62,8 @@
 		// Google Analytics との連携を設定。
 		#setupGoogleAnalytics() {
 			const gtagId = "G-X01B3QVSC1";
+			window.gtag = gtag;
+			window.dataLayer = window.dataLayer || [];
 			createGtagJs();
 			setDataLayer();
 
@@ -69,14 +71,17 @@
 				const scriptHolder = document.currentScript.parentNode;
 				const script = document.createElement("script");
 				script.src = `https://www.googletagmanager.com/gtag/js?id=${gtagId}`;
+				script.async = true;
 				scriptHolder.append(script);
 			}
 
 			function setDataLayer() {
-				window.gtag = () => window.dataLayer.push(arguments);
-				window.dataLayer = window.dataLayer || [];
 				gtag("js", new Date());
 				gtag("config", gtagId);
+			}
+
+			function gtag() {
+				window.dataLayer.push(arguments);
 			}
 		}
 
