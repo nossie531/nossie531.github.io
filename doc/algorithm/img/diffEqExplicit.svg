@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340" height="340">
+	<style>
+@import url("style/diffEq.css");
+	</style>
+	<script href="lib/graphViewer.js"/>
+	<script href="lib/diffEq.js"/>
+	<script>//<![CDATA[
+document.addEventListener("DOMContentLoaded", () => {
+	const ctx = getContext();
+	const viewer = new GraphViewer(ctx.range, ctx.origin, ctx.gridArea);
+	viewer.appendAxis("axis");
+	viewer.appendGridX("step", ctx.largeStep);
+	drawReal(viewer);
+	drawCalc(viewer);
+});
+
+function drawReal(viewer) {
+	const pathArr = getAlgorithm(getContext().smallStep).result();
+	viewer.setFuncPath("r1", pathArr[0]);
+	viewer.setFuncPath("r2", pathArr[1]);
+}
+
+function drawCalc(viewer) {
+	const pathArr = getAlgorithm().result();
+	viewer.setFuncPath("c1", pathArr[0]);
+	viewer.setFuncPath("c2", pathArr[1]);
+	viewer.setPathLine("g1", pathArr[0], 50);
+	viewer.setPathLine("g2", pathArr[1], 50);
+	viewer.setLabel("n1", pathArr[0][0], -25);
+	viewer.setLabel("n2", pathArr[1][0], -25);
+}
+
+function getAlgorithm(step) {
+	const result = new ExplicitDiffEq;
+	result.dc = getContext().dc;
+	result.step = step || getContext().largeStep;
+	result.range = getContext().range;
+	result.nodes = getContext().nodes;
+	return result;
+}
+
+function getContext() {
+	return {
+		dc: 0.0017,
+		diff: 30,
+		smallStep: 5,
+		largeStep: 200,
+		range: {min: 0, max: 200},
+		origin: {x: 10, y: 10},
+		gridArea: {x: 25, y:15, width: 230, height: 310},
+		nodes: [270, 20]
+	};
+}
+	//]]></script>
+	<defs>
+		<marker id="point" markerUnits="userSpaceOnUse"
+			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
+			<circle r="3"/>
+		</marker>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M2,0 L-6,4 -6,-4 Z"/>
+		</marker>
+		<marker id="gradSrc" markerUnits="userSpaceOnUse"
+			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
+			<circle r="4"/>
+		</marker>
+		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M3,0 L-8,6 -8,-6 Z"/>
+		</marker>
+		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
+			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
+			<path d="M 0,0 V -10"/>
+		</marker>
+	</defs>
+	<g>
+		<!-- 座標軸。-->
+		<g id="axis"/>
+		<!-- ステップ。-->
+		<g id="step"/>
+		<!-- 誤差表示。-->
+		<path class="error" d="M 235,107.04 V 130"/>
+		<!-- 真の値。-->
+		<path id="r1" class="flow"/>
+		<path id="r2" class="flow"/>
+		<!-- 計算値。-->
+		<path id="c1" class="calc endCap"/>
+		<path id="c2" class="calc endCap"/>
+		<!-- 勾配の方向。-->
+		<path id="g1" class="grad"/>
+		<path id="g2" class="grad"/>
+		<!-- 横軸ラベル。-->
+		<text class="label" x="265" y="315">
+			<tspan class="symbol">t</tspan>
+		</text>	
+		<!-- ノードラベル。-->
+		<text id="n1" class="label">
+			<tspan class="symbol">n</tspan><tspan class="sub" dy="0.7em">1</tspan>
+		</text>	
+		<text id="n2" class="label">
+			<tspan class="symbol">n</tspan><tspan class="sub" dy="0.7em">2</tspan>
+		</text>	
+		<!-- 誤差ラベル。-->
+		<text class="label error" x="255" y="120">
+			Error
+		</text>
+	</g>
+</svg>

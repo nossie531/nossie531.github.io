@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:m="http://www.w3.org/1998/Math/MathML"
+	  xml:lang="ja">
+	<head>
+		<title>拡散方程式の初期値問題</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<link rel="stylesheet" href="style/diffEq.css"/>
+		<script src="lib/base.js"></script>
+		<script defer="defer" src="../../lib/katex/katex.min.js"></script>
+		<script defer="defer" src="../../lib/katex/contrib/auto-render.min.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p class="todo">
+注: 書きかけです (残: Exponential Integrator について)。
+		</p> <p>
+ネットワーク上の拡散方程式の初期値問題について、各アルゴリズムの特徴を紹介する。
+		</p>
+		<section>
+			<h1>Runge-Kutta 法</h1>
+			<p>
+『<a href="rungeKutta.xhtml">Runge-Kutta 法</a>』に分類される各手法では以下のようになる。
+			</p>
+			<table id="finiteDiff" class="normal">
+				<thead>
+					<tr>
+						<th></th>
+						<th>単純さ</th>
+						<th>安定性</th>
+						<th>精度</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th>1 次の陽解法 </th>
+						<td>○</td>
+						<td>×</td>
+						<td>×</td>
+					</tr> <tr>
+						<th>1 次の陰解法 </th>
+						<td>×</td>
+						<td>〇</td>
+						<td>×</td>
+					</tr> <tr>
+						<th>Crank-Nicolson 法 </th>
+						<td>×</td>
+						<td>△</td>
+						<td>〇</td>
+					</tr>
+				</tbody>
+			</table>
+			<p>
+※ Crank-Nicolson 法は二次の陰解法にあたる。<br/>
+※ 低次のものを紹介したが高次でも似た傾向がある。
+			</p>
+			<section>
+				<h2>記号の導入</h2>
+				<ul>
+					<li>
+\(n_i(t)\) は \(i\) 番目のノードの時刻 \(t\) の値。
+					</li> <li>
+\(w_{ij}\) は \(n_i\) から \(n_j\) へのエッジの重み。
+					</li>
+				</ul>
+			</section> <section>
+				<h1>1 次の陽解法</h1>
+				<p>
+現時点と次時点のノード値を直線で結んだ時、傾きが現時点の状況に従う。
+				</p>
+				<div class="math">
+\[\frac{n_i(t+\Delta{t})-n_i(t)}{\Delta{t}}=\sum_{j}w_{ij} \{n_j(t)-n_i(t)\}\]
+				</div>
+				<p>
+以下はノードが 2 つしかない状況における、1 ステップ分の計算イメージ。濃度勾配は本来は時間変化を伴うが、代表値として現時点での値のみを使うため、精度が低い。
+				</p>
+				<figure class="normal">
+					<object data="img/diffEqExplicit.svg" style="width: calc(30rem * 2 / 3);"/>
+					<figcaption>陽解法での計算</figcaption>
+				</figure>
+				<p>
+以下はノードが 2 つしかない状況における、複数ステップ分の計算イメージ。誤差によりノード値の差が拡大していく可能性がある。これは時間刻みに対して拡散係数が大きすぎると発生する。
+				</p>
+				<div class="cmpFigure full">
+					<figure class="normal">
+						<object data="img/diffEqExplicitVsSmallDc.svg"/>
+						<figcaption>拡散係数小 → 安定</figcaption>
+					</figure>
+					<figure class="normal">
+						<object data="img/diffEqExplicitVsLargeDc.svg"/>
+						<figcaption>拡散係数大 → 不安定</figcaption>
+					</figure>
+				</div>
+			</section> <section>
+				<h1>1 次の陰解法</h1>
+				<p>
+現時点と次時点のノード値を直線で結んだ時、傾きが次時点の状況に従う。
+				</p>
+				<div class="math">
+\[\frac{n_i(t+\Delta{t})-n_i(t)}{\Delta{t}}=\sum_{j}w_{ij} \{n_j(t+\Delta{t})-n_i(t+\Delta{t})\}\]
+				</div>
+				<p>
+これを満たすように次時点のノード値を調整するには、ノードの数だけある上記の式から<a href="linearEq.xhtml">連立線形方程式</a>を立て、\(A \boldsymbol{n}(t+\Delta{t}) = \boldsymbol{n}(t)\) とし、未知ベクトル \(\boldsymbol{n}(t+\Delta{t})\) について解かなければならない。精度については陽解法と同じ要因で低い。
+				</p> <p>
+以下はノードが 2 つしかない状況における、1 ステップ分の計算イメージ。陽解法で逆方向へと時間発展すると、次時点から現時点へと向かうように次時点が調整されている。
+				</p>
+				<figure class="normal">
+					<object data="img/diffEqImplicit.svg" style="width: calc(30rem * 2 / 3);"/>
+					<figcaption>陰解法での計算</figcaption>
+				</figure>
+				<p>
+以下はノードが 2 つしかない状況における、複数ステップ分の計算イメージ。拡散係数によらずノード値の差は常に縮小する。つまり、無条件安定である。
+				</p>
+				<div class="cmpFigure full">
+					<figure class="normal">
+						<object data="img/diffEqImplicitVsSmallDc.svg"/>
+						<figcaption>拡散係数小 → 安定</figcaption>
+					</figure>
+					<figure class="normal">
+						<object data="img/diffEqImplicitVsLargeDc.svg"/>
+						<figcaption>拡散係数大 → 安定</figcaption>
+					</figure>
+				</div>
+			</section> <section>
+				<h1>Crank-Nicolson 法</h1>
+				<p>
+現時点と次時点のノード値を直線で結んだ時、傾きが両時点の平均に従う。
+				</p>
+				<div class="math">
+\[\begin{align}
+\frac{n_i(t+\Delta{t})-n_i(t)}{\Delta{t}}&amp;=\frac{1}{2}\sum_{j}w_{ij} \{n_j(t)-n_i(t)\} \\
+&amp;+\frac{1}{2}\sum_{j}w_{ij} \{n_j(t+\Delta{t})-n_i(t+\Delta{t})\}
+\end{align}\]
+				</div>
+				<p>
+陰解法と同様、<a href="linearEq.xhtml">連立線形方程式</a>を解く必要がある。2 次の差分となるため精度は良い。
+				</p>
+				<p>
+以下はノードが 2 つしかない状況における、1 ステップ分の計算イメージ。
+				</p>
+				<figure class="normal">
+					<object data="img/diffEqCrankNicolson.svg" style="width: calc(30rem * 2 / 3);"/>
+					<figcaption>Crank-Nicolson 法での計算</figcaption>
+				</figure>
+				<p>
+以下はノードが 2 つしかない状況における、複数ステップ分の計算イメージ。拡散係数が大きいと振動することもあるが、その振幅はステップごとに減衰していく。
+				</p>
+				<div class="cmpFigure full">
+					<figure class="normal">
+						<object data="img/diffEqCrankNicolsonVsSmallDc.svg"/>
+						<figcaption>拡散係数小 → 安定</figcaption>
+					</figure>
+					<figure class="normal">
+						<object data="img/diffEqCrankNicolsonVsLargeDc.svg"/>
+						<figcaption>拡散係数大 → 安定 (振動あり)</figcaption>
+					</figure>
+				</div>
+			</section>
+		</section> <section>
+			<h1>考察</h1>
+			<section>
+				<h2>安定性</h2>
+				<p>
+上述のように変化が急になりうる場合、不安定化するため陽解法は使いにくい。
+				</p> 
+			</section> <section>
+				<h2>連立方程式</h2>
+				<p>
+陰解法では連立方程式を解く必要があるが、この解法には反復法が使える場合が多い。なぜなら、連立方程式の計算に利用される行列は、以下のような実用上よく見るネットワークの特徴のため、対角優位の疎行列となりやすい。
+				</p>
+				<ul>
+					<li>
+ノードは近隣の少数のノードとのみ接続している場合が多い。
+					</li> <li>
+ノードの次時点の値は現時点のノードと大きく変わらない。
+					</li>
+				</ul>
+			</section>
+		</section>
+	</body>
+</html>

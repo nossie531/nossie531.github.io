@@ -1,0 +1,9 @@
+:root {
+	--fg-color: hsla(230, 50%, 10%, 0.8);
+	--mc0-color: hsl(150, 5%, 0%);
+	--mc1-color: hsl(150, 5%, 12.5%);
+	--mc2-color: hsl(150, 5%, 25.0%);
+	--mc3-color: hsl(150, 5%, 50.0%);
+	--mc4-color: hsl(150, 5%, 62.5%);
+	--mc5-color: hsl(150, 5%, 75.0%);
+}

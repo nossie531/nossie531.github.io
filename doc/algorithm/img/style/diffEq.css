@@ -1,0 +1,109 @@
+@import url("color.css");
+
+:root {
+	font-size:10px;
+	--error-color: hsl(0, 100%, 70%);
+	--flow-color: hsl(240, 80%, 70%);
+	--aux-color: hsl(0, 0%, 40%);
+	--calc-color: black;
+}
+
+g#axis > path {
+	stroke: var(--mc4-color);
+	stroke-width: 1.5;
+	marker-end: url(#arrow);
+}
+
+g#step > path {
+	stroke: var(--mc5-color);
+	stroke-width: 1;
+	stroke-dasharray: 3;
+}
+
+path.auxStep {
+	stroke: var(--mc5-color);
+	stroke-width: 1;
+	stroke-dasharray: 1 5;
+}
+
+path.flow {
+	fill: none;
+	stroke: var(--flow-color);
+	stroke-width: 1.5;
+}
+
+path.calc {
+	fill: none;
+	stroke: var(--calc-color);
+	stroke-width: 2;
+	marker-start: url(#point);
+	marker-mid: url(#point);
+}
+
+path.calc.endCap {
+	marker-end: url(#point);
+}
+
+path.grad {
+	stroke: var(--calc-color);
+	stroke-width: 3;
+	marker-start: url(#gradSrc);
+	marker-end: url(#gradDst);
+}
+
+path.aux {
+	fill: none;
+	stroke: var(--aux-color);
+	stroke-width: 1.5;
+	marker-mid: url(#auxPoint);
+}
+
+path.error {
+	fill: none;
+	stroke: var(--error-color);
+	stroke-width: 2;
+	marker-start: url(#lengthMark);
+	marker-end: url(#lengthMark);
+}
+
+text.label {
+	font-size: 2rem;
+	font-family: "Times New Roman", serif;
+	dominant-baseline: middle;
+	fill: var(--fg-color);
+}
+
+text.label > tspan.sub {
+	dominant-baseline: auto;
+}
+
+text.error {
+	font-size: 1.5rem;
+	fill: var(--error-color);
+}
+
+tspan.symbol {
+	font-style: italic;
+}
+
+tspan.sub {
+	font-size: 0.6em;
+}
+
+marker#arrow > path {
+	fill: var(--mc4-color);
+}
+
+marker#calcSrc > circle,
+marker#calcDst > path {
+	fill: var(--calc-color);
+}
+
+marker#auxPoint > circle {
+	fill: var(--aux-color);
+}
+
+marker#lengthMark path {
+	stroke: var(--error-color);
+	stroke-width: 1.5;
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 320" height="320">
+	<style>
+@import url("style/diffEq.css");
+	</style>
+	<script href="lib/graphViewer.js"/>
+	<script href="lib/diffEq.js"/>
+	<script>
+document.addEventListener("DOMContentLoaded", () => {
+	const smallStep = 5;
+	const largeStep = 100;
+	const range = {min: 0, max: 315};
+	const origin = {x: 10, y: 20};
+	const gridArea = {x: 25, y: 15, width: 335, height: 285};
+	const viewer = new GraphViewer(range, origin, gridArea);
+	const smallStepResults = getAlgorithm(smallStep, range).result();
+	const largeStepResults = getAlgorithm(largeStep, range).result();
+	viewer.appendAxis("axis");
+	viewer.appendGridX("step", largeStep);
+	viewer.setFuncPath("r1", smallStepResults[0]);
+	viewer.setFuncPath("r2", smallStepResults[1]);
+	viewer.setFuncPath("c1", largeStepResults[0]);
+	viewer.setFuncPath("c2", largeStepResults[1]);
+	viewer.setLabel("n1", largeStepResults[0][0], -25);
+	viewer.setLabel("n2", largeStepResults[1][0], -25);
+});
+
+function getAlgorithm(step, range) {
+	const result = new ExplicitDiffEq;
+	result.dc = 0.003;
+	result.range = range;
+	result.nodes = [220, 20];
+	result.step = step;
+	return result;
+}
+	</script>
+	<defs>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M2,0 L-6,4 -6,-4 Z"/>
+		</marker>
+		<marker id="point" markerUnits="userSpaceOnUse"
+			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
+			<circle r="3"/>
+		</marker>
+	</defs>
+	<g>
+		<!-- 座標軸。-->
+		<g id="axis"/>
+		<!-- ステップ。-->
+		<g id="step"/>
+		<!-- 真の値。-->
+		<path id="r1" class="flow"/>
+		<path id="r2" class="flow"/>
+		<!-- 計算値。-->
+		<path id="c1" class="calc"/>
+		<path id="c2" class="calc"/>
+		<!-- 横軸ラベル。-->
+		<text class="label" x="370" y="280">
+			<tspan class="symbol">t</tspan>
+		</text>	
+		<!-- ノードラベル。-->
+		<text id="n1" class="label">
+			<tspan class="symbol">n</tspan><tspan class="sub" dy="0.7em">1</tspan>
+		</text>	
+		<text id="n2" class="label">
+			<tspan class="symbol">n</tspan><tspan class="sub" dy="0.7em">2</tspan>
+		</text>	
+	</g>
+</svg>

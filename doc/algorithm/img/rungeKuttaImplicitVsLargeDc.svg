@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 300" height="300">
+	<style>
+@import url("style/rungeKutta.css");
+	</style>
+	<script href="lib/graphViewer.js"/>
+	<script href="lib/rungeKutta.js"/>
+	<script>
+document.addEventListener("DOMContentLoaded", () => {
+	const smallStep = 0.1;
+	const largeStep = 1;
+	const range = {min: 0, max: 3.1};
+	const origin = {x: 10, y: 30};
+	const gridArea = {x:15, y:15, width: 335, height: 275};
+	const viewer = new GraphViewer(range, origin, gridArea);
+	const calc = getAlgorithm(largeStep, range).result();
+	const real = getAlgorithm(smallStep, range).result();
+	viewer.magnify = 100;
+	viewer.appendAxis("axis");
+	viewer.appendGridX("step", largeStep);
+	viewer.setFuncPath("real", real);
+	viewer.setFuncPath("calc", calc);
+});
+
+function getAlgorithm(step, range) {
+	const result = new DiffEq;
+	result.range = range;
+	result.value = 1.9;
+	result.step = step;
+	result.execStep = (x, y) => {
+		// 元の式: df = (x, y) => -2.15 * y + 2.32;
+		return (y + 2.32 * step) / (1 + 2.15 * step)
+	};
+	return result;
+}
+	</script>
+	<defs>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M2,0 L-6,4 -6,-4 Z"/>
+		</marker>
+		<marker id="point" markerUnits="userSpaceOnUse"
+			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
+			<circle r="3"/>
+		</marker>
+	</defs>
+	<g>
+		<!-- 座標軸。-->
+		<g id="axis"/>
+		<!-- ステップ。-->
+		<g id="step"/>
+		<!-- 真の値。-->
+		<path id="real" class="flow"/>
+		<!-- 計算値。-->
+		<path id="calc" class="calc"/>
+		<!-- 横軸ラベル。-->
+		<text class="label" x="360" y="260">
+			<tspan class="symbol">t</tspan>
+		</text>	
+	</g>
+</svg>

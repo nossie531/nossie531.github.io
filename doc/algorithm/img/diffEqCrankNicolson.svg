@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340" height="340">
+	<style>
+@import url("style/diffEq.css");
+	</style>
+	<script href="lib/graphViewer.js"/>
+	<script href="lib/diffEq.js"/>
+	<script>//<![CDATA[
+document.addEventListener("DOMContentLoaded", () => {
+	const ctx = getContext();
+	const viewer = new GraphViewer(ctx.range, ctx.origin, ctx.gridArea);
+	viewer.appendAxis("axis");
+	viewer.appendGridX("step", ctx.largeStep);
+	drawReal(viewer);
+	drawCalc(viewer);
+	drawAuxLines(viewer);
+	drawBackDiffusion(viewer);
+});
+
+function drawReal(viewer) {
+	const pathArr = getAlgorithm(getContext().smallStep).result();
+	viewer.setFuncPath("r1", pathArr[0]);
+	viewer.setFuncPath("r2", pathArr[1]);
+}
+
+function drawCalc(viewer) {
+	const pathArr = getAlgorithm().result();
+	viewer.setFuncPath("c1", pathArr[0]);
+	viewer.setFuncPath("c2", pathArr[1]);
+	viewer.setLabel("n1", pathArr[0][0], -25);
+	viewer.setLabel("n2", pathArr[1][0], -25);
+}
+
+function drawAuxLines(viewer) {
+	const fullPathArr = getAlgorithm().result();
+	const halfPathArr = getHalfStepAlgorithm().result();
+	const pathArr = halfPathArr.map((x, i) => x.concat([fullPathArr[i][1]]));
+	viewer.setFuncPath("ax1", pathArr[0]);
+	viewer.setFuncPath("ax2", pathArr[1]);
+}
+
+function drawBackDiffusion(viewer) {
+	const nodes = getAlgorithm().result().map(x => x[1].y);
+	const pathArr = getReverseAlgorithm(nodes).result().map(flipPathX);
+	viewer.setFuncPath("b1", pathArr[0]);
+	viewer.setFuncPath("b2", pathArr[1]);
+}
+
+function flipPathX(points) {
+	const range = getContext().range;
+	const center = (range.max - range.min) / 2;
+	return points.map(p => ({x: center - (p.x - center), y: p.y}));
+}
+
+function getContext() {
+	return {
+		dc: 0.0035,
+		smallStep: 5,
+		largeStep: 200,
+		range: {min: 0, max: 200},
+		origin: {x: 10, y: 10},
+		gridArea: {x: 25, y:15, width: 230, height: 310},
+		nodes: [270, 20]
+	};
+}
+
+function getAlgorithm(step) {
+	const result = new CrankNicolsonDiffEq();
+	result.dc = getContext().dc;
+	result.step = step || getContext().largeStep;
+	result.range = getContext().range;
+	result.nodes = getContext().nodes;
+	return result;
+}
+
+function getHalfStepAlgorithm() {
+	const result = new ExplicitDiffEq();
+	const min = getContext().range.min;
+	result.dc = getContext().dc;
+	result.step = getContext().largeStep / 2;
+	result.range = {min, max: min + getContext().largeStep / 2};
+	result.nodes = getContext().nodes;
+	return result;
+}
+
+function getReverseAlgorithm(nodes) {
+	const result = new ExplicitDiffEq;
+	const baseRange = getContext().range;
+	result.dc = -getContext().dc;
+	result.step = getContext().smallStep;
+	result.range = {min: baseRange.min, max: baseRange.max};
+	result.nodes = nodes;
+	return result;
+}
+	//]]></script>
+	<defs>
+		<marker id="point" markerUnits="userSpaceOnUse"
+			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
+			<circle r="3"/>
+		</marker>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M2,0 L-6,4 -6,-4 Z"/>
+		</marker>
+		<marker id="auxPoint" markerUnits="userSpaceOnUse"
+			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
+			<circle r="3"/>
+		</marker>
+		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
+			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
+			<path d="M 0,0 V -10"/>
+		</marker>
+	</defs>
+	<g>
+		<!-- 座標軸。-->
+		<g id="axis"/>
+		<!-- ステップ。-->
+		<g id="step"/>
+		<!-- 誤差表示。-->
+		<path class="error" d="M 235,139.18 V 147.94"/>
+		<!-- 真の値。-->
+		<path id="r1" class="flow"/>
+		<path id="r2" class="flow"/>
+		<!-- 計算値からの逆拡散。-->
+		<path id="b1" class="flow"/>
+		<path id="b2" class="flow"/>
+		<!-- 補助線。-->
+		<path id="ax1" class="aux"/>
+		<path id="ax2" class="aux"/>
+		<!-- 計算値。-->
+		<path id="c1" class="calc endCap"/>
+		<path id="c2" class="calc endCap"/>
+		<!-- 横軸ラベル。-->
+		<text class="label" x="265" y="315">
+			<tspan class="symbol">t</tspan>
+		</text>	
+		<!-- ノードラベル。-->
+		<text id="n1" class="label">
+			<tspan class="symbol">n</tspan><tspan class="sub" dy="0.7em">1</tspan>
+		</text>	
+		<text id="n2" class="label">
+			<tspan class="symbol">n</tspan><tspan class="sub" dy="0.7em">2</tspan>
+		</text>	
+		<!-- 誤差ラベル。-->
+		<text class="label error" x="255" y="145">
+			Error
+		</text>
+	</g>
+</svg>
