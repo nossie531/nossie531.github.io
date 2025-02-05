@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:m="http://www.w3.org/1998/Math/MathML"
+	  xml:lang="ja">
+	<head>
+		<title>Gram-Schmidt 法</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="lib/base.js"></script>
+		<script defer="defer" src="../../lib/katex/katex.min.js"></script>
+		<script defer="defer" src="../../lib/katex/contrib/auto-render.min.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Base.insertTitle();</script></h1>
+		</header>
+		<p>
+このアルゴリズムでは、入力に線形独立なベクトルの組を与え、出力にそれらと同じ部分空間を張る正規直行系のベクトルの組を得る。
+		</p> 
+		<section>
+			<h1>導入</h1>
+			<section>
+				<h1>基本戦略</h1>
+				<p>
+まずは、全てのベクトルを直行化させる。これは、直行化が未完了のベクトルから、直行化が完了済の全てのベクトルについて、それらとの平行成分を除去する事で行える。これにより、直行化したベクトルを一つずつ増やしていく。
+				</p> <p>
+最後に、直行化したベクトルそれぞれを、単位ベクトルに変換する。
+				</p>
+			</section> <section>
+				<h1>記号の定義</h1>
+				<ul>
+					<li>
+入力ベクトルの組: \(\{\boldsymbol{x}_1, \boldsymbol{x}_2, \cdots, \boldsymbol{x}_n\}\)
+					</li> <li>
+直行ベクトルの組: \(\{\boldsymbol{y}_1, \boldsymbol{y}_2, \cdots, \boldsymbol{y}_n\}\)
+					</li>
+				</ul>
+			</section> <section>
+				<h1>操作の定義</h1>
+				<p>
+ベクトル \(\boldsymbol{a}\) のベクトル \(\boldsymbol{b}\) 方向の平行成分は以下の計算で求められる。
+				</p>
+				<div class="math">
+\[\operatorname{proj}(\boldsymbol{a}, \boldsymbol{b}) =
+\frac
+	{\langle \boldsymbol{a}, \boldsymbol{b} \rangle}
+	{\langle \boldsymbol{b}, \boldsymbol{b} \rangle}
+\boldsymbol{b}\]
+				</div>
+			</section>
+		</section> <section>
+			<h1>各種アルゴリズム</h1>
+			<section>
+				<h1>古典的 Gram-Schmidt 法</h1>
+				<section>
+					<h2>特徴</h2>
+					<p>
+数学的には正しいが、計算機で解くと誤差が大きくなる。
+					</p>
+				</section> <section>
+					<h2>手順</h2>
+					<p>
+直行化における平行成分の計算を愚直に行う。
+					</p> <p>
+つまり、\(\boldsymbol{y}_k\) は以下のように計算される。
+					</p>
+					<div class="math">
+\[\boldsymbol{y}_k = \boldsymbol{x}_k - \sum_{i=1}^{k-1}{\operatorname{proj}(\boldsymbol{x}_k,\boldsymbol{y}_i)}\]
+					</div>
+				</section>
+			</section> <section>
+				<h1>修正 Gram-Schmidt 法</h1>
+				<section>
+					<h2>特徴</h2>
+					<p>
+数学的には古典版と同じだが、計算機で解いた場合の誤差がそれより小さい。
+					</p>
+				</section> <section>
+					<h2>手順</h2>
+					<p>
+直行化における平行成分の計算を、対象ベクトルから他の平行成分を除去した後に行う。
+					</p> <p>
+つまり、\(\boldsymbol{y}_k\) は以下のように計算される。
+					</p>
+					<div class="math">
+\[\boldsymbol{y}_k = \boldsymbol{y}_k^{(k)}\]
+					</div>
+					<div class="math">
+\[\boldsymbol{y}_k^{(i)} = \boldsymbol{y}_k^{(i-1)} - \operatorname{proj}(\boldsymbol{y}_k^{(i-1)},\boldsymbol{y}_i)\]
+					</div>
+					<div class="math">
+\[\boldsymbol{y}_k^{(0)} = \boldsymbol{x}_k\]
+					</div>
+					<p>
+ここで \(\{\boldsymbol{y}_k^{(1)}, \cdots, \boldsymbol{y}_k^{(k-1)}\}\) は \(\boldsymbol{y}_k\) の計算途中のワーク変数である。
+					</p>
+				</section> <section>
+					<h2>備考 (誤差の改良点)</h2>
+					<p>
+古典版と修正版、それぞれの \(i\) 回目のループの以下の箇所に着目する。
+					</p> <p>
+古典版: \(\operatorname{proj}(\boldsymbol{x}_k, \boldsymbol{y}_i)\)
+					</p> <p>
+修正版: \(\operatorname{proj}(\boldsymbol{y}_k^{(i-1)},\boldsymbol{y}_i)\)
+					</p> <p>
+ここで、古典版の第一引数は常に \(\boldsymbol{x}_k\) である。一方、修正版は \(\boldsymbol{y}_k^{(i-1)}\) でこれは \(i=1\) では古典版と同じだが、\(i\) が一つ増えるたびに各成分が除去されていくため、その絶対値も減少していく。これにより、平行成分の計算に誤差があっても、それも必ず減少していく。この積み重ねが原因で、修正版のほうが誤差が小さくなる。
+					</p>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
