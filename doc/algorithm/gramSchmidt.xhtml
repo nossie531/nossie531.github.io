@@ -22,10 +22,27 @@
 			<section>
 				<h1>基本戦略</h1>
 				<p>
-まずは、全てのベクトルを直行化させる。これは、直行化が未完了のベクトルから、直行化が完了済の全てのベクトルについて、それらとの平行成分を除去する事で行える。これにより、直行化したベクトルを一つずつ増やしていく。
-				</p> <p>
-最後に、直行化したベクトルそれぞれを、単位ベクトルに変換する。
+最初にまとめて直交化して、最後にまとめて正規化する。
 				</p>
+				<section>
+					<h2>直交化</h2>
+					<p>
+ベクトルから直行化済のベクトルの成分を全て除去すると、新たに直行化したベクトルが一つ増える。この作業を繰り返して全てのベクトルを直交化させる。
+					</p> <p>
+以下では、ベクトル \(\boldsymbol{x}_3\) を直行化が完了済のベクトル \(\boldsymbol{y}_1\) と \(\boldsymbol{y}_2\) に直交化させ、\(\boldsymbol{y}_3\) を求めている。ここで、\(\operatorname{proj}(\boldsymbol{x}_3, \boldsymbol{y}_1)\) と \(\operatorname{proj}(\boldsymbol{x}_3, \boldsymbol{y}_2)\) は \(\boldsymbol{x}_3\) の \(\boldsymbol{y}_1\) と \(\boldsymbol{y}_2\) 方向の成分を表す。
+					</p>
+					<figure class="normal">
+						<object data="img/gramSchmidt.svg" style="height: 30rem;"></object>
+						<figcaption>直交化のイメージ</figcaption>
+					</figure>
+				</section> <section>
+					<h2>正規化</h2>
+					<p>
+直交化された各ベクトルをその大きさで割り、単位ベクトルに変換する。
+					</p> <p>
+(直交化だけが目的の場合、この作業は省略可能。)
+					</p>
+				</section>
 			</section> <section>
 				<h1>記号の定義</h1>
 				<ul>
@@ -38,7 +55,7 @@
 			</section> <section>
 				<h1>操作の定義</h1>
 				<p>
-ベクトル \(\boldsymbol{a}\) のベクトル \(\boldsymbol{b}\) 方向の平行成分は以下の計算で求められる。
+平行成分は以下のように求められる。
 				</p>
 				<div class="math">
 \[\operatorname{proj}(\boldsymbol{a}, \boldsymbol{b}) =
