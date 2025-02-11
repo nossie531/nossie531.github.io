@@ -44,11 +44,14 @@
 			window.renderMathInElement(document.body, {output: "mathml"});
 		}
 
+		// フォーカス可能要素を設定。
 		#setupFocusableElements() {
+			// NOTE: フォーカスによりスクロール操作を素早く行えるようにしている。
+			// これにより横長の内容がスクリーン範囲を超えても良いようにしている。
 			for (const target of document.querySelectorAll("div.math, div.cmpFigure")) {
 				target.tabIndex = 0;
 				target.addEventListener("pointerdown", _ => {
-					math.focus();
+					target.focus();
 					event.preventDefault();
 				});
 			}
