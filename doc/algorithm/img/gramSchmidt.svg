@@ -3,6 +3,7 @@
      xmlns:m="http://www.w3.org/1998/Math/MathML"
      viewBox="0 0 400 300">
 	<style> @import url("style/gramSchmidt.css"); </style>
+	<script href="lib/matrix.js"/>
 	<script href="lib/gramSchmidt.js"/>
 	<defs>
 		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
