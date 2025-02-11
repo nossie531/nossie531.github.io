@@ -1,6 +1,11 @@
 "use strict";
 
 {
+	/* -- スクリプトのロード --
+	 - Chrome のバグで XML 形式からは import 宣言が無効 (import 構文は有効)
+	 - https://issues.chromium.org/issues/40518469 */
+	import("../../../lib/nav/nav.js");
+
 	// このサイトの管理用の基本クラス。
 	class Base {
 		static #instance = null;
@@ -13,7 +18,6 @@
 
 			Base.#instance = new Base();
 			Base.#instance.#setupViewport();
-			Base.#instance.#setupScripts();
 			document.addEventListener("DOMContentLoaded", () => {
 				Base.#instance.#setupFocusableElements();
 				Base.#instance.#setupKatex();
@@ -31,13 +35,6 @@
 			meta.name = "viewport";
 			meta.content = "width=device-width,initial-scale=1,minimum-scale=1";
 			document.head.insertBefore(meta, document.head.firstElementChild);
-		}
-
-		/* Chrome は XHTML と ES Module の組合せに未対応のため自前でロード。
-		 - https://issues.chromium.org/issues/40518469 */
-		#setupScripts() {
-			const scriptHolder = document.currentScript.parentNode;
-			import("../../../lib/nav/nav.js");
 		}
 
 		#setupKatex() {
