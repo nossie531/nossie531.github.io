@@ -20,6 +20,37 @@
 連立線形方程式の代表的な計算方法についてまとめておく。
 		</p> 
 		<section>
+			<h1>記号の導入</h1>
+			<p>
+連立線形方程式は行列で以下のように表せる。
+			</p>
+			<div class="math">
+\[\boldsymbol{A}\boldsymbol{x} = \boldsymbol{b}\]
+			</div>
+			<ul>
+				<li>
+\(\boldsymbol{A}\) は \(n\) 次の正方行列
+				</li> <li>
+\(\boldsymbol{x}\) は未知ベクトル
+				</li> <li>
+\(\boldsymbol{b}\) は定数ベクトル
+				</li>
+			</ul>
+			<p>
+この等式を以下のように変形できると解が得られる。
+			</p>
+			<div class="math">
+\[\boldsymbol{E}\boldsymbol{x}=\boldsymbol{b}'\]
+			</div>
+			<ul>
+				<li>
+\(\boldsymbol{E}\) は \(n\) 次の単位行列
+				</li> <li>
+\(\boldsymbol{b}'\) は解ベクトル
+				</li>
+			</ul>
+		</section> 
+		<section>
 			<h1>各種アルゴリズム</h1>
 			<p>
 様々な手法があるが、大きく分けると以下の二種類。
@@ -28,7 +59,7 @@
 				<dt> 直接法 </dt>
 				<dd>
 					<p>
-連立線形方程式を構成する各式に代数的操作を繰り返し、係数行列を単位行列へと整形していく解法 (係数行列が単位行列になれば定数ベクトルは解ベクトルに一致)。
+連立線形方程式を構成する各式に代数的操作を繰り返のはず係数行列を単位行列へと整形していく解法 (係数行列が単位行列ベクトルのはずのは解ベクトルに一致)。
 					</p>
 					<ul>
 						<li>
@@ -70,98 +101,60 @@
 				</dd>
 			</dl>
 			<section>
-				<h2>記号の導入</h2>
-				<p>
-以降、連立線形方程式の行列表現を使用する。
-				</p>
-				<div class="math">
-\[\boldsymbol{A}\boldsymbol{x} = \boldsymbol{b}\]
-				</div>
-				<ul>
-					<li>
-\(\boldsymbol{A}\) は \(n\) 次の正方行列。
-					</li> <li>
-\(\boldsymbol{x}\) は解ベクトル。
-					</li> <li>
-\(\boldsymbol{b}\) は定数ベクトル。
-					</li>
-				</ul>
-			</section> <section>
 				<h1 id="GaussJordanMethod">Gauss-Jordan 法</h1>
 				<p>
-直接法の一種。他に比べると実装が簡単。
+直接法の一種。他と比べると実装が簡単。
 				</p>
 				<section>
 					<h2>全体の流れ</h2>
 					<p>
-単位行列を目指して係数行列を左側から変形していく。<br/>
-\(k\) 回目のループでの係数行列は以下のようになる。
+行列の左側の列から順に、単位行列の各要素になるよう変形していく。
+					</p> <p>
+つまり、ちょうど \(k\) 回目のループでの等式は以下のようになる。
 					</p>
 					<div class="math">
 \[\left[\begin{array}{ccc|ccc}
-\delta_{1,1}   &amp; \ldots &amp; \delta_{1,k-1} &amp; a_{1,k}   &amp; \ldots &amp; a_{1,n} \\
-\vdots         &amp;        &amp; \vdots         &amp; \vdots    &amp;        &amp; \vdots \\
-\vdots         &amp;        &amp; \vdots         &amp; \vdots    &amp;        &amp; \vdots \\
-\delta_{k,1}   &amp; \ldots &amp; \delta_{k,k-1} &amp; a_{k,k}   &amp; \ldots &amp; a_{k,n} \\
-\vdots         &amp;        &amp; \vdots         &amp; \vdots    &amp;        &amp; \vdots \\
-\delta_{n,1}   &amp; \ldots &amp; \delta_{n,k-1} &amp; a_{n,k}   &amp; \ldots &amp; a_{n,n} \\
+\delta_{1,1} &amp; \ldots &amp; \delta_{1,k-1} &amp; v_{1,k} &amp; \ldots &amp; v_{1,n} \\
+\vdots       &amp;        &amp; \vdots         &amp; \vdots  &amp;        &amp; \vdots  \\
+\delta_{n,1} &amp; \ldots &amp; \delta_{n,k-1} &amp; v_{n,k} &amp; \ldots &amp; v_{n,n} \\
 \end{array}\right]
 \boldsymbol{x}=
 \left[\begin{array}{c}
-b_1 \\ \vdots \\ \vdots \\ b_k \\ \vdots \\ b_n
+w_1 \\ \vdots \\ w_n
 \end{array}\right]\]
 					</div>
+					<ul>
+						<li>
+\(\delta_{i,j}\) は単位行列の \(i\) 行 \(j\) 列の値
+						</li> <li>
+\(v\) と \(w\) は計算途中の値
+						</li>
+					</ul>
 				</section> <section>
-					<h2>処理手順</h2>
+					<h2>各行の操作</h2>
+					<p>
+\(k\) 回目のループにおける各行の操作は以下のように行う。
+					</p>
 					<ol>
 						<li>
 							<p>
-変数 \(k\) を 1 から \(n\) までループ、完了時の \(\boldsymbol{b}\) の値が解になる。
+行 \(k\) について、\(v_{k, k}\) で除算
 							</p>
-							<ol>
-								<li>
-									<p>
-行 \(k\) について、\(a_{k,k}\) を 1 にするため、両辺を \(a_{k,k}\) で割る。
-									</p>
-									<div class="math">
-\[\left(\begin{array}{ccc|ccc}
-0 &amp; \ldots &amp;0 &amp; 1 &amp;
-a_{k,k+1}/a_{k,k}&amp; \ldots &amp;a_{k,n}/a_{k,k}
-\end{array}\right) \boldsymbol{x}=
-b_k/a_{k,k}\]
-									</div>
-								</li> <li>
-									<p>
-行 \(k\) 以外の行 \(i\) について、\(a_{i,k}\) を 0 にするため、行 \(k\) の \(a_{i,k}\) 倍を減算。
-									</p>
-									<div class="math">
-\[\left(\begin{array}{ccc|ccc}
-\delta_{i,1} &amp; \ldots &amp; \delta_{i,k-1} &amp; 0 &amp;
-a_{i,k+1}-c_{i,k+1}
-&amp; \ldots &amp;
-a_{i,n}-c_{i,n}
-\end{array}\right)\boldsymbol{x}
-=b_i-d_i\]
-									</div>
-									<p>
-ここで、式中の \(c\) と \(d\) はそれぞれ行 \(k\) から生成した以下の値である。
-									</p>
-									<div class="math">
-\[\begin{align}
-c_{i,j}=&amp;a_{i,k}\cdot{a_{i,j}} \\[6pt]
-d_i=&amp;a_{i,k}\cdot{b_k}
-\end{align}\]
-									</div>
-								</li>
-							</ol>
+						</li> <li>
+							<p>
+行 \(i\not = k\) について、行 \(k\) の \(v_{i, k}\) 倍で減算
+							</p>
 						</li>
 					</ol>
+					<p>
+※ ここで \(v_{k, k}\) はピボットと呼ばれる。
+					</p>
 				</section> <section>
 					<h2>ピボット選択</h2>
 					<p>
-両辺を割る対角要素をピボットと言う。この値の絶対値が 0 または小さ過ぎる場合、計算できないか誤差が大きくなる。そのため、操作前に行または列を入れ替える。
+ピボットの絶対値が 0 または小さ過ぎる場合、計算できないか誤差が大きくなる。
 					</p> <p>
-行のみを入れ替える場合、部分ピボット選択、両方を入れ替える場合、完全ピボット選択と言う。行を入れ替えても解の位置は変わらないため、前者は比較的簡単に実装できる。
+そのため、操作前に行または列を入れ替える。行のみを入れ替える場合、部分ピボット選択、両方を入れ替える場合、完全ピボット選択と言う。行を入れ替えても解の位置は変わらないため、前者は比較的簡単に実装できる。
 					</p>
 				</section>
 			</section>
