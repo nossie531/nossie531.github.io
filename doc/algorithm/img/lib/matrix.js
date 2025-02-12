@@ -80,6 +80,10 @@ class Matrix {
 		return this.#n;
 	}
 
+	get arr() {
+		return this.#arr;
+	}
+
 	at(i, j) {
 		return this.pos.apply(this, arguments).val;
 	}
@@ -183,6 +187,61 @@ class Matrix {
 		}
 
 		return result;
+	}
+
+	linearEq(v) {
+		if (this.m !== this.n || v.n !== 1 || this.n !== v.m) {
+			throw new Error;
+		}
+
+		const b = new Vector(v);
+		const a = new Matrix(this);
+
+		for (let k = 0; k < a.n; k++) {
+			swapPivot(a, k);
+			const pivot = a.at(k, k);
+
+			b.pos(k).val /= pivot;
+			for (let j = k; j < a.n; j++) {      
+				a.pos(k, j).val /= pivot;
+			}
+
+			for (let i = 0; i < a.m; i++) {
+				if (i === k) {
+					continue;
+				}
+
+				const mag = a.at(i, k);
+				b.pos(i).val -= mag * b.at(k);
+				for (let j = k; j < a.n; j++){
+					a.pos(i, j).val -= mag * a.at(k, j);
+				}
+			}
+		}
+
+		return b;
+
+		function swapPivot(a, k) {
+			let maxAbs = a.at(k, k);
+			let maxAbsRow = k;
+			for (let i = k + 1; i < a.n; i++) {
+				if (Math.abs(a.at(i, k)) > maxAbs) {
+					maxAbs = Math.abs(a.at(i, k));
+					maxAbsRow = i;
+				}
+			}
+
+			if (maxAbs === 0) {
+				throw new Error;
+			}
+
+			let memo;
+			for (let i = k; i < a.n; i++) {
+				let memo = a.at(k, i);
+				a.pos(k, i).val = a.at(maxAbsRow, i);
+				a.pos(maxAbsRow, i).val = memo;
+			}
+		}
 	}
 }
 

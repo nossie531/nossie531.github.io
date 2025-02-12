@@ -4,6 +4,7 @@
 @import url("style/diffEq.css");
 	</style>
 	<script href="lib/graphViewer.js"/>
+	<script href="lib/matrix.js"/>
 	<script href="lib/diffEq.js"/>
 	<script>
 document.addEventListener("DOMContentLoaded", () => {

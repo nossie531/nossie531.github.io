@@ -65,7 +65,6 @@ class DiffEq {
 
 // 陽解法による拡散計算のためのクラスです。
 class ExplicitDiffEq extends DiffEq {
-
 	// Implement.
 	execStep(currents) {
 		const results = new Array(currents.length);
@@ -83,129 +82,68 @@ class ExplicitDiffEq extends DiffEq {
 
 // 陰解法による拡散計算のためのクラスです。
 class ImplicitDiffEq extends DiffEq {
-
 	// Implement.
 	execStep(currents) {
-		const results = new Array(currents.length);
-		const matrix = this.getDiffuseMatrix(currents);
-		return matrix.calcLinearEquation();
+		const vector = this.getLinearEqVector(currents);
+		const matrix = this.getLinearEqMatrix(currents);
+		return matrix.linearEq(vector).arr;
 	}
 
-	// 分散を表す行列を取得します。
-	getDiffuseMatrix(nodes) {
+	// 線形方程式のベクタ部分を取得します。
+	getLinearEqVector(nodes) {
 		const nSize = nodes.length;
-		const array = Matrix.newInternalArray(nSize, nSize + 1);
+		const vector = new Vector(nSize);
+		for (let i = 0; i < nSize; i++) {
+			vector.pos(i).val = nodes[i];
+		}
+
+		return vector;
+	}
+
+	// 線形方程式の行列部分をを取得します。
+	getLinearEqMatrix(nodes) {
+		const nSize = nodes.length;
+		const matrix = new Matrix(nSize, nSize);
 		const v = this.dc * this.step;
 
 		for (let i = 0; i < nSize; i++) {
-			array[i][nSize] = nodes[i];
-		}
-
-		for (let i = 0; i < nSize; i++) {
 			for (let j = 0; j < nSize; j++) {
-				array[i][j] = i !== j ? -v : 1 + v * (nSize - 1);
+				matrix.pos(i, j).val = i !== j ? -v : 1 + v * (nSize - 1);
 			}
 		}
 
-		return new Matrix(array);
+		return matrix;
 	}
 }
 
 // 二次の陰解法による拡散計算のためのクラスです。
 class CrankNicolsonDiffEq extends ImplicitDiffEq {
-
 	// Override.
-	getDiffuseMatrix(nodes) {
+	getLinearEqVector(nodes) {
 		const nSize = nodes.length;
-		const array = Matrix.newInternalArray(nSize, nSize + 1);
+		const vector = new Vector(nSize);
+		const v = this.dc * this.step;
+
+		for (let i = 0; i < nSize; i++) {
+			vector.pos(i).val = nodes[i] + 0.5 * v * nodes.reduce((r, x) => r + x - nodes[i], 0);
+		}
+
+		return vector;
+	}
+	
+	// Override.
+	getLinearEqMatrix(nodes) {
+		const nSize = nodes.length;
+		const matrix = new Matrix(nSize, nSize);
 		const v = this.dc * this.step;
 		
 		for (let i = 0; i < nSize; i++) {
-			array[i][nSize] = nodes[i] + 0.5 * v * nodes.reduce((r, x) => r + x - nodes[i], 0);
-		}
-
-		for (let i = 0; i < nSize; i++) {
 			for (let j = 0; j < nSize; j++) {
-				array[i][j] = i !== j ? -0.5 * v : 1 + 0.5 * v * (nSize - 1);
+				matrix.pos(i, j).val = i !== j ? -0.5 * v : 1 + 0.5 * v * (nSize - 1);
 			}
 		}
 
-		return new Matrix(array);
+		return matrix;
 	}
 }
 
-// 行列を操作するためのクラスです。
-class Matrix {
-
-	#arr;
-	#rowSize;
-	#colSize;
-
-	// 指定したサイズの二次元配列を生成します。
-	constructor(arr) {
-		if (!(arr instanceof Array)) {
-			throw new Error;
-		}
-
-		if (!arr.every(x => x instanceof Array && x.length === arr[0].length)) {
-			throw new Error;
-		}
-
-		this.#arr = arr;
-		this.#rowSize = arr.length;
-		this.#colSize = arr[0].length;
-	}
-
-	// 行数を取得します。
-	get rowSize() {
-		this.#rowSize;
-	}
-
-	// 列数を取得します。
-	get colSize() {
-		this.#colSize;
-	}
-
-	// 指定したサイズの内部配列を生成します。
-	static newInternalArray(rowSize, colSize) {
-		return ([...Array(rowSize)]).map(_ => ([...Array(colSize)]).map(_ => 0));
-	}
-
-	// 内部配列を複製します。
-	cloneInternalArray() {
-		return JSON.parse(JSON.stringify(this.#arr));
-	}
-
-	// 連立一次方程式を計算します [Gauss-Jordan 法 (ピボット選択なし)]。
-	calcLinearEquation() {
-		if (this.rowSize === this.colSize - 1) {
-			throw new Error;
-		}
-
-		const a = this.cloneInternalArray();
-
-		for (let k = 0; k < a.length; k++) {
-
-			const pivotRow = a[k];
-			const pivotValue = a[k][k];
-			for (let j = k; j < a.length + 1; j++) {      
-				pivotRow[j] /= pivotValue;
-			}
-
-			for (let i = 0; i < a.length; i++) {
-
-				if (i === k) {
-					continue;
-				}
-
-				const targetRow = a[i];
-				const targetRowPivotCol = targetRow[k];
-				for (let j = k; j < a.length + 1; j++){
-					targetRow[j] -= targetRowPivotCol * pivotRow[j];
-				}
-			}
-		}
-
-		return a.map(x => x[a.length]);
-	}
-}
