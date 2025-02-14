@@ -7,9 +7,14 @@
 		<title>拡散方程式の初期値問題</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<link rel="stylesheet" href="style/diffEq.css"/>
+		<style>/*<![CDATA[*/
+/* Polyfill for mtable attributes. */
+@namespace m url("http://www.w3.org/1998/Math/MathML");
+m|mtable[columnalign="right left"] > m|mtr > m|mtd:nth-child(1) { text-align: right; }
+m|mtable[columnalign="right left"] > m|mtr > m|mtd:nth-child(2) { text-align: left; }
+m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0; }
+		/*]]>*/</style>
 		<script src="lib/base.js"></script>
-		<script defer="defer" src="../../lib/katex/katex.min.js"></script>
-		<script defer="defer" src="../../lib/katex/contrib/auto-render.min.js"></script>
 	</head>
 	<body>
 		<header>
@@ -61,9 +66,9 @@
 				<h2>記号の導入</h2>
 				<ul>
 					<li>
-\(n_i(t)\) は \(i\) 番目のノードの時刻 \(t\) の値。
+<m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> は <m:math><m:mi>i</m:mi></m:math> 番目のノードの時刻 <m:math><m:mi>t</m:mi></m:math> の値。
 					</li> <li>
-\(w_{ij}\) は \(n_i\) から \(n_j\) へのエッジの重み。
+<m:math><m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub></m:math> は <m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub></m:math> から <m:math><m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub></m:math> へのエッジの重み。
 					</li>
 				</ul>
 			</section> <section>
@@ -72,7 +77,56 @@
 現時点と次時点のノード値を直線で結んだ時、傾きが現時点の状況に従う。
 				</p>
 				<div class="math">
-\[\frac{n_i(t+\Delta{t})-n_i(t)}{\Delta{t}}=\sum_{j}w_{ij} \{n_j(t)-n_i(t)\}\]
+<m:math display="block">
+	<m:mfrac>
+		<m:mrow>
+			<m:mrow>
+				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+				<m:mo stretchy="false">(</m:mo>
+				<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+				<m:mo stretchy="false">)</m:mo>
+			</m:mrow>
+			<m:mo>−</m:mo>
+			<m:mrow>
+				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+				<m:mo stretchy="false">(</m:mo>
+				<m:mi>t</m:mi>
+				<m:mo stretchy="false">)</m:mo>
+			</m:mrow>
+		</m:mrow>
+		<m:mrow>
+			<m:mo>∆</m:mo><m:mi>t</m:mi>
+		</m:mrow>
+	</m:mfrac>
+	<m:mo>=</m:mo>
+	<m:mrow>
+		<m:munder>
+			<m:mo>∑</m:mo>
+			<m:mi>j</m:mi>
+		</m:munder>
+		<m:msub>
+			<m:mi>w</m:mi>
+			<m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow>
+		</m:msub>
+		<m:mrow>
+			<m:mo stretchy="false">{</m:mo>
+			<m:mrow>
+				<m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub>
+				<m:mo stretchy="false">(</m:mo>
+				<m:mi>t</m:mi>
+				<m:mo stretchy="false">)</m:mo>
+			</m:mrow>
+			<m:mo>−</m:mo>
+			<m:mrow>
+				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+				<m:mo stretchy="false">(</m:mo>
+				<m:mi>t</m:mi>
+				<m:mo stretchy="false">)</m:mo>
+			</m:mrow>
+			<m:mo stretchy="false">}</m:mo>
+		</m:mrow>
+	</m:mrow>
+</m:math>
 				</div>
 				<p>
 以下はノードが 2 つしかない状況における、1 ステップ分の計算イメージ。濃度勾配は本来は時間変化を伴うが、代表値として現時点での値のみを使うため、精度が低い。
@@ -100,10 +154,54 @@
 現時点と次時点のノード値を直線で結んだ時、傾きが次時点の状況に従う。
 				</p>
 				<div class="math">
-\[\frac{n_i(t+\Delta{t})-n_i(t)}{\Delta{t}}=\sum_{j}w_{ij} \{n_j(t+\Delta{t})-n_i(t+\Delta{t})\}\]
+<m:math display="block">
+	<m:mfrac>
+		<m:mrow>
+			<m:mrow>
+				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+				<m:mo stretchy="false">(</m:mo>
+				<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+				<m:mo stretchy="false">)</m:mo>
+			</m:mrow>
+			<m:mo>−</m:mo>
+			<m:mrow>
+				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+				<m:mo stretchy="false">(</m:mo>
+				<m:mi>t</m:mi>
+				<m:mo stretchy="false">)</m:mo>
+			</m:mrow>
+		</m:mrow>
+		<m:mrow>
+			<m:mo>∆</m:mo><m:mi>t</m:mi>
+		</m:mrow>
+	</m:mfrac>
+	<m:mo>=</m:mo>
+	<m:mrow>
+		<m:munder><m:mo>∑</m:mo><m:mi>j</m:mi></m:munder>
+		<m:msub>
+			<m:mi>w</m:mi>
+			<m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow>
+		</m:msub>
+		<m:mo stretchy="false">{</m:mo>
+		<m:mrow>
+			<m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub>
+			<m:mo stretchy="false">(</m:mo>
+			<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+			<m:mo stretchy="false">)</m:mo>
+		</m:mrow>
+		<m:mo>−</m:mo>
+		<m:mrow>
+			<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+			<m:mo stretchy="false">(</m:mo>
+			<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+			<m:mo stretchy="false">)</m:mo>
+		</m:mrow>
+		<m:mo stretchy="false">}</m:mo>
+	</m:mrow>
+</m:math>
 				</div>
 				<p>
-これを満たすように次時点のノード値を調整するには、ノードの数だけある上記の式から<a href="linearEq.xhtml">連立線形方程式</a>を立て、\(A \boldsymbol{n}(t+\Delta{t}) = \boldsymbol{n}(t)\) とし、未知ベクトル \(\boldsymbol{n}(t+\Delta{t})\) について解かなければならない。精度については陽解法と同じ要因で低い。
+これを満たすように次時点のノード値を調整するには、ノードの数だけある上記の式から<a href="linearEq.xhtml">連立線形方程式</a>を立て、<m:math><m:mi>𝐀</m:mi><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow><m:mo>=</m:mo><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow></m:math> とし、未知ベクトル <m:math><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> について解かなければならない。精度については陽解法と同じ要因で低い。
 				</p> <p>
 以下はノードが 2 つしかない状況における、1 ステップ分の計算イメージ。陽解法で逆方向へと時間発展すると、次時点から現時点へと向かうように次時点が調整されている。
 				</p>
@@ -130,10 +228,86 @@
 現時点と次時点のノード値を直線で結んだ時、傾きが両時点の平均に従う。
 				</p>
 				<div class="math">
-\[\begin{align}
-\frac{n_i(t+\Delta{t})-n_i(t)}{\Delta{t}}&amp;=\frac{1}{2}\sum_{j}w_{ij} \{n_j(t)-n_i(t)\} \\
-&amp;+\frac{1}{2}\sum_{j}w_{ij} \{n_j(t+\Delta{t})-n_i(t+\Delta{t})\}
-\end{align}\]
+<m:math display="block">
+	<m:mtable columnalign="right left" columnspacing="0">
+		<m:mtr>
+			<m:mtd displaystyle="true">
+				<m:mfrac>
+					<m:mrow>
+						<m:mrow>
+							<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+							<m:mo stretchy="false">(</m:mo>
+							<m:mi>t</m:mi>
+							<m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+							<m:mo stretchy="false">)</m:mo>
+						</m:mrow>
+						<m:mo>−</m:mo>
+						<m:mrow>
+							<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+							<m:mo stretchy="false">(</m:mo>
+							<m:mi>t</m:mi>
+							<m:mo stretchy="false">)</m:mo>
+						</m:mrow>
+					</m:mrow>
+					<m:mrow>
+						<m:mo>∆</m:mo><m:mi>t</m:mi>
+					</m:mrow>
+				</m:mfrac>
+				<m:mo>=</m:mo>
+			</m:mtd> <m:mtd displaystyle="true">
+				<m:mfrac><m:mn>1</m:mn><m:mn>2</m:mn></m:mfrac>
+				<m:mrow>
+					<m:munder><m:mo>∑</m:mo><m:mi>j</m:mi></m:munder>
+					<m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub>
+					<m:mrow>
+						<m:mo stretchy="false">{</m:mo>
+						<m:mrow>
+							<m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub>
+							<m:mo stretchy="false">(</m:mo>
+							<m:mi>t</m:mi>
+							<m:mo stretchy="false">)</m:mo>
+						</m:mrow>
+						<m:mo>−</m:mo>
+						<m:mrow>
+							<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+							<m:mo stretchy="false">(</m:mo>
+							<m:mi>t</m:mi>
+							<m:mo stretchy="false">)</m:mo>
+						</m:mrow>
+						<m:mo stretchy="false">}</m:mo>
+					</m:mrow>
+				</m:mrow>
+				<m:mo>+</m:mo>
+			</m:mtd>
+		</m:mtr> <m:mtr>
+			<m:mtd>
+			</m:mtd> <m:mtd displaystyle="true">
+				<m:mfrac><m:mn>1</m:mn><m:mn>2</m:mn></m:mfrac>
+				<m:mrow>
+					<m:munder><m:mo>∑</m:mo><m:mi>j</m:mi></m:munder>
+					<m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub>
+					<m:mrow>
+						<m:mo stretchy="false">{</m:mo>
+						<m:mrow>
+							<m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub>
+							<m:mo stretchy="false">(</m:mo>
+							<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+							<m:mo stretchy="false">)</m:mo>
+						</m:mrow>
+						<m:mo>−</m:mo>
+						<m:mrow>
+							<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
+							<m:mo stretchy="false">(</m:mo>
+							<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+							<m:mo stretchy="false">)</m:mo>
+							<m:mo stretchy="false">}</m:mo>
+						</m:mrow>
+					</m:mrow>
+				</m:mrow>
+			</m:mtd>
+		</m:mtr>
+	</m:mtable>
+</m:math>
 				</div>
 				<p>
 陰解法と同様、<a href="linearEq.xhtml">連立線形方程式</a>を解く必要がある。2 次の差分となるため精度は良い。
@@ -164,7 +338,7 @@
 			<section>
 				<h2>安定性</h2>
 				<p>
-上述のように変化が急になりうる場合、不安定化するため陽解法は使いにくい。
+上述のように急な変化がある場合、不安定化するため陽解法は使いにくい。
 				</p> 
 			</section> <section>
 				<h2>連立方程式</h2>

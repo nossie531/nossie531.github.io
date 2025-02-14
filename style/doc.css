@@ -26,7 +26,7 @@
 @import url("import/console_rustc.css") layer(import_console_rustc);
 @import url("../lib/nav/nav.css") layer(import_nav);
 
-@namespace m url('http://www.w3.org/1998/Math/MathML');
+@namespace m url("http://www.w3.org/1998/Math/MathML");
 
 @font-face {
 	font-family: "MyMath";

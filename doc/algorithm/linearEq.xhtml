@@ -7,8 +7,6 @@
 		<title>連立線形方程式の解法</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
-		<script defer="defer" src="../../lib/katex/katex.min.js"></script>
-		<script defer="defer" src="../../lib/katex/contrib/auto-render.min.js"></script>
 	</head>
 	<body>
 		<header>
@@ -25,28 +23,38 @@
 連立線形方程式は行列で以下のように表せる。
 			</p>
 			<div class="math">
-\[\boldsymbol{A}\boldsymbol{x} = \boldsymbol{b}\]
+<m:math display="block">
+	<m:mi>𝐀</m:mi>
+	<m:mi>𝒙</m:mi>
+	<m:op>=</m:op>
+	<m:mi>𝒃</m:mi>
+</m:math>
 			</div>
 			<ul>
 				<li>
-\(\boldsymbol{A}\) は \(n\) 次の正方行列
+<m:math><m:mi>𝐀</m:mi></m:math> は <m:math><m:mi>n</m:mi></m:math> 次の正方行列
 				</li> <li>
-\(\boldsymbol{x}\) は未知ベクトル
+<m:math><m:mi>𝒙</m:mi></m:math> は未知ベクトル
 				</li> <li>
-\(\boldsymbol{b}\) は定数ベクトル
+<m:math><m:mi>𝒃</m:mi></m:math> は定数ベクトル
 				</li>
 			</ul>
 			<p>
 この等式を以下のように変形できると解が得られる。
 			</p>
 			<div class="math">
-\[\boldsymbol{E}\boldsymbol{x}=\boldsymbol{b}'\]
+<m:math display="block">
+	<m:mi>𝐄</m:mi>
+	<m:mi>𝒙</m:mi>
+	<m:op>=</m:op>
+	<m:mi>𝒃</m:mi><m:op>′</m:op>
+</m:math>
 			</div>
 			<ul>
 				<li>
-\(\boldsymbol{E}\) は \(n\) 次の単位行列
+<m:math><m:mi>𝐄</m:mi></m:math> は単位行列
 				</li> <li>
-\(\boldsymbol{b}'\) は解ベクトル
+<m:math><m:mi>𝒃</m:mi><m:op>′</m:op></m:math> は解ベクトル
 				</li>
 			</ul>
 		</section> 
@@ -59,7 +67,7 @@
 				<dt> 直接法 </dt>
 				<dd>
 					<p>
-連立線形方程式を構成する各式に代数的操作を繰り返のはず係数行列を単位行列へと整形していく解法 (係数行列が単位行列ベクトルのはずのは解ベクトルに一致)。
+連立線形方程式を構成する各式に代数的操作を繰り返し、係数行列を単位行列へと整形していく解法 (係数行列が単位行列ベクトルのはずのは解ベクトルに一致)。
 					</p>
 					<ul>
 						<li>
@@ -110,44 +118,74 @@
 					<p>
 行列の左側の列から順に、単位行列の各要素になるよう変形していく。
 					</p> <p>
-つまり、ちょうど \(k\) 回目のループでの等式は以下のようになる。
+つまり、ちょうど <m:math><m:mi>k</m:mi></m:math> 回目のループでの等式は以下のようになる。
 					</p>
 					<div class="math">
-\[\left[\begin{array}{ccc|ccc}
-\delta_{1,1} &amp; \ldots &amp; \delta_{1,k-1} &amp; v_{1,k} &amp; \ldots &amp; v_{1,n} \\
-\vdots       &amp;        &amp; \vdots         &amp; \vdots  &amp;        &amp; \vdots  \\
-\delta_{n,1} &amp; \ldots &amp; \delta_{n,k-1} &amp; v_{n,k} &amp; \ldots &amp; v_{n,n} \\
-\end{array}\right]
-\boldsymbol{x}=
-\left[\begin{array}{c}
-w_1 \\ \vdots \\ w_n
-\end{array}\right]\]
+<m:math display="block">
+	<m:mrow>
+		<m:mo fence="true">[</m:mo>
+		<m:mtable columnlines="none none solid none none">
+			<m:mtr>
+				<m:mtd><m:msub><m:mi>δ</m:mi><m:mrow><m:mn>1</m:mn><m:mo>,</m:mo><m:mn>1</m:mn></m:mrow></m:msub></m:mtd>
+				<m:mtd><m:mi>⋯</m:mi></m:mtd>
+				<m:mtd><m:msub><m:mi>δ</m:mi><m:mrow><m:mn>1</m:mn><m:mo>,</m:mo><m:mi>k</m:mi><m:mo>−</m:mo><m:mn>1</m:mn></m:mrow></m:msub></m:mtd>
+				<m:mtd><m:msub><m:mi>v</m:mi><m:mrow><m:mn>1</m:mn><m:mo>,</m:mo><m:mi>k</m:mi></m:mrow></m:msub></m:mtd><m:mtd><m:mi>⋯</m:mi></m:mtd>
+				<m:mtd><m:msub><m:mi>v</m:mi><m:mrow><m:mn>1</m:mn><m:mo>,</m:mo><m:mi>n</m:mi></m:mrow></m:msub></m:mtd>
+			</m:mtr> <m:mtr>
+				<m:mtd><m:mi>⋮</m:mi></m:mtd>
+				<m:mtd></m:mtd>
+				<m:mtd><m:mi>⋮</m:mi></m:mtd>
+				<m:mtd><m:mi>⋮</m:mi></m:mtd>
+				<m:mtd></m:mtd>
+				<m:mtd><m:mi>⋮</m:mi></m:mtd>
+			</m:mtr> <m:mtr>
+				<m:mtd><m:msub><m:mi>δ</m:mi><m:mrow><m:mi>n</m:mi><m:mo>,</m:mo><m:mn>1</m:mn></m:mrow></m:msub></m:mtd>
+				<m:mtd><m:mi>⋯</m:mi></m:mtd>
+				<m:mtd><m:msub><m:mi>δ</m:mi><m:mrow><m:mi>n</m:mi><m:mo>,</m:mo><m:mi>k</m:mi><m:mo>−</m:mo><m:mn>1</m:mn></m:mrow></m:msub></m:mtd>
+				<m:mtd><m:msub><m:mi>v</m:mi><m:mrow><m:mi>n</m:mi><m:mo>,</m:mo><m:mi>k</m:mi></m:mrow></m:msub></m:mtd><m:mtd><m:mi>⋯</m:mi></m:mtd>
+				<m:mtd><m:msub><m:mi>v</m:mi><m:mrow><m:mi>n</m:mi><m:mo>,</m:mo><m:mi>n</m:mi></m:mrow></m:msub></m:mtd>
+			</m:mtr>
+		</m:mtable>
+		<m:mo fence="true">]</m:mo>
+	</m:mrow>
+	<m:mi>𝒙</m:mi>
+	<m:mo>=</m:mo>
+	<m:mrow>
+		<m:mo fence="true">[</m:mo>
+		<m:mtable>
+			<m:mtr><m:mtd><m:msub><m:mi>w</m:mi><m:mn>1</m:mn></m:msub></m:mtd></m:mtr>
+			<m:mtr><m:mtd><m:mi>⋮</m:mi></m:mtd></m:mtr>
+			<m:mtr><m:mtd><m:msub><m:mi>w</m:mi><m:mi>n</m:mi></m:msub></m:mtd></m:mtr>
+		</m:mtable>
+		<m:mo fence="true">]</m:mo>
+	</m:mrow>
+</m:math>
 					</div>
 					<ul>
 						<li>
-\(\delta_{i,j}\) は単位行列の \(i\) 行 \(j\) 列の値
+<m:math><m:msub><m:mi>δ</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub></m:math> は単位行列の <m:math><m:mi>i</m:mi></m:math> 行 <m:math><m:mi>j</m:mi></m:math> 列の値
 						</li> <li>
-\(v\) と \(w\) は計算途中の値
+<m:math><m:mi>v</m:mi></m:math> 行 <m:math><m:mi>w</m:mi></m:math> は計算途中の値
 						</li>
 					</ul>
 				</section> <section>
 					<h2>各行の操作</h2>
 					<p>
-\(k\) 回目のループにおける各行の操作は以下のように行う。
+<m:math><m:mi>k</m:mi></m:math> 回目のループにおける各行の操作は以下のように行う。
 					</p>
 					<ol>
 						<li>
 							<p>
-行 \(k\) について、\(v_{k, k}\) で除算
+行 <m:math><m:mi>k</m:mi></m:math> について <m:math><m:msub><m:mi>v</m:mi><m:mrow><m:mi>k</m:mi><m:mo>,</m:mo><m:mi>k</m:mi></m:mrow></m:msub></m:math> で除算
 							</p>
 						</li> <li>
 							<p>
-行 \(i\not = k\) について、行 \(k\) の \(v_{i, k}\) 倍で減算
+行 <m:math><m:mi>i</m:mi><m:mo>≠</m:mo><m:mi>k</m:mi></m:math> について、行 <m:math><m:mi>k</m:mi></m:math> の <m:math><m:msub><m:mi>v</m:mi><m:mrow><m:mi>i</m:mi><m:mi>k</m:mi></m:mrow></m:msub></m:math> 倍で減算
 							</p>
 						</li>
 					</ol>
 					<p>
-※ ここで \(v_{k, k}\) はピボットと呼ばれる。
+※ ここで <m:math><m:msub><m:mi>v</m:mi><m:mrow><m:mi>k</m:mi><m:mo>,</m:mo><m:mi>k</m:mi></m:mrow></m:msub></m:math> はピボットと呼ばれる。
 					</p>
 				</section> <section>
 					<h2>ピボット選択</h2>

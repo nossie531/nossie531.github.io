@@ -26,56 +26,29 @@
 		</g>
 		<g id="x3Guide"/>
 		<foreignObject id="y1Text" width="60" height="30">
-			<m:math>
-				<m:msub>
-					<m:mi mathvariant="bold-italic">y</m:mi>
-					<m:mn>1</m:mn>
-				</m:msub>
-			</m:math>
+			<m:math><m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub></m:math>
 		</foreignObject>
 		<foreignObject id="y2Text" width="60" height="30">
-			<m:math>
-				<m:msub>
-					<m:mi mathvariant="bold-italic">y</m:mi>
-					<m:mn>2</m:mn>
-				</m:msub>
-			</m:math>
+			<m:math><m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub></m:math>
 		</foreignObject>
 		<foreignObject id="x3Text" width="60" height="30">
-			<m:math>
-				<m:msub>
-					<m:mi mathvariant="bold-italic">x</m:mi>
-					<m:mn>3</m:mn>
-				</m:msub>
-			</m:math>
+			<m:math><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub></m:math>
 		</foreignObject>
 		<foreignObject id="y3Text" width="180" height="60">
 			<m:math>
 				<m:mtable>
 					<m:mtr columnalign="right">
 						<m:mtd>
-							<m:msub>
-								<m:mi mathvariant="bold-italic">y</m:mi>
-								<m:mn>3</m:mn>
-							</m:msub>
+							<m:msub><m:mi>𝒚</m:mi><m:mn>3</m:mn></m:msub>
 							<m:mo>=</m:mo>
-							<m:msub>
-								<m:mi mathvariant="bold-italic">x</m:mi>
-								<m:mn>3</m:mn>
-							</m:msub>
+							<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
 							<m:mo>-</m:mo>
 							<m:mrow style="color: green;">
 								<m:mi>proj</m:mi>
 								<m:mo stretchy="false">(</m:mo>
-								<m:msub>
-									<m:mi mathvariant="bold-italic">x</m:mi>
-									<m:mn>3</m:mn>
-								</m:msub>
-								<m:mi separator="true">,</m:mi>
-								<m:msub>
-									<m:mi mathvariant="bold-italic">y</m:mi>
-									<m:mn>1</m:mn>
-								</m:msub>
+								<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
+								<m:mi>,</m:mi>
+								<m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub>
 								<m:mo stretchy="false">)</m:mo>
 							</m:mrow>
 						</m:mtd>
@@ -83,29 +56,17 @@
 					<m:mtr columnalign="right">
 						<m:mtd>
 							<m:mphantom>
-								<m:msub>
-									<m:mi mathvariant="bold-italic">y</m:mi>
-									<m:mn>3</m:mn>
-								</m:msub>
+								<m:msub><m:mi>𝒚</m:mi><m:mn>3</m:mn></m:msub>
 								<m:mo>=</m:mo>
-								<m:msub>
-									<m:mi mathvariant="bold-italic">x</m:mi>
-									<m:mn>3</m:mn>
-								</m:msub>
+								<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
 							</m:mphantom>
 							<m:mo>-</m:mo>
 							<m:mrow style="color: blue;">
 								<m:mi>proj</m:mi>
 								<m:mo stretchy="false">(</m:mo>
-								<m:msub>
-									<m:mi mathvariant="bold-italic">x</m:mi>
-									<m:mn>3</m:mn>
-								</m:msub>
-								<m:mi separator="true">,</m:mi>
-								<m:msub>
-									<m:mi mathvariant="bold-italic">y</m:mi>
-									<m:mn>2</m:mn>
-								</m:msub>
+								<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
+								<m:mi>,</m:mi>
+								<m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub>
 								<m:mo stretchy="false">)</m:mo>
 							</m:mrow>
 						</m:mtd>
@@ -117,15 +78,9 @@
 			<m:math>
 				<m:mi>proj</m:mi>
 				<m:mo stretchy="false">(</m:mo>
-				<m:msub>
-					<m:mi mathvariant="bold-italic">x</m:mi>
-					<m:mn>3</m:mn>
-				</m:msub>
-				<m:mi separator="true">,</m:mi>
-				<m:msub>
-					<m:mi mathvariant="bold-italic">y</m:mi>
-					<m:mn>1</m:mn>
-				</m:msub>
+				<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
+				<m:mo>,</m:mo>
+				<m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub>
 				<m:mo stretchy="false">)</m:mo>
 			</m:math>
 		</foreignObject>
@@ -133,15 +88,9 @@
 			<m:math>
 				<m:mi>proj</m:mi>
 				<m:mo stretchy="false">(</m:mo>
-				<m:msub>
-					<m:mi mathvariant="bold-italic">x</m:mi>
-					<m:mn>3</m:mn>
-				</m:msub>
-				<m:mi separator="true">,</m:mi>
-				<m:msub>
-					<m:mi mathvariant="bold-italic">y</m:mi>
-					<m:mn>2</m:mn>
-				</m:msub>
+				<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
+				<m:mo>,</m:mo>
+				<m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub>
 				<m:mo stretchy="false">)</m:mo>
 			</m:math>
 		</foreignObject>

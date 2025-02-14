@@ -20,7 +20,6 @@
 			Base.#instance.#setupViewport();
 			document.addEventListener("DOMContentLoaded", () => {
 				Base.#instance.#setupFocusableElements();
-				Base.#instance.#setupKatex();
 			});
 		}
 
@@ -35,10 +34,6 @@
 			meta.name = "viewport";
 			meta.content = "width=device-width,initial-scale=1,minimum-scale=1";
 			document.head.insertBefore(meta, document.head.firstElementChild);
-		}
-
-		#setupKatex() {
-			window.renderMathInElement(document.body, {output: "mathml"});
 		}
 
 		// フォーカス可能要素を設定。

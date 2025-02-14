@@ -7,8 +7,6 @@
 		<title>Gram-Schmidt 法</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
-		<script defer="defer" src="../../lib/katex/katex.min.js"></script>
-		<script defer="defer" src="../../lib/katex/contrib/auto-render.min.js"></script>
 	</head>
 	<body>
 		<header>
@@ -29,7 +27,7 @@
 					<p>
 ベクトルから直行化済のベクトルの成分を全て除去すると、新たに直行化したベクトルが一つ増える。この作業を繰り返して全てのベクトルを直交化させる。
 					</p> <p>
-以下では、ベクトル \(\boldsymbol{x}_3\) を直行化が完了済のベクトル \(\boldsymbol{y}_1\) と \(\boldsymbol{y}_2\) に直交化させ、\(\boldsymbol{y}_3\) を求めている。ここで、\(\operatorname{proj}(\boldsymbol{x}_3, \boldsymbol{y}_1)\) と \(\operatorname{proj}(\boldsymbol{x}_3, \boldsymbol{y}_2)\) は \(\boldsymbol{x}_3\) の \(\boldsymbol{y}_1\) と \(\boldsymbol{y}_2\) 方向の成分を表す。
+以下では、ベクトル <m:math><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub></m:math> を直行化が完了済のベクトル <m:math><m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub></m:math> と <m:math><m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub></m:math> に直交化させ、<m:math><m:msub><m:mi>𝒚</m:mi><m:mn>3</m:mn></m:msub></m:math> を求めている。ここで、<m:math><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub><m:mo stretchy="false">)</m:mo></m:math> と <m:math><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub><m:mo stretchy="false">)</m:mo></m:math> は <m:math><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub></m:math> の <m:math><m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub></m:math> と <m:math><m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub></m:math> 方向の成分を表す。
 					</p>
 					<figure class="normal">
 						<object data="img/gramSchmidt.svg" style="weight: 40rem;"/>
@@ -47,9 +45,9 @@
 				<h1>記号の定義</h1>
 				<ul>
 					<li>
-入力ベクトルの組: \(\{\boldsymbol{x}_1, \boldsymbol{x}_2, \cdots, \boldsymbol{x}_n\}\)
+入力ベクトルの組: <m:math><m:mo>{</m:mo><m:msub><m:mi>𝒙</m:mi><m:mn>1</m:mn></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒙</m:mi><m:mn>2</m:mn></m:msub><m:mo>,</m:mo><m:mo>⋯</m:mo> <m:mo>,</m:mo><m:msub><m:mi>𝒙</m:mi><m:mi>n</m:mi></m:msub><m:mo>}</m:mo></m:math>
 					</li> <li>
-直行ベクトルの組: \(\{\boldsymbol{y}_1, \boldsymbol{y}_2, \cdots, \boldsymbol{y}_n\}\)
+直行ベクトルの組: <m:math><m:mo>{</m:mo><m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub><m:mo>,</m:mo><m:mo>⋯</m:mo> <m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mi>n</m:mi></m:msub><m:mo>}</m:mo></m:math>
 					</li>
 				</ul>
 			</section> <section>
@@ -58,11 +56,34 @@
 平行成分は以下のように求められる。
 				</p>
 				<div class="math">
-\[\operatorname{proj}(\boldsymbol{a}, \boldsymbol{b}) =
-\frac
-	{\langle \boldsymbol{a}, \boldsymbol{b} \rangle}
-	{\langle \boldsymbol{b}, \boldsymbol{b} \rangle}
-\boldsymbol{b}\]
+					<m:math display="block">
+						<m:mrow>
+							<m:mi>proj</m:mi>
+							<m:mo stretchy="false">(</m:mo>
+							<m:mi>𝒂</m:mi>
+							<m:mo>,</m:mo>
+							<m:mi>𝒃</m:mi>
+							<m:mo stretchy="false">)</m:mo>
+						</m:mrow>
+						<m:mo>=</m:mo>
+						<m:mfrac>
+							<m:mrow>
+								<m:mo>&#x27E8;</m:mo>
+								<m:mi>𝒂</m:mi>
+								<m:mo>,</m:mo>
+								<m:mi>𝒃</m:mi>
+								<m:mo>&#x27E9;</m:mo>
+							</m:mrow>
+							<m:mrow>
+								<m:mo>&#x27E8;</m:mo>
+								<m:mi>𝒃</m:mi>
+								<m:mo>,</m:mo>
+								<m:mi>𝒃</m:mi>
+								<m:mo>&#x27E9;</m:mo>
+							</m:mrow>
+						</m:mfrac>
+						<m:mi>𝒃</m:mi>
+					</m:math>
 				</div>
 			</section>
 		</section> <section>
@@ -79,10 +100,30 @@
 					<p>
 直行化における平行成分の計算を愚直に行う。
 					</p> <p>
-つまり、\(\boldsymbol{y}_k\) は以下のように計算される。
+つまり、<m:math><m:msub><m:mi>𝒚</m:mi><m:mn>k</m:mn></m:msub></m:math> は以下のように計算される。
 					</p>
 					<div class="math">
-\[\boldsymbol{y}_k = \boldsymbol{x}_k - \sum_{i=1}^{k-1}{\operatorname{proj}(\boldsymbol{x}_k,\boldsymbol{y}_i)}\]
+						<m:math display="block">
+							<m:mrow>
+								<m:msub><m:mi>𝒚</m:mi><m:mi>k</m:mi></m:msub>
+								<m:mo>=</m:mo>
+								<m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub>
+								<m:mo>-</m:mo>
+								<m:munderover>
+									<m:mo>∑</m:mo>
+									<m:mrow><m:mi>i</m:mi><m:mo>=</m:mo><m:mn>1</m:mn></m:mrow>
+									<m:mrow><m:mi>k</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow>
+								</m:munderover>
+								<m:mrow>
+									<m:mi>proj</m:mi>
+									<m:mo stretchy="false">(</m:mo>
+									<m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub>
+									<m:mo>,</m:mo>
+									<m:msub><m:mi>𝒚</m:mi><m:mi>i</m:mi></m:msub>
+									<m:mo stretchy="false">)</m:mo>
+								</m:mrow>
+							</m:mrow>
+						</m:math>
 					</div>
 				</section>
 			</section> <section>
@@ -97,30 +138,71 @@
 					<p>
 直行化における平行成分の計算を、対象ベクトルから他の平行成分を除去した後に行う。
 					</p> <p>
-つまり、\(\boldsymbol{y}_k\) は以下のように計算される。
+つまり、<m:math><m:msub><m:mi>𝒚</m:mi><m:mn>k</m:mn></m:msub></m:math> は以下のように計算される。
 					</p>
 					<div class="math">
-\[\boldsymbol{y}_k = \boldsymbol{y}_k^{(k)}\]
+						<m:math display="block">
+							<m:msub><m:mi>𝒚</m:mi><m:mi>k</m:mi></m:msub>
+							<m:mo>=</m:mo>
+							<m:msubsup>
+								<m:mi>𝒘</m:mi>
+								<m:mi>k</m:mi>
+								<m:mi>k</m:mi>
+							</m:msubsup>
+						</m:math>
 					</div>
 					<div class="math">
-\[\boldsymbol{y}_k^{(i)} = \boldsymbol{y}_k^{(i-1)} - \operatorname{proj}(\boldsymbol{y}_k^{(i-1)},\boldsymbol{y}_i)\]
+						<m:math display="block">
+							<m:msubsup>
+								<m:mi>𝒘</m:mi>
+								<m:mi>k</m:mi>
+								<m:mi>i</m:mi>
+							</m:msubsup>
+							<m:mo>=</m:mo>
+							<m:msubsup>
+								<m:mi>𝒘</m:mi>
+								<m:mi>k</m:mi>
+								<m:mrow><m:mi>i</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow>
+							</m:msubsup>
+							<m:mo>-</m:mo>
+							<m:mrow>
+								<m:mi>proj</m:mi>
+								<m:mo stretchy="false">(</m:mo>
+								<m:msubsup>
+									<m:mi>𝒘</m:mi>
+									<m:mi>k</m:mi>
+									<m:mrow><m:mi>i</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow>
+								</m:msubsup>
+								<m:mo>,</m:mo>
+								<m:msub><m:mi>𝒚</m:mi><m:mi>i</m:mi></m:msub>
+								<m:mo stretchy="false">)</m:mo>
+							</m:mrow>
+						</m:math>
 					</div>
 					<div class="math">
-\[\boldsymbol{y}_k^{(0)} = \boldsymbol{x}_k\]
+						<m:math display="block">
+							<m:msubsup>
+								<m:mi>𝒘</m:mi>
+								<m:mi>k</m:mi>
+								<m:mn>0</m:mn>
+							</m:msubsup>
+							<m:mo>=</m:mo>
+							<m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub>
+						</m:math>
 					</div>
 					<p>
-ここで \(\{\boldsymbol{y}_k^{(1)}, \cdots, \boldsymbol{y}_k^{(k-1)}\}\) は \(\boldsymbol{y}_k\) の計算途中のワーク変数である。
+ここで <m:math><m:mo>{</m:mo><m:msubsup><m:mi>𝒘</m:mi><m:mi>k</m:mi><m:mn>0</m:mn></m:msubsup><m:mo>,</m:mo><m:mo>⋯</m:mo><m:mo>,</m:mo><m:msubsup><m:mi>𝒘</m:mi><m:mi>k</m:mi><m:mi>k</m:mi></m:msubsup><m:mo>}</m:mo></m:math> は <m:math><m:msub><m:mi>𝒚</m:mi><m:mi>k</m:mi></m:msub></m:math> の計算途中のワーク変数である。
 					</p>
 				</section> <section>
 					<h2>備考 (誤差の改良点)</h2>
 					<p>
-古典版と修正版、それぞれの \(i\) 回目のループの以下の箇所に着目する。
+					古典版と修正版、それぞれの <m:math><m:mi>i</m:mi></m:math> 回目のループの以下の箇所に着目する。
 					</p> <p>
-古典版: \(\operatorname{proj}(\boldsymbol{x}_k, \boldsymbol{y}_i)\)
+古典版: <m:math><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mi>i</m:mi></m:msub><m:mo stretchy="false">)</m:mo></m:math>
 					</p> <p>
-修正版: \(\operatorname{proj}(\boldsymbol{y}_k^{(i-1)},\boldsymbol{y}_i)\)
+修正版: <m:math><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msubsup><m:mi>𝒘</m:mi><m:mi>k</m:mi><m:mrow><m:mi>i</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:msubsup><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mi>i</m:mi></m:msub><m:mo stretchy="false">)</m:mo></m:math>
 					</p> <p>
-ここで、古典版の第一引数は常に \(\boldsymbol{x}_k\) である。一方、修正版は \(\boldsymbol{y}_k^{(i-1)}\) でこれは \(i=1\) では古典版と同じだが、\(i\) が一つ増えるたびに各成分が除去されていくため、その絶対値も減少していく。これにより、平行成分の計算に誤差があっても、それも必ず減少していく。この積み重ねが原因で、修正版のほうが誤差が小さくなる。
+ここで、古典版の第一引数は常に <m:math><m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub></m:math> である。一方、修正版は <m:math><m:msubsup><m:mi>𝒘</m:mi><m:mi>k</m:mi><m:mrow><m:mi>i</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:msubsup></m:math> でこれは <m:math><m:mi>i</m:mi><m:mo>=</m:mo><m:mn>1</m:mn></m:math> では古典版と同じだが、<m:math><m:mi>i</m:mi></m:math> が一つ増えるたびに各成分が除去されていくため、その絶対値も減少していく。これにより、平行成分の計算に誤差があっても、それも必ず減少していく。この積み重ねが原因で、修正版のほうが誤差が小さくなる。
 					</p>
 				</section>
 			</section>
