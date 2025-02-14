@@ -14,7 +14,6 @@
 	import_nav,
 	import_quote,
 	import_prism,
-	import_console_rustc,
 	import_font_math,
 	custom_nav,
 	custom_prism;
@@ -24,7 +23,6 @@
 @import url("import/lang.css") layer(import_lang);
 @import url("import/quote.css") layer(import_quote);
 @import url("import/prism.css") layer(import_prism);
-@import url("import/console_rustc.css") layer(import_console_rustc);
 @import url("import/font_math.css") layer(import_font_math);
 @import url("../lib/nav/nav.css") layer(import_nav);
 @namespace m url("http://www.w3.org/1998/Math/MathML");
