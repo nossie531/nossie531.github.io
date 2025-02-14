@@ -15,6 +15,7 @@
 	import_quote,
 	import_prism,
 	import_console_rustc,
+	import_font_math,
 	custom_nav,
 	custom_prism;
 
@@ -24,14 +25,9 @@
 @import url("import/quote.css") layer(import_quote);
 @import url("import/prism.css") layer(import_prism);
 @import url("import/console_rustc.css") layer(import_console_rustc);
+@import url("import/font_math.css") layer(import_font_math);
 @import url("../lib/nav/nav.css") layer(import_nav);
-
 @namespace m url("http://www.w3.org/1998/Math/MathML");
-
-@font-face {
-	font-family: "MyMath";
-	src: url("font/latinmodern-math.otf") format("opentype");
-}
 
 @layer root {
 	:root {
@@ -519,16 +515,12 @@
 	div.cmpFigure {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		column-gap: 1rem;
+		column-gap: calc(var(--gap) * 2);
 		margin: 1rem 0;
 	}
 
 	div.cmpFigure > figure.normal {
 		margin: 0;
-	}
-
-	div.cmpFigure > figure.normal > object {
-		pointer-events: none;
 	}
 
 	div.cmpFigure.center > figure.normal:nth-child(1) {
@@ -539,20 +531,26 @@
 		justify-self: left;
 	}
 
-	@media screen and (width <= 46rem) {
-		div.cmpFigure.full  {
-			width: 100%;
-			overflow-x: hidden;
-		}
+	div.cmpFigure.full {
+		width: 100%;
+		overflow-x: hidden;
+	}
 
-		div.cmpFigure.full > figure.normal {
-			width: 20.5rem;
-		}
+	div.cmpFigure.full:focus {
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
 
-		div.cmpFigure.full:focus {
-			overflow-x: auto;
-			scrollbar-width: thin;
-		}
+	div.cmpFigure.full > figure.normal {
+		width: calc((var(--base-width-size) - var(--gap) * 2) / 2);
+	}
+
+	div.cmpFigure.full > figure.normal > *:not(figcaption) {
+		width: 100%;
+	}
+
+	div.cmpFigure.full > figure.normal > object {
+		pointer-events: none;
 	}
 }
 

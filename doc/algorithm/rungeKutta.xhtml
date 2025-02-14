@@ -21,7 +21,7 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 時間を細かく区切り、現時点の状況から次時点の状況を求め、そのステップの繰り返しで全体の時間発展を求める。
 			</p>
 			<figure class="normal">
-				<object data="img/rungeKuttaSteps.svg" style="height: calc(22em * 2 / 3)"/>
+				<object data="img/rungeKuttaSteps.svg" style="height: 15rem"/>
 			</figure>
 			<p>
 各ステップごとの計算には様々なバリエーションが知られている。
@@ -29,13 +29,13 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 最も単純な方法である陽的 Euler 法では、現時点からの勾配をそのまま延長する。しかしこの場合、ステップ内での勾配の時間変化は完全に無視される。そのため、ステップ幅に対する誤差が大きくなってしまう。
 			</p>
 			<figure class="normal">
-				<object data="img/rungeKuttaEulerStep.svg" style="height: calc(30em * 2 / 3)"/>
+				<object data="img/rungeKuttaEulerStep.svg" style="height: 20rem"/>
 			</figure>
 			<p>
 そこで、精度を高めるために、現時点から次時点への経路付近にある複数の調査点について、それぞれの勾配の加重平均をとる。
 			</p>
 			<figure class="normal">
-				<object data="img/rungeKuttaAverageStep.svg" style="height: calc(30em * 2 / 3)"/>
+				<object data="img/rungeKuttaAverageStep.svg" style="height: 20rem"/>
 			</figure>
 			<p>
 なお、計算元となるそれぞれの調査点の位置についても、次時点を計算する場合と同様、他の調査点の勾配の加重平均から計算する。

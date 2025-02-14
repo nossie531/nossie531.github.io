@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340" height="340">
+<svg xmlns="http://www.w3.org/2000/svg"
+	xmlns:m="http://www.w3.org/1998/Math/MathML"
+	viewBox="0 0 210 230" height="230">
 	<style>
 @import url("style/diffEq.css");
 	</style>
 	<script href="lib/graphViewer.js"/>
 	<script href="lib/matrix.js"/>
 	<script href="lib/diffEq.js"/>
-	<script>//<![CDATA[
+	<script><![CDATA[
 document.addEventListener("DOMContentLoaded", () => {
 	const ctx = getContext();
 	const viewer = new GraphViewer(ctx.range, ctx.origin, ctx.gridArea);
@@ -14,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	viewer.appendGridX("step", ctx.largeStep);
 	drawReal(viewer);
 	drawCalc(viewer);
+	drawError(viewer);
 	drawBackDiffusion(viewer);
 });
 
@@ -27,10 +30,18 @@ function drawCalc(viewer) {
 	const pathArr = getAlgorithm().result();
 	viewer.setFuncPath("c1", pathArr[0]);
 	viewer.setFuncPath("c2", pathArr[1]);
-	viewer.setLabel("n1", pathArr[0][0], -25);
-	viewer.setLabel("n2", pathArr[1][0], -25);
-	viewer.setPathLine("g1", [...pathArr[0]].reverse(), 50);
-	viewer.setPathLine("g2", [...pathArr[1]].reverse(), 50);
+	viewer.setLabel("n1", pathArr[0][0], -20, -10);
+	viewer.setLabel("n2", pathArr[1][0], -20, -10);
+	viewer.setPathLine("g1", [...pathArr[0]].reverse(), 30);
+	viewer.setPathLine("g2", [...pathArr[1]].reverse(), 30);
+}
+
+function drawError(viewer) {
+	const real = getAlgorithm(getContext().smallStep).result()[0].at(-1);
+	const calc = getAlgorithm().result()[0].at(-1);
+	const error = [calc, real];
+	viewer.setPath("error", error);
+	viewer.setLabel("errorText", getErrorTextPos(error), 12);
 }
 
 function drawBackDiffusion(viewer) {
@@ -48,13 +59,13 @@ function flipPathX(points) {
 
 function getContext() {
 	return {
-		dc: 0.004,
+		dc: 0.006,
 		smallStep: 5,
-		largeStep: 200,
-		range: {min: 0, max: 200},
+		largeStep: 140,
+		range: {min: 0, max: 140},
 		origin: {x: 10, y: 10},
-		gridArea: {x: 25, y:15, width: 230, height: 310},
-		nodes: [245, 45]
+		gridArea: {x: 15, y:10, width: 160, height: 210},
+		nodes: [170, 25]
 	};
 }
 
@@ -76,27 +87,31 @@ function getReverseAlgorithm(nodes) {
 	result.nodes = nodes;
 	return result;
 }
-	//]]></script>
+
+function getErrorTextPos(error) {
+	return {x: error[0].x, y: (error[0].y + error[1].y) / 2};
+}
+	]]></script>
 	<defs>
 		<marker id="point" markerUnits="userSpaceOnUse"
 			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
-			<circle r="3"/>
+			<circle r="2"/>
 		</marker>
 		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M2,0 L-6,4 -6,-4 Z"/>
+			<path d="M2,0 L-4,3 -4,-3"/>
 		</marker>
 		<marker id="gradSrc" markerUnits="userSpaceOnUse"
 			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
-			<circle r="4"/>
+			<circle r="2.5"/>
 		</marker>
 		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M3,0 L-8,6 -8,-6 Z"/>
+			<path d="M2,0 L-6,4 -6,-4 Z"/>
 		</marker>
 		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
-			<path d="M 0,0 V -10"/>
+			<path d="M 0,0 V -7.5"/>
 		</marker>
 	</defs>
 	<g>
@@ -105,7 +120,7 @@ function getReverseAlgorithm(nodes) {
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 誤差表示。-->
-		<path class="error" d="M 235,131.54 V 149.17"/>
+		<path id="error"/>
 		<!-- 真の値。-->
 		<path id="r1" class="flow"/>
 		<path id="r2" class="flow"/>
@@ -119,19 +134,17 @@ function getReverseAlgorithm(nodes) {
 		<path id="g1" class="grad"/>
 		<path id="g2" class="grad"/>
 		<!-- 横軸ラベル。-->
-		<text class="label" x="265" y="315">
-			<tspan class="symbol">t</tspan>
-		</text>	
+		<foreignObject x="182" y="202" width="30" height="30">
+			<m:math><m:mi>t</m:mi></m:math>
+		</foreignObject>	
 		<!-- ノードラベル。-->
-		<text id="n1" class="label">
-			<tspan class="symbol">n</tspan><tspan class="sub" dy="0.7em">1</tspan>
-		</text>	
-		<text id="n2" class="label">
-			<tspan class="symbol">n</tspan><tspan class="sub" dy="0.7em">2</tspan>
-		</text>
+		<foreignObject id="n1" width="30" height="30">
+			<m:math><m:msub><m:mi>n</m:mi><m:mn>1</m:mn></m:msub></m:math>
+		</foreignObject>
+		<foreignObject id="n2" width="30" height="30">
+			<m:math><m:msub><m:mi>n</m:mi><m:mn>2</m:mn></m:msub></m:math>
+		</foreignObject>
 		<!-- 誤差ラベル。-->
-		<text class="label error" x="255" y="142">
-			Error
-		</text>
+		<text id="errorText">Error</text>
 	</g>
 </svg>

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 300" height="300">
+<svg xmlns="http://www.w3.org/2000/svg"
+	xmlns:m="http://www.w3.org/1998/Math/MathML"
+	viewBox="0 0 220 200" height="200">
 	<style>
 @import url("style/rungeKutta.css");
 	</style>
@@ -19,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const grad2 = getGradLine(points[1]);
 	const grad3 = getGradLine(points[2]);
 	const error = [real.at(-1), calc.at(-1)];
-	viewer.magnify = 120;
+	viewer.magnify = 80;
 	viewer.appendAxis("axis");
 	viewer.appendGridX("step", ctx.largeStep);
 	viewer.setFuncPath("flow1", flow1);
@@ -30,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	viewer.setPathLine("grad3", grad3, 0.5);
 	viewer.setFuncPath("calc", calc);
 	viewer.setPath("error", error);
-	viewer.setLabel("errorText", getErrorTextPos(error), 20, 1);
+	viewer.setLabel("errorText", getErrorTextPos(error), 12, 1);
 });
 
 function getAlgorithm(step) {
@@ -56,7 +58,6 @@ function getResearchPoints() {
 }
 
 function fromPoint(p) {
-
 	const ctx = getContext();
 	const bkwd = bkwdResult();
 	const frwd = frwdResult();
@@ -90,7 +91,7 @@ function getContext() {
 		largeStep: 2,
 		range: {min: 0, max: 2},
 		origin: {x: 10, y: 10},
-		gridArea: {x:15, y:15, width: 275, height: 275}
+		gridArea: {x: 10, y: 10, width: 185, height: 180}
 	};
 }
 
@@ -101,23 +102,23 @@ function getErrorTextPos(error) {
 	<defs>
 		<marker id="point" markerUnits="userSpaceOnUse"
 			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
-			<circle r="3"/>
+			<circle r="2"/>
 		</marker>
 		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M2,0 L-6,4 -6,-4 Z"/>
+			<path d="M2,0 L-4,3 -4,-3 Z"/>
 		</marker>
 		<marker id="gradSrc" markerUnits="userSpaceOnUse"
 			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
-			<circle r="4"/>
+			<circle r="3"/>
 		</marker>
 		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M3,0 L-8,6 -8,-6 Z"/>
+			<path d="M2,0 L-6,4 -6,-4 Z"/>
 		</marker>
 		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
-			<path d="M 0,0 V -10"/>
+			<path d="M 0,0 V -7.5"/>
 		</marker>
 	</defs>
 	<g>
@@ -126,7 +127,7 @@ function getErrorTextPos(error) {
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 誤差表示。-->
-		<path id="error" class="error"/>
+		<path id="error"/>
 		<!-- 周辺の値。-->
 		<path id="flow1" class="flow"/>
 		<path id="flow2" class="flow"/>
@@ -138,10 +139,10 @@ function getErrorTextPos(error) {
 		<!-- 計算値。-->
 		<path id="calc" class="calc endCap"/>
 		<!-- 横軸ラベル。-->
-		<text class="label" x="300" y="280">
-			<tspan class="symbol">t</tspan>
-		</text>	
+		<foreignObject x="203" y="172" width="30" height="30">
+			<m:math><m:mi>t</m:mi></m:math>
+		</foreignObject>
 		<!-- 誤差ラベル。-->
-		<text id="errorText" class="label error">Error</text>
+		<text id="errorText">Error</text>
 	</g>
 </svg>

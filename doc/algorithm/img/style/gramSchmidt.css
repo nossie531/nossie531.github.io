@@ -1,16 +1,6 @@
 @import url("color.css");
-
+@import url("../../../../style/import/font_math.css");
 @namespace m url("http://www.w3.org/1998/Math/MathML");
-
-@font-face {
-	font-family: "MyMath";
-	src: url("../../../../style/font/latinmodern-math.otf") format("opentype");
-}
-
-m|math {
-	font-family: "MyMath", math;
-	font-size: 12px;
-}
 
 g#axis > path {
 	stroke-width: 1.5;
@@ -50,3 +40,9 @@ g#x3Guide > path {
 #prodX3Y2Text > m|math {
 	color: blue;
 }
+
+m|math {
+	font-family: "MyMath", math;
+	font-size: 12px;
+}
+

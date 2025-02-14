@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 220" height="220">
+<svg xmlns="http://www.w3.org/2000/svg"
+	xmlns:m="http://www.w3.org/1998/Math/MathML"
+	viewBox="0 0 250 150" height="150">
 	<style>
 @import url("style/rungeKutta.css");
 	</style>
 	<script href="lib/graphViewer.js"/>
 	<script href="lib/rungeKutta.js"/>
-	<script>
+	<script><![CDATA[
 document.addEventListener("DOMContentLoaded", () => {
 	const step = 0.5;
 	const range = {min: 0, max: 3 };
-	const origin = {x: 10, y: 10};
-	const gridArea = {x:15, y:15, width: 335, height: 195};
+	const origin = {x: 7.5, y: 7.5};
+	const gridArea = {x:10, y:10, width: 220, height: 130};
 	const viewer = new GraphViewer(range, origin, gridArea);
 	const calc = getAlgorithm(step, range).result();
-	viewer.magnify = 100;
+	viewer.magnify = 66;
 	viewer.appendAxis("axis");
 	viewer.appendGridX("step", step);
 	viewer.appendPointsPath("calc", calc);
@@ -27,15 +29,15 @@ function getAlgorithm(step, range) {
 	result.step = step;
 	return result;
 }
-	</script>
+	]]></script>
 	<defs>
 		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M2,0 L-6,4 -6,-4 Z"/>
+			<path d="M2,0 L-4,3 -4,-3 Z"/>
 		</marker>
 		<marker id="calcArrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M3,0 L-8,6 -8,-6 Z"/>
+			<path d="M2,0 L-6,4 -6,-4 Z"/>
 		</marker>
 	</defs>
 	<g>
@@ -46,8 +48,8 @@ function getAlgorithm(step, range) {
 		<!-- 計算値。-->
 		<g id="calc" class="calc withArrow"/>
 		<!-- 横軸ラベル。-->
-		<text class="label" x="360" y="200">
-			<tspan class="symbol">t</tspan>
-		</text>	
+		<foreignObject x="238" y="125" width="30" height="30">
+			<m:math><m:mi>t</m:mi></m:math>
+		</foreignObject>
 	</g>
 </svg>

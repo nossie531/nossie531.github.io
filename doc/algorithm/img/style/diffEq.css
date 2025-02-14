@@ -1,4 +1,6 @@
 @import url("color.css");
+@import url("../../../../style/import/font_math.css");
+@namespace m url("http://www.w3.org/1998/Math/MathML");
 
 :root {
 	font-size:10px;
@@ -10,14 +12,14 @@
 
 g#axis > path {
 	stroke: var(--mc4-color);
-	stroke-width: 1.5;
+	stroke-width: 1;
 	marker-end: url(#arrow);
 }
 
 g#step > path {
 	stroke: var(--mc5-color);
 	stroke-width: 1;
-	stroke-dasharray: 3;
+	stroke-dasharray: 2;
 }
 
 path.auxStep {
@@ -29,13 +31,13 @@ path.auxStep {
 path.flow {
 	fill: none;
 	stroke: var(--flow-color);
-	stroke-width: 1.5;
+	stroke-width: 1;
 }
 
 path.calc {
 	fill: none;
 	stroke: var(--calc-color);
-	stroke-width: 2;
+	stroke-width: 1;
 	marker-start: url(#point);
 	marker-mid: url(#point);
 }
@@ -46,7 +48,7 @@ path.calc.endCap {
 
 path.grad {
 	stroke: var(--calc-color);
-	stroke-width: 3;
+	stroke-width: 1.5;
 	marker-start: url(#gradSrc);
 	marker-end: url(#gradDst);
 }
@@ -54,31 +56,22 @@ path.grad {
 path.aux {
 	fill: none;
 	stroke: var(--aux-color);
-	stroke-width: 1.5;
+	stroke-width: 1;
 	marker-mid: url(#auxPoint);
 }
 
-path.error {
+path#error {
 	fill: none;
 	stroke: var(--error-color);
-	stroke-width: 2;
+	stroke-width: 1;
 	marker-start: url(#lengthMark);
 	marker-end: url(#lengthMark);
 }
 
-text.label {
-	font-size: 2rem;
+text#errorText {
+	font-size: 12px;
 	font-family: "Times New Roman", serif;
 	dominant-baseline: middle;
-	fill: var(--fg-color);
-}
-
-text.label > tspan.sub {
-	dominant-baseline: auto;
-}
-
-text.error {
-	font-size: 1.5rem;
 	fill: var(--error-color);
 }
 
@@ -105,5 +98,10 @@ marker#auxPoint > circle {
 
 marker#lengthMark path {
 	stroke: var(--error-color);
-	stroke-width: 1.5;
+	stroke-width: 1;
+}
+
+m|math {
+	font-family: "MyMath", math;
+	font-size: 12px;
 }
