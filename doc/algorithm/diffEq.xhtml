@@ -26,51 +26,116 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 ネットワーク上の拡散方程式の初期値問題について、各アルゴリズムの特徴を紹介する。
 		</p>
 		<section>
-			<h1>Runge-Kutta 法</h1>
-			<p>
-『<a href="rungeKutta.xhtml">Runge-Kutta 法</a>』に分類される各手法では以下のようになる。
-			</p>
-			<table id="finiteDiff" class="normal">
-				<thead>
-					<tr>
-						<th></th>
-						<th>単純さ</th>
-						<th>安定性</th>
-						<th>精度</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th>1 次の陽解法 </th>
-						<td>○</td>
-						<td>×</td>
-						<td>×</td>
-					</tr> <tr>
-						<th>1 次の陰解法 </th>
-						<td>×</td>
-						<td>〇</td>
-						<td>×</td>
-					</tr> <tr>
-						<th>Crank-Nicolson 法 </th>
-						<td>×</td>
-						<td>△</td>
-						<td>〇</td>
-					</tr>
-				</tbody>
-			</table>
-			<p>
-※ Crank-Nicolson 法は二次の陰解法にあたる。<br/>
-※ 低次のものを紹介したが高次でも似た傾向がある。
-			</p>
+			<h1>導入</h1>
 			<section>
-				<h2>記号の導入</h2>
+				<h1>全体像</h1>
+				<p>
+対象のネットワークでは、各ノードが重みつきのエッジを通して線形な影響を与えあう。
+				</p> <p>
+この状況で各ノードの値がどのように時間発展していくかを求める。
+				</p>
+				<figure class="normal">
+					<object data="img/diffEqNetwork.svg" style="height: 15rem;"/>
+					<figcaption>ネットワークの例</figcaption>
+				</figure>
+			</section> <section>
+				<h1>応用先</h1>
+				<p>
+この問題は例えば、集団での助け合いをモデル化できる。ここで、各ノードの値は各人物の資金を表す。また、エッジの重みで各人物どうしの親密度を表す。そして、親密度と貧富の差の積により、互いを平均化する方向に資金を融通していく。
+				</p> <p>
+なお、この応用は他の多くの応用と共通するエッジの特徴を持つ。まず、資金は他の人物とのやり取り以外では増減しないので、ノードの自身へのエッジは 1 である。さらに、入金と出金は同額でなければならないため、エッジはその逆方向のものと同じ値になる。
+				</p>
+			</section> <section>
+				<h1>記号の定義</h1>
 				<ul>
 					<li>
-<m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> は <m:math><m:mi>i</m:mi></m:math> 番目のノードの時刻 <m:math><m:mi>t</m:mi></m:math> の値。
+<m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> は <m:math><m:mi>i</m:mi></m:math> 番目のノードの時刻 <m:math><m:mi>t</m:mi></m:math> の値
 					</li> <li>
-<m:math><m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub></m:math> は <m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub></m:math> から <m:math><m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub></m:math> へのエッジの重み。
+<m:math><m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub></m:math> は <m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub></m:math> への <m:math><m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub></m:math> からのエッジの重み
+					</li> <li>
+<m:math><m:mi>𝒏</m:mi></m:math> は全ての <m:math><m:mi>i</m:mi></m:math> についての <m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub></m:math> からなるベクトル
+					</li> <li>
+<m:math><m:mi>𝐖</m:mi></m:math> は全ての<m:math><m:mi>i</m:mi><m:mi>j</m:mi></m:math> についての <m:math><m:msub><m:mi>w</m:mi><m:mi>i</m:mi><m:mi>j</m:mi></m:msub></m:math> からなる正方行列
 					</li>
 				</ul>
+			</section> <section>
+				<h1>時間発展</h1>
+				<p>
+線形の操作のみを考えるため、微小時間の発展は以下のように表せる。
+				</p>
+				<div class="math">
+<m:math display="block">
+	<m:mrow>
+		<m:mi>𝒏</m:mi>
+		<m:mo>(</m:mo>
+		<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+		<m:mo>)</m:mo>
+	</m:mrow>
+	<m:mo>=</m:mo>
+	<m:mi>𝐀</m:mi>
+	<m:mrow>
+		<m:mi>𝒏</m:mi>
+		<m:mo>(</m:mo>
+		<m:mi>t</m:mi>
+		<m:mo>)</m:mo>
+	</m:mrow>
+</m:math>
+				</div>
+				<p>
+ここで、<m:math><m:mi>𝐀</m:mi></m:math> は各応用から導かれる正方行列である。例えば、前述の集団での助け合いの例では、これはネットワークにおけるラプラシアン行列であり、以下のように表せる。
+				</p>
+				<div class="math">
+<m:math display="block">
+	<m:mi>𝐀</m:mi>
+	<m:mo>=</m:mo>
+	<m:mi>𝐖</m:mi>
+	<m:mo>−</m:mo>
+	<m:mi>𝐃</m:mi>
+</m:math>
+				</div>
+				<div class="math">
+<m:math display="block">
+	<m:mi>𝐃</m:mi>
+	<m:mo>=</m:mo>
+	<m:mstyle displaystyle="true">
+		<m:mo stretchy="true">[</m:mo>
+		<m:msub><m:mi>δ</m:mi><m:mi>i</m:mi><m:mi>j</m:mi></m:msub>
+		<m:mrow>
+			<m:munder>
+				<m:mo stretchy="true">∑</m:mo>
+				<m:mrow><m:mi>k</m:mi><m:mo>≠</m:mo><m:mi>i</m:mi></m:mrow>
+			</m:munder>
+			<m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>k</m:mi></m:mrow></m:msub>
+		</m:mrow>
+		<m:mo stretchy="true">]</m:mo>
+	</m:mstyle>
+</m:math>
+				</div>
+			</section>
+		</section> <section>
+			<h1>Runge-Kutta 法</h1>
+			<p>
+代表的な初期値問題の解法『<a href="rungeKutta.xhtml">Runge-Kutta 法</a>』を使った場合について。
+			</p>
+			<section>
+				<h2>問題点 1. 安定性</h2>
+				<p>
+陽解法では、ノードの値に急な変化があると安定しなくなる。
+				</p>
+			</section> <section>
+				<h2>問題点 2. 速度</h2>
+				<p>
+陰解法では、密なネットワークにも対応しようとすると遅くなる。
+				<p> </p>
+なぜなら、<a href="linearEq.xhtml">連立線形方程式</a>の行列が密になり、反復法でなく直接法が必要となる。
+				</p>
+			</section> <section>
+				<h2>問題点 3. 精度</h2>
+				<p>
+精度が低い。次数を上げれば改善されるが、アルゴリズムも複雑になる。
+				</p> <p>
+後述の例では 1 次と 2 次で全体の傾向を示しているが、高次でもこの傾向は変わらない。
+				</p>
 			</section> <section>
 				<h1>1 次の陽解法</h1>
 				<p>
@@ -223,7 +288,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 					</figure>
 				</div>
 			</section> <section>
-				<h1>Crank-Nicolson 法</h1>
+				<h1>2 次の陰解法 <span class="navNone">(Crank-Nicolson 法)</span></h1>
 				<p>
 現時点と次時点のノード値を直線で結んだ時、傾きが両時点の平均に従う。
 				</p>
@@ -332,26 +397,6 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 						<figcaption>拡散係数大 → 安定 (振動あり)</figcaption>
 					</figure>
 				</div>
-			</section>
-		</section> <section>
-			<h1>考察</h1>
-			<section>
-				<h2>安定性</h2>
-				<p>
-上述のように急な変化がある場合、不安定化するため陽解法は使いにくい。
-				</p> 
-			</section> <section>
-				<h2>連立方程式</h2>
-				<p>
-陰解法では連立方程式を解く必要があるが、この解法には反復法が使える場合が多い。なぜなら、連立方程式の計算に利用される行列は、以下のような実用上よく見るネットワークの特徴のため、対角優位の疎行列となりやすい。
-				</p>
-				<ul>
-					<li>
-ノードは近隣の少数のノードとのみ接続している場合が多い。
-					</li> <li>
-ノードの次時点の値は現時点のノードと大きく変わらない。
-					</li>
-				</ul>
 			</section>
 		</section>
 	</body>

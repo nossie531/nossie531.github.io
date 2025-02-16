@@ -1,0 +1,19 @@
+@import url("color.css");
+@import url("../../../../style/import/font_math.css");
+@namespace m url("http://www.w3.org/1998/Math/MathML");
+
+#node {
+	fill: white;
+	stroke: black;
+}
+
+g#edges path {
+	fill: none;
+	stroke: black;
+	marker-end: url(#arrow);
+}
+
+m|math {
+	font-size: 12px;
+	font-family: "MyMath", math;
+}

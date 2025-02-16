@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	xmlns:m="http://www.w3.org/1998/Math/MathML"
+	viewBox="0 0 230 150" height="150">
+	<style>
+@import url("style/diffEqNetwork.css");
+	</style>
+	<script href="lib/diffEqNetwork.js"/>
+	<script><![CDATA[
+document.addEventListener("DOMContentLoaded", () => {
+	const con = new Connector("node", "edges");
+	con.join("w12", "n2", "n1");
+	con.join("w13", "n3", "n1");
+	con.join("w54", "n4", "n5");
+	con.join("w24", "n4", "n2", {rot: 0.3, dx: +3, dy: -30});
+	con.join("w42", "n2", "n4", {rot: 0.3, dx: -3, dy: +10});
+	con.join("w35", "n5", "n3", {rot: 0.3, dx: +3, dy: -30});
+	con.join("w53", "n3", "n5", {rot: 0.3, dx: -3, dy: +10});
+});
+	]]></script>
+	<defs>
+		<circle id="node" r="12"/>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M0,0 L-6,3 -6,-3"/>
+		</marker>
+	</defs>
+	<g>
+		<g id="n1" transform="translate(30, 50)">
+			<use href="#node"/>
+			<foreignObject x="-6" y="-15" width="30" height="30">
+				<m:math><m:msub><m:mi>n</m:mi><m:mn>1</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="n2" transform="translate(110, 30)">
+			<use href="#node"/>
+			<foreignObject x="-6" y="-15" width="30" height="30">
+				<m:math><m:msub><m:mi>n</m:mi><m:mn>2</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="n3" transform="translate(80, 110)">
+			<use href="#node"/>
+			<foreignObject x="-6" y="-15" width="30" height="30">
+				<m:math><m:msub><m:mi>n</m:mi><m:mn>3</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="n4" transform="translate(200, 40)">
+			<use href="#node"/>
+			<foreignObject x="-6" y="-15" width="30" height="30">
+				<m:math><m:msub><m:mi>n</m:mi><m:mn>4</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="n5" transform="translate(170, 120)">
+			<use href="#node"/>
+			<foreignObject x="-6" y="-15" width="30" height="30">
+				<m:math><m:msub><m:mi>n</m:mi><m:mn>5</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+	</g>
+	<g id="edges">
+		<g id="w12">
+			<path/>
+			<foreignObject width="30" height="30">
+				<m:math><m:msub><m:mi>w</m:mi><m:mn>12</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="w13">
+			<path/>
+			<foreignObject width="30" height="30">
+				<m:math><m:msub><m:mi>w</m:mi><m:mn>13</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="w54">
+			<path/>
+			<foreignObject width="30" height="30">
+				<m:math><m:msub><m:mi>w</m:mi><m:mn>54</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="w24">
+			<path/>
+			<foreignObject width="30" height="30">
+				<m:math><m:msub><m:mi>w</m:mi><m:mn>24</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="w42">
+			<path/>
+			<foreignObject width="30" height="30">
+				<m:math><m:msub><m:mi>w</m:mi><m:mn>42</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="w35">
+			<path/>
+			<foreignObject width="30" height="30">
+				<m:math><m:msub><m:mi>w</m:mi><m:mn>35</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+		<g id="w53">
+			<path/>
+			<foreignObject width="30" height="30">
+				<m:math><m:msub><m:mi>w</m:mi><m:mn>53</m:mn></m:msub></m:math>
+			</foreignObject>
+		</g>
+	</g>
+</svg>
