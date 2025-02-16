@@ -147,3 +147,25 @@ class CrankNicolsonDiffEq extends ImplicitDiffEq {
 	}
 }
 
+class ExpIntegratorDiffEq extends DiffEq {
+	// Implement.
+	execStep(currents) {
+		const vector = new Vector(currents);
+		const matrix = this.#createMatrix(currents.length);
+		return matrix.expMul(vector).arr;
+	}
+
+	// 拡散行列を生成します。
+	#createMatrix(n) {
+		const result = new Matrix(n, n);
+		const v = this.dc * this.step;
+		for (let i = 0; i < result.m; i++) {
+			for (let j = 0; j < result.n; j++) {
+				result.pos(i, j).val = i === j ? -(n - 1) * v : v;
+			}
+		}
+
+		return result;
+	}
+}
+

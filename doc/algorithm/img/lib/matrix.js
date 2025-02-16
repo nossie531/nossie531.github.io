@@ -243,6 +243,22 @@ class Matrix {
 			}
 		}
 	}
+
+	expMul(x) {
+		if (this.m !== this.n || x.n !== 1 || this.n !== x.m) {
+			throw new Error;
+		}
+
+		let result = new Vector(x);
+		let term = new Vector(x);
+
+		for (let i = 1; i < 32; i++) {
+			term = this.mulMat(term).mulVal(1 / i);
+			result = result.add(term);
+		}
+
+		return result;
+	}
 }
 
 const Vector = Matrix;
