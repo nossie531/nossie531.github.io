@@ -30,7 +30,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			<section>
 				<h1>全体像</h1>
 				<p>
-対象のネットワークでは、各ノードが重みつきのエッジを通して線形な影響を与えあう。
+対象のネットワークでは、各ノードが重みつきのエッジを通して影響を与えあう。
 				</p> <p>
 この状況で各ノードの値がどのように時間発展していくかを求める。
 				</p>
@@ -61,7 +61,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			</section> <section>
 				<h1>時間発展</h1>
 				<p>
-線形の操作のみを考えるため、微小時間の発展は以下のように表せる。
+線形の操作のみを考えた場合、微小時間 <m:math><m:mo>∆</m:mo><m:mi>t</m:mi></m:math> の発展は以下のように表せる。
 				</p>
 				<div class="math">
 <m:math display="block">
@@ -79,10 +79,11 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mi>t</m:mi>
 		<m:mo>)</m:mo>
 	</m:mrow>
+	<m:mo>∆</m:mo><m:mi>t</m:mi>
 </m:math>
 				</div>
 				<p>
-ここで、<m:math><m:mi>𝐀</m:mi></m:math> は各応用から導かれる正方行列である。例えば、前述の集団での助け合いの例では、これはネットワークにおけるラプラシアン行列であり、以下のように表せる。
+ここで、<m:math><m:mi>𝐀</m:mi></m:math> は各応用から導かれる正方行列である。例えば、前述の集団での助け合いの例では以下のように表せる (これはネットワークにおけるラプラシアン行列の -1 倍である)。
 				</p>
 				<div class="math">
 <m:math display="block">
@@ -139,101 +140,99 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			</section> <section>
 				<h1>1 次の陽解法</h1>
 				<p>
-現時点と次時点のノード値を直線で結んだ時、傾きが現時点の状況に従う。
-				</p>
-				<div class="math">
-<m:math display="block">
-	<m:mfrac>
-		<m:mrow>
-			<m:mrow>
-				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-				<m:mo stretchy="false">(</m:mo>
-				<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-				<m:mo stretchy="false">)</m:mo>
-			</m:mrow>
-			<m:mo>−</m:mo>
-			<m:mrow>
-				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-				<m:mo stretchy="false">(</m:mo>
-				<m:mi>t</m:mi>
-				<m:mo stretchy="false">)</m:mo>
-			</m:mrow>
-		</m:mrow>
-		<m:mrow>
-			<m:mo>∆</m:mo><m:mi>t</m:mi>
-		</m:mrow>
-	</m:mfrac>
-	<m:mo>=</m:mo>
-	<m:mrow>
-		<m:munder>
-			<m:mo>∑</m:mo>
-			<m:mi>j</m:mi>
-		</m:munder>
-		<m:msub>
-			<m:mi>w</m:mi>
-			<m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow>
-		</m:msub>
-		<m:mrow>
-			<m:mo stretchy="false">{</m:mo>
-			<m:mrow>
-				<m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub>
-				<m:mo stretchy="false">(</m:mo>
-				<m:mi>t</m:mi>
-				<m:mo stretchy="false">)</m:mo>
-			</m:mrow>
-			<m:mo>−</m:mo>
-			<m:mrow>
-				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-				<m:mo stretchy="false">(</m:mo>
-				<m:mi>t</m:mi>
-				<m:mo stretchy="false">)</m:mo>
-			</m:mrow>
-			<m:mo stretchy="false">}</m:mo>
-		</m:mrow>
-	</m:mrow>
-</m:math>
-				</div>
-				<p>
-以下はノードが 2 つしかない状況における、1 ステップ分の計算イメージ。濃度勾配は本来は時間変化を伴うが、代表値として現時点での値のみを使うため、精度が低い。
+現時点からの傾き次時点の値を求める。
+				</p> <p>
+つまり、前述の <m:math><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow><m:mo>=</m:mo><m:mi>𝐀</m:mi><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow><m:mo>∆</m:mo><m:mi>t</m:mi></m:math> をそのまま使用する。
+				</p> <p>
+以下は、ノードが 2 つしかない状況での 1 ステップ分の計算イメージ。本来なら勾配は時間変化を伴うが、代表値として現時点の勾配のみを使うため、精度が低くなる。
 				</p>
 				<figure class="normal">
 					<object data="img/diffEqExplicit.svg" style="height: 23rem;"/>
 					<figcaption>陽解法での計算</figcaption>
 				</figure>
 				<p>
-以下はノードが 2 つしかない状況における、複数ステップ分の計算イメージ。誤差によりノード値の差が拡大していく可能性がある。これは時間刻みに対して拡散係数が大きすぎると発生する。
+以下は、ノードが 2 つしかない状況での複数ステップ分の計算イメージ。傾きがステップ幅に対して大きすぎると、誤差が発振して不安定になる。
 				</p>
 				<div class="cmpFigure full">
 					<figure class="normal">
 						<object data="img/diffEqExplicitVsSmallDc.svg"/>
-						<figcaption>拡散係数小 → 安定</figcaption>
+						<figcaption>傾き小 → 安定</figcaption>
 					</figure>
 					<figure class="normal">
 						<object data="img/diffEqExplicitVsLargeDc.svg"/>
-						<figcaption>拡散係数大 → 不安定</figcaption>
+						<figcaption>傾き大 → 不安定</figcaption>
 					</figure>
 				</div>
 			</section> <section>
 				<h1>1 次の陰解法</h1>
 				<p>
-現時点と次時点のノード値を直線で結んだ時、傾きが次時点の状況に従う。
+次時点からの傾きが現時点に繋がるよう、次時点の値を調整する。
+				</p> <p>
+つまり、次の連立線形方程式を <m:math><m:mi>n</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> について解けばよい。
+				</p>
+				<div class="math">
+<m:math display="block">
+	<m:mo>-</m:mo>
+	<m:mi>𝐀</m:mi>
+	<m:mrow>
+		<m:mi>𝒏</m:mi>
+		<m:mo>(</m:mo>
+		<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+		<m:mo>)</m:mo>
+	</m:mrow>
+	<m:mo>=</m:mo>
+	<m:mrow>
+		<m:mi>𝒏</m:mi>
+		<m:mo>(</m:mo>
+		<m:mi>t</m:mi>
+		<m:mo>)</m:mo>
+	</m:mrow>
+	<m:mo>∆</m:mo><m:mi>t</m:mi>
+</m:math>				
+				</div>
+				<p>
+以下は、ノードが 2 つしかない状況での 1 ステップ分の計算イメージ。陽解法で逆方向へと時間発展すると、次時点から現時点へと向かうように次時点が調整されている。
+				</p>
+				<figure class="normal">
+					<object data="img/diffEqImplicit.svg" style="height: 23rem;"/>
+					<figcaption>陰解法での計算</figcaption>
+				</figure>
+				<p>
+以下は、ノードが 2 つしかない状況での複数ステップ分の計算イメージ。傾きとステップ幅の大きさによらず、無条件安定となる。
+				</p>
+				<div class="cmpFigure full">
+					<figure class="normal">
+						<object data="img/diffEqImplicitVsSmallDc.svg"/>
+						<figcaption>傾き小 → 安定</figcaption>
+					</figure>
+					<figure class="normal">
+						<object data="img/diffEqImplicitVsLargeDc.svg"/>
+						<figcaption>傾き大 → 安定</figcaption>
+					</figure>
+				</div>
+			</section> <section>
+				<h1>2 次の陰解法 <span class="navNone">(Crank-Nicolson 法)</span></h1>
+				<p>
+現時点と次時点の傾きの平均が、次時点に繋がるよう次時点を調整する。
+				</p> <p>
+つまり、次の連立線形方程式を <m:math><m:mi>n</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> について解けばよい。
 				</p>
 				<div class="math">
 <m:math display="block">
 	<m:mfrac>
 		<m:mrow>
 			<m:mrow>
-				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-				<m:mo stretchy="false">(</m:mo>
+				<m:mi>𝒏</m:mi>
+				<m:mo>(</m:mo>
 				<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-				<m:mo stretchy="false">)</m:mo>
+				<m:mo>)</m:mo>
 			</m:mrow>
-			<m:mo>−</m:mo>
+			<m:mo>-</m:mo>
 			<m:mrow>
-				<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-				<m:mo stretchy="false">(</m:mo>
+				<m:mi>𝒏</m:mi>
+				<m:mo>(</m:mo>
 				<m:mi>t</m:mi>
-				<m:mo stretchy="false">)</m:mo>
+				<m:mo>)</m:mo>
 			</m:mrow>
 		</m:mrow>
 		<m:mrow>
@@ -242,159 +241,64 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:mfrac>
 	<m:mo>=</m:mo>
 	<m:mrow>
-		<m:munder><m:mo>∑</m:mo><m:mi>j</m:mi></m:munder>
-		<m:msub>
-			<m:mi>w</m:mi>
-			<m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow>
-		</m:msub>
-		<m:mo stretchy="false">{</m:mo>
 		<m:mrow>
-			<m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub>
-			<m:mo stretchy="false">(</m:mo>
-			<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-			<m:mo stretchy="false">)</m:mo>
+			<m:mo>(</m:mo>
+			<m:mi>𝐀</m:mi>
+			<m:mo>∆</m:mo><m:mi>t</m:mi>
+			<m:mo>-</m:mo>
+			<m:mi>𝐄</m:mi>
+			<m:mo>)</m:mo>
 		</m:mrow>
-		<m:mo>−</m:mo>
 		<m:mrow>
-			<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-			<m:mo stretchy="false">(</m:mo>
-			<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-			<m:mo stretchy="false">)</m:mo>
+			<m:mo stretchy="true">{</m:mo>
+			<m:mrow>
+				<m:mfrac>
+					<m:mn>1</m:mn>
+					<m:mn>2</m:mn>
+				</m:mfrac>
+				<m:mrow>
+					<m:mi>𝒏</m:mi>
+					<m:mo>(</m:mo>
+					<m:mi>t</m:mi>
+					<m:mo>)</m:mo>
+				</m:mrow>
+			</m:mrow>
+			<m:mo>+</m:mo>
+			<m:mrow>
+				<m:mfrac>
+					<m:mn>1</m:mn>
+					<m:mn>2</m:mn>
+				</m:mfrac>
+				<m:mrow>
+					<m:mi>𝒏</m:mi>
+					<m:mo>(</m:mo>
+					<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
+					<m:mo>)</m:mo>
+				</m:mrow>
+			</m:mrow>
+			<m:mo stretchy="true">}</m:mo>
 		</m:mrow>
-		<m:mo stretchy="false">}</m:mo>
 	</m:mrow>
 </m:math>
 				</div>
 				<p>
-これを満たすように次時点のノード値を調整するには、ノードの数だけある上記の式から<a href="linearEq.xhtml">連立線形方程式</a>を立て、<m:math><m:mi>𝐀</m:mi><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow><m:mo>=</m:mo><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow></m:math> とし、未知ベクトル <m:math><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> について解かなければならない。精度については陽解法と同じ要因で低い。
-				</p> <p>
-以下はノードが 2 つしかない状況における、1 ステップ分の計算イメージ。陽解法で逆方向へと時間発展すると、次時点から現時点へと向かうように次時点が調整されている。
-				</p>
-				<figure class="normal">
-					<object data="img/diffEqImplicit.svg" style="height: 23rem;"/>
-					<figcaption>陰解法での計算</figcaption>
-				</figure>
-				<p>
-以下はノードが 2 つしかない状況における、複数ステップ分の計算イメージ。拡散係数によらずノード値の差は常に縮小する。つまり、無条件安定である。
-				</p>
-				<div class="cmpFigure full">
-					<figure class="normal">
-						<object data="img/diffEqImplicitVsSmallDc.svg"/>
-						<figcaption>拡散係数小 → 安定</figcaption>
-					</figure>
-					<figure class="normal">
-						<object data="img/diffEqImplicitVsLargeDc.svg"/>
-						<figcaption>拡散係数大 → 安定</figcaption>
-					</figure>
-				</div>
-			</section> <section>
-				<h1>2 次の陰解法 <span class="navNone">(Crank-Nicolson 法)</span></h1>
-				<p>
-現時点と次時点のノード値を直線で結んだ時、傾きが両時点の平均に従う。
-				</p>
-				<div class="math">
-<m:math display="block">
-	<m:mtable columnalign="right left" columnspacing="0">
-		<m:mtr>
-			<m:mtd displaystyle="true">
-				<m:mfrac>
-					<m:mrow>
-						<m:mrow>
-							<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-							<m:mo stretchy="false">(</m:mo>
-							<m:mi>t</m:mi>
-							<m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-							<m:mo stretchy="false">)</m:mo>
-						</m:mrow>
-						<m:mo>−</m:mo>
-						<m:mrow>
-							<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-							<m:mo stretchy="false">(</m:mo>
-							<m:mi>t</m:mi>
-							<m:mo stretchy="false">)</m:mo>
-						</m:mrow>
-					</m:mrow>
-					<m:mrow>
-						<m:mo>∆</m:mo><m:mi>t</m:mi>
-					</m:mrow>
-				</m:mfrac>
-				<m:mo>=</m:mo>
-			</m:mtd> <m:mtd displaystyle="true">
-				<m:mfrac><m:mn>1</m:mn><m:mn>2</m:mn></m:mfrac>
-				<m:mrow>
-					<m:munder><m:mo>∑</m:mo><m:mi>j</m:mi></m:munder>
-					<m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub>
-					<m:mrow>
-						<m:mo stretchy="false">{</m:mo>
-						<m:mrow>
-							<m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub>
-							<m:mo stretchy="false">(</m:mo>
-							<m:mi>t</m:mi>
-							<m:mo stretchy="false">)</m:mo>
-						</m:mrow>
-						<m:mo>−</m:mo>
-						<m:mrow>
-							<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-							<m:mo stretchy="false">(</m:mo>
-							<m:mi>t</m:mi>
-							<m:mo stretchy="false">)</m:mo>
-						</m:mrow>
-						<m:mo stretchy="false">}</m:mo>
-					</m:mrow>
-				</m:mrow>
-				<m:mo>+</m:mo>
-			</m:mtd>
-		</m:mtr> <m:mtr>
-			<m:mtd>
-			</m:mtd> <m:mtd displaystyle="true">
-				<m:mfrac><m:mn>1</m:mn><m:mn>2</m:mn></m:mfrac>
-				<m:mrow>
-					<m:munder><m:mo>∑</m:mo><m:mi>j</m:mi></m:munder>
-					<m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub>
-					<m:mrow>
-						<m:mo stretchy="false">{</m:mo>
-						<m:mrow>
-							<m:msub><m:mi>n</m:mi><m:mi>j</m:mi></m:msub>
-							<m:mo stretchy="false">(</m:mo>
-							<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-							<m:mo stretchy="false">)</m:mo>
-						</m:mrow>
-						<m:mo>−</m:mo>
-						<m:mrow>
-							<m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub>
-							<m:mo stretchy="false">(</m:mo>
-							<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-							<m:mo stretchy="false">)</m:mo>
-							<m:mo stretchy="false">}</m:mo>
-						</m:mrow>
-					</m:mrow>
-				</m:mrow>
-			</m:mtd>
-		</m:mtr>
-	</m:mtable>
-</m:math>
-				</div>
-				<p>
-陰解法と同様、<a href="linearEq.xhtml">連立線形方程式</a>を解く必要がある。2 次の差分となるため精度は良い。
-				</p>
-				<p>
-以下はノードが 2 つしかない状況における、1 ステップ分の計算イメージ。
+以下は、ノードが 2 つしかない状況での 1 ステップ分の計算イメージ。
 				</p>
 				<figure class="normal">
 					<object data="img/diffEqCrankNicolson.svg" style="height: 23rem;"/>
 					<figcaption>Crank-Nicolson 法での計算</figcaption>
 				</figure>
 				<p>
-以下はノードが 2 つしかない状況における、複数ステップ分の計算イメージ。拡散係数が大きいと振動することもあるが、その振幅はステップごとに減衰していく。
+以下は、ノードが 2 つしかない状況での複数ステップ分の計算イメージ。傾きが大きいと振動することもあるが、その振幅はステップごとに減衰していく。
 				</p>
 				<div class="cmpFigure full">
 					<figure class="normal">
 						<object data="img/diffEqCrankNicolsonVsSmallDc.svg"/>
-						<figcaption>拡散係数小 → 安定</figcaption>
+						<figcaption>傾き小 → 安定</figcaption>
 					</figure>
 					<figure class="normal">
 						<object data="img/diffEqCrankNicolsonVsLargeDc.svg"/>
-						<figcaption>拡散係数大 → 安定 (振動あり)</figcaption>
+						<figcaption>傾き大 → 安定 (振動あり)</figcaption>
 					</figure>
 				</div>
 			</section>
