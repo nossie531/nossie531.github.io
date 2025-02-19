@@ -35,9 +35,9 @@ function getAlgorithm(step, range) {
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
 			<path d="M2,0 L-4,3 -4,-3 Z"/>
 		</marker>
-		<marker id="calcArrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+		<marker id="calcArrow" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M2,0 L-6,4 -6,-4 Z"/>
+			<path d="M-4,3 L 1,0 -4,-3"/>
 		</marker>
 	</defs>
 	<g>

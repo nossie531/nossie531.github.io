@@ -112,7 +112,7 @@ function getErrorTextPos(error) {
 			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
 			<circle r="3"/>
 		</marker>
-		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
 			<path d="M2,0 L-6,4 -6,-4 Z"/>
 		</marker>
@@ -129,7 +129,7 @@ function getErrorTextPos(error) {
 		<!-- 誤差表示。-->
 		<path id="error"/>
 		<!-- 周辺の値。-->
-		<path id="flow1" class="flow"/>
+		<path id="flow1" class="real"/>
 		<path id="flow2" class="flow"/>
 		<path id="flow3" class="flow"/>
 		<!-- 勾配の方向。-->

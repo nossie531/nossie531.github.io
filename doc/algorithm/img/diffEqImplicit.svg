@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function drawReal(viewer) {
 	const pathArr = getAlgorithm(getContext().smallStep).result();
-	viewer.setFuncPath("r1", pathArr[0]);
-	viewer.setFuncPath("r2", pathArr[1]);
+	viewer.setFuncPath("f1", pathArr[0]);
+	viewer.setFuncPath("f2", pathArr[1]);
 }
 
 function drawCalc(viewer) {
@@ -32,8 +32,6 @@ function drawCalc(viewer) {
 	viewer.setFuncPath("c2", pathArr[1]);
 	viewer.setLabel("n1", pathArr[0][0], -20, -10);
 	viewer.setLabel("n2", pathArr[1][0], -20, -10);
-	viewer.setPathLine("g1", [...pathArr[0]].reverse(), 30);
-	viewer.setPathLine("g2", [...pathArr[1]].reverse(), 30);
 }
 
 function drawError(viewer) {
@@ -47,8 +45,10 @@ function drawError(viewer) {
 function drawBackDiffusion(viewer) {
 	const nodes = getAlgorithm().result().map(x => x[1].y);
 	const pathArr = getReverseAlgorithm(nodes).result().map(flipPathX);
-	viewer.setFuncPath("b1", pathArr[0]);
-	viewer.setFuncPath("b2", pathArr[1]);
+	viewer.setFuncPath("f3", pathArr[0]);
+	viewer.setFuncPath("f4", pathArr[1]);
+	viewer.setPathLine("g1", pathArr[0].splice(0, 2), 30);
+	viewer.setPathLine("g2", pathArr[1].splice(0, 2), 30);
 }
 
 function flipPathX(points) {
@@ -59,13 +59,13 @@ function flipPathX(points) {
 
 function getContext() {
 	return {
-		dc: 0.006,
+		dc: 0.0055,
 		smallStep: 5,
 		largeStep: 140,
 		range: {min: 0, max: 140},
 		origin: {x: 10, y: 10},
 		gridArea: {x: 15, y:10, width: 160, height: 210},
-		nodes: [170, 25]
+		nodes: [165, 20]
 	};
 }
 
@@ -105,9 +105,9 @@ function getErrorTextPos(error) {
 			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
 			<circle r="2.5"/>
 		</marker>
-		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M2,0 L-6,4 -6,-4 Z"/>
+			<path d="M2,0 L-6,3 -6,-3 Z"/>
 		</marker>
 		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
@@ -121,12 +121,11 @@ function getErrorTextPos(error) {
 		<g id="step"/>
 		<!-- 誤差表示。-->
 		<path id="error"/>
-		<!-- 真の値。-->
-		<path id="r1" class="flow"/>
-		<path id="r2" class="flow"/>
-		<!-- 計算値からの逆拡散。-->
-		<path id="b1" class="flow"/>
-		<path id="b2" class="flow"/>
+		<!-- 流れ線。-->
+		<path id="f1" class="real"/>
+		<path id="f2" class="real"/>
+		<path id="f3" class="flow"/>
+		<path id="f4" class="flow"/>
 		<!-- 計算値。-->
 		<path id="c1" class="calc endCap"/>
 		<path id="c2" class="calc endCap"/>

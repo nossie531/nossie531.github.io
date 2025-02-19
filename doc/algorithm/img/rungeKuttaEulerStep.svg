@@ -54,9 +54,9 @@ function getErrorTextPos(error) {
 			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
 			<circle r="3"/>
 		</marker>
-		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
-			<path d="M2,0 L-6,4 -6,-4 Z"/>
+			<path d="M2,0 L-6,3 -6,-3 Z"/>
 		</marker>
 		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
@@ -71,7 +71,7 @@ function getErrorTextPos(error) {
 		<!-- 誤差表示。-->
 		<path id="error"/>
 		<!-- 真の値。-->
-		<path id="real" class="flow"/>
+		<path id="real" class="real"/>
 		<!-- 計算値。-->
 		<path id="calc" class="calc endCap"/>
 		<!-- 勾配の方向。-->

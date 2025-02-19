@@ -49,7 +49,7 @@ function getAlgorithm(step, range) {
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 真の値。-->
-		<path id="real" class="flow"/>
+		<path id="real" class="real"/>
 		<!-- 計算値。-->
 		<path id="calc" class="calc"/>
 		<!-- 横軸ラベル。-->

@@ -5,8 +5,7 @@
 :root {
 	font-size:10px;
 	--error-color: hsl(0, 100%, 70%);
-	--flow-color: hsl(240, 80%, 70%);
-	--aux-color: hsl(0, 0%, 40%);
+	--real-color: hsl(240, 80%, 70%);
 	--calc-color: black;
 }
 
@@ -22,15 +21,15 @@ g#step > path {
 	stroke-dasharray: 2;
 }
 
-path.auxStep {
-	stroke: var(--mc5-color);
+path.real {
+	fill: none;
+	stroke: var(--real-color);
 	stroke-width: 1;
-	stroke-dasharray: 1 5;
 }
 
 path.flow {
 	fill: none;
-	stroke: var(--flow-color);
+	stroke: var(--mc5-color);
 	stroke-width: 1;
 }
 
@@ -53,13 +52,6 @@ path.grad {
 	marker-end: url(#gradDst);
 }
 
-path.aux {
-	fill: none;
-	stroke: var(--aux-color);
-	stroke-width: 1;
-	marker-mid: url(#auxPoint);
-}
-
 path#error {
 	fill: none;
 	stroke: var(--error-color);
@@ -75,29 +67,14 @@ text#errorText {
 	fill: var(--error-color);
 }
 
-tspan.symbol {
-	font-style: italic;
-}
-
-tspan.sub {
-	font-size: 0.6em;
-}
-
-marker#arrow > path {
-	fill: var(--mc4-color);
-}
-
+marker#arrow > path,
 marker#calcSrc > circle,
 marker#calcDst > path {
-	fill: var(--calc-color);
-}
-
-marker#auxPoint > circle {
-	fill: var(--aux-color);
+	fill: context-stroke;
 }
 
 marker#lengthMark path {
-	stroke: var(--error-color);
+	stroke: context-stroke;
 	stroke-width: 1;
 }
 

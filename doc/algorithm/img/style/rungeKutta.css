@@ -5,7 +5,7 @@
 :root {
 	font-size:10px;
 	--error-color: hsl(0, 100%, 70%);
-	--flow-color: hsl(240, 80%, 70%);
+	--real-color: hsl(240, 80%, 70%);
 	--calc-color: black;
 }
 
@@ -21,9 +21,15 @@ g#step > path {
 	stroke-dasharray: 2;
 }
 
+path.real {
+	fill: none;
+	stroke: var(--real-color);
+	stroke-width: 1;
+}
+
 path.flow {
 	fill: none;
-	stroke: var(--flow-color);
+	stroke: var(--mc5-color);
 	stroke-width: 1;
 }
 
@@ -67,16 +73,17 @@ g#calc.withArrow > path {
 	marker-end: url(#calcArrow);
 }
 
-tspan.symbol {
-	font-style: italic;
+marker#arrow > path {
+	fill: context-stroke;
 }
 
-marker#arrow > path {
-	fill: var(--mc4-color);
+marker#calcArrow path {
+	stroke: context-stroke;
+	fill: none;
 }
 
 marker#lengthMark path {
-	stroke: var(--error-color);
+	stroke: context-stroke;
 	stroke-width: 1;
 }
 

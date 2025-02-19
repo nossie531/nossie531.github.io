@@ -17,14 +17,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	drawReal(viewer);
 	drawCalc(viewer);
 	drawError(viewer);
-	drawAuxLines(viewer);
 	drawBackDiffusion(viewer);
 });
 
 function drawReal(viewer) {
 	const pathArr = getAlgorithm(getContext().smallStep).result();
-	viewer.setFuncPath("r1", pathArr[0]);
-	viewer.setFuncPath("r2", pathArr[1]);
+	viewer.setFuncPath("f1", pathArr[0]);
+	viewer.setFuncPath("f2", pathArr[1]);
+	viewer.setPathLine("g11", pathArr[0].slice(0, 2), 30);
+	viewer.setPathLine("g21", pathArr[1].slice(0, 2), 30);
 }
 
 function drawCalc(viewer) {
@@ -33,14 +34,6 @@ function drawCalc(viewer) {
 	viewer.setFuncPath("c2", pathArr[1]);
 	viewer.setLabel("n1", pathArr[0][0], -20, -10);
 	viewer.setLabel("n2", pathArr[1][0], -20, -10);
-}
-
-function drawAuxLines(viewer) {
-	const fullPathArr = getAlgorithm().result();
-	const halfPathArr = getHalfStepAlgorithm().result();
-	const pathArr = halfPathArr.map((x, i) => x.concat([fullPathArr[i][1]]));
-	viewer.setFuncPath("ax1", pathArr[0]);
-	viewer.setFuncPath("ax2", pathArr[1]);
 }
 
 function drawError(viewer) {
@@ -54,8 +47,10 @@ function drawError(viewer) {
 function drawBackDiffusion(viewer) {
 	const nodes = getAlgorithm().result().map(x => x[1].y);
 	const pathArr = getReverseAlgorithm(nodes).result().map(flipPathX);
-	viewer.setFuncPath("b1", pathArr[0]);
-	viewer.setFuncPath("b2", pathArr[1]);
+	viewer.setFuncPath("f3", pathArr[0]);
+	viewer.setFuncPath("f4", pathArr[1]);
+	viewer.setPathLine("g12", pathArr[0].slice(0, 2), 30);
+	viewer.setPathLine("g22", pathArr[1].slice(0, 2), 30);
 }
 
 function flipPathX(points) {
@@ -118,9 +113,13 @@ function getErrorTextPos(error) {
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
 			<path d="M2,0 L-4,3 -4,-3"/>
 		</marker>
-		<marker id="auxPoint" markerUnits="userSpaceOnUse"
+		<marker id="gradSrc" markerUnits="userSpaceOnUse"
 			markerWidth="10" markerHeight="10" viewBox="-5 -5 10 10">
-			<circle r="2"/>
+			<circle r="2.5"/>
+		</marker>
+		<marker id="gradDst" markerUnits="userSpaceOnUse" orient="auto"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M2,0 L-6,3 -6,-3 Z"/>
 		</marker>
 		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
@@ -134,18 +133,19 @@ function getErrorTextPos(error) {
 		<g id="step"/>
 		<!-- 誤差表示。-->
 		<path id="error"/>
-		<!-- 真の値。-->
-		<path id="r1" class="flow"/>
-		<path id="r2" class="flow"/>
-		<!-- 計算値からの逆拡散。-->
-		<path id="b1" class="flow"/>
-		<path id="b2" class="flow"/>
-		<!-- 補助線。-->
-		<path id="ax1" class="aux"/>
-		<path id="ax2" class="aux"/>
+		<!-- 流れ線。-->
+		<path id="f1" class="real"/>
+		<path id="f2" class="real"/>
+		<path id="f3" class="flow"/>
+		<path id="f4" class="flow"/>
 		<!-- 計算値。-->
 		<path id="c1" class="calc endCap"/>
 		<path id="c2" class="calc endCap"/>
+		<!-- 勾配の方向。-->
+		<path id="g11" class="grad"/>
+		<path id="g21" class="grad"/>
+		<path id="g12" class="grad"/>
+		<path id="g22" class="grad"/>
 		<!-- 横軸ラベル。-->
 		<foreignObject x="182" y="202" width="30" height="30">
 			<m:math><m:mi>t</m:mi></m:math>

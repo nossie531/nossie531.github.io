@@ -53,8 +53,8 @@ function getAlgorithm(step, range) {
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 真の値。-->
-		<path id="r1" class="flow" d="M 0,0"/>
-		<path id="r2" class="flow" d="M 0,0"/>
+		<path id="r1" class="real" d="M 0,0"/>
+		<path id="r2" class="real" d="M 0,0"/>
 		<!-- 計算値。-->
 		<path id="c1" class="calc" d="M 0,0"/>
 		<path id="c2" class="calc" d="M 0,0"/>
