@@ -11,7 +11,7 @@
 	<script><![CDATA[
 document.addEventListener("DOMContentLoaded", () => {
 	const ctx = getContext();
-	const viewer = new GraphViewer(ctx.range, ctx.origin, ctx.gridArea);
+	const viewer = new GraphViewer(ctx.gridArea, ctx.origin);
 	viewer.appendAxis("axis");
 	viewer.appendGridX("step", ctx.largeStep);
 	drawReal(viewer);
@@ -64,7 +64,7 @@ function getContext() {
 		largeStep: 140,
 		range: {min: 0, max: 140},
 		origin: {x: 10, y: 10},
-		gridArea: {x: 15, y:10, width: 160, height: 210},
+		gridArea: {x: 15, y:20, width: 150, height: 200},
 		nodes: [165, 20]
 	};
 }
@@ -116,7 +116,11 @@ function getErrorTextPos(error) {
 	</defs>
 	<g>
 		<!-- 座標軸。-->
-		<g id="axis"/>
+		<g id="axis">
+			<foreignObject class="x" width="30" height="30">
+				<m:math><m:mi>t</m:mi></m:math>
+			</foreignObject>	
+		</g>
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 誤差表示。-->
@@ -132,10 +136,6 @@ function getErrorTextPos(error) {
 		<!-- 勾配の方向。-->
 		<path id="g1" class="grad"/>
 		<path id="g2" class="grad"/>
-		<!-- 横軸ラベル。-->
-		<foreignObject x="182" y="202" width="30" height="30">
-			<m:math><m:mi>t</m:mi></m:math>
-		</foreignObject>	
 		<!-- ノードラベル。-->
 		<foreignObject id="n1" width="30" height="30">
 			<m:math><m:msub><m:mi>n</m:mi><m:mn>1</m:mn></m:msub></m:math>
@@ -147,3 +147,4 @@ function getErrorTextPos(error) {
 		<text id="errorText">Error</text>
 	</g>
 </svg>
+

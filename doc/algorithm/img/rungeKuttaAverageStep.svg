@@ -10,7 +10,7 @@
 	<script><![CDATA[
 document.addEventListener("DOMContentLoaded", () => {
 	const ctx = getContext();
-	const viewer = new GraphViewer(ctx.range, ctx.origin, ctx.gridArea);
+	const viewer = new GraphViewer(ctx.gridArea, ctx.origin, 80);
 	const real = getAlgorithm(ctx.smallStep, ctx.range).result();
 	const calc = getAlgorithm(ctx.largeStep, ctx.range).result();
 	const points = getResearchPoints();
@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	const grad2 = getGradLine(points[1]);
 	const grad3 = getGradLine(points[2]);
 	const error = [real.at(-1), calc.at(-1)];
-	viewer.magnify = 80;
 	viewer.appendAxis("axis");
 	viewer.appendGridX("step", ctx.largeStep);
 	viewer.setFuncPath("flow1", flow1);
@@ -91,7 +90,7 @@ function getContext() {
 		largeStep: 2,
 		range: {min: 0, max: 2},
 		origin: {x: 10, y: 10},
-		gridArea: {x: 10, y: 10, width: 185, height: 180}
+		gridArea: {x: 10, y: 20, width: 175, height: 170}
 	};
 }
 
@@ -123,7 +122,11 @@ function getErrorTextPos(error) {
 	</defs>
 	<g>
 		<!-- 座標軸。-->
-		<g id="axis"/>
+		<g id="axis">
+			<foreignObject class="x" width="30" height="30">
+				<m:math><m:mi>t</m:mi></m:math>
+			</foreignObject>
+		</g>
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 誤差表示。-->
@@ -138,10 +141,6 @@ function getErrorTextPos(error) {
 		<path id="grad3" class="grad"/>
 		<!-- 計算値。-->
 		<path id="calc" class="calc endCap"/>
-		<!-- 横軸ラベル。-->
-		<foreignObject x="203" y="172" width="30" height="30">
-			<m:math><m:mi>t</m:mi></m:math>
-		</foreignObject>
 		<!-- 誤差ラベル。-->
 		<text id="errorText">Error</text>
 	</g>

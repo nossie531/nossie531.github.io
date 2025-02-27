@@ -12,10 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	const step = 0.5;
 	const range = {min: 0, max: 3 };
 	const origin = {x: 7.5, y: 7.5};
-	const gridArea = {x:10, y:10, width: 220, height: 130};
-	const viewer = new GraphViewer(range, origin, gridArea);
+	const gridArea = {x:10, y:20, width: 210, height: 120};
+	const viewer = new GraphViewer(gridArea, origin, 66);
 	const calc = getAlgorithm(step, range).result();
-	viewer.magnify = 66;
 	viewer.appendAxis("axis");
 	viewer.appendGridX("step", step);
 	viewer.appendPointsPath("calc", calc);
@@ -42,14 +41,14 @@ function getAlgorithm(step, range) {
 	</defs>
 	<g>
 		<!-- 座標軸。-->
-		<g id="axis"/>
+		<g id="axis">
+			<foreignObject class="x" width="30" height="30">
+				<m:math><m:mi>t</m:mi></m:math>
+			</foreignObject>
+		</g>
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 計算値。-->
 		<g id="calc" class="calc withArrow"/>
-		<!-- 横軸ラベル。-->
-		<foreignObject x="238" y="125" width="30" height="30">
-			<m:math><m:mi>t</m:mi></m:math>
-		</foreignObject>
 	</g>
 </svg>

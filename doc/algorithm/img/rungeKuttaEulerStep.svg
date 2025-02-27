@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	const smallStep = 0.01;
 	const range = {min: 0, max: 2};
 	const origin = {x: 10, y: 10};
-	const gridArea = {x: 10, y: 10, width: 185, height: 180};
-	const viewer = new GraphViewer(range, origin, gridArea);
+	const gridArea = {x: 10, y: 20, width: 175, height: 170};
+	const viewer = new GraphViewer(gridArea, origin, 80);
 	const real = getAlgorithm(smallStep, range).result();
 	const calc = getAlgorithm(largeStep, range).result();
 	const error = [real.at(-1), calc.at(-1)];
@@ -65,7 +65,11 @@ function getErrorTextPos(error) {
 	</defs>
 	<g>
 		<!-- 座標軸。-->
-		<g id="axis"/>
+		<g id="axis">
+			<foreignObject class="x" width="30" height="30">
+				<m:math><m:mi>t</m:mi></m:math>
+			</foreignObject>
+		</g>
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 誤差表示。-->
@@ -76,10 +80,6 @@ function getErrorTextPos(error) {
 		<path id="calc" class="calc endCap"/>
 		<!-- 勾配の方向。-->
 		<path id="grad" class="grad"/>
-		<!-- 横軸ラベル。-->
-		<foreignObject x="203" y="172" width="30" height="30">
-			<m:math><m:mi>t</m:mi></m:math>
-		</foreignObject>
 		<!-- 誤差ラベル。-->
 		<text id="errorText">Error</text>
 	</g>

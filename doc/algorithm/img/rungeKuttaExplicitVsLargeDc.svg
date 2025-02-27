@@ -13,11 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	const largeStep = 1;
 	const range = {min: 0, max: 3.1};
 	const origin = {x: 5, y: 20};
-	const gridArea = {x:10, y:10, width: 200, height: 160};
-	const viewer = new GraphViewer(range, origin, gridArea);
+	const gridArea = {x:10, y:20, width: 190, height: 150};
+	const viewer = new GraphViewer(gridArea, origin, 60);
 	const calc = getAlgorithm(largeStep, range).result();
 	const real = getAlgorithm(smallStep, range).result();
-	viewer.magnify = 60;
 	viewer.appendAxis("axis");
 	viewer.appendGridX("step", largeStep);
 	viewer.setFuncPath("real", real);
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function getAlgorithm(step, range) {
 	const result = new ExplicitEuler;
-	result.df = (x, y) => -2.15 * y + 2.32;
+	result.df = (x, y) => -2.14 * y + 2.32;
 	result.range = range;
 	result.value = 1.9;
 	result.step = step;
@@ -45,16 +44,16 @@ function getAlgorithm(step, range) {
 	</defs>
 	<g>
 		<!-- 座標軸。-->
-		<g id="axis"/>
+		<g id="axis">
+			<foreignObject class="x" width="30" height="30">
+				<m:math><m:mi>t</m:mi></m:math>
+			</foreignObject>
+		</g>
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 真の値。-->
 		<path id="real" class="real"/>
 		<!-- 計算値。-->
 		<path id="calc" class="calc"/>
-		<!-- 横軸ラベル。-->
-		<foreignObject x="217" y="142" width="30" height="30">
-			<m:math><m:mi>t</m:mi></m:math>
-		</foreignObject>
 	</g>
 </svg>

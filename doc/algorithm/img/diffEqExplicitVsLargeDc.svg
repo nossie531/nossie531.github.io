@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
 	xmlns:m="http://www.w3.org/1998/Math/MathML"
-	viewBox="0 0 270 210" height="210">
+	viewBox="0 0 270 220" height="220">
 	<style>
 @import url("style/diffEq.css");
 	</style>
@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	const largeStep = 66;
 	const range = {min: 0, max: 210};
 	const origin = {x: 10, y: 15};
-	const gridArea = {x: 20, y: 10, width: 230, height: 190};
-	const viewer = new GraphViewer(range, origin, gridArea);
+	const gridArea = {x: 20, y: 20, width: 220, height: 190};
+	const viewer = new GraphViewer(gridArea, origin);
 	const smallStepResults = getAlgorithm(smallStep, range).result();
 	const largeStepResults = getAlgorithm(largeStep, range).result();
 	viewer.appendAxis("axis");
@@ -49,7 +49,11 @@ function getAlgorithm(step, range) {
 	</defs>
 	<g>
 		<!-- 座標軸。-->
-		<g id="axis"/>
+		<g id="axis">
+			<foreignObject class="x" width="30" height="30">
+				<m:math><m:mi>t</m:mi></m:math>
+			</foreignObject>
+		</g>
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 真の値。-->
@@ -58,10 +62,6 @@ function getAlgorithm(step, range) {
 		<!-- 計算値。-->
 		<path id="c1" class="calc"/>
 		<path id="c2" class="calc"/>
-		<!-- 横軸ラベル。-->
-		<foreignObject x="257" y="178" width="30" height="30">
-			<m:math><m:mi>t</m:mi></m:math>
-		</foreignObject>	
 		<!-- ノードラベル。-->
 		<foreignObject id="n1" width="30" height="30">
 			<m:math><m:msub><m:mi>n</m:mi><m:mn>1</m:mn></m:msub></m:math>
@@ -71,3 +71,4 @@ function getAlgorithm(step, range) {
 		</foreignObject>
 	</g>
 </svg>
+
