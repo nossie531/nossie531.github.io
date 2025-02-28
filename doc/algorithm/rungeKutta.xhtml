@@ -16,59 +16,69 @@
 Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一種である。
 		</p>
 		<section>
-			<h1>基本コンセプト</h1>
-			<p>
-時間を細かく区切り、現時点の状況から次時点の状況を求め、そのステップの繰り返しで全体の時間発展を求める。
-			</p>
-			<figure class="normal">
-				<object data="img/rungeKuttaSteps.svg" style="height: 15rem"/>
-			</figure>
-			<p>
-各ステップごとの計算には様々なバリエーションが知られている。
-			</p> <p>
-最も単純な方法である陽的 Euler 法では、現時点からの勾配をそのまま延長する。しかしこの場合、ステップ内での勾配の時間変化は完全に無視される。そのため、ステップ幅に対する誤差が大きくなってしまう。
-			</p>
-			<figure class="normal">
-				<object data="img/rungeKuttaEulerStep.svg" style="height: 20rem"/>
-			</figure>
-			<p>
-そこで、精度を高めるために、現時点から次時点への経路付近にある複数の調査点について、それぞれの勾配の加重平均をとる。
-			</p>
-			<figure class="normal">
-				<object data="img/rungeKuttaAverageStep.svg" style="height: 20rem"/>
-			</figure>
-			<p>
-なお、計算元となるそれぞれの調査点の位置についても、次時点を計算する場合と同様、他の調査点の勾配の加重平均から計算する。
-			</p>
-		</section> <section>
-			<h1>用語と記号</h1>
-			<p>
-以降、以下の用語と記号を使用する。
-			</p>
+			<h1>導入</h1>
 			<section>
-				<h2>用語: 陽解法と陰解法</h2>
+				<h1>問題設定</h1>
 				<p>
+常微分方程式の初期値問題では、一つの未知変数とその従属変数から勾配が決まるシステムに対し、初期値を与えてそこを通過点とする経路を求める。よくある応用は、未知変数が時刻の場合で、これは初期状態からどのように時間発展するかを求めるのに等しい。
+				</p> <p>
+イメージとしては、時間を川の流れ、値をそこに浮かべた木の葉のように見立てるといい。
+				</p>
+				<figure class="normal">
+					<object data="img/rungeKuttaIntro.svg" style="height: 15rem"/>
+				</figure>
+			</section> <section>
+				<h1>基本戦略</h1>
+				<p>
+時間を細かく区切り、現時点の状況から次時点の状況を求め、そのステップの繰り返しで全体の時間発展を求める。
+				</p>
+				<figure class="normal">
+					<object data="img/rungeKuttaSteps.svg" style="height: 15rem"/>
+				</figure>
+				<p>
+各ステップごとの計算には様々なバリエーションが知られている。
+				</p> <p>
+最も単純な方法である陽的 Euler 法では、現時点からの勾配をそのまま延長する。しかしこの場合、ステップ内での勾配の時間変化は完全に無視される。そのため、ステップ幅に対する誤差が大きくなってしまう。
+				</p>
+				<figure class="normal">
+					<object data="img/rungeKuttaEulerStep.svg" style="height: 20rem"/>
+				</figure>
+				<p>
+そこで、精度を高めるために、現時点から次時点への経路付近にある複数の調査点について、それぞれの勾配の加重平均をとる。
+				</p>
+				<figure class="normal">
+					<object data="img/rungeKuttaAverageStep.svg" style="height: 20rem"/>
+				</figure>
+				<p>
+なお、計算元となるそれぞれの調査点の位置についても、次時点を計算する場合と同様、他の調査点の勾配の加重平均から計算する。
+				</p>
+			</section> <section>
+				<h1>用語の定義</h1>
+				<section>
+					<h2>陽解法と陰解法</h2>
+					<p>
 どの調査点からどの調査点を求めるかについて、大きく分けて二種類の方法がある。
-				</p> <p>
+					</p> <p>
 陽解法では、既知の調査点 (まずは現時点) から、一つずつ調査点を増やしていく。
-				</p> <p>
+					</p> <p>
 陰解法では、未知の調査点も含め、それぞれの関係式をまとめ、連立方程式を解く。
-				</p> <p>
+					</p> <p>
 それぞれの特徴については後述。
-				</p>
-			</section> <section>
-				<h2>用語: 段数と次数</h2>
-				<p>
+					</p>
+				</section> <section>
+					<h2>段数と次数</h2>
+					<p>
 段数とは、1 ステップ辺りの調査点の数である。
-				</p> <p>
+					</p> <p>
 次数とは、近似結果が Tayler 展開のどの次数まで一致するかである。
-				</p> <p>
+					</p> <p>
 段数が増えると次数も増える傾向にあるが、必ずしも比例するわけではない。
-				</p> <p>
+					</p> <p>
 よく使われる古典的 Runge-Kutta 法の場合、4 段 4 次である。
-				</p>
+					</p>
+				</section>
 			</section> <section>
-				<h2>記号の導入</h2>
+				<h1>記号の定義</h1>
 				<ul>
 					<li>
 <m:math><m:mi>s</m:mi></m:math> は段数
@@ -87,7 +97,8 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 					</li>
 				</ul>
 			</section>
-		</section> <section>
+		</section>
+		<section>
 			<h1>具体的な手順</h1>
 			<section>
 				<h2>ステップの更新式</h2>

@@ -21,6 +21,10 @@ g#step > path {
 	stroke-dasharray: 2;
 }
 
+circle.iv {
+	fill: var(--real-color);
+}
+
 path.real {
 	fill: none;
 	stroke: var(--real-color);
