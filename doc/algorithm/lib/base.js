@@ -43,8 +43,10 @@
 			for (const target of document.querySelectorAll("div.math, div.cmpFigure")) {
 				target.tabIndex = 0;
 				target.addEventListener("pointerdown", _ => {
-					target.focus();
-					event.preventDefault();
+					if (document.activeElement !== target) {
+						target.focus();
+						event.preventDefault();
+					}
 				});
 			}
 		}

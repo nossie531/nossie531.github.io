@@ -550,7 +550,7 @@
 		width: 100%;
 	}
 
-	div.cmpFigure.full > figure.normal > object {
+	*:not(:focus) > figure.normal > object {
 		pointer-events: none;
 	}
 }
