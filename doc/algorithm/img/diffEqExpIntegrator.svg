@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
 	xmlns:m="http://www.w3.org/1998/Math/MathML"
-	viewBox="0 0 400 230" height="230">
+	viewBox="0 0 380 230" height="230">
 	<style>
 @import url("style/diffEq.css");
 	</style>
@@ -10,22 +10,27 @@
 	<script href="lib/diffEq.js"/>
 	<script><![CDATA[
 document.addEventListener("DOMContentLoaded", () => {
-	const ctx = getContext();
-	const viewer = new GraphViewer(ctx.range, ctx.origin, ctx.gridArea);
-	viewer.appendAxis("axis");
-	viewer.appendGridX("step", ctx.largeStep);
+	const viewer = setupViewer();
 	drawReal(viewer);
 	drawCalc(viewer);
 });
 
+function setupViewer() {
+	const ctx = getContext();
+	const result = new GraphViewer(ctx.gridArea, ctx.origin);
+	result.appendAxis("axis");
+	result.appendGridX("step", ctx.stepL);
+	return result;
+}
+
 function drawReal(viewer) {
-	const pathArr = getAlgorithm(getContext().smallStep).result();
+	const pathArr = getAlgorithm(getContext().stepS).result();
 	viewer.setFuncPath("r1", pathArr[0]);
 	viewer.setFuncPath("r2", pathArr[1]);
 }
 
 function drawCalc(viewer) {
-	const pathArr = getAlgorithm().result();
+	const pathArr = getAlgorithm(getContext().stepL).result();
 	viewer.setFuncPath("c1", pathArr[0]);
 	viewer.setFuncPath("c2", pathArr[1]);
 	viewer.setLabel("n1", pathArr[0][0], -20, -10);
@@ -35,7 +40,7 @@ function drawCalc(viewer) {
 function getAlgorithm(step) {
 	const result = new ExpIntegratorDiffEq;
 	result.dc = getContext().dc;
-	result.step = step || getContext().largeStep;
+	result.step = step;
 	result.range = getContext().range;
 	result.nodes = getContext().nodes;
 	return result;
@@ -44,12 +49,11 @@ function getAlgorithm(step) {
 function getContext() {
 	return {
 		dc: 0.0035,
-		diff: 30,
-		smallStep: 5,
-		largeStep: 330,
-		range: {min: 0, max: 330},
+		stepS: 5,
+		stepL: 320,
+		range: {min: 0, max: 320},
 		origin: {x: 10, y: 10},
-		gridArea: {x: 15, y:10, width: 350, height: 210},
+		gridArea: {x: 15, y:20, width: 330, height: 200},
 		nodes: [180, 20]
 	};
 }
@@ -65,20 +69,20 @@ function getContext() {
 		</marker>
 	</defs>
 	<g>
-		<!-- 座標軸。-->
-		<g id="axis"/>
 		<!-- ステップ。-->
 		<g id="step"/>
+		<!-- 座標軸。-->
+		<g id="axis">
+			<foreignObject class="x" width="30" height="30">
+				<m:math><m:mi>t</m:mi></m:math>
+			</foreignObject>	
+		</g>
 		<!-- 真の値。-->
-		<path id="r1" class="flow"/>
-		<path id="r2" class="flow"/>
+		<path id="r1" class="real"/>
+		<path id="r2" class="real"/>
 		<!-- 計算値。-->
 		<path id="c1" class="calc endCap"/>
 		<path id="c2" class="calc endCap"/>
-		<!-- 横軸ラベル。-->
-		<foreignObject x="372" y="202" width="30" height="30">
-			<m:math><m:mi>t</m:mi></m:math>
-		</foreignObject>	
 		<!-- ノードラベル。-->
 		<foreignObject id="n1" width="30" height="30">
 			<m:math><m:msub><m:mi>n</m:mi><m:mn>1</m:mn></m:msub></m:math>
@@ -88,3 +92,4 @@ function getContext() {
 		</foreignObject>
 	</g>
 </svg>
+

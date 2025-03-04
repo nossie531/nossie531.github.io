@@ -42,6 +42,21 @@ class DiffEq {
 		return this.nodes.map(v => [{x: this.range.min, y: v}]);
 	}
 
+	// ラプラシアン行列を取得します。
+	createLaplacianMatrix() {
+		const n = this.nodes.length;
+		const result = new Matrix(n, n);
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				const w = i === j ? 0 : this.dc;
+				const d = i === j ? this.dc * (result.n  - 1) : 0;
+				result.pos(i, j).val = w - d;
+			}
+		}
+
+		return result;
+	}
+
 	// 計算結果を取得します。
 	result() {
 		const results = this.createInitialResult();
@@ -67,16 +82,11 @@ class DiffEq {
 class ExplicitDiffEq extends DiffEq {
 	// Implement.
 	execStep(currents) {
-		const results = new Array(currents.length);
-
-		for (let i = 0; i < currents.length; i++) {
-			const base = currents[i];
-			const diff = currents.reduce((s, x) => s + (x - base), 0);
-			const y = base + this.dc * diff * this.step;
-			results[i] = y;
-		}
-
-		return results;
+		const curr = new Vector(currents);
+		const m = this.createLaplacianMatrix();
+		const diff = m.mulMat(curr).mulVal(this.step);
+		const result = curr.add(diff);
+		return result.arr;
 	}
 }
 
@@ -90,60 +100,33 @@ class ImplicitDiffEq extends DiffEq {
 	}
 
 	// 線形方程式のベクタ部分を取得します。
-	getLinearEqVector(nodes) {
-		const nSize = nodes.length;
-		const vector = new Vector(nSize);
-		for (let i = 0; i < nSize; i++) {
-			vector.pos(i).val = nodes[i];
-		}
-
-		return vector;
+	getLinearEqVector(currents) {
+		return new Vector(currents);
 	}
 
 	// 線形方程式の行列部分をを取得します。
-	getLinearEqMatrix(nodes) {
-		const nSize = nodes.length;
-		const matrix = new Matrix(nSize, nSize);
-		const v = this.dc * this.step;
-
-		for (let i = 0; i < nSize; i++) {
-			for (let j = 0; j < nSize; j++) {
-				matrix.pos(i, j).val = i !== j ? -v : 1 + v * (nSize - 1);
-			}
-		}
-
-		return matrix;
+	getLinearEqMatrix(currents) {
+		const e = Matrix.identity(currents.length);
+		const m = this.createLaplacianMatrix();
+		return e.sub(m.mulVal(this.step));
 	}
 }
 
 // 二次の陰解法による拡散計算のためのクラスです。
 class CrankNicolsonDiffEq extends ImplicitDiffEq {
 	// Override.
-	getLinearEqVector(nodes) {
-		const nSize = nodes.length;
-		const vector = new Vector(nSize);
-		const v = this.dc * this.step;
-
-		for (let i = 0; i < nSize; i++) {
-			vector.pos(i).val = nodes[i] + 0.5 * v * nodes.reduce((r, x) => r + x - nodes[i], 0);
-		}
-
-		return vector;
+	getLinearEqVector(currents) {
+		const m = this.createLaplacianMatrix()
+		const c = new Vector(currents);
+		const d = m.mulMat(c).mulVal(0.5 * this.step); 
+		return c.add(d);
 	}
 	
 	// Override.
-	getLinearEqMatrix(nodes) {
-		const nSize = nodes.length;
-		const matrix = new Matrix(nSize, nSize);
-		const v = this.dc * this.step;
-		
-		for (let i = 0; i < nSize; i++) {
-			for (let j = 0; j < nSize; j++) {
-				matrix.pos(i, j).val = i !== j ? -0.5 * v : 1 + 0.5 * v * (nSize - 1);
-			}
-		}
-
-		return matrix;
+	getLinearEqMatrix(currents) {
+		const e = Matrix.identity(currents.length);
+		const m = this.createLaplacianMatrix();
+		return e.sub(m.mulVal(0.5 * this.step));
 	}
 }
 
@@ -151,21 +134,9 @@ class ExpIntegratorDiffEq extends DiffEq {
 	// Implement.
 	execStep(currents) {
 		const vector = new Vector(currents);
-		const matrix = this.#createMatrix(currents.length);
-		return matrix.expMul(vector).arr;
-	}
-
-	// 拡散行列を生成します。
-	#createMatrix(n) {
-		const result = new Matrix(n, n);
-		const v = this.dc * this.step;
-		for (let i = 0; i < result.m; i++) {
-			for (let j = 0; j < result.n; j++) {
-				result.pos(i, j).val = i === j ? -(n - 1) * v : v;
-			}
-		}
-
-		return result;
+		const m = this.createLaplacianMatrix();
+		const mt = m.mulVal(this.step);
+		return mt.expMul(vector).arr;
 	}
 }
 

@@ -107,15 +107,22 @@
 		border-radius: 0.25ch;
 	}
 
+	div.math {
+		margin: 0.5em 0;
+		overflow: hidden;
+	}
+
 	m|math {
 		font-family: "MyMath", math;
 		font-size: 1.2em;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
 	}
 
 	m|math[display="block"] {
-		width: fit-content;
-		padding: 0.8rem 0 1.2rem 0.5rem;
 		text-align: left;
+		text-indent: 0.5rem;
+		white-space: nowrap;
 	}
 
 	kbd::before {
@@ -154,11 +161,6 @@
 	}
 
 	@media screen and (width <= 46rem) {
-		div.math {
-			max-width: var(--base-width);
-			overflow-x: hidden;
-		}
-
 		div.math:focus {
 			overflow-x: auto;
 			scrollbar-width: thin;
