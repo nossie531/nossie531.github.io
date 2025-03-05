@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
 	xmlns:m="http://www.w3.org/1998/Math/MathML"
-	viewBox="0 0 250 150" height="150">
+	viewBox="0 0 250 150">
 	<style>
 @import url("style/rungeKutta.css");
 	</style>

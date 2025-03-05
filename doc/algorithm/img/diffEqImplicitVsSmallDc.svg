@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
 	xmlns:m="http://www.w3.org/1998/Math/MathML"
-	viewBox="0 0 270 220" height="220">
+	viewBox="0 0 270 220">
 	<style>
 @import url("style/diffEq.css");
 	</style>

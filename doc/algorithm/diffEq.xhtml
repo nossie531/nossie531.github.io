@@ -35,7 +35,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 この状況で各ノードの値がどのように時間発展していくかを求める。
 				</p>
 				<figure class="normal">
-					<object data="img/diffEqNetwork.svg" style="height: 15rem;"/>
+					<iframe loading="lazy"
+						src="img/diffEqNetwork.svg"
+						style="height: 15rem;"/>
 					<figcaption>ネットワークの例</figcaption>
 				</figure>
 			</section> <section>
@@ -141,7 +143,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 以下は、2 個のノードの拡散方程式における 1 ステップの計算イメージ。
 				</p>
 				<figure class="normal">
-					<object data="img/diffEqExplicit.svg" style="height: 23rem;"/>
+					<iframe loading="lazy"
+						src="img/diffEqExplicit.svg"
+						style="height: 23rem;"/>
 					<figcaption>陽解法での計算</figcaption>
 				</figure>
 				<p>
@@ -149,11 +153,15 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				</p>
 				<div class="cmpFigure full">
 					<figure class="normal">
-						<object data="img/diffEqExplicitVsSmallDc.svg"/>
+						<iframe loading="lazy"
+							src="img/diffEqExplicitVsSmallDc.svg"
+							style="aspect-ratio: 27/22;"/>
 						<figcaption>勾配小 → 安定</figcaption>
 					</figure>
 					<figure class="normal">
-						<object data="img/diffEqExplicitVsLargeDc.svg"/>
+						<iframe loading="lazy"
+							src="img/diffEqExplicitVsLargeDc.svg"
+							style="aspect-ratio: 27/22;"/>
 						<figcaption>勾配大 → 不安定</figcaption>
 					</figure>
 				</div>
@@ -194,7 +202,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 以下は、2 個のノードの拡散方程式における 1 ステップの計算イメージ。
 				</p>
 				<figure class="normal">
-					<object data="img/diffEqImplicit.svg" style="height: 23rem;"/>
+					<iframe loading="lazy"
+						src="img/diffEqImplicit.svg"
+						style="height: 23rem;"/>
 					<figcaption>陰解法での計算</figcaption>
 				</figure>
 				<p>
@@ -202,11 +212,15 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				</p>
 				<div class="cmpFigure full">
 					<figure class="normal">
-						<object data="img/diffEqImplicitVsSmallDc.svg"/>
+						<iframe loading="lazy"
+							src="img/diffEqImplicitVsSmallDc.svg"
+							style="aspect-ratio: 27/22;"/>
 						<figcaption>傾き小 → 安定</figcaption>
 					</figure>
 					<figure class="normal">
-						<object data="img/diffEqImplicitVsLargeDc.svg"/>
+						<iframe loading="lazy"
+							src="img/diffEqImplicitVsLargeDc.svg"
+							style="aspect-ratio: 27/22;"/>
 						<figcaption>傾き大 → 安定</figcaption>
 					</figure>
 				</div>
@@ -268,7 +282,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 以下は、2 個のノードの拡散方程式における 1 ステップの計算イメージ。 
 				</p>
 				<figure class="normal">
-					<object data="img/diffEqCrankNicolson.svg" style="height: 23rem;"/>
+					<iframe loading="lazy"
+						src="img/diffEqCrankNicolson.svg"
+						style="height: 23rem;"/>
 					<figcaption>Crank-Nicolson 法での計算</figcaption>
 				</figure>
 				<p>
@@ -276,11 +292,15 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				</p>
 				<div class="cmpFigure full">
 					<figure class="normal">
-						<object data="img/diffEqCrankNicolsonVsSmallDc.svg"/>
+						<iframe loading="lazy"
+							src="img/diffEqCrankNicolsonVsSmallDc.svg"
+							style="aspect-ratio: 27/22;"/>
 						<figcaption>勾配小 → 安定</figcaption>
 					</figure>
 					<figure class="normal">
-						<object data="img/diffEqCrankNicolsonVsLargeDc.svg"/>
+						<iframe loading="lazy"
+							src="img/diffEqCrankNicolsonVsLargeDc.svg"
+							style="aspect-ratio: 27/22;"/>
 						<figcaption>勾配大 → 安定 (振動あり)</figcaption>
 					</figure>
 				</div>
@@ -295,7 +315,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 以下は、2 個のノードの拡散方程式における 1 ステップの計算イメージ。ステップ幅を巨大にしているにも関わらず、誤差がほぼないのが特徴的である。
 			</p>
 			<figure class="normal">
-				<object data="img/diffEqExpIntegrator.svg" style="width: 38rem;"/>
+				<iframe loading="lazy"
+					src="img/diffEqExpIntegrator.svg"
+					style="width: 38rem; aspect-ratio: 38/23;"/>
 				<figcaption>Exponential-Integrator での計算</figcaption>
 			</figure>
 			<section>
@@ -727,6 +749,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 									<p>
 式を簡単化して <m:math><m:mi>C</m:mi></m:math> の値を導出。
 									</p>
+									<div class="math">
 <m:math display="block">
 	<m:mi>C</m:mi>
 	<m:mo>=</m:mo>
@@ -738,6 +761,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mo>)</m:mo>
 	</m:mrow>
 </m:math>
+									</div>
 								</li> <li>
 									<p>
 導出した <m:math><m:mi>C</m:mi></m:math> の値を一般解に代入。
