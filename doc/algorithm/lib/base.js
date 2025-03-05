@@ -18,9 +18,6 @@
 
 			Base.#instance = new Base();
 			Base.#instance.#setupViewport();
-			document.addEventListener("DOMContentLoaded", () => {
-				Base.#instance.#setupFocusableElements();
-			});
 		}
 
 		// 現在実行中のスクリプトの直後にタイトルを追加。
@@ -34,21 +31,6 @@
 			meta.name = "viewport";
 			meta.content = "width=device-width,initial-scale=1,minimum-scale=1";
 			document.head.insertBefore(meta, document.head.firstElementChild);
-		}
-
-		// フォーカス可能要素を設定。
-		#setupFocusableElements() {
-			// NOTE: フォーカスによりスクロール操作を素早く行えるようにしている。
-			// これにより横長の内容がスクリーン範囲を超えても良いようにしている。
-			for (const target of document.querySelectorAll("div.math, div.cmpFigure")) {
-				target.tabIndex = 0;
-				target.addEventListener("pointerdown", _ => {
-					if (document.activeElement !== target) {
-						target.focus();
-						event.preventDefault();
-					}
-				});
-			}
 		}
 	}
 

@@ -109,7 +109,8 @@
 
 	div.math {
 		margin: 0.5em 0;
-		overflow: hidden;
+		overflow-x: auto;
+		scrollbar-width: thin;
 	}
 
 	m|math {
@@ -156,14 +157,7 @@
 
 	@media all and (width > 46rem) {
 		m|math[display="block"] {
-			padding-left: 1.5rem;
-		}
-	}
-
-	@media screen and (width <= 46rem) {
-		div.math:focus {
-			overflow-x: auto;
-			scrollbar-width: thin;
+			text-indent: 1.5rem;
 		}
 	}
 }
@@ -531,10 +525,6 @@
 
 	div.cmpFigure.full {
 		width: 100%;
-		overflow-x: hidden;
-	}
-
-	div.cmpFigure.full:focus {
 		overflow-x: auto;
 		scrollbar-width: thin;
 	}
@@ -545,10 +535,6 @@
 
 	div.cmpFigure.full > figure.normal > *:not(figcaption) {
 		width: 100%;
-	}
-
-	*:not(:focus) > figure.normal > iframe {
-		pointer-events: none;
 	}
 }
 
