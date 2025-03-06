@@ -57,12 +57,18 @@ path.grad {
 	marker-end: url(#gradDst);
 }
 
-path#error {
+path#errorTick {
 	fill: none;
 	stroke: var(--error-color);
 	stroke-width: 1;
-	marker-start: url(#lengthMark);
-	marker-end: url(#lengthMark);
+	marker-start: url(#tickMark);
+	marker-end: url(#tickMark);
+}
+
+path#errorBand {
+	stroke: var(--error-color);
+	stroke-width: 10;
+	stroke-opacity: 0.2;
 }
 
 text#errorText {
@@ -86,7 +92,7 @@ marker#calcArrow path {
 	fill: none;
 }
 
-marker#lengthMark path {
+marker#tickMark path {
 	stroke: context-stroke;
 	stroke-width: 1;
 }

@@ -35,11 +35,15 @@ function drawCalc(viewer) {
 }
 
 function drawError(viewer) {
-	const real = getAlgorithm(getContext().smallStep).result()[0].at(-1);
-	const calc = getAlgorithm().result()[0].at(-1);
-	const error = [calc, real];
-	viewer.setPath("error", error);
-	viewer.setLabel("errorText", getErrorTextPos(error), 12);
+	const real = getAlgorithm(getContext().smallStep).result();
+	const calc = getAlgorithm().result();
+	const e1 = [real[0].at(-1), calc[0].at(-1)];
+	const e2 = [real[1].at(-1), calc[1].at(-1)];
+	viewer.setPath("et1", e1);
+	viewer.setPath("et2", e2);
+	viewer.setPath("eb1", e1);
+	viewer.setPath("eb2", e2);
+	viewer.setLabel("errorText", getErrorTextPos(e1), 10, -10);
 }
 
 function drawBackDiffusion(viewer) {
@@ -47,8 +51,8 @@ function drawBackDiffusion(viewer) {
 	const pathArr = getReverseAlgorithm(nodes).result().map(flipPathX);
 	viewer.setFuncPath("f3", pathArr[0]);
 	viewer.setFuncPath("f4", pathArr[1]);
-	viewer.setPathLine("g1", pathArr[0].splice(0, 2), 30);
-	viewer.setPathLine("g2", pathArr[1].splice(0, 2), 30);
+	viewer.setPathLine("g1", pathArr[0].splice(0, 2), -30);
+	viewer.setPathLine("g2", pathArr[1].splice(0, 2), -30);
 }
 
 function flipPathX(points) {
@@ -109,9 +113,9 @@ function getErrorTextPos(error) {
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
 			<path d="M2,0 L-6,3 -6,-3 Z"/>
 		</marker>
-		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
+		<marker id="tickMark" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
-			<path d="M 0,0 V -7.5"/>
+			<path d="M 0,-5 V 5"/>
 		</marker>
 	</defs>
 	<g>
@@ -124,7 +128,11 @@ function getErrorTextPos(error) {
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 誤差表示。-->
-		<path id="error"/>
+		<text id="errorText">Error</text>
+		<path id="et1" class="errorTick"/>
+		<path id="et2" class="errorTick"/>
+		<path id="eb1" class="errorBand"/>
+		<path id="eb2" class="errorBand"/>
 		<!-- 流れ線。-->
 		<path id="f1" class="real"/>
 		<path id="f2" class="real"/>
@@ -143,8 +151,6 @@ function getErrorTextPos(error) {
 		<foreignObject id="n2" width="30" height="30">
 			<m:math><m:msub><m:mi>n</m:mi><m:mn>2</m:mn></m:msub></m:math>
 		</foreignObject>
-		<!-- 誤差ラベル。-->
-		<text id="errorText">Error</text>
 	</g>
 </svg>
 

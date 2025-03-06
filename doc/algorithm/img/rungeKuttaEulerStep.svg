@@ -24,8 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	viewer.setFuncPath("real", real);
 	viewer.setFuncPath("calc", calc);
 	viewer.setPathLine("grad", calc, 0.5);
-	viewer.setPath("error", error);
-	viewer.setLabel("errorText", getErrorTextPos(error), 12);
+	viewer.setPath("errorTick", error);
+	viewer.setPath("errorBand", error);
+	viewer.setLabel("errorText", getErrorTextPos(error), 10);
 });
 
 function getAlgorithm(step, range) {
@@ -58,9 +59,9 @@ function getErrorTextPos(error) {
 			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
 			<path d="M2,0 L-6,3 -6,-3 Z"/>
 		</marker>
-		<marker id="lengthMark" markerUnits="userSpaceOnUse" orient="auto"
+		<marker id="tickMark" markerUnits="userSpaceOnUse" orient="auto"
 			markerWidth="10" markerHeight="20" viewBox="-5 -10 10 20">
-			<path d="M 0,0 V -7.5"/>
+			<path d="M 0,-5 V 5"/>
 		</marker>
 	</defs>
 	<g>
@@ -73,14 +74,14 @@ function getErrorTextPos(error) {
 		<!-- ステップ。-->
 		<g id="step"/>
 		<!-- 誤差表示。-->
-		<path id="error"/>
+		<text id="errorText">Error</text>
+		<path id="errorTick"/>
+		<path id="errorBand"/>
 		<!-- 真の値。-->
 		<path id="real" class="real"/>
 		<!-- 計算値。-->
 		<path id="calc" class="calc endCap"/>
 		<!-- 勾配の方向。-->
 		<path id="grad" class="grad"/>
-		<!-- 誤差ラベル。-->
-		<text id="errorText">Error</text>
 	</g>
 </svg>
