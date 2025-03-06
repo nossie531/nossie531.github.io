@@ -121,9 +121,14 @@
 	}
 
 	m|math[display="block"] {
-		padding-left: 0.5rem;
-		text-align: left;
 		white-space: nowrap;
+		padding-left: 0.5rem;
+		/* -- 数式の左寄せ --
+		 * 2025 年現在、ブラウザ依存の方法しかない。
+		 * - Gecko は text-align: left が使用可能
+		 * - Blink と WebKit は diaplay: math が使用可能 */
+		text-align: left;
+		display: math; 
 	}
 
 	kbd::before {
