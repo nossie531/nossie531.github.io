@@ -7,6 +7,12 @@
 		<title>Runge-Kutta 法</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="lib/base.js"></script>
+		<style>/*<![CDATA[*/
+/* Polyfill for mtable attributes. */
+@namespace m url("http://www.w3.org/1998/Math/MathML");
+m|mtable[rowlines$=" solid"] > m|mtr:last-child > m|mtd { border-top: thin solid; }
+m|mtable[columnlines^="solid "] > m|mtr > m|mtd:nth-child(2) { border-left: thin solid; }
+		/*]]>*/</style>
 	</head>
 	<body>
 		<header>
