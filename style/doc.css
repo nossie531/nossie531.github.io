@@ -121,8 +121,8 @@
 	}
 
 	m|math[display="block"] {
+		padding-left: 0.5rem;
 		text-align: left;
-		text-indent: 0.5rem;
 		white-space: nowrap;
 	}
 
@@ -157,7 +157,7 @@
 
 	@media all and (width > 46rem) {
 		m|math[display="block"] {
-			text-indent: 1.5rem;
+			padding-left: 1.5rem;
 		}
 	}
 }
