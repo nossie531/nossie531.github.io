@@ -51,7 +51,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				<h1>記号の定義</h1>
 				<ul>
 					<li>
-<m:math><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> は時刻 <m:math><m:mi>t</m:mi></m:math> のノード値からなるベクトル、<m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> はその各成分
+<m:math><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo></m:math> は時刻 <m:math><m:mi>t</m:mi></m:math> のノード値からなるベクトル、<m:math><m:msub><m:mi>n</m:mi><m:mi>i</m:mi></m:msub><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo></m:math> はその各成分
 					</li> <li>
 <m:math><m:mi>𝐖</m:mi></m:math> はネットワークの<a href="#adjMat">隣接行列</a>、<m:math><m:msub><m:mi>w</m:mi><m:mrow><m:mi>i</m:mi><m:mi>j</m:mi></m:mrow></m:msub></m:math> はその各成分
 					</li> <li>
@@ -91,17 +91,17 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:mfrac>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:mi>𝐋</m:mi>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
 					</div>
@@ -138,7 +138,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				<p>
 現時点からの傾きを延長して次時点の値を求める。
 				</p> <p>
-つまり、<m:math><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow><m:mo>=</m:mo><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow><m:mo>+</m:mo><m:mi>𝐋</m:mi><m:mrow><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:mrow><m:mo>∆</m:mo><m:mi>t</m:mi></m:math> として計算する。
+つまり、<m:math><m:mrow><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo></m:mrow><m:mo>=</m:mo><m:mrow><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo></m:mrow><m:mo>+</m:mo><m:mi>𝐋</m:mi><m:mrow><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo></m:mrow><m:mo>∆</m:mo><m:mi>t</m:mi></m:math> として計算する。
 				</p> <p>
 以下は、2 個のノードの拡散方程式における 1 ステップの計算イメージ。
 				</p>
@@ -170,30 +170,30 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				<p>
 次時点からの傾きが現時点に繋がるよう、次時点の値を調整する。
 				</p> <p>
-つまり、次の連立線形方程式を <m:math><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> について解けばよい。
+つまり、次の連立線形方程式を <m:math><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo></m:math> について解けばよい。
 				</p>
 				<div class="math">
 <m:math display="block">
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>+</m:mo>
 	<m:mi>𝐋</m:mi>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>∆</m:mo><m:mi>t</m:mi>
 </m:math>				
@@ -229,21 +229,21 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				<p>
 現時点と次時点の傾きの平均が、次時点に繋がるよう次時点を調整する。
 				</p> <p>
-つまり、次の連立線形方程式を <m:math><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>)</m:mo></m:math> について解けばよい。
+つまり、次の連立線形方程式を <m:math><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo></m:math> について解けばよい。
 				</p>
 				<div class="math">
 <m:math display="block">
 	<m:mi>𝒏</m:mi>
-	<m:mo>(</m:mo>
+	<m:mo stretchy="false">(</m:mo>
 	<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-	<m:mo>)</m:mo>
+	<m:mo stretchy="false">)</m:mo>
 	<m:mo>=</m:mo>
 	<m:mrow>
 		<m:mrow>
 			<m:mi>𝒏</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
 		<m:mo>+</m:mo>
 		<m:mrow>
@@ -254,9 +254,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			<m:mi>𝐋</m:mi>
 			<m:mrow>
 				<m:mi>𝒏</m:mi>
-				<m:mo>(</m:mo>
+				<m:mo stretchy="false">(</m:mo>
 				<m:mi>t</m:mi>
-				<m:mo>)</m:mo>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
 			<m:mo>∆</m:mo><m:mi>t</m:mi>
 		</m:mrow>
@@ -269,9 +269,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			<m:mi>𝐋</m:mi>
 			<m:mrow>
 				<m:mi>𝒏</m:mi>
-				<m:mo>(</m:mo>
+				<m:mo stretchy="false">(</m:mo>
 				<m:mi>t</m:mi><m:mo>+</m:mo><m:mo>∆</m:mo><m:mi>t</m:mi>
-				<m:mo>)</m:mo>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
 			<m:mo>∆</m:mo><m:mi>t</m:mi>
 		</m:mrow>
@@ -338,29 +338,29 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:mfrac>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:mi>𝐋</m:mi>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>+</m:mo>
 	<m:mrow>
 		<m:mi>f</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
 		<m:mo>,</m:mo>
 		<m:mrow>
 			<m:mi>𝒏</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
 		<m:mo>)</m:mo>
 	</m:mrow>
@@ -380,9 +380,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 <m:math display="block">
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mo>∆</m:mo><m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:msup>
@@ -391,9 +391,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:msup>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>0</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>+</m:mo>
 	<m:mrow>
@@ -407,21 +407,21 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				<m:mi>e</m:mi>
 				<m:mrow>
 					<m:mi>𝐋</m:mi>
-					<m:mo>(</m:mo>
+					<m:mo stretchy="false">(</m:mo>
 					<m:mo>∆</m:mo><m:mi>t</m:mi><m:mo>-</m:mo><m:mi>t</m:mi>
-					<m:mo>)</m:mo>
+					<m:mo stretchy="false">)</m:mo>
 				</m:mrow>
 			</m:msup>
 			<m:mrow>
 				<m:mi>f</m:mi>
-				<m:mo>(</m:mo>
+				<m:mo stretchy="false">(</m:mo>
 				<m:mrow>
 					<m:mi>𝒏</m:mi>
-					<m:mo>(</m:mo>
+					<m:mo stretchy="false">(</m:mo>
 					<m:mi>t</m:mi>
-					<m:mo>)</m:mo>
+					<m:mo stretchy="false">)</m:mo>
 				</m:mrow>
-				<m:mo>)</m:mo>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
 			<m:mi>d</m:mi>
 			<m:mi>t</m:mi>
@@ -463,9 +463,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:mfrac>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:msup>
@@ -475,9 +475,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	<m:mi>𝐋</m:mi>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>+</m:mo>
 	<m:msup>
@@ -486,16 +486,16 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:msup>
 	<m:mrow>
 		<m:mi>f</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
 		<m:mo>,</m:mo>
 		<m:mrow>
 			<m:mi>𝒏</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
 									</div>
@@ -515,9 +515,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:mfrac>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>-</m:mo>
 	<m:msup>
@@ -527,9 +527,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	<m:mi>𝐋</m:mi>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:msup>
@@ -538,16 +538,16 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:msup>
 	<m:mrow>
 		<m:mi>f</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
 		<m:mo>,</m:mo>
 		<m:mrow>
 			<m:mi>𝒏</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
 									</div>
@@ -569,9 +569,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		</m:msup>
 		<m:mrow>
 			<m:mi>𝒏</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
 		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
@@ -582,16 +582,16 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:msup>
 	<m:mrow>
 		<m:mi>f</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
 		<m:mo>,</m:mo>
 		<m:mrow>
 			<m:mi>𝒏</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
 									</div>
@@ -608,9 +608,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		</m:msup>
 		<m:mrow>
 			<m:mi>𝒏</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
 	</m:mrow>
 	<m:mo>+</m:mo>
@@ -624,16 +624,16 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		</m:msup>
 		<m:mrow>
 			<m:mi>f</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>s</m:mi>
 			<m:mo>,</m:mo>
 			<m:mrow>
 				<m:mi>𝒏</m:mi>
-				<m:mo>(</m:mo>
+				<m:mo stretchy="false">(</m:mo>
 				<m:mi>t</m:mi>
-				<m:mo>)</m:mo>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
 		<m:mi>d</m:mi>
 		<m:mi>t</m:mi>
@@ -648,9 +648,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 <m:math display="block">
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:mo>-</m:mo>
@@ -666,21 +666,23 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			<m:mi>e</m:mi>
 			<m:mrow>
 				<m:mi>𝐋</m:mi>
-				<m:mo>(</m:mo><m:mi>t</m:mi><m:mo>-</m:mo><m:mi>s</m:mi><m:mo>)</m:mo>
+				<m:mo stretchy="false">(</m:mo>
+				<m:mi>t</m:mi><m:mo>-</m:mo><m:mi>s</m:mi>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
 		</m:msup>
 		<m:mrow>
 			<m:mi>f</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
 			<m:mo>,</m:mo>
 			<m:mrow>
 				<m:mi>𝒏</m:mi>
-				<m:mo>(</m:mo>
+				<m:mo stretchy="false">(</m:mo>
 				<m:mi>s</m:mi>
-				<m:mo>)</m:mo>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
 		<m:mi>d</m:mi>
 		<m:mi>s</m:mi>
@@ -691,20 +693,20 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 							</ol>
 						</li> <li>
 							<p>
-<m:math><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>0</m:mi><m:mo>)</m:mo></m:math> を通る特殊解は以下の通り。
+<m:math><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>0</m:mi><m:mo stretchy="false">)</m:mo></m:math> を通る特殊解は以下の通り。
 							</p>
 							<ol>
 								<li>
 									<p>
-一般解より <m:math><m:mi>𝒏</m:mi><m:mo>(</m:mo><m:mi>0</m:mi><m:mo>)</m:mo></m:math> を導出。
+一般解より <m:math><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>0</m:mi><m:mo stretchy="false">)</m:mo></m:math> を導出。
 									</p>
 									<div class="math">
 <m:math display="block">
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>0</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:mo>-</m:mo>
@@ -724,21 +726,21 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			<m:mi>e</m:mi>
 			<m:mrow>
 				<m:mi>𝐋</m:mi>
-				<m:mo>(</m:mo><m:mi>t</m:mi><m:mo>-</m:mo><m:mi>s</m:mi><m:mo>)</m:mo>
+				<m:mo stretchy="false">(</m:mo><m:mi>t</m:mi><m:mo>-</m:mo><m:mi>s</m:mi><m:mo stretchy="false">)</m:mo>
 			</m:mrow>
 		</m:msup>
 		<m:mrow>
 			<m:mi>f</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
 			<m:mo>,</m:mo>
 			<m:mrow>
 				<m:mi>𝒏</m:mi>
-				<m:mo>(</m:mo>
+				<m:mo stretchy="false">(</m:mo>
 				<m:mi>s</m:mi>
-				<m:mo>)</m:mo>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
 		<m:mi>d</m:mi>
 		<m:mi>s</m:mi>
@@ -756,9 +758,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	<m:mo>-</m:mo>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>0</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
 									</div>
@@ -770,9 +772,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 <m:math display="block">
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:msup>
@@ -781,9 +783,9 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:msup>
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
-		<m:mo>(</m:mo>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mn>0</m:mn>
-		<m:mo>)</m:mo>
+		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 	<m:mo>+</m:mo>
 	<m:mrow>
@@ -792,21 +794,23 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			<m:mi>e</m:mi>
 			<m:mrow>
 				<m:mi>𝐋</m:mi>
-				<m:mo>(</m:mo><m:mi>t</m:mi><m:mo>-</m:mo><m:mi>s</m:mi><m:mo>)</m:mo>
+				<m:mo stretchy="false">(</m:mo>
+				<m:mi>t</m:mi><m:mo>-</m:mo><m:mi>s</m:mi>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
 		</m:msup>
 		<m:mrow>
 			<m:mi>f</m:mi>
-			<m:mo>(</m:mo>
+			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
 			<m:mo>,</m:mo>
 			<m:mrow>
 				<m:mi>𝒏</m:mi>
-				<m:mo>(</m:mo>
+				<m:mo stretchy="false">(</m:mo>
 				<m:mi>s</m:mi>
-				<m:mo>)</m:mo>
+				<m:mo stretchy="false">)</m:mo>
 			</m:mrow>
-			<m:mo>)</m:mo>
+			<m:mo stretchy="false">)</m:mo>
 		</m:mrow>
 		<m:mi>d</m:mi>
 		<m:mi>s</m:mi>
@@ -854,14 +858,14 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 					<p>
 これにも様々な方法があるが、どれも後述の方法と比べると遅い。
 					</p> <p>
-Taylor 展開を有限級数で近似する場合、時間計算量は <m:math><m:mi>O</m:mi><m:mo>(</m:mo><m:msup><m:mi>n</m:mi><m:mn>3</m:mn></m:msup><m:mo>)</m:mo></m:math> になる。これは行列の積に必要な計算量そのものである。また、他の方法 (Pade 近似などがあるが詳細は割愛) を利用する場合、より少ない級数で近似できたりするが、この影響は高々定数倍である。
+Taylor 展開を有限級数で近似する場合、時間計算量は <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>3</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> になる。これは行列の積に必要な計算量そのものである。また、他の方法 (Pade 近似などがあるが詳細は割愛) を利用する場合、より少ない級数で近似できたりするが、この影響は高々定数倍である。
 					</p>
 				</section> <section>
 					<h2>ベクトル乗算との混合計算</h2>
 					<p>
 行列指数関数にベクトルを乗算する場合、前者の単独の計算よりむしろ速くなる。
 					</p> <p>
-なぜなら、前述の Taylor 展開の両辺にベクトルを右から乗算したうえで、ベクトルと行列の積を優先して計算していけば、行列どうしの積が不要になる。これにより、時間計算量の次数を一つ減らし <m:math><m:mi>O</m:mi><m:mo>(</m:mo><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup><m:mo>)</m:mo></m:math> にできる。
+なぜなら、前述の Taylor 展開の両辺にベクトルを右から乗算したうえで、ベクトルと行列の積を優先して計算していけば、行列どうしの積が不要になる。これにより、時間計算量の次数を一つ減らし <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> にできる。
 					</p>
 				</section> <section>
 					<h2>Krylov 部分空間法</h2>
