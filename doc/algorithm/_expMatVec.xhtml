@@ -26,11 +26,13 @@
 				</p>
 				<div class="math">
 <m:math display="block">
-	<m:msup>
-		<m:mi>e</m:mi>
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
 		<m:mrow><m:mi>𝐀</m:mi><m:mi>t</m:mi></m:mrow>
-	</m:msup>
-	<m:mi>𝒃</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:mi>𝐛</m:mi>
 </m:math>
 				</div>
 			</section> <section>
@@ -39,13 +41,28 @@
 					<li>
 <m:math><m:mi>𝐀</m:mi></m:math> は <m:math><m:mi>n</m:mi></m:math> 次の正方行列
 					</li> <li>
-<m:math><m:mi>𝒃</m:mi></m:math> は <m:math><m:mi>n</m:mi></m:math> 次の列ベクトル
+<m:math><m:mi>𝐛</m:mi></m:math> は <m:math><m:mi>n</m:mi></m:math> 次のベクトル
 					</li> <li>
-<m:math><m:mi>t</m:mi></m:math> は任意の実数定数
+<m:math><m:mi>t</m:mi></m:math> は任意の実数
 					</li> <li>
 <m:math><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo></m:math> は行列 <m:math><m:mi>𝐀</m:mi></m:math> の非ゼロ要素の個数
 					</li>
 				</ul>
+				<section>
+					<h2><m:math><m:mi>t</m:mi></m:math> の存在理由</h2>
+					<p>
+多くの応用で、複数の <m:math><m:mi>t</m:mi></m:math> の値について計算する。
+					</p> <p>
+そのため、<m:math><m:mi>𝐀</m:mi><m:mi>t</m:mi></m:math> を一つにまとめず、あえて <m:math><m:mi>𝐀</m:mi></m:math> と <m:math><m:mi>t</m:mi></m:math> に分けている。
+					</p>
+				</section> <section>
+					<h2><m:math><m:mi>nnz</m:mi></m:math> の意味</h2>
+					<p>
+<m:math><m:mi>nnz</m:mi></m:math> は "the Number of None Zero" の略である。
+					</p> <p>
+行列の要素に 0 が多いかで疎行列と密行列に区別されるが、これはその指標になる。
+					</p>
+				</section>
 			</section> <section>
 				<h1>用語の定義</h1>
 				<section>
@@ -55,7 +72,12 @@
 					</p>
 					<div class="math">
 <m:math display="block">
-	<m:msup><m:mi>e</m:mi><m:mi>𝐌</m:mi></m:msup>
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>𝐌</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:mrow>
 		<m:munderover>
@@ -75,11 +97,16 @@
 </m:math>
 					</div>
 					<p>
-これは以下の通常の指数関数の Taylor 展開から連想できる。
+これは以下の通常指数関数の Taylor 展開に由来する。
 					</p>
 					<div class="math">
 <m:math display="block">
-	<m:msup><m:mi>e</m:mi><m:mi>x</m:mi></m:msup>
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>x</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
 	<m:mo>=</m:mo>
 	<m:mrow>
 		<m:munderover>
@@ -98,68 +125,170 @@
 	</m:mrow>
 </m:math>
 					</div>
+					<p>
+両者は引数の型をのぞいて全く同じ構造である。
+					</p>
 				</section>
+			</section>
+		</section> <section>
+			<h1>各種アルゴリズム</h1>
+			<p>
+二つの手法があり、それぞれ長所と短所がある。
+			</p>
+			<nav class="sub"/>
+			<section>
+				<h2>推奨手法</h2>
+				<p>
+少数の <m:math><m:mi>t</m:mi></m:math> についての計算では手法 A が、そうでなければ手法 B が推奨される。なぜなら、前者は後者にある重い前処理 (後述の <a href="#arnordiMethod">Arnordi 法</a>) がない反面、<m:math><m:mi>t</m:mi></m:math> を指定して計算する本処理が重くなっている。
+				</p>
+			</section> <section>
+				<h2>計算量</h2>
+				<p>
+以下の表は、各手法、各処理、そして <m:math><m:mi>𝐀</m:mi></m:math> が疎行列か密行列かでまとめている。
+				</p>
+				<table class="normal">
+					<thead>
+						<tr>
+							<td colspan="2" style="border: none;"></td>
+							<th>前処理</th>
+							<th>本処理</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th rowspan="2">密行列 vs</th>
+							<th>手法 A</th>
+							<td>
+<m:math display="inline">
+	<m:mi>O</m:mi>
+	<m:mo stretchy="false">(</m:mo>
+	<m:mn>1</m:mn>
+	<m:mo stretchy="false">)</m:mo>
+</m:math>
+							</td> <td>
+<m:math display="inline">
+	<m:mi>O</m:mi>
+	<m:mo stretchy="false">(</m:mo>
+	<m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup>
+	<m:mo stretchy="false">)</m:mo>
+</m:math>
+							</td>
+						</tr> <tr>
+							<th>手法 B</th>
+							<td>
+<m:math display="inline">
+	<m:mi>O</m:mi>
+	<m:mo stretchy="false">(</m:mo>
+	<m:mi>m</m:mi>
+	<m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup>
+	<m:mo>+</m:mo>
+	<m:msup><m:mi>m</m:mi><m:mn>2</m:mn></m:msup><m:mi>n</m:mi>
+	<m:mo stretchy="false">)</m:mo>
+</m:math>
+							</td> <td>
+<m:math display="inline">
+	<m:mi>O</m:mi>
+	<m:mo stretchy="false">(</m:mo>
+	<m:mi>m</m:mi><m:mi>n</m:mi>
+	<m:mo stretchy="false">)</m:mo>
+</m:math>
+							</td>
+						</tr> <tr>
+							<th rowspan="2">疎行列 vs</th>
+							<th>手法 A</th>
+							<td>
+<m:math display="inline">
+	<m:mi>O</m:mi>
+	<m:mo stretchy="false">(</m:mo>
+	<m:mn>1</m:mn>
+	<m:mo stretchy="false">)</m:mo>
+</m:math>
+							</td> <td>
+<m:math display="inline">
+	<m:mi>O</m:mi>
+	<m:mo stretchy="false">(</m:mo>
+	<m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo>
+	<m:mo stretchy="false">)</m:mo>
+</m:math>
+							</td>
+						</tr> <tr>
+							<th>手法 B</th>
+							<td>
+<m:math display="inline">
+	<m:mi>O</m:mi>
+	<m:mo stretchy="false">(</m:mo>
+	<m:mi>m</m:mi>
+	<m:mo>·</m:mo>
+	<m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo>
+	<m:mo>+</m:mo>
+	<m:msup><m:mi>m</m:mi><m:mn>2</m:mn></m:msup><m:mi>n</m:mi>
+	<m:mo stretchy="false">)</m:mo>
+</m:math>
+							</td> <td>
+<m:math display="inline">
+	<m:mi>O</m:mi>
+	<m:mo stretchy="false">(</m:mo>
+	<m:mi>m</m:mi><m:mi>n</m:mi>
+	<m:mo stretchy="false">)</m:mo>
+</m:math>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>
+※ <m:math><m:mi>m</m:mi></m:math> は手法 B のための値でそこで<a href="#aboutM">後述</a>するが、<m:math><m:mi>m</m:mi><m:mo>≪</m:mo><m:mi>n</m:mi></m:math> である。
+				</p> <p>
+疎行列の計算量の <m:math><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo></m:math> の箇所を <m:math><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup></m:math> にすると、密行列の計算量になる。つまり、計算量の観点では [疎行列の計算量] ≦ [密行列の計算量] である。しかし、疎行列を密行列として計算するのは推奨できない。なぜなら、密行列を疎行列のためのデータ構造に格納するとメモリ効率が悪くなり、計算量に反映されない計算時間の比例係数が悪化しやすい。
+				</p>
 			</section> <section>
 				<hgroup>
-					<h1>基本戦略 1</h1>
-					<div class="subTitle">計算順序の工夫</div>
+					<h1 id="simpleMethod">手法 A</h1>
+					<div class="subTitle">計算順序の単純な工夫</div>
 				</hgroup>
 				<p>
 計算には Taylor 展開が含まれるため、有限級数近似を行う。
 				</p> <p>
-ここで、計算順序を少し工夫するだけで計算量を改善できる。
+ここで、計算順序を少し工夫するだけで、計算量を改善できる。
 				</p>
 				<section>
-					<h2>効率の悪い方法</h2>
+					<h2>そのまま計算した場合</h2>
 					<p>
 行列指数関数の Taylor 展開の計算後に、ベクトルとの積を行う。
 					</p> <p>
-計算量は密行列でも疎行列でも <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>3</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> になる。これは <m:math><m:mi>n</m:mi></m:math> 次正方行列どうしの行列積の計算量と等しい。つまり、Taylor 展開の各回の計算では、保存した前回の結果との行列積で計算できるが、この部分が計算量を支配している。
-					</p> <p>
-なお、疎行列でも密行列でも計算量が同じなのは、積のたびに次第に密化するためである。
+計算量は密行列でも疎行列でも <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>3</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> になる。これは <m:math><m:mi>n</m:mi></m:math> 次正方行列どうしの行列積の計算量と等しい。つまり、Taylor 展開の各回の計算では、保存した前回の結果との行列積が必要になるが、この部分が計算量を支配する。なお、疎行列でも密行列でも計算量が同じなのは、行列積のたびに行列が密化していくためである。
 					</p> <p>
 ちなみに、行列指数関数の計算には Pade 近似など他の方法もある (詳細は割愛)。これらはより少ない級数で近似できるなど効率的ではあるが、影響は高々定数倍である。
 					</p>
 				</section> <section>
-					<h2>効率の良い方法</h2>
+					<h2>工夫して計算した場合</h2>
 					<p>
 行列指数関数の Taylor 展開にベクトルとの積を混ぜる。
 					</p> <p>
-計算量は密行列で <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> で疎行列で <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo><m:mo stretchy="false">)</m:mo></m:math> になる。これは <m:math><m:mi>n</m:mi></m:math> 次正方行列どうしの行列積の計算量より小さい。つまり、Taylor 展開の各回の計算では、保存した前回の結果との積とで計算できるが、これは行列とベクトルの積となるので、行列積が不要になる。
+計算量は密行列で <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> で疎行列で <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo><m:mo stretchy="false">)</m:mo></m:math> になる。これは <m:math><m:mi>n</m:mi></m:math> 次正方行列どうしの行列積の計算量より小さい。つまり、Taylor 展開の各回の計算では、保存した前回の結果との積が必要になるが、これは行列とベクトルとの積になるので、行列積は不要になる。
 					</p>
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1>基本戦略 2</h1>
+					<h1>手法 B</h1>
 					<div class="subTitle">Krylov 部分空間での近似</div>
 				</hgroup>
 				<p>
-部分空間を定義し、その中に対象を圧縮して計算する。
+部分空間を定義し、そこに対象を圧縮してから計算する。
 				</p>
 				<section>
-					<h2>有利な状況</h2>
+					<h2>近似精度</h2>
 					<p>
-以下のどれかを満たす状況で有利になる。
-					</p>
-					<ul>
-						<li>
-様々な <m:math><m:mi>t</m:mi></m:math> で計算
-						</li> <li>
-行列 <m:math><m:mi>𝐀</m:mi></m:math> が疎行列
-						</li>
-					</ul>
-				</section> <section>
-					<h2>有限級数近似</h2>
-					<p>
-対象の <m:math><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:math> 次の有限級数近似を求める。
+結果は Taylor 展開の <span id="aboutM"><m:math><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:math></span> 次までの有限級数近似と一致する。
 					</p>
 					<div class="math">
 <m:math display="block">
-	<m:msup>
-		<m:mi>e</m:mi>
-		<m:mrow><m:mi>𝐀</m:mi><m:mi>t</m:mi></m:mrow>
-	</m:msup>
-	<m:mi>𝒃</m:mi>
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>𝐀</m:mi><m:mi>t</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:mi>𝐛</m:mi>
 	<m:mo>≈</m:mo>
 	<m:mrow>
 		<m:munderover>
@@ -179,7 +308,7 @@
 			<m:mi>𝐀</m:mi>
 			<m:mi>k</m:mi>
 		</m:msup>
-		<m:mi>𝒃</m:mi>
+		<m:mi>𝐛</m:mi>
 	</m:mrow>
 </m:math>
 					</div>
@@ -189,9 +318,9 @@
 				</section> <section>
 					<h2>Krylov 部分空間</h2>
 					<p>
-上記の近似式は <m:math><m:mi>m</m:mi></m:math> 個のベクトル <m:math><m:msup><m:mi>𝐀</m:mi><m:mi>k</m:mi></m:msup><m:mi>𝒃</m:mi></m:math> の線形結合である。
+上述の近似式は <m:math><m:mi>m</m:mi></m:math> 個のベクトル <m:math><m:msup><m:mi>𝐀</m:mi><m:mi>k</m:mi></m:msup><m:mi>𝐛</m:mi></m:math> の線形結合になっている。
 					</p> <p>
-これらのベクトルにより張られる部分空間を Krylov 部分空間という。
+これらのベクトルで張られる部分空間は Krylov 部分空間と呼ばれる。
 					</p>
 					<div class="math">
 <m:math display="block">
@@ -203,32 +332,86 @@
 	<m:mrow>
 		<m:mi>span</m:mi>
 		<m:mo>{</m:mo>
-		<m:mi>𝒃</m:mi>
-		<m:mo>,</m:mo>
-		<m:mi>𝐀</m:mi><m:mi>𝒃</m:mi>
-		<m:mo>,</m:mo>
-		<m:msup><m:mi>𝐀</m:mi><m:mi>2</m:mi></m:msup><m:mi>𝒃</m:mi>
-		<m:mo>,</m:mo>
-		<m:mi>⋯</m:mi>
-		<m:mo>,</m:mo>
-		<m:msup><m:mi>𝐀</m:mi><m:mrow><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:msup><m:mi>𝒃</m:mi>
+		<m:mi>𝐛</m:mi><m:mo>,</m:mo>
+		<m:mi>𝐀</m:mi><m:mi>𝐛</m:mi><m:mo>,</m:mo>
+		<m:msup><m:mi>𝐀</m:mi><m:mi>2</m:mi></m:msup><m:mi>𝐛</m:mi><m:mo>,</m:mo>
+		<m:mi>⋯</m:mi><m:mo>,</m:mo>
+		<m:msup><m:mi>𝐀</m:mi><m:mrow><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:msup><m:mi>𝐛</m:mi>
 		<m:mo>}</m:mo>
 	</m:mrow>
 </m:math>
 					</div>
-				</section> <section>
-					<h2>部分空間での計算</h2>
 					<p>
-以下の要素が必要となるので <a href="#arnordiMethod">Arnordi 法</a>により求める。
+この空間の座標系の次元数は <m:math><m:mi>m</m:mi></m:math> で、これは元の問題の <m:math><m:mi>n</m:mi></m:math> より小さい。
+					</p> <p>
+そのため、計算前に座標変換して計算後に戻せば、計算が楽になる。
+					</p>
+				</section> <section>
+					<h2>座標変換と計算</h2>
+					<p>
+座標変換を挟むと、計算は以下のようになる。
+					</p>
+					<div class="math">
+<m:math display="block">
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>𝐀</m:mi><m:mi>t</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:mi>𝐛</m:mi>
+	<m:mo>≈</m:mo>
+	<m:msub><m:mi>𝐕</m:mi><m:mi>m</m:mi></m:msub>
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:msub><m:mi>𝐇</m:mi><m:mi>m</m:mi></m:msub>
+		<m:mi>t</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:msub><m:mi>𝐞</m:mi><m:mn>1</m:mn></m:msub>
+</m:math>
+					</div>
+					<p>
+ここで、新しく以下の概念を導入している。
 					</p>
 					<ul>
 						<li>
-<m:math><m:msub><m:mi>𝐕</m:mi><m:mi>m</m:mi></m:msub></m:math>: Krylov 部分空間の正規直交基底 (<m:math><m:mi>n</m:mi><m:mo>×</m:mo><m:mi>m</m:mi></m:math> 行列)
+<m:math><m:msub><m:mi>𝒦</m:mi><m:mi>m</m:mi></m:msub></m:math> の正規直交基底: <m:math><m:mo>{</m:mo><m:msub><m:mi>𝐯</m:mi><m:mn>1</m:mn></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝐯</m:mi><m:mn>2</m:mn></m:msub><m:mo>,</m:mo><m:mi>⋯</m:mi><m:mo>,</m:mo><m:msub><m:mi>𝐯</m:mi><m:mi>m</m:mi></m:msub><m:mo>}</m:mo></m:math>
 						</li> <li>
-<m:math><m:msub><m:mi>𝐇</m:mi><m:mi>m</m:mi></m:msub></m:math>: <m:math><m:mi>𝐀</m:mi></m:math> を <m:math><m:msub><m:mi>𝐕</m:mi><m:mi>m</m:mi></m:msub></m:math> へと圧縮した行列 (<m:math><m:mi>m</m:mi><m:mo>×</m:mo><m:mi>m</m:mi></m:math> 行列)
+座標変換のための <m:math><m:mi>m</m:mi><m:mo>×</m:mo><m:mi>n</m:mi></m:math> 行列: <m:math><m:msub><m:mi>𝐕</m:mi><m:mi>m</m:mi></m:msub><m:mo>=</m:mo><m:mrow><m:mo>{</m:mo><m:msub><m:mi>𝐯</m:mi><m:mn>1</m:mn></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝐯</m:mi><m:mn>2</m:mn></m:msub><m:mo>,</m:mo><m:mi>⋯</m:mi><m:mo>,</m:mo><m:msub><m:mi>𝐯</m:mi><m:mi>m</m:mi></m:msub><m:mo>}</m:mo></m:mrow></m:math>
+						</li> <li>
+新座標版の <m:math><m:mi>𝐀</m:mi></m:math> となる <m:math><m:mi>m</m:mi><m:mo>×</m:mo><m:mi>m</m:mi></m:math> 行列: <m:math><m:msub><m:mi>𝐇</m:mi><m:mi>m</m:mi></m:msub><m:mo>=</m:mo><m:msubsup><m:mi>𝐕</m:mi><m:mi>m</m:mi><m:mi>⊤</m:mi></m:msubsup><m:mi>𝐀</m:mi><m:msub><m:mi>𝐕</m:mi><m:mi>m</m:mi></m:msub></m:math>
+						</li> <li>
+最初の要素が 1 で他が 0 の <m:math><m:mi>m</m:mi></m:math> 次元ベクトル: <m:math><m:msub><m:mi>𝐞</m:mi><m:mn>1</m:mn></m:msub></m:math>
 						</li>
 					</ul>
-					<p class="todo">注: 書きかけです。</p>
+					<p>
+なお、<m:math><m:msub><m:mi>𝐕</m:mi><m:mi>m</m:mi></m:msub></m:math> と <m:math><m:msub><m:mi>𝐇</m:mi><m:mi>m</m:mi></m:msub></m:math> は <a href="#arnordiMethod">Arnordi 法</a>で効率的に計算できる。
+					</p>
+				</section> <section>
+					<h2>計算量</h2>
+					<p>
+まず、前処理は Arnordi 法の計算量になる。
+					</p> <p>
+次に、本処理の以下の計算量は <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:mi>m</m:mi><m:mi>n</m:mi><m:mo stretchy="false">)</m:mo></m:math> になる。 
+					</p>
+					<div class="math">
+<m:math display="block">
+	<m:msub><m:mi>𝐕</m:mi><m:mi>m</m:mi></m:msub>
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:msub><m:mi>𝐇</m:mi><m:mi>m</m:mi></m:msub>
+		<m:mi>t</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:msub><m:mi>𝐞</m:mi><m:mn>1</m:mn></m:msub>
+</m:math>
+					</div>
+					<p>
+なぜなら、まず <m:math><m:msub><m:mi>𝐕</m:mi><m:mi>m</m:mi></m:msub></m:math> と <m:math><m:mrow><m:mi>exp</m:mi><m:mo stretchy="false">(</m:mo><m:msub><m:mi>𝐇</m:mi><m:mi>m</m:mi></m:msub><m:mi>t</m:mi><m:mo stretchy="false">)</m:mo></m:mrow><m:msub><m:mi>𝐞</m:mi><m:mn>1</m:mn></m:msub></m:math> の積は、<m:math><m:mi>n</m:mi><m:mo>×</m:mo><m:mi>m</m:mi></m:math> 行列と <m:math><m:mi>m</m:mi></m:math> 次元ベクトルの積なので、<m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:mi>m</m:mi><m:mi>n</m:mi><m:mo stretchy="false">)</m:mo></m:math> である。そして、その右辺の計算量は<a href="#simpleMethod">手法 A</a> が適用できるため <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>m</m:mi><m:mi>2</m:mi></m:msup><m:mo stretchy="false">)</m:mo></m:math> で、これは先の計算量より小さいので無視できる。
+					</p>
 				</section>
 			</section>
 		</section> <section>
