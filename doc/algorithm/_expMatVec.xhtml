@@ -238,7 +238,7 @@
 				<p>
 ※ <m:math><m:mi>m</m:mi></m:math> は手法 B のための値でそこで<a href="#aboutM">後述</a>するが、<m:math><m:mi>m</m:mi><m:mo>≪</m:mo><m:mi>n</m:mi></m:math> である。
 				</p> <p>
-疎行列の計算量の <m:math><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo></m:math> の箇所を <m:math><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup></m:math> にすると、密行列の計算量になる。つまり、計算量の観点では [疎行列の計算量] ≦ [密行列の計算量] である。しかし、疎行列を密行列として計算するのは推奨できない。なぜなら、密行列を疎行列のためのデータ構造に格納するとメモリ効率が悪くなり、計算量に反映されない計算時間の比例係数が悪化しやすい。
+疎行列の計算量の <m:math><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo></m:math> の箇所を <m:math><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup></m:math> にすると、密行列の計算量になる。つまり、計算量の観点では [疎行列の計算量] ≦ [密行列の計算量] である。しかし、密行列を疎行列として計算するのは推奨できない。なぜなら、密行列を疎行列のためのデータ構造に格納するとメモリ効率が悪くなり、計算量に反映されない計算時間の比例係数が悪化しやすい。
 				</p>
 			</section> <section>
 				<hgroup>
