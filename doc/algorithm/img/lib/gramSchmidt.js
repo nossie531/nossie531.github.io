@@ -17,14 +17,14 @@ function setup() {
 	viewer.editLine("y1", zero, y1);
 	viewer.editLine("y2", zero, y2);
 	viewer.editLine("y3", zero, y3);
-	viewer.editLine("prodX3Y1", zero, projX3Y1);
-	viewer.editLine("prodX3Y2", zero, projX3Y2);
+	viewer.editLine("projX3Y1", zero, projX3Y1);
+	viewer.editLine("projX3Y2", zero, projX3Y2);
 	viewer.editMath("x3Text", x3, {offset: [-20,0]});
 	viewer.editMath("y1Text", y1, {offset: [0,10]});
 	viewer.editMath("y2Text", y2, {offset: [0,10]});
 	viewer.editMath("y3Text", y3, {offset: [40, 0]});
-	viewer.editMath("prodX3Y1Text", projX3Y1, {offset: [-10, -20], align: "r"});
-	viewer.editMath("prodX3Y2Text", projX3Y2, {offset: [10, -20]});
+	viewer.editMath("projX3Y1Text", projX3Y1, {offset: [-10, -20], align: "r"});
+	viewer.editMath("projX3Y2Text", projX3Y2, {offset: [10, -20]});
 	viewer.editPointGuide("x3Guide", x3);
 }
 

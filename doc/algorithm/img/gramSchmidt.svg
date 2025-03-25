@@ -20,8 +20,8 @@
 			<path id="y1"/>
 			<path id="y2"/>
 			<path id="y3"/>
-			<path id="prodX3Y1"/>
-			<path id="prodX3Y2"/>
+			<path id="projX3Y1"/>
+			<path id="projX3Y2"/>
 			<path id="x3"/>
 		</g>
 		<g id="x3Guide"/>
@@ -43,7 +43,7 @@
 							<m:mo>=</m:mo>
 							<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
 							<m:mo>-</m:mo>
-							<m:mrow style="color: green;">
+							<m:mrow class="projX3Y1">
 								<m:mi>proj</m:mi>
 								<m:mo stretchy="false">(</m:mo>
 								<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
@@ -61,7 +61,7 @@
 								<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
 							</m:mphantom>
 							<m:mo>-</m:mo>
-							<m:mrow style="color: blue;">
+							<m:mrow class="projX3Y2">
 								<m:mi>proj</m:mi>
 								<m:mo stretchy="false">(</m:mo>
 								<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
@@ -74,8 +74,8 @@
 				</m:mtable>
 			</m:math>
 		</foreignObject>
-		<foreignObject id="prodX3Y1Text" width="100" height="30">
-			<m:math>
+		<foreignObject id="projX3Y1Text" width="100" height="30">
+			<m:math class="projX3Y1">
 				<m:mi>proj</m:mi>
 				<m:mo stretchy="false">(</m:mo>
 				<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>
@@ -84,8 +84,8 @@
 				<m:mo stretchy="false">)</m:mo>
 			</m:math>
 		</foreignObject>
-		<foreignObject id="prodX3Y2Text" width="100" height="30">
-			<m:math>
+		<foreignObject id="projX3Y2Text" width="100" height="30">
+			<m:math class="projX3Y2"  >
 				<m:mi>proj</m:mi>
 				<m:mo stretchy="false">(</m:mo>
 				<m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub>

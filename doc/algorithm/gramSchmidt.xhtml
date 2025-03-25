@@ -20,12 +20,12 @@
 			<section>
 				<h1>基本戦略</h1>
 				<p>
-直交化して正規化する。
+直交化して正規化する (正規化は不要なら省略可能)。
 				</p>
 				<section>
 					<h2>直交化</h2>
 					<p>
-ベクトルから直行化済のベクトルの成分を全て除去すると、新たに直行化したベクトルが一つ増える。この作業を繰り返して全てのベクトルを直交化させる。
+ベクトルから直行化済のベクトルの成分を全て除去すると、そのベクトルが新たに直行化済のベクトルの一つとなる。この作業を繰り返して、全てのベクトルを直交化させる。
 					</p> <p>
 以下では、ベクトル <m:math><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub></m:math> を直行化が完了済のベクトル <m:math><m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub></m:math> と <m:math><m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub></m:math> に直交化させ、<m:math><m:msub><m:mi>𝒚</m:mi><m:mn>3</m:mn></m:msub></m:math> を求めている。ここで、<m:math><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub><m:mo stretchy="false">)</m:mo></m:math> と <m:math><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub><m:mo stretchy="false">)</m:mo></m:math> は <m:math><m:msub><m:mi>𝒙</m:mi><m:mn>3</m:mn></m:msub></m:math> の <m:math><m:msub><m:mi>𝒚</m:mi><m:mn>1</m:mn></m:msub></m:math> と <m:math><m:msub><m:mi>𝒚</m:mi><m:mn>2</m:mn></m:msub></m:math> 方向の成分を表す。
 					</p>
@@ -39,8 +39,6 @@
 					<h2>正規化</h2>
 					<p>
 直交化された各ベクトルをその大きさで割り、単位ベクトルに変換する。
-					</p> <p>
-(直交化だけが目的の場合、この作業は省略可能。)
 					</p>
 				</section>
 			</section> <section>

@@ -2,6 +2,11 @@
 @import url("../../../../style/import/font_math.css");
 @namespace m url("http://www.w3.org/1998/Math/MathML");
 
+:root {
+	--projX3Y1-color: green;
+	--projX3Y2-color: blue;
+}
+
 g#axis > path {
 	stroke-width: 1.5;
 	stroke: var(--mc4-color);
@@ -18,12 +23,12 @@ g#vecs {
 		stroke-dasharray: 6 2;
 	}
 
-	#prodX3Y1 {
-		stroke: green;
+	> path#projX3Y1 {
+		stroke: var(--projX3Y1-color);
 	}
 
-	#prodX3Y2 {
-		stroke: blue;
+	> path#projX3Y2 {
+		stroke: var(--projX3Y2-color);
 	}
 }
 
@@ -33,12 +38,12 @@ g#x3Guide > path {
 	stroke: red;
 }
 
-#prodX3Y1Text > m|math {
-	color: green;
+m|*.projX3Y1 {
+	color: var(--projX3Y1-color);
 }
 
-#prodX3Y2Text > m|math {
-	color: blue;
+m|*.projX3Y2 {
+	color: var(--projX3Y2-color);
 }
 
 m|math {
