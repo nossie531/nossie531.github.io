@@ -116,13 +116,11 @@
 	m|math {
 		font-family: "MyMath", math;
 		font-size: 1.2em;
-		padding-top: 0.5rem;
-		padding-bottom: 0.5rem;
 	}
 
 	m|math[display="block"] {
 		white-space: nowrap;
-		padding-left: 0.5rem;
+		padding: 0.5rem;
 		/* -- 数式の左寄せ --
 		 * 2025 年現在、ブラウザ依存の方法しかない。
 		 * - Gecko は text-align: left が使用可能
