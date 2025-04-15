@@ -6,23 +6,15 @@
 	<head>
 		<title>ネットワーク上の微分方程式</title>
 		<link rel="stylesheet" href="style/base.css"/>
-		<link rel="stylesheet" href="style/diffEq.css"/>
-		<style>/*<![CDATA[*/
-/* Polyfill for mtable attributes. */
-@namespace m url("http://www.w3.org/1998/Math/MathML");
-m|mtable[columnalign="right left"] > m|mtr > m|mtd:nth-child(1) { text-align: right; }
-m|mtable[columnalign="right left"] > m|mtr > m|mtd:nth-child(2) { text-align: left; }
-m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0; }
-		/*]]>*/</style>
+		<link rel="stylesheet" href="style/mathMlPolyfill.css"/>
+		<link rel="stylesheet" href="style/netDiffEq.css"/>
 		<script src="lib/base.js"></script>
 	</head>
 	<body>
 		<header>
 			<h1><script>Base.insertTitle();</script></h1>
 		</header>
-		<p class="todo">
-注: 書きかけです (残: Exponential Integrator について)。
-		</p> <p>
+		<p>
 ネットワーク上の微分方程式とその初期値問題について。
 		</p>
 		<section>
@@ -352,7 +344,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 	</m:mrow>
 	<m:mo>+</m:mo>
 	<m:mrow>
-		<m:mi>f</m:mi>
+		<m:mi>𝒇</m:mi>
 		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
 		<m:mo>,</m:mo>
@@ -374,7 +366,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				</section> <section>
 					<h2>微分方程式の解析解</h2>
 					<p>
-上記の微分方程式の特殊解から (解法は後述)、時刻 <m:math><m:mo>∆</m:mo><m:mi>t</m:mi></m:math> の状況は以下で求まる。
+上記の微分方程式の特殊解から (解法は<a href="#diffEqSol">後述</a>)、時刻 <m:math><m:mo>∆</m:mo><m:mi>t</m:mi></m:math> の状況は以下で求まる。
 					</p>
 					<div class="math">
 <m:math display="block">
@@ -413,7 +405,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 				</m:mrow>
 			</m:msup>
 			<m:mrow>
-				<m:mi>f</m:mi>
+				<m:mi>𝒇</m:mi>
 				<m:mo stretchy="false">(</m:mo>
 				<m:mrow>
 					<m:mi>𝒏</m:mi>
@@ -437,21 +429,18 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 第二項: 非線形成分がないとゼロになる。近似解は計算可能。
 					</p>
 				</section> <section>
-					<h2>微分方程式の解法</h2>
+					<h2 id="diffEqSol">微分方程式の解法</h2>
 					<p>
-上記の微分方程式の解法について。
+上記の微分方程式は以下の手順で解ける。
 					</p>
-					<ul>
-						<li>
-							<p>
-一般解は以下の通り。
-							</p>
-							<ol>
-								<li>
-									<p>
+					<section>
+						<h3>一般解</h3>
+						<ol>
+							<li>
+								<p>
 両辺に <m:math><m:msup><m:mi>e</m:mi><m:mrow><m:mo>-</m:mo><m:mi>𝐋</m:mi><m:mi>t</m:mi></m:mrow></m:msup></m:math> を乗算。
-									</p>
-									<div class="math">
+								</p>
+								<div class="math">
 <m:math display="block">
 	<m:msup>
 		<m:mi>e</m:mi>
@@ -485,7 +474,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mrow><m:mo>-</m:mo><m:mi>𝐋</m:mi><m:mi>t</m:mi></m:mrow>
 	</m:msup>
 	<m:mrow>
-		<m:mi>f</m:mi>
+		<m:mi>𝒇</m:mi>
 		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
 		<m:mo>,</m:mo>
@@ -498,12 +487,12 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
-									</div>
-								</li> <li>
-									<p>
+								</div>
+							</li> <li>
+								<p>
 右辺の第一項を左辺へ移行。
-									</p>
-									<div class="math">
+								</p>
+								<div class="math">
 <m:math display="block">
 	<m:msup>
 		<m:mi>e</m:mi>
@@ -537,7 +526,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mrow><m:mo>-</m:mo><m:mi>𝐋</m:mi><m:mi>t</m:mi></m:mrow>
 	</m:msup>
 	<m:mrow>
-		<m:mi>f</m:mi>
+		<m:mi>𝒇</m:mi>
 		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
 		<m:mo>,</m:mo>
@@ -550,12 +539,12 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
-									</div>
-								</li> <li>
-									<p>
+								</div>
+							</li> <li>
+								<p>
 左辺を積の微分として解釈。
-									</p>
-									<div class="math">
+								</p>
+								<div class="math">
 <m:math display="block">
 	<m:mrow>
 		<m:mfrac>
@@ -581,7 +570,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mrow><m:mo>-</m:mo><m:mi>𝐋</m:mi><m:mi>t</m:mi></m:mrow>
 	</m:msup>
 	<m:mrow>
-		<m:mi>f</m:mi>
+		<m:mi>𝒇</m:mi>
 		<m:mo stretchy="false">(</m:mo>
 		<m:mi>t</m:mi>
 		<m:mo>,</m:mo>
@@ -594,12 +583,12 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
-									</div>
-								</li> <li>
-									<p>
+								</div>
+							</li> <li>
+								<p>
 両辺を積分 (<m:math><m:mi>C</m:mi></m:math> は積分定数)。
-									</p>
-									<div class="math">
+								</p>
+								<div class="math">
 <m:math display="block">
 	<m:mrow>
 		<m:msup>
@@ -623,7 +612,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			<m:mrow><m:mo>-</m:mo><m:mi>𝐋</m:mi><m:mi>t</m:mi></m:mrow>
 		</m:msup>
 		<m:mrow>
-			<m:mi>f</m:mi>
+			<m:mi>𝒇</m:mi>
 			<m:mo stretchy="false">(</m:mo>
 			<m:mi>s</m:mi>
 			<m:mo>,</m:mo>
@@ -639,12 +628,12 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mi>t</m:mi>
 	</m:mrow>
 </m:math>
-									</div>
-								</li> <li>
-									<p>
+								</div>
+							</li> <li>
+								<p>
 式を整理 (右辺の積分変数は <m:math><m:mi>t</m:mi></m:math> から <m:math><m:mi>s</m:mi></m:math> に変更)。
-									</p>
-									<div class="math">
+								</p>
+								<div class="math">
 <m:math display="block">
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
@@ -672,7 +661,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			</m:mrow>
 		</m:msup>
 		<m:mrow>
-			<m:mi>f</m:mi>
+			<m:mi>𝒇</m:mi>
 			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
 			<m:mo>,</m:mo>
@@ -688,19 +677,19 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mi>s</m:mi>
 	</m:mrow>
 </m:math>
-									</div>
-								</li>
-							</ol>
-						</li> <li>
-							<p>
-<m:math><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>0</m:mi><m:mo stretchy="false">)</m:mo></m:math> を通る特殊解は以下の通り。
-							</p>
-							<ol>
-								<li>
-									<p>
+								</div>
+							</li>
+						</ol>
+					</section> <section>
+						<h3>
+<m:math><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>0</m:mi><m:mo stretchy="false">)</m:mo></m:math> を通る特殊解
+						</h3>
+						<ol>
+							<li>
+								<p>
 一般解より <m:math><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mi>0</m:mi><m:mo stretchy="false">)</m:mo></m:math> を導出。
-									</p>
-									<div class="math">
+								</p>
+								<div class="math">
 <m:math display="block">
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
@@ -730,7 +719,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			</m:mrow>
 		</m:msup>
 		<m:mrow>
-			<m:mi>f</m:mi>
+			<m:mi>𝒇</m:mi>
 			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
 			<m:mo>,</m:mo>
@@ -746,12 +735,12 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mi>s</m:mi>
 	</m:mrow>
 </m:math>
-									</div>
-								</li> <li>
-									<p>
+								</div>
+							</li> <li>
+								<p>
 式を簡単化して <m:math><m:mi>C</m:mi></m:math> の値を導出。
-									</p>
-									<div class="math">
+								</p>
+								<div class="math">
 <m:math display="block">
 	<m:mi>C</m:mi>
 	<m:mo>=</m:mo>
@@ -763,12 +752,12 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mo stretchy="false">)</m:mo>
 	</m:mrow>
 </m:math>
-									</div>
-								</li> <li>
-									<p>
+								</div>
+							</li> <li>
+								<p>
 導出した <m:math><m:mi>C</m:mi></m:math> の値を一般解に代入。
-									</p>
-									<div class="math">
+								</p>
+								<div class="math">
 <m:math display="block">
 	<m:mrow>
 		<m:mi>𝒏</m:mi>
@@ -800,7 +789,7 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 			</m:mrow>
 		</m:msup>
 		<m:mrow>
-			<m:mi>f</m:mi>
+			<m:mi>𝒇</m:mi>
 			<m:mo stretchy="false">(</m:mo>
 			<m:mi>t</m:mi>
 			<m:mo>,</m:mo>
@@ -816,72 +805,20 @@ m|mtable[columnspacing="0"] > m|mtr > m|mtd { padding-left: 0; padding-right: 0;
 		<m:mi>s</m:mi>
 	</m:mrow>
 </m:math>
-									</div>
-								</li>
-							</ol>
-						</li>
-					</ul>
+								</div>
+							</li>
+						</ol>
+					</section>
 				</section>
 			</section> <section>
 				<h1>計算の高速化</h1>
 				<p>
-行列指数関数 <m:math><m:msup><m:mi>e</m:mi><m:mi>𝐌</m:mi></m:msup></m:math> の計算時間は、正方行列 <m:math><m:mi>𝐌</m:mi></m:math> の次数 <m:math><m:mi>n</m:mi></m:math> の影響を大きく受ける。
+『<a href="expMatVec.xhtml">行列指数関数とベクトルの積</a>』で紹介する方法を使うと、<m:math><m:msup><m:mi>e</m:mi><m:mrow><m:mi>𝐋</m:mi><m:mi>t</m:mi></m:mrow></m:msup><m:mrow><m:mi>𝒏</m:mi><m:mo stretchy="false">(</m:mo><m:mn>0</m:mn><m:mo stretchy="false">)</m:mo></m:mrow></m:math> のような箇所の時間計算量をかなり小さくできる。
 				</p>
-				<section>
-					<h2>行列指数関数の定義</h2>
-					<p>
-行列指数関数は以下の Taylor 展開で定義される。
-					</p>
-					<div class="math">
-<m:math display="block">
-	<m:msup><m:mi>e</m:mi><m:mi>𝐌</m:mi></m:msup>
-	<m:mo>=</m:mo>
-	<m:mrow>
-		<m:munderover>
-			<m:mo>∑</m:mo>
-			<m:mrow><m:mi>k</m:mi><m:mo>=</m:mo><m:mi>0</m:mi></m:mrow>
-			<m:mi>∞</m:mi>
-		</m:munderover>
-		<m:mfrac>
-			<m:mn>1</m:mn>
-			<m:mrow><m:mi>k</m:mi><m:mo>!</m:mo></m:mrow>
-		</m:mfrac>
-		<m:msup>
-			<m:mi>𝐌</m:mi>
-			<m:mi>k</m:mi>
-		</m:msup>
-	</m:mrow>
-</m:math>
-					</div>
-				</section> <section>
-					<h2>行列指数関数の単独計算</h2>
-					<p>
-これにも様々な方法があるが、どれも後述の方法と比べると遅い。
-					</p> <p>
-Taylor 展開を有限級数で近似する場合、時間計算量は <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>3</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> になる。これは行列の積に必要な計算量そのものである。また、他の方法 (Pade 近似などがあるが詳細は割愛) を利用する場合、より少ない級数で近似できたりするが、この影響は高々定数倍である。
-					</p>
-				</section> <section>
-					<h2>ベクトル乗算との混合計算</h2>
-					<p>
-行列指数関数にベクトルを乗算する場合、前者の単独の計算よりむしろ速くなる。
-					</p> <p>
-なぜなら、前述の Taylor 展開の両辺にベクトルを右から乗算したうえで、ベクトルと行列の積を優先して計算していけば、行列どうしの積が不要になる。これにより、時間計算量の次数を一つ減らし <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> にできる。
-					</p>
-				</section> <section>
-					<h2>Krylov 部分空間法</h2>
-					<p>
-行列をその演算から生じる主要成分の空間へと圧縮する。
-					</p> <p>
-この方法が有利になるのは、ビデオのように多くの時刻の状態を知りたい場合である。不利になるのは、その逆で写真のように僅かな時刻の状態のみを知りたい場合である。
-					</p>
-					<p class="todo">
-TODO: 追記予定！
-					</p>
-				</section>
 			</section> <section>
 				<h1>非線形成分の近似</h1>
 				<p class="todo">
-TODO: 追記予定！
+TODO: 追記予定？
 				</p>
 			</section>
 		</section>

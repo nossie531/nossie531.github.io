@@ -479,6 +479,26 @@
 		background-color: initial;
 	}
 
+	pre > code.pseudoCode {
+		/* 数式を含めるために行高を大きく。*/
+		line-height: 1.7rem;
+
+		mark.kw {
+			color: blue;
+			background-color: initial;
+		}
+	}
+
+	span.nopre {
+		white-space: initial;
+
+		/* 先頭の空白類文字の空間を打ち消す。*/
+		&::before {
+			content: " ";
+			font-size: 0;
+		}
+	}
+
 	figure.file {
 		padding: 0;
 		border-radius: 0.5rem;

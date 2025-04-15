@@ -1,0 +1,18 @@
+@charset "utf-8";
+
+@namespace m url("http://www.w3.org/1998/Math/MathML");
+
+m|mtable[columnalign="right left"] > mtr > mtd:nth-child(1) {
+	text-align: right;
+}
+
+m|mtable[columnalign="right left"] > mtr > mtd:nth-child(2) {
+	text-align: left;
+}
+
+m|mtable[columnspacing="0"]  {
+	m|mtd {
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
