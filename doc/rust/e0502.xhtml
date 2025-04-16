@@ -4,11 +4,12 @@
 	<head>
 		<title>Rust メモ: E0502 - 不変参照と可変参照の同時使用</title>
 		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
 	</head>
 	<body>
 		<header>
-			<h1><script>Base.insertTitle();</script></h1>
+			<h1><script>Doc.insertTitle();</script></h1>
 		</header>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0502]</mark><mark class="title">: cannot borrow `data` as mutable because it is also borrowed as immutable</mark>

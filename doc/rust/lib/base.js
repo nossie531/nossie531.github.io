@@ -4,7 +4,6 @@
 	/* -- スクリプトのロード --
 	 - Chrome のバグで XML 形式からは import 宣言が無効 (import 構文は有効)
 	 - https://issues.chromium.org/issues/40518469 */
-	import("../../../lib/nav/nav.js");
 	import("../../../lib/quote.js");
 	import("../../../lib/prism/prism.js").then(() => setupPrismJs());
 
@@ -19,27 +18,13 @@
 			}
 
 			Base.#instance = new Base();
-			Base.#instance.#setupViewport();
 			Base.#instance.#setupGoogleAnalytics();
 			document.addEventListener("DOMContentLoaded", () => {
 				Base.#instance.#setupCodes();
 				Base.#instance.#setupIframes();
 			});
 		}
-
-		// 現在実行中のスクリプトの直後にタイトルを追加。
-		static insertTitle() {
-			document.currentScript.parentNode.append(document.title);
-		}
 		
-		// ビューポートを設定。
-		#setupViewport() {
-			const meta = document.createElement("meta");
-			meta.name = "viewport";
-			meta.content = "width=device-width,initial-scale=1,minimum-scale=1";
-			document.head.insertBefore(meta, document.head.firstElementChild);
-		}
-
 		/* コードブロックをフォーカス可能に設定。*/
 		#setupCodes() {
 			const selector = "pre > code:only-child, pre > samp:only-child";
@@ -136,8 +121,6 @@
 		});
 	}
 
-	window.Base = Base;
+	Base.init();
 }
-
-Base.init();
 

@@ -4,31 +4,13 @@
 	<head>
 		<title>Rust メモ: 内部可変性と get_mut, from_mut 関数</title>
 		<link rel="stylesheet" href="style/base.css"/>
+		<link rel="stylesheet" href="style/interior_mutability_xxx_mut.css"/>
+		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
-		<style><![CDATA[
-table.methods {
-	& > tr > td {
-		white-space: nowrap;
-		padding-right: 2ch;
-	}
-
-	& > tr > td code{
-		background: initial;
-	}
-
-	& > tr > td:nth-child(1) {
-		border-right-style: dashed;
-	}
-
-	& > tr > td:nth-child(2) {
-		border-left-style: dashed;
-	}
-}
-		]]></style>
 	</head>
 	<body>
 		<header>
-			<h1><script>Base.insertTitle();</script></h1>
+			<h1><script>Doc.insertTitle();</script></h1>
 		</header>
 		<p>
 内部可変性のある型の <code>get_mut</code> 関数と <code>from_mut</code> 関数について。

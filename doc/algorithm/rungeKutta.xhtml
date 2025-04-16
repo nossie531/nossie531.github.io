@@ -6,17 +6,12 @@
 	<head>
 		<title>Runge-Kutta 法</title>
 		<link rel="stylesheet" href="style/base.css"/>
-		<script src="lib/base.js"></script>
-		<style>/*<![CDATA[*/
-/* Polyfill for mtable attributes. */
-@namespace m url("http://www.w3.org/1998/Math/MathML");
-m|mtable[rowlines$=" solid"] > m|mtr:last-child > m|mtd { border-top: thin solid; }
-m|mtable[columnlines^="solid "] > m|mtr > m|mtd:nth-child(2) { border-left: thin solid; }
-		/*]]>*/</style>
+		<link rel="stylesheet" href="style/mathMlPolyfill.css"/>
+		<script src="../../lib/doc.js"></script>
 	</head>
 	<body>
 		<header>
-			<h1><script>Base.insertTitle();</script></h1>
+			<h1><script>Doc.insertTitle();</script></h1>
 		</header>
 		<p>
 Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一種である。
