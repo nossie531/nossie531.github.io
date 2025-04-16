@@ -1,0 +1,76 @@
+@charset "utf-8";
+
+@layer
+	import_color,
+	import_size,
+	import_lang,
+	root,
+	default,
+	doc,
+	util,
+	import_nav,
+	custom_nav;
+
+@import url("import/color.css") layer(import_color);
+@import url("import/size.css") layer(import_size);
+@import url("import/lang.css") layer(import_lang);
+@import url("../lib/nav/nav.css") layer(import_nav);
+
+@layer root {
+	:root {
+		height: 100%;
+		font-size: var(--root-font-size);
+		color: var(--fg-color);
+		background-color: var(--bg-color);
+	}
+
+	body {
+		height: 100%;
+		margin: 0;
+	}
+}
+
+@layer default {
+	a:link, a:visited {
+		color: var(--link-color);
+		text-decoration: none;
+	}
+
+	a:link:hover, a:visited:hover {
+		text-decoration: underline;
+	}
+}
+
+@layer doc {
+	iframe#sub {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border-style: none;
+	}
+}
+
+@layer util {
+	*.none {
+		display: none !important;
+	}
+}
+
+@layer custom_nav {
+	nav.forPage {
+		--nav-bg-color: var(--bg-em-color);
+		--nav-bd-color: var(--edge-color);
+	}
+
+	@media screen and (prefers-color-scheme: light) {
+		nav.forPage {
+			--nav-hl-color: hsla(0, 0%, 0%, 0.05);
+		}
+	}
+
+	@media screen and (prefers-color-scheme: dark) {
+		nav.forPage {
+			--nav-hl-color: hsla(0, 0%, 100%, 0.1);
+		}
+	}
+}
