@@ -28,7 +28,7 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 				<figure class="normal">
 					<iframe loading="lazy"
 						src="img/rungeKuttaIntro.svg"
-						style="width: 25rem; height: 15rem;"/>
+						style="width: 25rem; aspect-ratio: 25/15;"/>
 				</figure>
 			</section> <section>
 				<h1>基本戦略</h1>
@@ -38,7 +38,7 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 				<figure class="normal">
 					<iframe loading="lazy"
 						src="img/rungeKuttaSteps.svg"
-						style="width: 25rem; height: 15rem;"/>
+						style="width: 25rem; aspect-ratio: 25/15;"/>
 				</figure>
 				<p>
 各ステップごとの計算には様々なバリエーションが知られている。
@@ -48,7 +48,7 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 				<figure class="normal">
 					<iframe loading="lazy"
 						src="img/rungeKuttaEulerStep.svg"
-						style="width: 22rem; height: 20rem;"/>
+						style="width: 22rem; aspect-ratio: 22/20;"/>
 				</figure>
 				<p>
 そこで、精度を高めるために、現時点から次時点への経路付近にある複数の調査点について、それぞれの勾配の加重平均をとる。
@@ -56,7 +56,7 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 				<figure class="normal">
 					<iframe loading="lazy"
 						src="img/rungeKuttaAverageStep.svg"
-						style="width: 22rem; height: 20rem;"/>
+						style="width: 22rem; aspect-ratio: 22/20;"/>
 				</figure>
 				<p>
 なお、計算元となるそれぞれの調査点の位置についても、次時点を計算する場合と同様、他の調査点の勾配の加重平均から計算する。
@@ -193,7 +193,7 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 				</p> <p>
 精度が良くなるような様々な値の組み合わせが調べられている。
 				</p> <p>
-これらを系統的に表記するために Butcher 配列と呼ばれる表記法がある。
+Butcher 配列を使うと、これらを系統的に表記できる。
 				</p>
 				<div class="math">
 <m:math display="block">
@@ -236,7 +236,7 @@ Runge-Kutta 法は、常微分方程式の初期値問題の数値解法の一�
 </m:math>
 				</div>
 				<p>
-古典的 Runge-Kutta 法の Butcher 配列は以下の通り。
+例えば、以下は古典的 Runge-Kutta 法の Butcher 配列である。
 				</p>
 				<div class="math">
 <m:math display="block">
