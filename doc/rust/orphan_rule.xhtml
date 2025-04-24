@@ -22,30 +22,57 @@
 		</section> <section>
 			<h1>ルールの必要性</h1>
 			<p>
-もし仮に、この衝突が完成済のクレートのトレイト実装どうしでもあるなら、新しいクレートの導入のたびに既存のクレートとの相性確認が必要になってしまう。そのため、孤児ルールではそうした衝突がないよう、各クレートが実装できる範囲を制限している。
+もし仮に、この衝突が完成済のクレートのトレイト実装どうしでもあるなら、新しいクレートの導入のたびに既存のクレートとの相性確認が必要になってしまう。そのため、孤児ルールではそうした衝突がないよう、予め各クレートが実装できる範囲を制限している。
 			</p>
 		</section> <section>
-			<h1>ルールの詳細</h1>
-			<p>
-トレイト実装において、クレートは対象となる型かトレイト、少なくともどちらかをローカルで定義している必要がある。これにより、型もトレートも所有していないクレートが、両者を勝手に紐づける事はできなくなる。 
-			</p>
+			<h1>仕様</h1>
+			<div>
+				<iframe class="autoHeight" src="quote/reference/item/implementations.xhtml"/>
+			</div>
 			<section>
-				<h2>公式資料</h2>
-				<div>
-					<iframe class="autoHeight" src="quote/reference/item/implementations.xhtml"/>
-				</div>
+				<h2 id="basicRule">解説 (基本ルール)</h2>
 				<p>
-この仕様はトレイトが型パラメタを持つ場合についても考慮している。
+トレイトに型パラメタがない場合について。
 				</p> <p>
-つまり、以下の実装のうち、最後のものはエラーになる。
+トレイトと型の両方が同時に外部クレート由来であってはならない。
+				</p>
+			</section> <section>
+				<h2 id="specialRule">解説 (特別ルール)</h2>
+				<p>
+トレイトに型パラメタがある場合について。
+				</p> <p>
+トレイトが外部クレート由来でも、型パラメタによっては、問題にならなくなる。
+				</p> <p>
+まず、少なくとも一つの指定は、ローカルクレートに由来する型である必要がある。さらに、それよりも手前の型パラメタの指定には、単独の型パラメタがあってはならない。なぜなら、他のクレートの同様のトレイト実装にて、そのパラメタの箇所のみを、そのクレート由来の型に置き換えたものがあるかもしれない。
+				</p>
+			</section> <section>
+				<h2>実例</h2>
+				<p>
+以下は確実にコンパイルエラーになる。
 				</p>
 				<ul>
 					<li>
-<code>impl&lt;T&gt; ForeignTrait&lt;LocalType, T&gt; for ForeginType</code>
+<code>impl ForeignTrait for YourType</code>
 					</li> <li>
-<code>impl&lt;T&gt; ForeignTrait&lt;Cover&lt;T&gt;, LocalType&gt; for ForeginType</code>
+<code>impl&lt;T&gt; ForeignTrait&lt;T, MyType&gt; for YourType</code>
+					</li>
+				</ul>
+				<p>
+以下は E0119 が発生しなければコンパイルできる。
+				</p>
+				<ul>
+					<li>
+<code>impl MyTrait for YourType</code>
 					</li> <li>
-<code>impl&lt;T&gt; ForeignTrait&lt;T, LocalType&gt; for ForeginType</code>
+<code>impl YourTrait for MyType</code>
+					</li> <li>
+<code>impl&lt;T&gt; YourTrait&lt;MyType&gt; for YourType</code>
+					</li> <li>
+<code>impl&lt;T&gt; YourTrait&lt;MyType, T&gt; for YourType</code>
+					</li> <li>
+<code>impl&lt;T&gt; YourTrait&lt;YourType2, MyType&gt; for YourType</code>
+					</li> <li>
+<code>impl&lt;T&gt; YourTrait&lt;Cover&lt;T&gt;, MyType&gt; for YourType</code>
 					</li>
 				</ul>
 			</section>
