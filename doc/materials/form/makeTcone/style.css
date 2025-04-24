@@ -6,9 +6,10 @@
 }
 
 body {
+	display: flow-root;
 	width: max-content;
 	background-color: hsl(45, 5%, 85%);
-	padding: 1px 0.5rem 0.5rem;
+	padding: 0 0.5rem 0.5rem;
 }
 
 header h1 {
