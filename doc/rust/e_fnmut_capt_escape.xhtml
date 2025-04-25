@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: error - FnMut クロージャからのキャプチャ変数の流出</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Doc.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: captured variable cannot escape `FnMut` closure body</mark>
+</samp></pre>
+		<p>
+<code>FnMut</code> クロージャからキャプチャ変数が流出した。
+		</p>
+		<section>
+			<h1>詳細</h1>
+			<p>
+<code>FnMut</code> クロージャが可変でキャプチャしている変数の参照 (不変参照か可変参照かは不問) が、クロージャの外に公開されてしまうと発生する。
+			</p> <p>
+これが危険な理由は、初回の呼出で漏出したキャプチャ変数の参照の存在中に、クロージャの呼出がまた行われ、キャプチャ変数の更新が行われる可能性があるためである。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下で、<code>use_fn_mut</code> を <code>use_fn_once</code> で代替すると、エラーはなくなる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut counter = 1;
+    use_fn_mut(|| {
+        counter += 1;
+        <mark class="error">&amp;counter</mark>
+    });
+}
+
+#[allow(dead_code)]
+fn use_fn_mut&lt;'a, F&gt;(_: F)
+where
+    F: FnMut() -&gt; &amp;'a i32 + 'a
+{}
+
+#[allow(dead_code)]
+fn use_fn_once&lt;'a, F&gt;(_: F)
+where
+    F: FnOnce() -&gt; &amp;'a i32 + 'a
+{}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: captured variable cannot escape `FnMut` closure body</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:5:9
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let mut counter = 1;
+<mark class="info">  |</mark>         <mark class="info">----------- variable defined here</mark>
+<mark class="info">3 |</mark>     use_fn_mut(|| {
+<mark class="info">  |</mark>                 <mark class="info">- inferred to be a `FnMut` closure</mark>
+<mark class="info">4 |</mark>         counter += 1;
+<mark class="info">  |</mark>         <mark class="info">------- variable captured here</mark>
+<mark class="info">5 |</mark>         &amp;counter
+<mark class="info">  |</mark>         <mark class="error">^^^^^^^^ returns a reference to a captured variable which escapes the closure body</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: `FnMut` closures only have access to their captured variables while they are executing...
+<mark class="info">  =</mark> <mark class="title">note</mark>: ...therefore, they cannot allow references to captured variables to escape
+</samp></pre>
+		</section>
+	</body>
+</html>
