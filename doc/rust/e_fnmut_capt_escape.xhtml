@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: error - FnMut クロージャからのキャプチャ変数の流出</title>
+		<title>Rust メモ: error - キャプチャ変数の流出</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -22,7 +22,7 @@
 			<p>
 <code>FnMut</code> クロージャが可変でキャプチャしている変数の参照 (不変参照か可変参照かは不問) が、クロージャの外に公開されてしまうと発生する。
 			</p> <p>
-これが危険な理由は、初回の呼出で漏出したキャプチャ変数の参照の存在中に、クロージャの呼出がまた行われ、キャプチャ変数の更新が行われる可能性があるためである。
+これが危険な理由は、初回の呼出で流出したキャプチャ変数の参照の存在中に、クロージャの呼出がまた行われ、キャプチャ変数の更新が行われる可能性があるためである。
 			</p>
 		</section> <section>
 			<h1>サンプル</h1>
