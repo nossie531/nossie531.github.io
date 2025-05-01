@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: error - ライフタイムの不足と再借用</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Doc.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
+</samp></pre>
+		<p>
+『<a href="e_short_lifetime.xhtml">error - ライフタイムの不足</a>』の再借用についての派生パターン。
+		</p>
+		<section>
+			<h1>背景情報</h1>
+			<p>
+可変参照フィールドへのアクセスは､『<a href="reborrow.xhtml">再借用</a>』により行われる。
+			</p> <p>
+そしてこの場合、結果の参照のライフタイムは、フィールドアクセス式のベース側のライフタイムにより制限される。そのため、フィールド側のライフタイムがたとえ長くても、ベース側のライフタイムが短いと、結果のライフタイムはベース側の短いものとなる。
+			</p>
+		</section> <section>
+			<h1>パターン</h1>
+			<nav class="sub"/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">関数版</div>
+				</hgroup>
+				<p>
+以下では、<code>arg.0</code> は可変参照であるため、そのライフタイムは <code>arg</code> の <code>'s</code> になる。ここで、戻り値のライフタイムには <code>'l</code> が期待されていて、<code>arg</code> の型から暗黙的に <code>'l: 's</code> と分かる。そのため、ライフタイムが <code>'s</code> の参照は使えない。
+				</p>
+<pre><code class="language-rust">
+struct Holder&lt;'a&gt;(&amp;'a mut i32);
+
+fn val&lt;'l, 's&gt;(arg: &amp;'s Holder&lt;'l&gt;) -&gt; &amp;'l i32 {
+    <mark class="error">arg.0</mark>
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:5:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark> fn val&lt;'l, 's&gt;(arg: &amp;'s Holder&lt;'l&gt;) -&gt; &amp;'l i32 {
+<mark class="info">  |</mark>        <mark class="info">--  -- lifetime `'s` defined here</mark>
+<mark class="info">  |</mark>        <mark class="info">|</mark>
+<mark class="info">  |</mark>        <mark class="info">lifetime `'l` defined here</mark>
+<mark class="info">4 |</mark>     arg.0
+<mark class="info">  |</mark>     <mark class="error">^^^^^ function was supposed to return data with lifetime `'l` but it is returning data with lifetime `'s`</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: consider adding the following bound: `'s: 'l`
+</samp></pre>
+				<section>
+					<h2>解決策 1</h2>
+					<p>
+引数のライフタイムを長くする。
+					</p>
+<pre><code class="language-rust">
+struct Holder&lt;'a&gt;(&amp;'a mut i32);
+
+fn val&lt;'l&gt;(arg: &amp;'l Holder&lt;'_&gt;) -&gt; &amp;'l i32 {
+    arg.0
+}
+</code></pre>
+				</section> <section>
+					<h2>解決策 2</h2>
+					<p>
+戻り値のライフタイムを短くする。
+					</p>
+<pre><code class="language-rust">
+struct Holder&lt;'a&gt;(&amp;'a mut i32);
+
+fn val&lt;'l, 's&gt;(arg: &amp;'s Holder&lt;'l&gt;) -&gt; &amp;'s i32 {
+    arg.0
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">メソッド版</div>
+				</hgroup>
+				<p>
+以下では、<code>self.0</code> は可変参照であるため、そのライフタイムは <code>self</code> のそれと同じになる。ここで、戻り値のライフタイムには <code>'a</code> が期待されていて、<code>self</code> のライフタイムは <code>'a</code> より短い。そのため、ライフタイムが <code>self</code> と同じ参照は使えない。
+				</p>
+<pre><code class="language-rust">
+struct Holder&lt;'a&gt;(&amp;'a mut i32);
+
+impl&lt;'a&gt; Holder&lt;'a&gt; {
+    fn val(&amp;self) -&gt; &amp;'a i32 {
+        <mark class="error">self.0</mark>
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:5:9
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark> impl&lt;'a&gt; Holder&lt;'a&gt; {
+<mark class="info">  |</mark>      <mark class="info">-- lifetime `'a` defined here</mark>
+<mark class="info">4 |</mark>     fn val(&amp;self) -&gt; &amp;'a i32 {
+<mark class="info">  |</mark>            <mark class="info">- let's call the lifetime of this reference `'1`</mark>
+<mark class="info">5 |</mark>         self.0
+<mark class="info">  |</mark>         <mark class="error">^^^^^^ method was supposed to return data with lifetime `'a` but it is returning data with lifetime `'1`</mark>
+</samp></pre>
+				<section>
+					<h2>解決策 1</h2>
+					<p>
+引数のライフタイムを長くする。
+					</p>
+<pre><code class="language-rust">
+struct Holder&lt;'a&gt;(&amp;'a mut i32);
+
+impl&lt;'a&gt; Holder&lt;'a&gt; {
+    fn val(&amp;'a self) -&gt; &amp;'a i32 {
+        self.0
+    }
+}
+</code></pre>
+				</section> <section>
+					<h2>解決策 2</h2>
+					<p>
+戻り値のライフタイムを短くする。
+					</p>
+<pre><code class="language-rust">
+struct Holder&lt;'a&gt;(&amp;'a mut i32);
+
+impl Holder&lt;'_&gt; {
+    fn val(&amp;self) -&gt; &amp;i32 {
+        self.0
+    }
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
