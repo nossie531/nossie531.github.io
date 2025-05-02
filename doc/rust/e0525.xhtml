@@ -79,7 +79,9 @@ fn callback&lt;F: Fn()&gt;(f: F) {
 			</section> <section>
 				<hgroup>
 					<h1>パターン B1</h1>
-					<div class="subTitle"><code>Fn</code> と <code>FnMut</code> への不適合 (コピー不可能型のキャプチャ)</div>
+					<div class="subTitle">
+<code>Fn</code> と <code>FnMut</code> への不適合 (コピー不可能型のキャプチャ)
+					</div>
 				</hgroup>
 				<p>
 <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトを実装していない型をキャプチャすると、<code>Fn</code> と <code>FnMut</code> に適合しなくなる。
@@ -125,8 +127,10 @@ struct DontCopy();
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1>パターン B1</h1>
-					<div class="subTitle"><code>Fn</code> と <code>FnMut</code> への不適合 (可変参照のキャプチャ)</div>
+					<h1>パターン B2</h1>
+					<div class="subTitle">
+<code>Fn</code> と <code>FnMut</code> への不適合 (可変参照のキャプチャ)
+					</div>
 				</hgroup>
 				<p>
 前のパターンの可変参照版 (可変参照も <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトを実装しない)。
