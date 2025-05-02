@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0525 - クロージャのトレイト不適合</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Doc.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0525]</mark><mark class="title">: expected a closure that implements the `FnMut` trait, but this closure only implements `FnOnce`</mark>
+</samp></pre>
+		<p>
+クロージャが期待されるトレイトを実装していなかった。
+		</p>
+		<section>
+			<h1>概要</h1>
+			<p>
+クロージャ用のトレイトには <a href="https://doc.rust-lang.org/std/ops/trait.FnOnce.html"><code>FnOnce</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnMut.html"><code>FnMut</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a> の三種類があり、後に行くほど要件が追加されていく。そして、クロージャが期待されたトレイトを実装しないとエラーになる。
+			</p> 
+			<aside class="normal">
+				<p>
+仕様の方向性
+				</p> <p>
+このエラーは人間工学的に出現しやすい特徴がある。なぜなら、クロージャがどのトレイトを実装するかは、明示的に宣言されるわけではなく、その内容から自動的に判断される。この仕様は手軽な反面、条件反射的なコードリーディングを難しくする一面も持つ。
+				</p> 
+			</aside>
+		</section> <section>
+			<h1>パターン</h1>
+			<nav class="sub"/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle"><code>Fn</code> への不適合</div>
+				</hgroup>
+				<p>
+キャプチャした変数の編集があると、<code>Fn</code> に適合しなくなる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、クロージャがキャプチャ変数 <code>val</code> を編集している。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut val = 0;
+    let closure = <mark class="error">||</mark> { val += 1;};
+    callback(closure);
+}
+
+fn callback&lt;F: Fn()&gt;(f: F) {
+    f();
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0525]</mark><mark class="title">: expected a closure that implements the `Fn` trait, but this closure only implements `FnMut`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:19
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let closure = || { val += 1;};
+<mark class="info">  |</mark>                   <mark class="error">^^</mark>   <mark class="info">--- closure is `FnMut` because it mutates the variable `val` here</mark>
+<mark class="info">  |</mark>                   <mark class="error">|</mark>
+<mark class="info">  |</mark>                   <mark class="error">this closure implements `FnMut`, not `Fn`</mark>
+<mark class="info">4 |</mark>     callback(closure);
+<mark class="info">  |</mark>     <mark class="info">-------- ------- the requirement to implement `Fn` derives from here</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="info">required by a bound introduced by this call</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: required by a bound in `callback`
+<mark class="info"> --&gt;</mark> src\main.rs:7:16
+<mark class="info">  |</mark>
+<mark class="info">7 |</mark> fn callback&lt;F: Fn()&gt;(f: F) {
+<mark class="info">  |</mark>                <mark class="edit">^^^^ required by this bound in `callback`</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B1</h1>
+					<div class="subTitle"><code>Fn</code> と <code>FnMut</code> への不適合 (コピー不可能型のキャプチャ)</div>
+				</hgroup>
+				<p>
+<a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトを実装していない型をキャプチャすると、<code>Fn</code> と <code>FnMut</code> に適合しなくなる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、クロージャがコピーできない値 <code>dont_copy</code> をキャプチャしている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let dont_copy = DontCopy();
+    let closure = || { dbg!(dont_copy); };
+    callback(closure);
+}
+
+fn callback&lt;F: Fn()&gt;(f: F) {
+    f();
+}
+
+#[derive(Debug)]
+struct DontCopy();
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0525]</mark><mark class="title">: expected a closure that implements the `Fn` trait, but this closure only implements `FnOnce`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:19
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let closure = || { dbg!(dont_copy); };
+<mark class="info">  |</mark>                   <mark class="error">^^</mark>        <mark class="info">--------- closure is `FnOnce` because it moves the variable `dont_copy` out of its environment</mark>
+<mark class="info">  |</mark>                   <mark class="error">|</mark>
+<mark class="info">  |</mark>                   <mark class="error">this closure implements `FnOnce`, not `Fn`</mark>
+<mark class="info">4 |</mark>     callback(closure);
+<mark class="info">  |</mark>     <mark class="info">-------- ------- the requirement to implement `Fn` derives from here</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="info">required by a bound introduced by this call</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: required by a bound in `callback`
+<mark class="info"> --&gt;</mark> src\main.rs:7:16
+<mark class="info">  |</mark>
+<mark class="info">7 |</mark> fn callback&lt;F: Fn()&gt;(f: F) {
+<mark class="info">  |</mark>                <mark class="edit">^^^^ required by this bound in `callback`</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B1</h1>
+					<div class="subTitle"><code>Fn</code> と <code>FnMut</code> への不適合 (可変参照のキャプチャ)</div>
+				</hgroup>
+				<p>
+前のパターンの可変参照版 (可変参照も <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトを実装しない)。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、クロージャが可変参照 <code>val_mut</code> をキャプチャしている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut val = 42;
+    let val_mut = &amp;mut val;
+    let closure = <mark class="error">||</mark> { dbg!(val_mut); };
+    callback(closure);
+}
+
+fn callback&lt;F: FnMut()&gt;(mut f: F) {
+    f();
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0525]</mark><mark class="title">: expected a closure that implements the `FnMut` trait, but this closure only implements `FnOnce`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:19
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     let closure = || { dbg!(val_mut); };
+<mark class="info">  |</mark>                   <mark class="error">^^</mark>        <mark class="info">------- closure is `FnOnce` because it moves the variable `val_mut` out of its environment</mark>
+<mark class="info">  |</mark>                   <mark class="error">|</mark>
+<mark class="info">  |</mark>                   <mark class="error">this closure implements `FnOnce`, not `FnMut`</mark>
+<mark class="info">5 |</mark>     callback(closure);
+<mark class="info">  |</mark>     <mark class="info">-------- ------- the requirement to implement `FnMut` derives from here</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="info">required by a bound introduced by this call</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note:</mark> required by a bound in `callback`
+<mark class="info"> --&gt;</mark> src\main.rs:8:16
+<mark class="info">  |</mark>
+<mark class="info">8 |</mark> fn callback&lt;F: FnMut()&gt;(mut f: F) {
+<mark class="info">  |</mark>                <mark class="edit">^^^^^^^ required by this bound in `callback`</mark>
+</samp></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
