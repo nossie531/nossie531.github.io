@@ -80,96 +80,117 @@ fn callback&lt;F: Fn()&gt;(f: F) {
 				<hgroup>
 					<h1>パターン B1</h1>
 					<div class="subTitle">
-<code>Fn</code> と <code>FnMut</code> への不適合 (コピー不可能型のキャプチャ)
+<code>Fn</code> と <code>FnMut</code> への不適合 (キャプチャした変数のムーブ)
 					</div>
 				</hgroup>
 				<p>
-<a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトを実装していない型をキャプチャすると、<code>Fn</code> と <code>FnMut</code> に適合しなくなる。
+キャプチャした変数をムーブすると、<code>Fn</code> や <code>FnMut</code> に適合しなくなる。
 				</p>
 				<section>
+					<h2>備考</h2>
+					<p>
+ムーブはトレイト <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> を実装している型では発生しない。
+					</p> <p>
+そのため、同じようなコードでも、このエラーが発生するかはキャプチャ変数次第である。
+					</p>
+				</section> <section>
 					<h2>サンプル</h2>
 					<p>
-以下では、クロージャがコピーできない値 <code>dont_copy</code> をキャプチャしている。
+以下では、クロージャがキャプチャした変数 <code>val</code> をムーブしている。<br/>
 					</p>
 <pre><code class="language-rust">
 fn main() {
-    let dont_copy = DontCopy();
-    let closure = || { dbg!(dont_copy); };
+    let val = Val();
+	let closure = <mark class="error">||</mark> { move_arg(val); };
     callback(closure);
+}
+
+fn move_arg(arg: Val) {
+    _ = arg;
 }
 
 fn callback&lt;F: Fn()&gt;(f: F) {
     f();
 }
 
-#[derive(Debug)]
-struct DontCopy();
+struct Val();
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0525]</mark><mark class="title">: expected a closure that implements the `Fn` trait, but this closure only implements `FnOnce`</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:3:19
-<mark class="info">  |</mark>
-<mark class="info">3 |</mark>     let closure = || { dbg!(dont_copy); };
-<mark class="info">  |</mark>                   <mark class="error">^^</mark>        <mark class="info">--------- closure is `FnOnce` because it moves the variable `dont_copy` out of its environment</mark>
-<mark class="info">  |</mark>                   <mark class="error">|</mark>
-<mark class="info">  |</mark>                   <mark class="error">this closure implements `FnOnce`, not `Fn`</mark>
-<mark class="info">4 |</mark>     callback(closure);
-<mark class="info">  |</mark>     <mark class="info">-------- ------- the requirement to implement `Fn` derives from here</mark>
-<mark class="info">  |</mark>     <mark class="info">|</mark>
-<mark class="info">  |</mark>     <mark class="info">required by a bound introduced by this call</mark>
-<mark class="info">  |</mark>
+<mark class="error">error[E0525]</mark><mark class="title">: expected a closure that implements the `Fn` trait, but this closure only implements `FnOnce</mark>`
+<mark class="info">  --&gt;</mark> src\main.rs:3:19
+<mark class="info">   |</mark>
+<mark class="info">3  |</mark>     let closure = || { move_arg(val); };
+<mark class="info">   |</mark>                   <mark class="error">^^</mark>            <mark class="info">--- closure is `FnOnce` because it moves the variable `val` out of its environment</mark>
+<mark class="info">   |</mark>                   <mark class="error">|</mark>
+<mark class="info">   |</mark>                   <mark class="error">this closure implements `FnOnce`, not `Fn`</mark>
+<mark class="info">4  |</mark>     callback(closure);
+<mark class="info">   |</mark>     <mark class="info">-------- ------- the requirement to implement `Fn` derives from here</mark>
+<mark class="info">   |</mark>     <mark class="info">|</mark>
+<mark class="info">   |</mark>     <mark class="info">required by a bound introduced by this call</mark>
+<mark class="info">   |</mark>
 <mark class="edit">note</mark>: required by a bound in `callback`
-<mark class="info"> --&gt;</mark> src\main.rs:7:16
-<mark class="info">  |</mark>
-<mark class="info">7 |</mark> fn callback&lt;F: Fn()&gt;(f: F) {
-<mark class="info">  |</mark>                <mark class="edit">^^^^ required by this bound in `callback`</mark>
+<mark class="info">  --&gt;</mark> src\lib.rs:11:16
+<mark class="info">   |</mark>
+<mark class="info">11 |</mark> fn callback&lt;F: Fn()&gt;(f: F) {
+<mark class="info">   |</mark>                <mark class="edit">^^^^ required by this bound in `callback`</mark>
 </samp></pre>
 				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン B2</h1>
 					<div class="subTitle">
-<code>Fn</code> と <code>FnMut</code> への不適合 (可変参照のキャプチャ)
+<code>Fn</code> と <code>FnMut</code> への不適合 (可変参照のムーブ)
 					</div>
 				</hgroup>
 				<p>
-前のパターンの可変参照版 (可変参照も <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> トレイトを実装しない)。
+これは前のパターンの可変参照版である。
 				</p>
 				<section>
+					<h2>備考</h2>
+					<p>
+見落としがちだが、可変参照型もトレイト <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> を実装していない。
+					</p> <p>
+そのため、キャプチャした可変参照を他の関数などへ渡すとエラーになる。
+					</p>
+				</section> <section>
 					<h2>サンプル</h2>
 					<p>
-以下では、クロージャが可変参照 <code>val_mut</code> をキャプチャしている。
+以下では、クロージャが可変参照 <code>val_mut</code> をムーブしている。
 					</p>
 <pre><code class="language-rust">
 fn main() {
-    let mut val = 42;
+    let mut val = 0;
     let val_mut = &amp;mut val;
-    let closure = <mark class="error">||</mark> { dbg!(val_mut); };
+    let closure = <mark class="error">||</mark> { with_mut(val_mut); };
     callback(closure);
 }
 
-fn callback&lt;F: FnMut()&gt;(mut f: F) {
+fn with_mut(arg: &amp;mut i32) {
+    _ = arg;
+}
+
+fn callback&lt;F: Fn()&gt;(f: F) {
     f();
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0525]</mark><mark class="title">: expected a closure that implements the `FnMut` trait, but this closure only implements `FnOnce`</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:4:19
-<mark class="info">  |</mark>
-<mark class="info">4 |</mark>     let closure = || { dbg!(val_mut); };
-<mark class="info">  |</mark>                   <mark class="error">^^</mark>        <mark class="info">------- closure is `FnOnce` because it moves the variable `val_mut` out of its environment</mark>
-<mark class="info">  |</mark>                   <mark class="error">|</mark>
-<mark class="info">  |</mark>                   <mark class="error">this closure implements `FnOnce`, not `FnMut`</mark>
-<mark class="info">5 |</mark>     callback(closure);
-<mark class="info">  |</mark>     <mark class="info">-------- ------- the requirement to implement `FnMut` derives from here</mark>
-<mark class="info">  |</mark>     <mark class="info">|</mark>
-<mark class="info">  |</mark>     <mark class="info">required by a bound introduced by this call</mark>
-<mark class="info">  |</mark>
+<mark class="error">error[E0525]</mark><mark class="title">: expected a closure that implements the `Fn` trait, but this closure only implements `FnMut`</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:4:19
+<mark class="info">   |</mark>
+<mark class="info">4  |</mark>     let closure = || { with_mut(val_mut); };
+<mark class="info">   |</mark>                   <mark class="error">^^</mark>            <mark class="info">------- closure is `FnMut` because it mutates the variable `*val_mut` here</mark>
+<mark class="info">   |</mark>                   <mark class="error">|</mark>
+<mark class="info">   |</mark>                   <mark class="error">this closure implements `FnMut`, not `Fn`</mark>
+<mark class="info">5  |</mark>     callback(closure);
+<mark class="info">   |</mark>     <mark class="info">-------- ------- the requirement to implement `Fn` derives from here</mark>
+<mark class="info">   |</mark>     <mark class="info">|</mark>
+<mark class="info">   |</mark>     <mark class="info">required by a bound introduced by this call</mark>
+<mark class="info">   |</mark>
 <mark class="edit">note:</mark> required by a bound in `callback`
-<mark class="info"> --&gt;</mark> src\main.rs:8:16
-<mark class="info">  |</mark>
-<mark class="info">8 |</mark> fn callback&lt;F: FnMut()&gt;(mut f: F) {
-<mark class="info">  |</mark>                <mark class="edit">^^^^^^^ required by this bound in `callback`</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:12:16
+<mark class="info">   |</mark>
+<mark class="info">12 |</mark> fn callback&lt;F: Fn()&gt;(f: F) {
+<mark class="info">   |</mark>                <mark class="edit">^^^^ required by this bound in `callback`</mark>
 </samp></pre>
 				</section>
 			</section>
