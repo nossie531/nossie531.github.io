@@ -31,13 +31,13 @@ cite.info {
 
 blockquote {
 	margin: 0 calc(var(--gap) * -1);
-	padding: 0 calc(var(--gap) * 2);
+	padding: 0 calc(var(--gap) * 1);
 	border: thin dashed;
 	background: var(--light-color);
 
 	&::before, &::after {
 		content: "";
-		margin-top: calc(var(--gap) * 2);
+		margin-top: calc(var(--gap) * 1);
 		display: block;
 	}
 
@@ -74,7 +74,7 @@ blockquote {
 
 cite.info:not(.forPrint) {
 	float: right;
-	margin: 0.5ex 0.5em 0.5ex 1em;
+	margin: 0.5ex var(--gap) var(--gap) calc(var(--gap) * 2);
 
 	& > span.url {
 		display: none;
