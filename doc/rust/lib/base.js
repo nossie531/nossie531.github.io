@@ -11,17 +11,12 @@
 	class Base {
 		static #instance = null;
 
-		// このインスタンスを初期化。
-		static init() {
-			if (Base.#instance) {
-				throw new Error;
-			}
-
-			Base.#instance = new Base();
-			Base.#instance.#setupGoogleAnalytics();
+		static {
+			this.#instance = new Base();
+			this.#instance.#setupGoogleAnalytics();
 			document.addEventListener("DOMContentLoaded", () => {
-				Base.#instance.#setupCodes();
-				Base.#instance.#setupIframes();
+				this.#instance.#setupCodes();
+				this.#instance.#setupIframes();
 			});
 		}
 		
@@ -120,7 +115,5 @@
 			env.element.parentElement.removeAttribute("tabindex");
 		});
 	}
-
-	Base.init();
 }
 
