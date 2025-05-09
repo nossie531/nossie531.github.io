@@ -9,13 +9,13 @@
  * font-face からフォントを導入する。*/
 @font-face {
 	font-family: ja-sans-serif;
-	src: local('Meiryo');
+	src: local("Meiryo");
 }
 
 @font-face {
 	font-family: ja-sans-serif;
 	font-weight:bold;
-	src: local('Meiryo Bold');
+	src: local("Meiryo Bold");
 }
 
 :root {
@@ -23,7 +23,8 @@
 	--base-font: "ja-sans-serif", sans-serif;
 }
 
-:root:lang(ja) {
+:root:lang(ja),
+:host > *:lang(ja) {
 	font-family: "ja-sans-serif", sans-serif;
 	text-justify: inter-character;
 	/* 日本語は欧文より縦方向に密なため行間を空ける。*/
