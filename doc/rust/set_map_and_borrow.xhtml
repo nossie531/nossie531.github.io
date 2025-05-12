@@ -63,14 +63,15 @@ where
 				<p>
 検索引数の型 <code>&amp;Q</code> と検索対象の型 <code>K</code> について。<code>Q</code> は <code>K</code> から <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> を通して借用でき、かつ <code>K</code> と同じく <code>Ord</code> が必要。そして、<code>Q</code> を <code>K</code> から得る過程で、<code>Ord</code> による順序関係は変化してはならない (以下は rustdoc からの引用)。
 				</p>
-				<blockquote
-					class="normal"
-					cite="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html#method.get"
-					style="font-family: serif;">
-					<p>
+				<doc-quote>
+					<blockquote cite="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html#method.get" style="font-family: serif;">
+						<hr class="omit"/>
+						<p>
 The key may be any borrowed form of the map’s key type, but the ordering on the borrowed form must match the ordering on the key type.
-					</p>
-				</blockquote>
+						</p>
+						<hr class="omit"/>
+					</blockquote>
+				</doc-quote>
 			</section> <section>
 				<h1>
 <code><a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html">HashMap</a>::<a href="https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html#method.get">get</a></code>
@@ -100,14 +101,15 @@ where
 				<p>
 検索引数の型 <code>&amp;Q</code> と検索対象の型 <code>K</code> について。<code>Q</code> は <code>K</code> から <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> を通して借用でき、かつ <code>K</code> と同じく <code>Eq + Hash</code> が必要。そして、<code>Q</code> を <code>K</code> から得る過程で、<code>Eq</code> による同値関係と、<code>Hash</code> が生成する値は変化してはならない (以下は rustdoc からの引用)。
 				</p>
-				<blockquote
-					class="normal"
-					cite="https://doc.rust-lang.org/std/collections/struct.HashMap.html#method.get"
-					style="font-family: serif;">
-					<p>
+				<doc-quote>
+					<blockquote cite="https://doc.rust-lang.org/std/collections/struct.HashMap.html#method.get" style="font-family: serif;">
+						<hr class="omit"/>
+						<p>
 The key may be any borrowed form of the map’s key type, but <a href="../hash/trait.Hash.html" title="trait std::hash::Hash"><code>Hash</code></a> and <a href="../cmp/trait.Eq.html" title="trait std::cmp::Eq"><code>Eq</code></a> on the borrowed form <em>must</em> match those for the key type.
-					</p>
-				</blockquote>
+						</p>
+						<hr class="omit"/>
+					</blockquote>
+				</doc-quote>
 			</section>
 		</section> <section>
 			<h1>サンプル</h1>

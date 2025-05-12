@@ -12,7 +12,6 @@
 	ui,
 	util,
 	import_nav,
-	import_quote,
 	import_prism,
 	import_font_math,
 	custom_nav,
@@ -21,7 +20,6 @@
 @import url("import/color.css") layer(import_color);
 @import url("import/size.css") layer(import_size);
 @import url("import/lang.css") layer(import_lang);
-@import url("import/quote.css") layer(import_quote);
 @import url("import/prism.css") layer(import_prism);
 @import url("import/font_math.css") layer(import_font_math);
 @import url("../lib/nav/nav.css") layer(import_nav);
