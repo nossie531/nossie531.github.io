@@ -4,10 +4,14 @@
 	<head>
 		<title>blockquote</title>
 		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../base.css"/>
 	</head>
 	<body>
-		<blockquote cite="https://doc.rust-lang.org/std/convert/trait.From.html#when-to-implement-from">
-			<hr class="omit"/>
+		<blockquote data-time="2025-03-31" cite="https://doc.rust-lang.org/std/convert/trait.From.html#when-to-implement-from">
+			<h2 id="when-to-implement-from">
+<a class="doc-anchor" href="#when-to-implement-from">§</a>
+<code>From</code> を実装すべき状況
+			</h2>
 			<p>
 <code>From</code> の実装を使って行える変換に技術的制約はないが、一般的な期待としては変換はおおむね以下のように制限される。
 			</p>
@@ -18,11 +22,11 @@
 					</p>
 				</li> <li>
 					<p>
-変換は<em>情報を欠落させない</em> : 意味論として、情報を失ったり破棄したりすべきでない。例えば、<code>i32: From&lt;u16&gt;</code> では、元の値は <code>u16: TryFrom&lt;i32&gt;</code> を使って復元できる。また、<code>String: From&lt;&amp;str&gt;</code> では、元の値と同等のものが <code>Deref</code> 経由で取得できる。しかし、<code>From</code> は <code>u32</code> から <code>u16</code> への変換には使えない、なぜならこれは情報の欠落なしには成しえない。(ここで意味論に関係のない情報については余地がある。例えば、<code>Box&lt;[T]&gt;: From&lt;Vec&lt;T&gt;&gt;</code> では、容量が違っても二つのベクターが等しくなりうるように、容量を維持しないかもしれない。)
+変換は<em>無損失である</em> : 意味論として、情報を失ったり破棄したりすべきでない。例えば、<code>i32: From&lt;u16&gt;</code> があり、そこでは元の値は <code>u16: TryFrom&lt;i32&gt;</code> を使って復元できる。また、<code>String: From&lt;&amp;str&gt;</code> があり、そこでは元の値と同等のものが <code>Deref</code> 経由で取得できる。しかし、<code>From</code> は <code>u32</code> から <code>u16</code> への変換には使えない、なぜならこれは無損失な方法では達成できない。(ここで意味論に関係ない情報については余地がある。例えば、<code>Box&lt;[T]&gt;: From&lt;Vec&lt;T&gt;&gt;</code> では、容量が違っても二つのベクターが等しくなりうるように、容量を維持しないかもしれない。)
 					</p>
 				</li> <li>
 					<p>
-変換は<em>値を維持する</em> : Rust の型と技術的表現が異なっても、概念的な種類と結果値の意味は同じになる。例えば、<code>as</code> でキャストを戻せば元の値を復元できるため、<code>-1_i8 as u8</code> は<em>情報を欠落させない</em>が、<code>-1</code> と <code>255</code> は概念的に異なる値であるため (技術的には同じビットパターンだが) その変換は <code>From</code> を通しては<em>利用できない</em>。ただし <code>f32: From&lt;i16&gt;</code> は <code>1_i16</code> と <code>1.0_f32</code> は概念的に同じ実数であるため (技術的には全く異なるビットパターンだが) <em>利用できる</em>。<code>String: From&lt;char&gt;</code> はどちらも<em>テキスト</em>なので利用できるが、<code>String: From&lt;u32&gt;</code> は <code>1</code> (数) と <code>"1"</code> (テキスト) があまりに異なるために<em>利用できない</em>。(値のテキストへの変換は代わりに <a href="../fmt/trait.Display.html" title="trait std::fmt::Display"><code>Display</code></a> トレイトによりカバーされる。)
+変換は<em>値を維持する</em> : Rust の型や技術的表現が異なっても、概念的な種類と結果値の意味は同じになる。例えば、<code>as</code> でキャストを戻せば元の値を復元できるため、<code>-1_i8 as u8</code> は<em>無損失</em>だが、<code>-1</code> と <code>255</code> は概念的に異なる値なため (技術的には同じビットパターンだが) その変換は <code>From</code> を通しては利用でき<em>ない</em>。ただし <code>f32: From&lt;i16&gt;</code> は <code>1_i16</code> と <code>1.0_f32</code> は概念的に同じ実数なため (技術的には完全に異なるビットパターンだが) 利用<em>できる</em>。<code>String: From&lt;char&gt;</code> はどちらもが<em>テキスト</em>なので利用できるが、<code>String: From&lt;u32&gt;</code> は <code>1</code> (数) と <code>"1"</code> (テキスト) があまりに異なるため利用でき<em>ない</em>。(値のテキストへの変換は代わりに <a href="../fmt/trait.Display.html" title="trait std::fmt::Display"><code>Display</code></a> トレイトによりカバーされる。)
 					</p>
 				</li> <li>
 					<p>

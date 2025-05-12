@@ -7,12 +7,14 @@
 		<script src="../../../../lib/prism_shadow.js"></script>
 	</head>
 	<body>
-		<blockquote cite="https://doc.rust-lang.org/reference/crates-and-source-files.html#main-functions">
+		<blockquote data-time="2025-04-15" cite="https://doc.rust-lang.org/reference/crates-and-source-files.html#main-functions">
 			<h2 id="main-functions">
 <a class="header" href="#main-functions">メイン関数</a>
 			</h2>
 			<p>
-<code>main</code> <a href="items/functions.html">関数</a> を含むクレートは実行可能ファイルにコンパイルできる。<code>main</code> 関数があれば、それは引数をとってはならず、いかなる<a href="trait-bounds.html">トレイトやライフタイムの境界</a>も宣言してはならず、いかなる <a href="items/generics.html#where-clauses">where 句</a> も所持してはならず、また <a href="../std/process/trait.Termination.html"><code>Termination</code></a> トレイトを実装する型を戻さなければならない。
+<code>main</code> <a href="items/functions.html">関数</a> を含むクレートは実行可能ファイルにコンパイルできる。
+			</p> <p>
+もし <code>main</code> 関数があれば、それは引数をとってはならず、いかなる<a href="trait-bounds.html">トレイトやライフタイムの境界</a>も宣言してはならず、いかなる <a href="items/generics.html#where-clauses">where 句</a> も所持してはならず、また <a href="../std/process/trait.Termination.html"><code>Termination</code></a> トレイトを実装する型を戻さなければならない。
 			</p>
 <pre><code class="language-rust">fn main() {}</code></pre>
 <pre><code class="language-rust">fn main() -&gt; ! {

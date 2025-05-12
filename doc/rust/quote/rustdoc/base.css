@@ -1,3 +1,8 @@
 @charset "utf-8";
 
+/* 以下は原文と近くなるよう調整。*/
 ol, ul { padding-left: 1.5rem; }
+
+/* 以下は原文からの変更部分。*/ 
+a.doc-anchor { display: none; }
+

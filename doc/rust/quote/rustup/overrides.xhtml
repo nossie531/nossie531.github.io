@@ -7,7 +7,7 @@
 		<script src="../../../../lib/prism_shadow.js"></script>
 	</head>
 	<body>
-		<blockquote cite="https://rust-lang.github.io/rustup/overrides.html">
+		<blockquote data-time="2024-11-13" cite="https://rust-lang.github.io/rustup/overrides.html">
 			<h1 id="overrides">
 				<a class="header" href="#overrides">上書き</a>
 			</h1>
@@ -30,7 +30,7 @@
 			<p>
 ツールチェーンは上記で示した順で選ばれ、最初に指定されたものが使われる。ただし、例外が一点: ディレクトリの上書と <code class="hljs">rust-toolchain.toml</code> ファイルではカレントディレクトリとの近さも優先される。つまり、これらの二つの上書の方式はディレクトリツリーをファイルシステムのルートに向かって上向きに歩いて発見されるので、カレントディレクトリに近い <code class="hljs">rust-toolchain.toml</code> ファイルはより遠くのディレクトリの上書よりも優先される。
 			</p> <p>
-どのツールチェーンがアクティブであるかの確認には、<code class="hljs">rustup show</code> が使用でき、それはもし現在のツールチェーンが上記のルールに従ってインストールされていない場合、対象のインストールも試行する。(問題 <a href="https://github.com/rust-lang/rustup/issues/1397">#1397</a> で詳しく説明されるように、この動作は変更される可能性があることに注意。)
+どのツールチェーンがアクティブであるかの確認には、<code class="hljs">rustup show</code> が使用できる。
 			</p>
 		</blockquote>
 	</body>
