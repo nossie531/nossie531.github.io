@@ -30,4 +30,9 @@ samp.console-rustc {
 		color: hsla(156, 70%, 40%, 0.8);
 		background-color: transparent;
 	}
+
+	& a {
+		color: inherit;
+		text-decoration: underline;
+	}
 }

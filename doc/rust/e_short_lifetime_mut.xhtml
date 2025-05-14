@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: error - ライフタイムの不足と可変参照</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Doc.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
+</samp></pre>
+		<p>
+『<a href="e_short_lifetime.xhtml">error - ライフタイムの不足</a>』の可変参照についての派生パターン。
+		</p>
+		<section>
+			<h1>背景情報</h1>
+			<p>
+不変参照でのみ被参照型のサブタイプが波及し、可変参照にこの効果はない。
+			</p>
+			<section>
+				<h2>不変参照の場合 (共変)</h2>
+				<p>
+型 <code>S</code> が型 <code>T</code> のサブタイプなら、<code>&amp;S</code> は <code>&amp;T</code> をサブタイプになる。
+				</p> <p>
+なぜなら、<code>&amp;T</code> からは <code>T</code> を取得できればよいが、<code>&amp;S</code> はこれを満足できる。
+				</p>
+			</section> <section>
+				<h2>可変参照の場合 (不変)</h2>
+				<p>
+型 <code>S</code> が型 <code>T</code> のサブタイプでも、<code>&amp;mut S</code> と <code>&amp;mut T</code> は互いに互いのサブタイプにならない。
+				</p> <p>
+なぜなら、<code>&amp;mut T</code> には <code>T</code> を設定できなければならないが、<code>&amp;mut S</code> はこれを満足できない。また、<code>&amp;mut S</code> は <code>S</code> を取得できなければならないが、<code>&amp;mut T</code> はこれを満足できない。
+				</p>
+			</section>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>Ref&lt;'static&gt;</code> は <code>Ref&lt;'a&gt;</code> のサブタイプであるが、<code>&amp;'a mut Ref&lt;'static&gt;</code> は <code>&amp;'a mut Ref&lt;'a&gt;</code> のサブタイプではない。そのため、前者の値を後者の値として戻している箇所でエラーになる。
+			</p>
+<pre><code class="language-rust">
+fn func&lt;'a&gt;(arg: &amp;'a mut Ref&lt;'static&gt;) -&gt; &amp;'a mut Ref&lt;'a&gt; {
+    <mark class="error">arg</mark>
+}
+
+struct Ref&lt;'a&gt;(&amp;'a i32);
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">1 |</mark> fn func&lt;'a&gt;(arg: &amp;'a mut Ref&lt;'static&gt;) -&gt; &amp;'a mut Ref&lt;'a&gt; {
+<mark class="info">  |</mark>         <mark class="info">-- lifetime `'a` defined here</mark>
+<mark class="info">2 |</mark>     arg
+<mark class="info">  |</mark>     <mark class="error">^^^ returning this value requires that `'a` must outlive `'static`</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: requirement occurs because of a mutable reference to `Ref&lt;'_&gt;`
+<mark class="info">  =</mark> <mark class="title">note</mark>: mutable references are invariant over their type parameter
+<mark class="info">  =</mark> <mark class="title">help</mark>: see &lt;<a href="https://doc.rust-lang.org/nomicon/subtyping.html">https://doc.rust-lang.org/nomicon/subtyping.html</a>&gt; for more information about variance
+</samp></pre>
+		</section>
+	</body>
+</html>
