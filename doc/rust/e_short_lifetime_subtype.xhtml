@@ -20,12 +20,12 @@
 		<section>
 			<h1>背景情報</h1>
 			<p>
-不変参照でのみ被参照型のサブタイプが波及し、可変参照にこの効果はない。
+不変参照は被参照型のサブタイプが波及するが、可変参照にこの効果はない。
 			</p>
 			<section>
 				<h2>不変参照の場合 (共変)</h2>
 				<p>
-型 <code>S</code> が型 <code>T</code> のサブタイプなら、<code>&amp;S</code> は <code>&amp;T</code> をサブタイプになる。
+型 <code>S</code> が型 <code>T</code> のサブタイプなら、<code>&amp;S</code> は <code>&amp;T</code> のサブタイプになる。
 				</p> <p>
 なぜなら、<code>&amp;T</code> からは <code>T</code> を取得できればよいが、<code>&amp;S</code> はこれを満足できる。
 				</p>
