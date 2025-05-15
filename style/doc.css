@@ -9,6 +9,7 @@
 	normal,
 	semantic,
 	code_block,
+	figures,
 	ui,
 	util,
 	import_nav,
@@ -35,11 +36,17 @@
 	}
 
 	:root > body {
-		margin: 0 auto;
-		padding: 2rem 0 6rem;
 		min-width: 20rem;
 		max-width: 46rem;
 		min-height: calc(100% - 8rem);
+		margin: 0 auto;
+		border-left: thin solid transparent;
+		border-right: thin solid transparent;
+		padding-top: 2rem;
+		padding-bottom: 6rem;
+		/* 左右パディングは画面サイズに応じて縮小。*/
+		padding-left: clamp(0px, calc((100% - 46rem) / 2), 4rem);
+		padding-right: clamp(0px, calc((100% - 46rem) / 2), 4rem);
 	}
 
 	@media print {
@@ -53,16 +60,25 @@
 		}
 	}
 
+	@media screen {
+		:root {
+			transition: background-color 1s;
+		}
+
+		:root > body {
+			transition: border-color 1s, background-color 1s, box-shadow 1s;
+		}
+	}
+
 	@media screen and (width > 56rem) {
 		:root {
 			background-color: var(--ob-color);
 		}
 
 		:root > body {
-			padding-left: 4rem;
-			padding-right: 4rem;
-			box-shadow: 0 0 0.5em hsla(0, 0%, 0%, 0.5);
 			background-color: var(--bg-color);
+			border-color: color-mix(in srgb, var(--edge-color), var(--bg-color) 25%);
+			box-shadow: 0 0 1px 0.25rem rgba(0, 0, 0, 0.025);
 		}
 	}
 }
@@ -239,19 +255,6 @@
 			background-image: url("img/unhappy.svg");
 			filter: saturate(30%);
 		}
-
-		@media screen and (prefers-color-scheme: dark) {
-			aside.normal {
-				&::before { 
-					background-image: url("img/book_dark.svg");
-				}
-
-				&.moan::before {
-					background-image: url("img/unhappy.svg");
-					filter: saturate(20%) brightness(85%);
-				}
-			}
-		}
 	}
 
 	table.normal {
@@ -271,44 +274,56 @@
 		}
 	}
 
-	@layer figure {
-		figure.normal {
-			margin: 1rem 0;
-			text-align: center;
-		}
+	figure.normal {
+		margin: 1rem 0;
+		text-align: center;
 
-		figure.normal > iframe {
+		& > iframe {
 			border: thin dashed hsla(0, 0%, 0%, 0.25);
 			vertical-align: bottom;
 		}
 
-		figure.normal > figcaption {
+		& > figcaption {
 			margin-top: 0.5em;
 		}
 
-		figure.normal > figcaption::before {
+		& > figcaption::before {
 			content: "[";
 		}
 
-		figure.normal > figcaption::after {
+		& > figcaption::after {
 			content: "]";
 		}
 
-		figure.normal > iframe {
+		& > iframe {
 			box-sizing: border-box;
 			max-width: 100%;
 		}
+	}
 
-		@media screen and (prefers-color-scheme: dark) {
-			figure.normal > iframe {
-				/* 背景色の輝度をライトモードと同程度に設定。*/
-				background-color: hsl(0, 0%, 90%);
-				/* 背景色の急激な輝度変化を緩和する設定。*/
-				filter: brightness(0.85);
-				/* 枠線のスタイルを周囲に馴染むよう設定。*/
-				border: thin solid hsl(0, 0%, 50%);
-				border-radius: 0.3rem;
+
+	@media screen and (prefers-color-scheme: dark) {
+		aside.normal {
+			&::before { 
+				background-image: url("img/book_dark.svg");
 			}
+
+			&.moan::before {
+				background-image: url("img/unhappy.svg");
+				filter: saturate(20%) brightness(85%);
+			}
+		}
+	}
+
+	@media screen and (prefers-color-scheme: dark) {
+		figure.normal > iframe {
+			/* 背景色の輝度をライトモードと同程度に設定。*/
+			background-color: hsl(0, 0%, 90%);
+			/* 背景色の急激な輝度変化を緩和する設定。*/
+			filter: brightness(0.85);
+			/* 枠線のスタイルを周囲に馴染むよう設定。*/
+			border: thin solid hsl(0, 0%, 50%);
+			border-radius: 0.3rem;
 		}
 	}
 }
@@ -412,6 +427,14 @@
 		border-style: dashed none none;
 		border-width: thin;
 		margin: 1rem 0;
+	}
+
+	@media screen {
+		section:has(> h1) section:has(> h1),
+		section:has(hgroup > h1) section:has(> h1),
+		section:has(hgroup > h1) section:has(hgroup > h1) {
+			transition: margin-left 1s, margin-right 1s;
+		}
 	}
 
 	@media all and (width > 56rem) {
