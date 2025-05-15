@@ -32,7 +32,6 @@
 		height: 100%;
 		padding: 0 0.5rem;
 		color: var(--fg-color);
-		background-color: var(--bg-color);
 	}
 
 	:root > body {
@@ -40,13 +39,15 @@
 		max-width: 46rem;
 		min-height: calc(100% - 8rem);
 		margin: 0 auto;
-		border-left: thin solid transparent;
-		border-right: thin solid transparent;
 		padding-top: 2rem;
 		padding-bottom: 6rem;
 		/* 左右パディングは画面サイズに応じて縮小。*/
 		padding-left: clamp(0px, calc((100% - 46rem) / 2), 4rem);
 		padding-right: clamp(0px, calc((100% - 46rem) / 2), 4rem);
+		/* 枠線は必要時のみ表示。*/
+		border-style: none;
+		border-width: thin;
+		border-color: color-mix(in srgb, var(--edge-color), var(--bg-color) 25%);
 	}
 
 	@media print {
@@ -62,11 +63,14 @@
 
 	@media screen {
 		:root {
+			background-color: var(--bg-color);
 			transition: background-color 1s;
 		}
 
 		:root > body {
-			transition: border-color 1s, background-color 1s, box-shadow 1s;
+			background-color: var(--bg-color);
+			box-shadow: 0 0 1px 0.25rem transparent;
+			transition: box-shadow 1s linear;
 		}
 	}
 
@@ -77,7 +81,8 @@
 
 		:root > body {
 			background-color: var(--bg-color);
-			border-color: color-mix(in srgb, var(--edge-color), var(--bg-color) 25%);
+			border-left-style: solid;
+			border-right-style: solid;
 			box-shadow: 0 0 1px 0.25rem rgba(0, 0, 0, 0.025);
 		}
 	}
