@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: E0521 - 関数系処理からの参照引数の流出</title>
+		<title>Rust メモ: E0521 - 参照引数の流出</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -50,8 +50,8 @@ fn f(arg: &amp;i32) {
     <mark class="error">use_static(arg)</mark>;
 }
 
-fn use_static(_: &amp;'static i32) {
-    /* ... */
+fn use_static(target: &amp;'static i32) {
+    _ = target;
 }
 </code></pre>
 <pre><samp class="console-rustc">
@@ -81,8 +81,8 @@ fn f(arg: &amp;Box&lt;i32&gt;) {
     use_static(arg.as_ref());
 }
 
-fn use_static(_: &amp;'static i32) {
-    /* ... */
+fn use_static(target: &amp;'static i32) {
+    _ = target;
 }
 </code></pre>
 <pre><samp class="console-rustc">
@@ -114,8 +114,8 @@ fn f(arg: &amp;i32) {
     <mark class="error">use_any(arg)</mark>;
 }
 
-fn use_any&lt;T: Any&gt;(_: T) {
-    /* ... */
+fn use_any&lt;T: Any&gt;(any: T) {
+    _ = any;
 }
 </code></pre>
 <pre><samp class="console-rustc">
