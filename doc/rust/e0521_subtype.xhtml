@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0521 - 参照引数の流出 × サブタイプ</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Doc.insertTitle();</script></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of function</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of method</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of closure</mark>
+</samp></pre>
+		<p>
+『<a href="e0521.xhtml">E0521 - 参照引数の流出</a>』にサブタイプが関連する派生パターン。
+		</p>
+		<section>
+			<h1>原因</h1>
+			<p>
+可変参照には被参照型のサブタイプが波及しない。そのため、クロージャのライフタイム制約 (キャプチャ変数のライフタイム) が他のクロージャのそれと包含関係にあっても、それらの可変参照型どうしは互いに互換性がない。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>inc</code> の型は <code>&amp;'v mut FnMut() + 'v</code> である。<br/>
+しかし、関数 <code>callback</code> には <code>&amp;'v mut FnMuyt + 'static</code> などが必要になる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    exec(&amp;mut 0);
+}
+
+fn exec&lt;'v&gt;(val: &amp;'v mut i32) {
+    let mut inc = || *val += 1;
+    <mark class="error">callback(&amp;mut inc)</mark>;
+}
+
+fn callback(f: &amp;mut (dyn FnMut() + 'static)) {
+    f();
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of function</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:7:5
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> fn exec&lt;'v&gt;(val: &amp;'v mut i32) {
+<mark class="info">  |</mark>         <mark class="info">--  --- `val` is a reference that is only valid in the function body</mark>
+<mark class="info">  |</mark>         <mark class="info">|</mark>
+<mark class="info">  |</mark>         <mark class="info">lifetime `'v` defined here</mark>
+<mark class="info">6 |</mark>     let mut inc = || *val += 1;
+<mark class="info">7 |</mark>     callback(&amp;mut inc);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>     <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="error">`val` escapes the function body here</mark>
+<mark class="info">  |</mark>     <mark class="error">argument requires that `'v` must outlive `'static`</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: requirement occurs because of a mutable reference to `(dyn FnMut() + 'static)`
+<mark class="info">  =</mark> <mark class="title">note</mark>: mutable references are invariant over their type parameter
+<mark class="info">  =</mark> <mark class="title">help</mark>: see &lt;<a href="https://doc.rust-lang.org/nomicon/subtyping.html">https://doc.rust-lang.org/nomicon/subtyping.html</a>&gt; for more information about variance
+</samp></pre>
+		</section> <section>
+			<hgroup>
+				<h1>補足</h1>
+				<div class="subTitle">
+					<code>'static</code> ライフタイムの省略
+				</div>
+			</hgroup>
+			<p>
+省略された <code>'static</code> がエラーに関係するパターンもある。
+			</p> <p>
+以下では、<code>type Action = dyn FnMut();</code> は <code>type Action = dyn FnMut() + 'static;</code> と等価になるため、前のコードと同様のコンパイルエラーになる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    exec(&amp;mut 0);
+}
+
+fn exec&lt;'v&gt;(val: &amp;'v mut i32) {
+    let mut inc = || *val += 1;
+    <mark class="error">callback(&amp;mut inc)</mark>;
+}
+
+fn callback(f: &amp;mut Action) {
+    f();
+}
+
+type Action = dyn FnMut();
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0521]</mark><mark class="title">: borrowed data escapes outside of function</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:7:5
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> fn exec&lt;'v&gt;(val: &amp;'v mut i32) {
+<mark class="info">  |</mark>         <mark class="info">--  --- `val` is a reference that is only valid in the function body</mark>
+<mark class="info">  |</mark>         <mark class="info">|</mark>
+<mark class="info">  |</mark>         <mark class="info">lifetime `'v` defined here</mark>
+<mark class="info">6 |</mark>     let mut inc = || *val += 1;
+<mark class="info">7 |</mark>     callback(&amp;mut inc);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>     <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="error">`val` escapes the function body here</mark>
+<mark class="info">  |</mark>     <mark class="error">argument requires that `'v` must outlive `'static`</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: requirement occurs because of a mutable reference to `(dyn FnMut() + 'static)`
+<mark class="info">  =</mark> <mark class="title">note</mark>: mutable references are invariant over their type parameter
+<mark class="info">  =</mark> <mark class="title">help</mark>: see &lt;<a href="https://doc.rust-lang.org/nomicon/subtyping.html">https://doc.rust-lang.org/nomicon/subtyping.html</a>&gt; for more information about variance
+</samp></pre>
+		</section>
+	</body>
+</html>

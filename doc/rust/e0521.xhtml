@@ -28,7 +28,7 @@
 (クロージャ版には<a href="#closureVer">後述</a>の特殊事情あり。)
 		</p>
 		<section>
-			<h1>エラーの概要</h1>
+			<h1>原因</h1>
 			<p>
 このエラーは参照型の引数の扱いを間違えると発生する。
 			</p> <p>
@@ -177,6 +177,14 @@ Rust 以外の多くの言語では、型推論はただの糖衣構文である
 						</p>
 					</aside>
 				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="closureVer">パターン E</h1>
+					<div class="subTitle">サブタイプが関連</div>
+				</hgroup>
+				<p>
+サブタイプが関連。詳しくは『<a href="e0521_subtype.xhtml">参照引数の流出 × サブタイプ</a>』を参照。
+				</p>
 			</section>
 		</section>
 	</body>
