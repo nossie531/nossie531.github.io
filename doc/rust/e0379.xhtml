@@ -36,13 +36,14 @@
 					<p>
 <a href="https://doc.rust-lang.org/std/ops/trait.Add.html"><code>Add</code></a> などの四則演算トレイトが使えない。
 					</p> <p>
-これにより、複素数型のような Rust 標準にない型の定数が計算しにくくなる。
+これにより、Rust 標準にない複素数型のような型の計算がしにくくなる。
 					</p>
 				</li> <li>
 					<p>
 <a href="https://doc.rust-lang.org/std/iter/trait.IntoIterator.html"><code>IntoIterator</code></a> などのトレイトが使えない。
 					</p> <p>
-これにより、for ループ構文までもが使えなくなる (詳しくは <a href="e0658.xhtml">E0658</a> を参照)。
+これにより、for ループ構文が機能しなくなる。<br/>
+詳しくは､『<a href="e0658_const_for.xhtml">E0658 - const 文脈での for ループ</a>』を参照。
 					</p>
 				</li>
 			</ul>
