@@ -256,6 +256,10 @@
 			content: none;
 		}
 
+		&.old::before {
+			background-image: url("img/floppy.svg");
+		}
+
 		&.moan::before {
 			background-image: url("img/unhappy.svg");
 			filter: saturate(30%);

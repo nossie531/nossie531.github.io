@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: dyn 型のアップキャスト</title>
+		<title>Rust メモ: E0658 - dyn 型のアップキャスト</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -12,21 +12,19 @@
 			<h1><script>Doc.insertTitle();</script></h1>
 		</header>
 		<p>
-<code>dyn</code> 型 (動的型) のアップキャストについて。
+<code>dyn</code> 型をアップキャストするとエラーになる。
 		</p> 
-		<aside class="normal">
+		<aside class="normal old">
 			<p>
-このメモの背景。
+この記事はもう古い。
 			</p> <p>
-<time>2023 年現在</time>、動的型から動的型へのアップキャストが面倒。
-			</p> <p>
-将来は <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/trait-upcasting.html">trait_upcasting</a> で解決されるかもしれない。
+Rust 1.86.0 (<time>2025-04-03</time>) より <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/trait-upcasting.html">trait_upcasting</a> が正式採用された。
 			</p>
 		</aside>
 		<section>
-			<h1>失敗例</h1>
+			<h1>サンプル</h1>
 			<p>
-動的型から動的型へのキャストはエラーになる。
+以下では、<code>dyn</code> 型から <code>dyn</code> 型へのキャストでエラーになっている。
 			</p>
 <pre><code class="language-rust">
 fn main() {
@@ -53,7 +51,7 @@ impl&lt;T: BaseTrait&gt; SomeTrait for T {}
 <mark class="info">3 |</mark>     let _base = some as &amp;dyn BaseTrait;
 <mark class="info">  |</mark>                 <mark class="error">^^^^</mark>
 <mark class="info">  |</mark>
-<mark class="info">  =</mark> <mark class="title">note</mark>: see issue #65991 &lt;https://github.com/rust-lang/rust/issues/65991&gt; for more information
+<mark class="info">  =</mark> <mark class="title">note</mark>: see issue #65991 &lt;<a href="https://github.com/rust-lang/rust/issues/65991">https://github.com/rust-lang/rust/issues/65991</a>&gt; for more information
 <mark class="info">  =</mark> <mark class="title">note</mark>: required when coercing `&amp;dyn SomeTrait` into `&amp;dyn BaseTrait`
 </samp></pre>
 		</section> <section>

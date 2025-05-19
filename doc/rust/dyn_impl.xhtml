@@ -28,7 +28,7 @@
 			</section> <section>
 				<h2>サンプル</h2>
 				<p>
-以下では、<code>dyn Animal</code> を <code>Dog</code> にダウンキャストしている。なお、ダウンキャスト用のメソッドは <code>dyn Any</code> にあるため、いったん <code>dyn Animal</code> から <code>dyn Any</code> へアップキャストしている (参考:『<a href="dyn_upcast.xhtml"><code>dyn</code> 型のアップキャスト</a>』)。
+以下では、<code>dyn Animal</code> を <code>Dog</code> にダウンキャストしている。
 				</p>
 <pre><code class="language-rust">
 use std::any::Any;
@@ -41,13 +41,11 @@ fn main() {
 
 // -- Animal -- //
 
-trait Animal: Any {
-    fn upcast(&amp;self) -&gt; &amp;dyn Any;
-}
+trait Animal: Any {}
 
 impl dyn Animal {
     fn downcast&lt;T: Animal&gt;(&amp;self) -&gt; &amp;T {
-        self.upcast().downcast_ref().unwrap()
+        (self as &amp;dyn Any).downcast_ref().unwrap()
     }
 }
 
@@ -55,15 +53,11 @@ impl dyn Animal {
 
 struct Dog {}
 
+impl Animal for Dog {}
+
 impl Dog {
     fn trick(&amp;self) {
         println!("Bow!");
-    }
-}
-
-impl Animal for Dog {
-    fn upcast(&amp;self) -&gt; &amp;dyn Any {
-        self
     }
 }
 </code></pre>
