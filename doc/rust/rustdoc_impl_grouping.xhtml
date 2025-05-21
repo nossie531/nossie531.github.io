@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: rustdoc での関連関数のグループ分け</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><script>Doc.insertTitle();</script></h1>
+		</header>
+		<p>
+rustdoc で関連関数をグループ分けする方法について。
+		</p>
+		<section>
+			<h1>背景情報</h1>
+			<p>
+複数の関連関数を書く場合、一つの <code>impl</code> ブロックにまとめず、複数の <code>impl</code> ブロックに分けて書けば、関連関数をグループ分けできる。これにより、関連関数が沢山あっても目的のものを探しやすくなる。
+			</p> <p>
+そして、<code>impl</code> ブロックにはドキュメントコメントも付加できる。
+			</p> <p>
+そのため、このグループ分けを rustdoc にも反映できる。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+<pre><code class="language-rust">
+/// My original type.
+/// 
+/// This type has two group methods.
+/// 
+/// * [Group A](#group-a-methods)
+/// * [Group B](#group-b-methods)
+pub struct MyType();
+
+/// # Group A methods.
+impl MyType {
+    /// Method A1
+    pub fn method_a1(&amp;self) {}
+    /// Method A2
+    pub fn method_a2(&amp;self) {}
+}
+
+/// # Group B methods.
+impl MyType {
+    /// Method B1
+    pub fn method_b1(&amp;self) {}
+    /// Method B2
+    pub fn method_b2(&amp;self) {}
+}
+</code></pre>
+		</section>
+	</body>
+</html>
