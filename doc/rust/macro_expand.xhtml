@@ -19,37 +19,60 @@
 この生成内容を確認できると、いくらかデバッグが簡単になる。
 			</p>
 		</section> <section>
-			<h1>rust-analyzer</h1>
+			<h1>解決策</h1>
 			<p>
-rust-analyzer にはこのための専用機能がある。
-			</p> <p>
-VS Code からの場合、以下の手順で実行できる。
+以下を状況によって使い分けるとよい。
 			</p>
-			<ol>
-				<li>
-キャレットをマクロの呼出箇所へ移動
-				</li> <li>
-コマンドパレットを起動 (<span class="mt"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></span> を押下)
-				</li> <li>
-"rust-analyzer: Expand macro recursively at caret" を選択
-				</li> <li>
-新規タブに表示される展開結果を確認
-				</li>
-			</ol>
+			<dl class="normal lowProfile">
+				<dt><a href="#rust-analyzer">rust-analyzer</a></dt>
+				<dd>手軽な普段使いに最適</dd>
+				<dt><a href="#cargo-expand">cargo expand</a></dt>
+				<dd>実行コードの入手に最適</dd>
+			</dl>
 			<section>
-				<h2>サンプル</h2>
+				<h1 id="rust-analyzer">rust-analyzer</h1>
 				<p>
-以下のコードの <code>vec!</code> の箇所で前述の操作を行うと…。
+rust-analyzer にはこのための専用機能がある。
 				</p>
+				<section>
+					<h2>長所と短所</h2>
+					<ul>
+						<li>
+手軽に実行できる。
+						</li> <li>
+展開結果に <code>$crate</code> などの展開前のコードが混ざる事がある。
+						</li>
+					</ul>
+				</section> <section>
+					<h2>実行手順</h2>
+					<p>
+VS Code からの場合、以下の手順で実行できる。
+					</p>
+					<ol>
+						<li>
+キャレットをマクロの呼出箇所へ移動
+						</li> <li>
+コマンドパレットを起動 (<span class="mt"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></span> を押下)
+						</li> <li>
+"rust-analyzer: Expand macro recursively at caret" を選択
+						</li> <li>
+新規タブに表示される展開結果を確認
+						</li>
+					</ol>
+				</section> <section>
+					<h2>サンプル</h2>
+					<p>
+以下のコードの <code>vec!</code> の箇所で前述の操作を行うと…。
+					</p>
 <pre><code class="language-rust">
 fn main() {
     let words = vec!["Hello", "macro", "world"];
     println!("{}", words.join(" "));
 }
 </code></pre>
-				<p>
+					<p>
 以下のような展開結果が表示される。
-				</p>
+					</p>
 <pre><code class="language-rust">
 // Recursive expansion of vec! macro
 // ==================================
@@ -59,31 +82,42 @@ fn main() {
     $crate::boxed::Box::new(["Hello", "macro", "world"]),
 ))
 </code></pre>
-			</section>
-		</section> <section>
-			<h1>cargo expand</h1>
-			<p>
-<code>cargo expand</code> コマンドも使える。
-			</p>
-			<section>
-				<h2>インストール</h2>
+				</section>
+			</section> <section>
+				<h1 id="cargo-expand">cargo expand</h1>
 				<p>
-crates.io から <a href="https://crates.io/crates/cargo-expand/"><code>cargo-expand</code></a> をインストールして <code>cargo</code> を拡張する。
+<code>cargo expand</code> コマンドも使える。
 				</p>
+				<section>
+					<h2>長所と短所</h2>
+					<ul>
+						<li>
+実行可能なコードを取得できる。
+						</li> <li>
+処理対象が最低でも関数単位のため小回りが効かない。
+						</li> <li>
+エラーが早期に検出されると展開が打ち切られる事がある。
+						</li>
+					</ul>
+				</section> <section>
+					<h2>実行手順</h2>
+					<p>
+crates.io から <a href="https://crates.io/crates/cargo-expand/"><code>cargo-expand</code></a> をインストールして <code>cargo</code> を拡張する。
+					</p>
 <pre><code class="console">
 <mark class="prompt">&gt;</mark> cargo install cargo-expand
 </code></pre>
-			</section> <section>
-				<h2>サンプル</h2>
-				<p>
-以下のコマンドを前述のコードで実行すると…。
-				</p>
+					<p>
+コマンドを実行する (以下は前述の例の <code>main</code> 関数を対象にした場合)。
+					</p>
 <pre><code class="console">
 <mark class="prompt">&gt;</mark> cargo expand main 
 </code></pre>
-				<p>
+				</section> <section>
+					<h2>サンプル</h2>
+					<p>
 以下のような展開結果が表示される。
-				</p>
+					</p>
 <pre><code class="language-rust">
 fn main() {
     let words = &lt;[_]&gt;::into_vec(
@@ -95,31 +129,8 @@ fn main() {
     };
 }
 </code></pre>
+				</section>
 			</section>
-		</section> <section>
-			<h1>使い分け</h1>
-			<p>
-それぞれ、以下のような特徴がある。
-			</p>
-			<ul>
-				<li>
-<code>cargo expand</code> では、処理対象が最低でも関数単位のため小回りが効かない。
-				</li> <li>
-<code>cargo expand</code> では、早期に入力エラーが検出されると展開が打ち切られる事がある。
-				</li> <li>
-rust-analyzer では、展開結果に <code>$crate</code> などの展開前のコードが混ざる事がある。
-				</li>
-			</ul>
-			<p>
-そのため、以下のように使い分けるのがお勧め。
-			</p>
-			<ul>
-				<li>
-rust-analyzer → 手軽な普段使い
-				</li> <li>
-<code>cargo expand</code> → 実行コードの入手
-				</li>
-			</ul>
 		</section>
 	</body>
 </html>
