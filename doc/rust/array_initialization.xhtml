@@ -105,17 +105,12 @@ fn main() {
 				</p>
 <pre><code class="language-rust">
 fn main() {
-    let arr = [const { CopyNg::new(42) }; 3];
-    assert_eq!(arr, [CopyNg::new(42), CopyNg::new(42), CopyNg::new(42)]);
+    let arr = [const { CopyNg(42) }; 3];
+    assert_eq!(arr, [CopyNg(42), CopyNg(42), CopyNg(42)]);
 }
 
 #[derive(Debug, Eq, PartialEq)]
 struct CopyNg(i32);
-impl CopyNg {
-    pub const fn new(value: i32) -&gt; Self {
-        Self(value)
-    }
-}
 </code></pre>
 			</section>
 		</section> <section>
