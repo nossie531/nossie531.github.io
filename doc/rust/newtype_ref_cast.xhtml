@@ -34,7 +34,7 @@ unsafe な機能 <a href="https://doc.rust-lang.org/std/mem/fn.transmute.html"><
 				<p>
 以下では、<code>from_ref</code> 関数が <code>&amp;i32</code> を <code>&amp;Newtype</code> に変換している。
 				</p>
-				<pre><code class="language-rust">
+<pre><code class="language-rust">
 fn main() {
     let base = 1;
     let newtype = Newtype::from_ref(&amp;base);
@@ -53,7 +53,7 @@ impl Newtype {
         unsafe { std::mem::transmute(r) }
     }
 }
-				</code></pre>
+</code></pre>
 			</section>
 		</section> <section>
 			<h1>クレート紹介</h1>
