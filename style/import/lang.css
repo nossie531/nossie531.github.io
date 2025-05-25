@@ -18,14 +18,12 @@
 	src: local("Meiryo Bold");
 }
 
-:root {
+:root:lang(ja),
+:host:lang(ja), 
+:not(:lang(ja)) > :lang(ja) {
 	--mono-font: "Consolas", "ja-sans-serif", monospace;
 	--base-font: "ja-sans-serif", sans-serif;
-}
-
-:root:lang(ja),
-:host > *:lang(ja) {
-	font-family: "ja-sans-serif", sans-serif;
+	font-family: var(--base-font);
 	text-justify: inter-character;
 	/* 日本語は欧文より縦方向に密なため行間を空ける。*/
 	line-height: 1.7;
@@ -33,5 +31,14 @@
 	p {
 		text-align: justify;
 	}
+}
+
+:root:lang(en),
+:host:lang(en), 
+:not(:lang(en)) > :lang(en) {
+	--mono-font: "Consolas", monospace;
+	--base-font: "Verdana", sans-serif;
+	font-family: var(--base-font);
+	line-height: normal;
 }
 

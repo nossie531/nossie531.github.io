@@ -129,7 +129,7 @@ blockquote {
 		padding: 0;
 
 		&::before {
-			content: "…";
+			content: "⋯";
 		}
 	}
 
