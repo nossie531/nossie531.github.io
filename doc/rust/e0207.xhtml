@@ -52,26 +52,30 @@ impl&lt;T, U&gt; MyType&lt;T&gt; where T: MyTrait&lt;U&gt;
 			<p>
 以下は E0207 についての公式からの引用。
 			</p>
-			<blockquote cite="https://doc.rust-lang.org/error_codes/E0207.html">
-				<p>
+			<doc-quote>
+				<blockquote data-time="2025-05-26" cite="https://doc.rust-lang.org/error_codes/E0207.html">
+					<hr class="omit"/>
+					<p>
 <code class="hljs">impl</code> の任意の型や定数パラメタは以下の基準の少なくともどれか一つを満たさなければならない:
-				</p>
-				<ul>
-					<li>
+					</p>
+					<ul>
+						<li>
 impl が<em>実装する型</em>&#x2009;の中に表れる。<br/>
 例. <code class="hljs">impl&lt;T&gt; Foo&lt;T&gt;</code>
-					</li> <li>
+						</li> <li>
 トレイト実装において、<em>実装されるトレイト</em>&#x2009;の中に表れる。<br/>
 例. <code class="hljs">impl&lt;T&gt; SomeTrait&lt;T&gt; for Foo</code>
-					</li> <li>
+						</li> <li>
 関連型としてバインドされている。<br/>
 例. <code class="hljs">impl&lt;T, U&gt; SomeTrait for T where T: AnotherTrait&lt;AssocType=U&gt;</code>
-					</li>
-				</ul>
-				<p>
+						</li>
+					</ul>
+					<p>
 ライフタイムパラメタが関連型として使われている場合、<code class="hljs">impl</code> での制限なしのライフタイムパラメタはサポートされない。
-				</p>
-			</blockquote>
+					</p>
+					<hr class="omit"/>
+				</blockquote>
+			</doc-quote>
 		</section> <section>
 			<h1>パターン</h1>
 			<nav class="sub"/>
