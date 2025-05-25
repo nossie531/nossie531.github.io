@@ -2,8 +2,7 @@
 
 /* 以下は原文と近くなるよう調整。*/
 
-:root:lang(en),
-:host:lang(en),
+:where(:root, :host):lang(en),
 :not(:lang(en)) > :lang(en) { 
 	line-height: 1.5;
 	font-family: "Sitka", serif;

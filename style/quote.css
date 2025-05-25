@@ -151,22 +151,14 @@ blockquote {
 		border: thin dashed;
 		border-color: var(--fg-color);
 		background-color: var(--bg-em-color);
-		cursor: pointer;
 
 		&:focus-within {
 			outline: auto;
 			outline-color: -webkit-focus-ring-color; 
 		}
 
-		* {
-			cursor: inherit;
-		}
-
-		a {
-			display: none;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			overflow: hidden;
+		button {
+			display: inline;
 			cursor: pointer;
 		}
 
@@ -174,15 +166,25 @@ blockquote {
 			display: none;
 		}
 
+		a {
+			display: none;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow: hidden;
+		}
+
 		&.open {
 			margin: -0.25em -0.25em 0 0;
 			box-shadow: 0.25em 0.25em 1px hsla(0, 0%, 0%, 0.1);
 			border-style: solid;
-			cursor: default;
 		}
 
 		&.open:has(button:focus) {
 			outline: none;
+		}
+
+		&.open button {
+			cursor: default;
 		}
 
 		&.open time {

@@ -47,17 +47,17 @@ impl&lt;K, V, A&gt; BTreeMap&lt;K, V, A&gt;
 where
     A: Allocator + Clone,
 {
-	// ...
+    // ... //
 
-	pub fn get&lt;Q&gt;(&amp;self, key: &amp;Q) -&gt; Option&lt;&amp;V&gt;
-	where
-		K: Borrow&lt;Q&gt; + Ord,
-		Q: Ord + ?Sized,
-	{
-		// ...
-	}
+    pub fn get&lt;Q&gt;(&amp;self, key: &amp;Q) -&gt; Option&lt;&amp;V&gt;
+    where
+        K: Borrow&lt;Q&gt; + Ord,
+        Q: Ord + ?Sized,
+    {
+        // ... //
+    }
 
-	// ...
+    // ... //
 }
 </code></pre>
 				<p>
@@ -74,6 +74,7 @@ The key may be any borrowed form of the map’s key type, but the ordering on th
 						</p>
 						<hr class="omit"/>
 					</blockquote>
+					<script>Doc.endQuote();</script>
 				</doc-quote>
 			</section> <section>
 				<h1>
@@ -88,17 +89,17 @@ where
     K: Eq + Hash,
     S: BuildHasher,
 {
-	// ...
+    // ... //
 
-	pub fn get&lt;Q&gt;(&amp;self, k: &amp;Q) -&gt; Option&lt;&amp;V&gt;
-	where
-		K: Borrow&lt;Q&gt;,
-		Q: Hash + Eq + ?Sized,
-	{
-		// ...
-	}
+    pub fn get&lt;Q&gt;(&amp;self, k: &amp;Q) -&gt; Option&lt;&amp;V&gt;
+    where
+        K: Borrow&lt;Q&gt;,
+        Q: Hash + Eq + ?Sized,
+    {
+        // ... //
+    }
 
-	// ...
+    // ... //
 }
 </code></pre>
 				<p>
@@ -115,6 +116,7 @@ The key may be any borrowed form of the map’s key type, but <a href="../hash/t
 						</p>
 						<hr class="omit"/>
 					</blockquote>
+					<script>Doc.endQuote();</script>
 				</doc-quote>
 			</section>
 		</section> <section>
@@ -133,7 +135,7 @@ fn main() {
     dict.insert(1, "bar".to_string());
     dict.insert(2, "baz".to_string());
 
-	let result = dict.get(&amp;1);
+    let result = dict.get(&amp;1);
 
     assert_eq!(result , Some(&amp;"bar".to_string()));
 }
@@ -205,7 +207,7 @@ fn main() {
     dict.insert(Key { id: 1 }, "bar".to_string());
     dict.insert(Key { id: 2 }, "baz".to_string());
 
-	let result = dict.get(&amp;1);
+    let result = dict.get(&amp;1);
 
     assert_eq!(result, Some(&amp;"bar".to_string()));
 }
