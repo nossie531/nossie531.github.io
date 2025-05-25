@@ -1,0 +1,11 @@
+nav.js でページロードの進捗を監視してるが、この方法がよくない。
+
+現状: 現在処理中のノードを、要素のロードのたびに後方へと伸ばしていく方法をとっている。
+問題: しかし、これだとロード中にスクリプトが body の末尾に要素を追加すると事故る。
+改善: MutationObserver の通知のたびに前回と状況の違いを確認する。
+
+この方法の利点。
+- MutationObserver の発火回数は少ない。
+- 確認が必要な要素もこちらの処理対象のものだけですむ。
+- DOMContentLoaded で MutationObserver を解除できる。
+(MutationObserver は DOMContentLoaded 後に発火したりしないよな…ちょっと不安)
