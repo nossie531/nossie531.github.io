@@ -1,7 +1,6 @@
 @import url("import/color.css");
 @import url("import/size.css");
 @import url("import/lang.css");
-@import url("import/prism.css");
 
 :host {
 	display: block;

@@ -1,0 +1,24 @@
+@charset "utf-8";
+
+pre[class*="language-"] {
+	padding: unset;
+	border-style: unset;
+	border-radius: unset;
+	box-shadow: unset;
+	background-color: unset;
+}
+
+pre > code[class|="language"] mark.error {
+	color: inherit;
+	background-color: transparent;
+	text-decoration: wavy underline hsla(5, 90%, 60%, 0.6);
+	text-decoration-skip-ink: none;
+}
+
+pre > code[class|="language"] mark.warn {
+	color: inherit;
+	background-color: transparent;
+	text-decoration: wavy underline hsla(60, 50%, 40%, 0.8);
+	text-decoration-skip-ink: none;
+}
+

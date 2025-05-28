@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+doc-nav-sub:not(:defined),
+doc-nav-sub:not(:defined) ~ *,
+:has(doc-nav-sub:not(:defined)) ~ *,
+doc-nav-sub:state(loading),
+doc-nav-sub:state(loading) ~ *,
+:has(doc-nav-sub:state(loading)) ~ * {
+	display: none;
+}
+
+doc-nav, doc-nav-sub {
+	--nav-bg-color: var(--bg-em-color);
+	--nav-bd-color: var(--edge-color);
+	--nav-link-color: var(--link-color);
+}
+
+@media screen and (prefers-color-scheme: light) {
+	doc-nav {
+		--nav-hl-color: hsla(0, 0%, 0%, 0.05);
+	}
+}
+
+@media screen and (prefers-color-scheme: dark) {
+	doc-nav {
+		--nav-hl-color: hsla(0, 0%, 100%, 0.1);
+	}
+}
+

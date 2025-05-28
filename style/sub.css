@@ -7,14 +7,12 @@
 	root,
 	default,
 	doc,
-	util,
-	import_nav,
-	custom_nav;
+	import_custom_nav;
 
 @import url("import/color.css") layer(import_color);
 @import url("import/size.css") layer(import_size);
 @import url("import/lang.css") layer(import_lang);
-@import url("../lib/nav/nav.css") layer(import_nav);
+@import url("import/custom_nav.css") layer(import_custom_nav);
 
 @layer root {
 	:root {
@@ -50,27 +48,3 @@
 	}
 }
 
-@layer util {
-	*.none {
-		display: none !important;
-	}
-}
-
-@layer custom_nav {
-	nav.forPage {
-		--nav-bg-color: var(--bg-em-color);
-		--nav-bd-color: var(--edge-color);
-	}
-
-	@media screen and (prefers-color-scheme: light) {
-		nav.forPage {
-			--nav-hl-color: hsla(0, 0%, 0%, 0.05);
-		}
-	}
-
-	@media screen and (prefers-color-scheme: dark) {
-		nav.forPage {
-			--nav-hl-color: hsla(0, 0%, 100%, 0.1);
-		}
-	}
-}

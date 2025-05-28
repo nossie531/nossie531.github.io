@@ -12,18 +12,18 @@
 	figures,
 	ui,
 	util,
-	import_nav,
 	import_prism,
 	import_font_math,
-	custom_nav,
-	custom_prism;
+	import_custom_nav,
+	import_custom_prism;
 
 @import url("import/color.css") layer(import_color);
 @import url("import/size.css") layer(import_size);
 @import url("import/lang.css") layer(import_lang);
 @import url("import/prism.css") layer(import_prism);
 @import url("import/font_math.css") layer(import_font_math);
-@import url("../lib/nav/nav.css") layer(import_nav);
+@import url("import/custom_nav.css") layer(import_custom_nav);
+@import url("import/custom_prism.css") layer(import_custom_prism);
 @namespace m url("http://www.w3.org/1998/Math/MathML");
 
 @layer root {
@@ -64,7 +64,6 @@
 	@media screen {
 		:root {
 			background-color: var(--bg-color);
-			transition: background-color 1s;
 		}
 
 		:root > body {
@@ -620,49 +619,6 @@
 
 	*.todo {
 		color: var(--x-color);
-	}
-}
-
-@layer custom_nav {
-	nav.forPage {
-		--nav-bg-color: var(--bg-em-color);
-		--nav-bd-color: var(--edge-color);
-	}
-
-	@media screen and (prefers-color-scheme: light) {
-		nav.forPage {
-			--nav-hl-color: hsla(0, 0%, 0%, 0.05);
-		}
-	}
-
-	@media screen and (prefers-color-scheme: dark) {
-		nav.forPage {
-			--nav-hl-color: hsla(0, 0%, 100%, 0.1);
-		}
-	}
-}
-
-@layer custom_prism {
-	pre[class*="language-"] {
-		padding: unset;
-		border-style: unset;
-		border-radius: unset;
-		box-shadow: unset;
-		background-color: unset;
-	}
-
-	pre > code[class|="language"] mark.error {
-		color: inherit;
-		background-color: transparent;
-		text-decoration: wavy underline hsla(5, 90%, 60%, 0.6);
-		text-decoration-skip-ink: none;
-	}
-
-	pre > code[class|="language"] mark.warn {
-		color: inherit;
-		background-color: transparent;
-		text-decoration: wavy underline hsla(60, 50%, 40%, 0.8);
-		text-decoration-skip-ink: none;
 	}
 }
 
