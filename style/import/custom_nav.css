@@ -1,18 +1,20 @@
 @charset "utf-8";
 
-doc-nav-sub:not(:defined),
-doc-nav-sub:not(:defined) ~ *,
-:has(doc-nav-sub:not(:defined)) ~ *,
-doc-nav-sub:state(loading),
-doc-nav-sub:state(loading) ~ *,
-:has(doc-nav-sub:state(loading)) ~ * {
-	display: none;
-}
-
 doc-nav, doc-nav-sub {
 	--nav-bg-color: var(--bg-em-color);
 	--nav-bd-color: var(--edge-color);
 	--nav-link-color: var(--link-color);
+}
+
+@layer loading {
+	doc-nav-sub:not(:defined),
+	doc-nav-sub:not(:defined) ~ *,
+	:has(doc-nav-sub:not(:defined)) ~ *,
+	doc-nav-sub:state(loading),
+	doc-nav-sub:state(loading) ~ *,
+	:has(doc-nav-sub:state(loading)) ~ * {
+		display: none;
+	}
 }
 
 @media screen and (prefers-color-scheme: light) {

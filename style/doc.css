@@ -15,7 +15,8 @@
 	import_prism,
 	import_font_math,
 	import_custom_nav,
-	import_custom_prism;
+	import_custom_prism,
+	loading;
 
 @import url("import/color.css") layer(import_color);
 @import url("import/size.css") layer(import_size);
@@ -309,7 +310,6 @@
 		}
 	}
 
-
 	@media screen and (prefers-color-scheme: dark) {
 		aside.normal {
 			&::before { 
@@ -477,12 +477,10 @@
 	}
 
 	pre {
-		&.command,
 		> code:only-child {
 			border-radius: 0.5rem;
 		}
 
-		&.command,
 		> code:only-child,
 		> samp:only-child {
 			background-color: var(--code-bg-color);
@@ -497,10 +495,20 @@
 			margin-top: -1lh;
 		}
 		
-		&.directory {
-			line-height: normal;
-			border-color: var(--base0-color);
-		}
+	}
+
+	pre > code[class|="language"] mark.error {
+		color: inherit;
+		background-color: transparent;
+		text-decoration: wavy underline hsla(5, 90%, 60%, 0.6);
+		text-decoration-skip-ink: none;
+	}
+
+	pre > code[class|="language"] mark.warn {
+		color: inherit;
+		background-color: transparent;
+		text-decoration: wavy underline hsla(60, 50%, 40%, 0.8);
+		text-decoration-skip-ink: none;
 	}
 
 	pre > code[class|="console"] mark.prompt {
@@ -508,16 +516,33 @@
 		background-color: initial;
 	}
 
+	/* ディレクトリ構成。*/
+	pre.directory {
+		line-height: normal;
+		border-color: var(--base0-color);
+	}
+
+	/* コマンドの構文説明。*/
+	pre.command {
+		border-radius: 0.5rem;
+		overflow: auto;
+		scrollbar-width: thin;
+		background-color: var(--code-bg-color);
+	}
+
+	/* 疑似コード */
 	pre > code.pseudoCode {
 		/* 数式を含めるために行高を大きく。*/
 		line-height: 1.7rem;
 
+		/* キーワードの構文強調用。*/
 		mark.kw {
 			color: blue;
 			background-color: initial;
 		}
 	}
 
+	/* pre の効果の部分的解除 */
 	span.nopre {
 		white-space: initial;
 
@@ -528,6 +553,7 @@
 		}
 	}
 
+	/* ファイル名付きコードブロック。*/
 	figure.file {
 		padding: 0;
 		border-radius: 0.5rem;
@@ -597,9 +623,9 @@
 		scroll-behavior: smooth;
 
 		/* -- 右スクロールバーは常に表示 --
-		 * nav.css の右サイドバーには、ページ遷移用ボタンがある。この位置が
-		 * スクロールバーの有無でページごとに変わると、連続したページ遷移の
-		 * 操作がしにくい。*/
+		 * 右サイドバーとしてページ遷移用のナビゲーションを表示したい。ページ
+		 * スクロールバーは右側に表示されるため、その有無がこの位置に影響する。
+		 * ページ遷移ボタンの位置が毎回変わると、連続して押下しにくくなる。*/
 		overflow: auto scroll;
 	}
 
@@ -622,3 +648,13 @@
 	}
 }
 
+@layer loading {
+	doc-quote:not(:defined),
+	doc-quote:not(:defined) ~ *,
+	:has(doc-quote:not(:defined)) ~ *,
+	doc-quote:state(loading),
+	doc-quote:state(loading) ~ *,
+	:has(doc-quote:state(loading)) ~ * {
+		display: none;
+	}
+}

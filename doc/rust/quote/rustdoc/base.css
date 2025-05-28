@@ -5,7 +5,7 @@
 :where(:root, :host):lang(en),
 :not(:lang(en)) > :lang(en) { 
 	line-height: 1.5;
-	font-family: "Sitka", serif;
+	font-family: "Georgia", serif;
 }
 
 ol, ul { padding-left: 1.5rem; }
