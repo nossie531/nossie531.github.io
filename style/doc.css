@@ -497,25 +497,6 @@
 		
 	}
 
-	pre > code[class|="language"] mark.error {
-		color: inherit;
-		background-color: transparent;
-		text-decoration: wavy underline hsla(5, 90%, 60%, 0.6);
-		text-decoration-skip-ink: none;
-	}
-
-	pre > code[class|="language"] mark.warn {
-		color: inherit;
-		background-color: transparent;
-		text-decoration: wavy underline hsla(60, 50%, 40%, 0.8);
-		text-decoration-skip-ink: none;
-	}
-
-	pre > code[class|="console"] mark.prompt {
-		font-weight: bold;
-		background-color: initial;
-	}
-
 	/* ディレクトリ構成。*/
 	pre.directory {
 		line-height: normal;
@@ -530,16 +511,35 @@
 		background-color: var(--code-bg-color);
 	}
 
-	/* 疑似コード */
-	pre > code.pseudoCode {
-		/* 数式を含めるために行高を大きく。*/
-		line-height: 1.7rem;
+	/* ソースコード。*/
+	pre > code[class|="language"] {
+		mark.error {
+			color: inherit;
+			background-color: transparent;
+			text-decoration: wavy underline hsla(5, 90%, 60%, 0.6);
+			text-decoration-skip-ink: none;
+		}
 
-		/* キーワードの構文強調用。*/
-		mark.kw {
-			color: blue;
+		mark.warn {
+			color: inherit;
+			background-color: transparent;
+			text-decoration: wavy underline hsla(60, 50%, 40%, 0.8);
+			text-decoration-skip-ink: none;
+		}
+	}
+
+	/* コンソール。*/
+	pre > code[class|="console"] {
+		mark.prompt {
+			font-weight: bold;
 			background-color: initial;
 		}
+	}
+
+	/* 疑似コード。*/
+	pre > code.pseudoCode {
+		/* 数式用に行を拡張。*/
+		line-height: 1.7rem; 
 	}
 
 	/* pre の効果の部分的解除 */
@@ -577,6 +577,20 @@
 			border-top-style: none;
 			border-top-left-radius: 0;
 			border-top-right-radius: 0;
+		}
+	}
+
+	@media (prefers-color-scheme: light) {
+		pre > code.pseudoCode mark.kw {
+			color: hsla(240, 90%, 60%, 0.8);
+			background-color: initial;
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		pre > code.pseudoCode mark.kw {
+			color: hsla(240, 80%, 75%, 0.8);
+			background-color: initial;
 		}
 	}
 }
