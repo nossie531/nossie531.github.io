@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+	</head>
+	<body>
+		<blockquote data-time="2025-04-18" cite="https://doc.rust-lang.org/rustc/tests/index.html#--nocapture">
+			<h4 id="--nocapture">
+				<a class="header" href="#--nocapture"><code>--nocapture</code></a>
+			</h4>
+			<p>
+stdout と stderr をキャプチャせず、テストにコンソールへのプリントを許可する。通常は出力はキャプチャされ、テストが失敗した場合のみ表示される。
+			</p> <p>
+これは <code class="hljs">RUST_TEST_NOCAPTURE</code> 環境変数を <code class="hljs">0</code> 以外に設定することでも指定できるだろう。
+			</p>
+			<h4 id="--show-output">
+				<a class="header" href="#--show-output"><code>--show-output</code></a>
+			</h4>
+			<p>
+stdout と stderr を全てのテストの実行後に表示する。
+			</p> <p>
+<a href="#--nocapture"><code class="hljs">--nocapture</code></a> はテストへ<em>それらの実行中の</em>プリントを許可しており、これはもし複数のテストが存在し並列に実行されていると出力が交互配置されうるが、対照的に <code class="hljs">--show-output</code> は出力が連続を保証する、ただし全てのテストの終了の待機が必要。
+			</p>
+		</blockquote>
+	</body>
+</html>
+

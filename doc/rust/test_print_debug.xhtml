@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 自動テストでのコンソール出力</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+自動テストでのコンソール出力について。
+		</p> <p>
+プリントデバッグでよくある問題を取り上げる。
+		</p> 
+		<section>
+			<h1>背景情報</h1>
+			<p>
+自動テストとプリントデバッグには、以下のような相性問題がある。
+			</p> 
+			<ul>
+				<li>
+					<p>
+テスト成功時: コンソールに内容が表示されない。
+					</p> <p>
+これは、成功時のログまでは必要ない場合が多いため。
+					</p> <p>
+しかし、成功時のログが必要になる場合も少なからずある。
+					</p>
+				</li> <li>
+					<p>
+テスト失敗時: テストが終了するまでコンソールに内容が表示されない。
+					</p> <p>
+これは、並列テスト時に複数のテストの内容が混ざるのを防ぐため。
+					</p> <p>
+しかし、ステップ実行やブレークポイントで停止しつつの確認ができなくなる。
+					</p>
+				</li>
+			</ul>
+		</section> <section>
+			<h1>解決策</h1>
+			<p>
+VS Code + rust-analyzer + CodeLLDB の環境では以下が使える。
+			</p>
+			<doc-nav-sub/>
+			<p>
+どちらの方法も <code>cargo test</code> コマンドに渡される以下のオプションを渡している。
+			</p>
+			<doc-quote src="quote/rustc/tests/index.xhtml"/>
+			<section>
+				<hgroup>
+					<h1>解決策 1</h1>
+					<div class="subTitle"><code>settings.json</code> ファイルの設定</div>
+				</hgroup>
+				<p>
+この方法はユーザの環境全体に適用される。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-json">
+{
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "workbench.colorTheme": "Default Dark+",
+    "diffEditor.ignoreTrimWhitespace": false,
+
+    // -- 略 -- //
+
+    "rust-analyzer.runnables.extraTestBinaryArgs": [
+        "--nocapture"
+    ],
+
+    // -- 略 -- //
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>解決策 2</h1>
+					<div class="subTitle"><code>launch.json</code> ファイルの設定</div>
+				</hgroup>
+				<p>
+この方法は個別のテストの起動設定に適用される。<br/>
+詳しくは､『<a href="cargo_test_target.xhtml">cargo test での対象の指定</a> - <a href="cargo_test_target.xhtml#launch.json">付録 (launch.json)</a>』を参照。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-json">
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Custom test",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=my_test_file",
+                    "--package=my_crate",
+                ],
+                "filter": {
+                    "name": "my_test_file",
+                    "kind": "test"
+                }
+            },
+            "args": ["funcPath", "--exact", "--no-capture"],
+            "cwd": "${workspaceFolder}",
+            "env": { "RUST_BACKTRACE": "1" }
+        },
+
+        // -- 略 -- //
+    ]
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
