@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 演算子オーバーロードと交換法則</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+二項演算子のオーバーロードにおいて、左辺と右辺の交換法則をスマートに記述できない場合がある。
+ここでは、その問題とそれに対するやや力技の解決策を紹介している。
+		</p> 
+		<aside class="normal moan">
+			<p>
+仕様の不備？
+			</p> <p>
+解決策が力技になるため、ソースの景観はどうしても少し悪くなる。
+			</p> <p>
+有名なクレート <a href="https://crates.io/crates/num-complex/0.4.6"><code>num-complex</code> (0.4.6)</a> でも、[複素数型 * 数値型] は数値トレイトでまとめて<a href="https://docs.rs/num-complex/0.4.6/num_complex/struct.Complex.html#impl-Mul%3CT%3E-for-Complex%3CT%3E">定義</a>しているが、[数値型 * 複素数型] は個々の数値型ごとにわけて<a href="https://docs.rs/num-complex/0.4.6/num_complex/struct.Complex.html#impl-Mul%3CComplex%3Ci32%3E%3E-for-i32">定義</a>している。
+			</p>
+		</aside>
+		<section>
+			<h1>基礎知識</h1>
+			<section>
+				<h2>演算子オーバーロード</h2>
+				<p>
+演算子オーバーロードを使うと、型に対する演算子の挙動を定義できる。
+				</p> <p>
+例えば、組込の数値型 <code>i32</code> では <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> などが定義されている。
+				</p> <p>
+そして、ユーザが作成した独自型についても、組込型と同様、これらを定義できる。
+				</p>
+			</section>
+		</section> <section>
+			<h1>通常パターン</h1>
+			<p>
+殆どの場合、特に問題なく交換法則を定義できる。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、<code>*</code> 演算子をトレイト <code>i32</code> と型 <code>P3&lt;i32&gt;</code> とで定義をしようとしている。<br/>
+				</p>
+<pre><code class="language-rust">
+use std::fmt::Debug;
+use std::ops::Mul;
+
+fn main() {
+    let (op_x, op_y) = (P3(1, 2, 3), 2);
+    assert_eq!(op_x * op_y, P3(2, 4, 6));
+    assert_eq!(op_y * op_x, P3(2, 4, 6));
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct P3&lt;T&gt;(T, T, T);
+
+impl Mul&lt;i32&gt; for P3&lt;i32&gt; {
+    type Output = P3&lt;i32&gt;;
+
+    fn mul(self, rhs: i32) -&gt; Self::Output {
+        let v1 = self.0 * rhs;
+        let v2 = self.1 * rhs;
+        let v3 = self.2 * rhs;
+        P3(v1, v2, v3)
+    }
+}
+
+impl Mul&lt;P3&lt;i32&gt;&gt; for i32 {
+    type Output = P3&lt;i32&gt;;
+
+    fn mul(self, rhs: P3&lt;i32&gt;) -&gt; Self::Output {
+        rhs * self
+    }
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>問題点</h1>
+			<p>
+クレート固有の型、トレイトでまとめた型、両者を演算対象として演算子をオーバーロードしたいとする。この時、左辺が前者で右辺が後者のパターンは問題ないが、左辺が後者で右辺が前者のパターンでは、<a href="orphan_rule.xhtml">孤児ルール</a>によりエラー <a href="e0210.xhtml">E0210</a> が発生する。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、<code>*</code> 演算子をトレイト <code>Scalar</code> と型 <code>P3&lt;T&gt;</code> とで定義をしようとしている。<br/>
+しかし、<code>Scalar</code> を左辺とするパターンの定義でエラーになってしまっている。
+				</p>
+<pre><code class="language-rust">
+use std::fmt::Debug;
+use std::ops::Mul;
+
+fn main() {
+    let (op_x, op_y) = (P3(1, 2, 3), 2);
+    assert_eq!(op_x * op_y, P3(2, 4, 6));
+    assert_eq!(op_y * op_x, P3(2, 4, 6));
+}
+
+trait Scalar: Clone + Copy + Sized + Mul&lt;Output = Self&gt; {}
+impl&lt;T&gt; Scalar for T where T: Clone + Copy + Sized + Mul&lt;Output = Self&gt; {}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct P3&lt;T&gt;(T, T, T);
+
+impl&lt;T&gt; Mul&lt;T&gt; for P3&lt;T&gt;
+where
+    T: Scalar,
+{
+    type Output = P3&lt;T&gt;;
+
+    fn mul(self, rhs: T) -&gt; Self::Output {
+        let v1 = self.0 * rhs;
+        let v2 = self.1 * rhs;
+        let v3 = self.2 * rhs;
+        P3(v1, v2, v3)
+    }
+}
+
+impl&lt;<mark class="error">T</mark>&gt; Mul&lt;P3&lt;T&gt;&gt; for T
+where
+    T: Scalar,
+{
+    type Output = P3&lt;T&gt;;
+
+    fn mul(self, rhs: P3&lt;T&gt;) -&gt; Self::Output {
+        rhs * self
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0210]</mark><mark class="title">: type parameter `T` must be covered by another type when it appears before the first local type (`P3&lt;_&gt;`)</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:27:6
+<mark class="info">   |</mark>
+<mark class="info">27 |</mark> impl&lt;T&gt; Mul&lt;P3&lt;T&gt;&gt; for T
+<mark class="info">   |</mark>      <mark class="error">^ type parameter `T` must be covered by another type when it appears before the first local type (`P3&lt;_&gt;`)</mark>
+<mark class="info">   |</mark>
+<mark class="info">   =</mark> <mark class="title">note</mark>: implementing a foreign trait is only possible if at least one of the types for which it is implemented is local, and no uncovered type parameters appear before that first local type
+<mark class="info">   =</mark> <mark class="title">note</mark>: in this case, 'before' refers to the following order: `impl&lt;..&gt; ForeignTrait&lt;T1, ..., Tn&gt; for T0`, where `T0` is the first and `Tn` is the last
+</samp></pre>
+			</section>
+		</section> <section>
+			<h1>解決策</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>解決策 1</h1>
+					<div class="subTitle">型ごとの個別定義</div>
+				</hgroup>
+				<p>
+トレイトを実装する型に対して一つ一つ個別に定義していく。
+				</p> <p>
+この方法は演算は普段通り行えるが、未知の型に対応できない。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、コード量を減らすためにマクロ <code>define_mul_p3</code> を導入している。
+					</p>
+<pre><code class="language-rust">
+use std::fmt::Debug;
+use std::ops::Mul;
+
+fn main() {
+    let (op_x, op_y) = (P3(1, 2, 3), 2);
+    assert_eq!(op_x * op_y, P3(2, 4, 6));
+    assert_eq!(op_y * op_x, P3(2, 4, 6));
+}
+
+trait Scalar: Clone + Copy + Sized + Mul&lt;Output = Self&gt; {}
+impl&lt;T&gt; Scalar for T where T: Clone + Copy + Sized + Mul&lt;Output = Self&gt; {}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct P3&lt;T&gt;(T, T, T);
+
+impl&lt;T&gt; Mul&lt;T&gt; for P3&lt;T&gt;
+where
+    T: Scalar,
+{
+    type Output = P3&lt;T&gt;;
+
+    fn mul(self, rhs: T) -&gt; Self::Output {
+        let v1 = self.0 * rhs;
+        let v2 = self.1 * rhs;
+        let v3 = self.2 * rhs;
+        P3(v1, v2, v3)
+    }
+}
+
+macro_rules! define_mul_p3 {
+    ($type:ty) =&gt; {
+        impl Mul&lt;P3&lt;$type&gt;&gt; for $type {
+            type Output = P3&lt;$type&gt;;
+        
+            fn mul(self, rhs: P3&lt;$type&gt;) -&gt; Self::Output {
+                rhs * self
+            }
+        }                
+    };
+}
+
+define_mul_p3!(i32);
+define_mul_p3!(i64);
+define_mul_p3!(f32);
+define_mul_p3!(f64);
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>解決策 2</h1>
+					<div class="subTitle">ラッパー型の導入</div>
+				</hgroup>
+				<p>
+ラッパー型を導入して孤児ルールに抵触しないようにする。
+				</p> <p>
+この方法は演算前に左辺のラップが必要になるが、未知の型にも対応できる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、ラッパー型 <code>Lhs</code> を導入している。
+					</p>
+<pre><code class="language-rust">
+use std::fmt::Debug;
+use std::ops::Mul;
+
+fn main() {
+    let (op_x, op_y) = (P3(1, 2, 3), 2);
+    assert_eq!(op_x * op_y, P3(2, 4, 6));
+    assert_eq!(Lhs(op_y) * op_x, P3(2, 4, 6));
+}
+
+struct Lhs&lt;T&gt;(T);
+
+trait Scalar: Clone + Copy + Sized + Mul&lt;Output = Self&gt; {}
+impl&lt;T&gt; Scalar for T where T: Clone + Copy + Sized + Mul&lt;Output = Self&gt; {}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct P3&lt;T&gt;(T, T, T);
+
+impl&lt;T&gt; Mul&lt;T&gt; for P3&lt;T&gt;
+where
+    T: Scalar,
+{
+    type Output = P3&lt;T&gt;;
+
+    fn mul(self, rhs: T) -&gt; Self::Output {
+        let v1 = self.0 * rhs;
+        let v2 = self.1 * rhs;
+        let v3 = self.2 * rhs;
+        P3(v1, v2, v3)
+    }
+}
+
+impl&lt;T&gt; Mul&lt;P3&lt;T&gt;&gt; for Lhs&lt;T&gt;
+where
+    T: Scalar,
+{
+    type Output = P3&lt;T&gt;;
+
+    fn mul(self, rhs: P3&lt;T&gt;) -&gt; Self::Output {
+        rhs * self.0
+    }
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
