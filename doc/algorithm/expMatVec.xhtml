@@ -128,6 +128,46 @@
 両者は引数の型をのぞいて全く同じ構造である。
 					</p>
 				</section>
+			</section> <section>
+				<h1>近似精度</h1>
+				<p>
+結果は Taylor 展開の <m:math><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:math> 次まで求める。
+				</p>
+				<div class="math">
+<m:math display="block">
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>𝐀</m:mi><m:mi>t</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:mi>𝐛</m:mi>
+	<m:mo>≈</m:mo>
+	<m:mrow>
+		<m:munderover>
+			<m:mo>∑</m:mo>
+			<m:mrow><m:mi>k</m:mi><m:mo>=</m:mo><m:mi>0</m:mi></m:mrow>
+			<m:mrow><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow>
+		</m:munderover>
+		<m:mfrac>
+			<m:mn>1</m:mn>
+			<m:mrow><m:mi>k</m:mi><m:mo>!</m:mo></m:mrow>
+		</m:mfrac>
+		<m:msup>
+			<m:mi>t</m:mi>
+			<m:mi>k</m:mi>
+		</m:msup>
+		<m:msup>
+			<m:mi>𝐀</m:mi>
+			<m:mi>k</m:mi>
+		</m:msup>
+		<m:mi>𝐛</m:mi>
+	</m:mrow>
+</m:math>
+				</div>
+				<p>
+ただし、<m:math><m:mi>m</m:mi><m:mo>≪</m:mo><m:mi>n</m:mi></m:math> とする。
+				</p>
 			</section>
 		</section> <section>
 			<h1>各種アルゴリズム</h1>
@@ -160,6 +200,8 @@
 <m:math display="inline">
 	<m:mi>O</m:mi>
 	<m:mo stretchy="false">(</m:mo>
+	<m:mi>m</m:mi>
+	<m:mo>·</m:mo>
 	<m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo>
 	<m:mo stretchy="false">)</m:mo>
 </m:math>
@@ -177,7 +219,7 @@
 <m:math display="inline">
 	<m:mi>O</m:mi>
 	<m:mo stretchy="false">(</m:mo>
-	<m:mi>m</m:mi><m:mi>n</m:mi>
+	<m:mi>m</m:mi><m:mo>·</m:mo><m:mi>n</m:mi>
 	<m:mo stretchy="false">)</m:mo>
 </m:math>
 							</td> <td>
@@ -196,8 +238,6 @@
 					</tbody>
 				</table>
 				<p>
-※ <m:math><m:mi>m</m:mi></m:math> は手法 B のための値で<a href="#accuracy">後述</a>の通り、<m:math><m:mi>m</m:mi><m:mo>≪</m:mo><m:mi>n</m:mi></m:math> である。
-				</p> <p>
 ただし、行列 <m:math><m:mi>𝐀</m:mi></m:math> に密行列のためのデータ構造を利用している場合、<m:math><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo></m:math> の箇所は <m:math><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup></m:math> に増える。しかし、これを嫌って疎行列のためのデータ構造を利用した場合、メモリ効率が悪くなり計算量に表れない比例係数が悪化しやすいため、推奨されない。
 				</p>
 			</section> <section>
@@ -215,7 +255,7 @@
 					<p>
 行列指数関数の Taylor 展開の計算後に、ベクトルとの積を行う。
 					</p> <p>
-計算量は密行列でも疎行列でも <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>3</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> になる。これは <m:math><m:mi>n</m:mi></m:math> 次正方行列どうしの行列積の計算量と等しい。つまり、Taylor 展開の各回の計算では、保存した前回の結果との行列積が必要になるが、この部分が計算量を支配する。なお、疎行列でも密行列でも計算量が同じなのは、行列積のたびに行列が密化していくためである。
+計算量は密行列でも疎行列でも <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:mi>m</m:mi><m:mo>·</m:mo><m:msup><m:mi>n</m:mi><m:mn>3</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> になる。なお、<m:math><m:msup><m:mi>n</m:mi><m:mn>3</m:mn></m:msup></m:math> の箇所は <m:math><m:mi>n</m:mi></m:math> 次正方行列どうしの行列積の計算量に由来する。つまり、Taylor 展開の各回の計算では、保存した前回の結果との行列積が主な計算となる。なお、疎行列でも密行列でも計算量が同じなのは、行列積のたびに行列が密化していくためである。
 					</p> <p>
 ちなみに、行列指数関数の計算には Pade 近似など他の方法もある (詳細は割愛)。これらはより少ない級数で近似できるなど効率的ではあるが、影響は高々定数倍である。
 					</p>
@@ -224,7 +264,7 @@
 					<p>
 行列指数関数の Taylor 展開にベクトルとの積を混ぜる。
 					</p> <p>
-計算量は疎行列で <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo><m:mo stretchy="false">)</m:mo></m:math>、密行列で <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> になる。これは <m:math><m:mi>n</m:mi></m:math> 次正方行列どうしの行列積の計算量より小さい。つまり、Taylor 展開の各回の計算では、保存した前回の結果との積が必要になるが、これは行列とベクトルとの積になるので、行列積は不要になる。
+計算量は疎行列で <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:mi>m</m:mi><m:mo>·</m:mo><m:mi>nnz</m:mi><m:mo stretchy="false">(</m:mo><m:mi>𝐀</m:mi><m:mo stretchy="false">)</m:mo><m:mo stretchy="false">)</m:mo></m:math>、密行列で <m:math><m:mi>O</m:mi><m:mo stretchy="false">(</m:mo><m:mi>m</m:mi><m:mo>·</m:mo><m:msup><m:mi>n</m:mi><m:mn>2</m:mn></m:msup><m:mo stretchy="false">)</m:mo></m:math> になる。これは <m:math><m:mi>n</m:mi></m:math> 次正方行列どうしの行列積の計算量より小さい。つまり、Taylor 展開の各回の計算では、保存した前回の結果との積が必要になるが、これは行列とベクトルとの積であり、行列積が不要になる。
 					</p>
 				</section>
 			</section> <section>
@@ -236,46 +276,6 @@
 部分空間を定義し、そこに対象を圧縮してから計算する。
 				</p>
 				<section>
-					<h2 id="accuracy">近似精度</h2>
-					<p>
-結果は Taylor 展開の <m:math><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:math> 次までの有限級数近似と一致する。
-					</p>
-					<div class="math">
-<m:math display="block">
-	<m:mrow>
-		<m:mi>exp</m:mi>
-		<m:mo stretchy="false">(</m:mo>
-		<m:mi>𝐀</m:mi><m:mi>t</m:mi>
-		<m:mo stretchy="false">)</m:mo>
-	</m:mrow>
-	<m:mi>𝐛</m:mi>
-	<m:mo>≈</m:mo>
-	<m:mrow>
-		<m:munderover>
-			<m:mo>∑</m:mo>
-			<m:mrow><m:mi>k</m:mi><m:mo>=</m:mo><m:mi>0</m:mi></m:mrow>
-			<m:mrow><m:mi>m</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow>
-		</m:munderover>
-		<m:mfrac>
-			<m:mn>1</m:mn>
-			<m:mrow><m:mi>k</m:mi><m:mo>!</m:mo></m:mrow>
-		</m:mfrac>
-		<m:msup>
-			<m:mi>t</m:mi>
-			<m:mi>k</m:mi>
-		</m:msup>
-		<m:msup>
-			<m:mi>𝐀</m:mi>
-			<m:mi>k</m:mi>
-		</m:msup>
-		<m:mi>𝐛</m:mi>
-	</m:mrow>
-</m:math>
-					</div>
-					<p>
-ただし、<m:math><m:mi>m</m:mi><m:mo>≪</m:mo><m:mi>n</m:mi></m:math> とする。
-					</p>
-				</section> <section>
 					<h2>Krylov 部分空間</h2>
 					<p>
 上述の近似式は <m:math><m:mi>m</m:mi></m:math> 個のベクトル <m:math><m:msup><m:mi>𝐀</m:mi><m:mi>k</m:mi></m:msup><m:mi>𝐛</m:mi></m:math> の線形結合になっている。

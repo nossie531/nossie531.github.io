@@ -135,7 +135,7 @@
 				<section>
 					<h2>特徴</h2>
 					<p>
-数学的には古典版と同じだが、計算機で解いた場合の誤差がそれより小さい。
+数学的には古典版と同じだが、計算誤差が小さい。
 					</p>
 				</section> <section>
 					<h2>手順</h2>
@@ -200,13 +200,19 @@
 				</section> <section>
 					<h2>備考 (誤差の改良点)</h2>
 					<p>
-					古典版と修正版、それぞれの <m:math><m:mi>i</m:mi></m:math> 回目のループの以下の箇所に着目する。
-					</p> <p>
-古典版: <m:math><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mi>i</m:mi></m:msub><m:mo stretchy="false">)</m:mo></m:math>
-					</p> <p>
-修正版: <m:math><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msubsup><m:mi>𝒘</m:mi><m:mi>k</m:mi><m:mrow><m:mi>i</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:msubsup><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mi>i</m:mi></m:msub><m:mo stretchy="false">)</m:mo></m:math>
-					</p> <p>
-ここで、古典版の第一引数は常に <m:math><m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub></m:math> である。一方、修正版は <m:math><m:msubsup><m:mi>𝒘</m:mi><m:mi>k</m:mi><m:mrow><m:mi>i</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:msubsup></m:math> でこれは <m:math><m:mi>i</m:mi><m:mo>=</m:mo><m:mn>1</m:mn></m:math> では古典版と同じだが、<m:math><m:mi>i</m:mi></m:math> が一つ増えるたびに各成分が除去されていくため、その絶対値も減少していく。これにより、平行成分の計算に誤差があっても、それも必ず減少していく。この積み重ねが原因で、修正版のほうが誤差が小さくなる。
+古典版と修正版、それぞれの <m:math><m:mi>i</m:mi></m:math> 回目のループに着目すると、以下の大小関係がある。
+					</p>
+<m:math display="block">
+	<m:mo>|</m:mo><m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub><m:mo>|</m:mo>
+	<m:mo>≥</m:mo>
+	<m:mo>|</m:mo><m:msubsup><m:mi>𝒘</m:mi><m:mi>k</m:mi><m:mrow><m:mi>i</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:msubsup><m:mo>|</m:mo>
+	<m:mo>≥</m:mo>
+	<m:mo>|</m:mo><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msub><m:mi>𝒙</m:mi><m:mi>k</m:mi></m:msub><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mi>i</m:mi></m:msub><m:mo stretchy="false">)</m:mo><m:mo>|</m:mo>
+	<m:mo>≈</m:mo>
+	<m:mo>|</m:mo><m:mi>proj</m:mi><m:mo stretchy="false">(</m:mo><m:msubsup><m:mi>𝒘</m:mi><m:mi>k</m:mi><m:mrow><m:mi>i</m:mi><m:mo>-</m:mo><m:mn>1</m:mn></m:mrow></m:msubsup><m:mo>,</m:mo><m:msub><m:mi>𝒚</m:mi><m:mi>i</m:mi></m:msub><m:mo stretchy="false">)</m:mo><m:mo>|</m:mo>
+</m:math>
+					<p>
+そのため、古典版よりも修正版のほうが、並行成分の減算時の計算が、近い値どうしとなり、丸め誤差が小さくなる。
 					</p>
 				</section>
 			</section>
