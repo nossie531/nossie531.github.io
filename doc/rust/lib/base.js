@@ -44,7 +44,7 @@
 
 			function setDataLayer() {
 				gtag("js", new Date());
-				gtag("config", gtagId, {cookie_flags: "SameSite=None;Secure"});
+				gtag("config", gtagId, {cookie_domain: "auto"});
 			}
 
 			function gtag() {
