@@ -62,7 +62,60 @@ fn increment(x: i32) -&gt; i32 {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="withTypeInference">パターン B</h1>
+					<h1>パターン B</h1>
+					<div class="subTitle">クロージャが関連</div>
+				</hgroup>
+				<p>
+クロージャの型はたとえ引数や戻り値の型が同じでも一つ一つ異なる。<br/>
+そのため、それらに互換性があると想定するとエラーになる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、変数 <code>closure</code> の参照先を切替ようとしている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut closure = &amp;(|| false);
+    assert_eq!(closure(), false);
+
+    closure = <mark class="error">&amp;(|| true)</mark>;
+    assert_eq!(closure(), true)
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:5:15
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let mut closure = &amp;(|| false);
+<mark class="info">  |</mark>                         <mark class="info">-- the expected closure</mark>
+<mark class="info">...</mark>
+<mark class="info">5 |</mark>     closure = &amp;(|| true);
+<mark class="info">  |</mark>               <mark class="error">^^^^^^^^^^ expected `&amp;{closure@main.rs:2:25}`, found `&amp;{closure@main.rs:5:17}`</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: expected reference `&amp;<mark class="em">{closure@src\main.rs:2:25: 2:27}</mark>`
+<mark class="info">   </mark>          found reference `&amp;<mark class="em">{closure@src\main.rs:5:17: 5:19}</mark>`
+<mark class="info">  =</mark> <mark class="title">note</mark>: no two closures, even if identical, have the same type
+<mark class="info">  =</mark> <mark class="title">help</mark>: consider boxing your closure and/or using it as a trait object
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+型を <code>dyn</code> キーワードで抽象化するとよい。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut closure = &amp;(|| false) as &amp;dyn Fn() -&gt; _;
+    assert_eq!(closure(), false);
+
+    closure = &amp;(|| true);
+    assert_eq!(closure(), true)
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="withTypeInference">パターン C</h1>
 					<div class="subTitle">型推論が関連</div>
 				</hgroup>
 				<p>
