@@ -18,7 +18,7 @@
 			});
 		}
 		
-		/* コードブロックをフォーカス可能に設定。*/
+		// コードブロックをフォーカス可能に設定。
 		#setupCodes() {
 			const selector = "pre > code:only-child, pre > samp:only-child";
 			for (const target of document.querySelectorAll(selector)) {
@@ -43,8 +43,8 @@
 			}
 
 			function setDataLayer() {
-				gtag("js", new Date(), {cookie_domain: "auto"});
-				gtag("config", gtagId, {cookie_domain: "auto"});
+				gtag("js", new Date());
+				gtag("config", gtagId, {cookie_flags: "SameSite=None;Secure"});
 			}
 
 			function gtag() {
