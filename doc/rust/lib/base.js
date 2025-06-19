@@ -43,8 +43,8 @@
 			}
 
 			function setDataLayer() {
-				gtag("js", new Date());
-				gtag("config", gtagId);
+				gtag("js", new Date(), {cookie_domain: "auto"});
+				gtag("config", gtagId, {cookie_domain: "auto"});
 			}
 
 			function gtag() {
