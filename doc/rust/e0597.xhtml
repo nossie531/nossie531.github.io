@@ -91,20 +91,20 @@ fn use_static_ref(_: &amp;'static i32) {
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnC1">パターン C1</h1>
-					<div class="subTitle">明示的な <code>Drop</code> トレイトとブロック末尾の式</div>
+					<div class="subTitle">明示的な <code>Drop</code> トレイトとブロック式の末尾</div>
 				</hgroup>
 				<p>
-型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装し、かつ参照を持つ場合について。その参照先を格納するブロックの末尾の式内に、その型の値があるとエラーになる。なぜなら、ブロック内のローカル変数はブロック末尾の式内の値よりも先に解放される。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先が存在しなくなってしまう。
+<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型が参照を持つ場合について。ブロック式の末尾にその型があり、かつそれがブロック内のローカル変数を参照しているとエラーになる。なぜなら、ブロック内のローカル変数はブロック式の末尾よりも先に解放される。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先が存在しなくなってしまう。
 				</p>
 				<section>
 					<h2>エラーの解決方法</h2>
 					<p>
-後述のエラーメッセージの <q>help</q> にある通り、ブロック末尾の式をローカル変数として切り出せばよい。これにより、値を破棄する順序を逆転できる。
+後述のエラーメッセージの <q>help</q> にある通り、ブロック式の末尾をローカル変数として切り出せばよい。これにより、値の破棄順序を逆転できる。
 					</p>
 				</section> <section>
 					<h2>サンプル</h2>
 					<p>
-以下では、<code>OnDrop(&amp;local)</code> がブロック末尾の式内にある。しかし、その解放時には <code>local</code> は解放済のため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時には参照先が存在しない状態になってしまっている。
+以下では、<code>OnDrop(&amp;local)</code> がブロック式の末尾にある。しかし、その破棄による <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が実行される時点で、<code>local</code> はすでに破棄され使えなくなっている。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -150,7 +150,7 @@ impl Drop for OnDrop&lt;'_&gt; {
 			</section> <section>
 				<hgroup>
 					<h1>パターン C2</h1>
-					<div class="subTitle">暗黙的な <code>Drop</code> トレイトとブロック末尾の式</div>
+					<div class="subTitle">暗黙的な <code>Drop</code> トレイトとブロック式の末尾</div>
 				</hgroup>
 				<p>
 基本は<a href="#ptnC1">パターン C1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化が静的か動的かは問わない。
@@ -158,7 +158,7 @@ impl Drop for OnDrop&lt;'_&gt; {
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、<code>MyType(&amp;local).as_trait()</code> がブロック末尾の式内にある。しかし、その解放時には <code>local</code> は解放済のため、結果のトレイトの具象型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> を実装していた場合、その実行時には参照先が存在しない状態になってしまっている。
+以下では、<code>MyType(&amp;local).as_trait()</code> がブロック式の末尾にある。しかし、その破棄により <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が実行されるかもしれない時点で、<code>local</code> はすでに破棄され使えなくなってしまっている。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -217,12 +217,12 @@ impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
 					<div class="subTitle">明示的な <code>Drop</code> トレイトとフィールド間の参照</div>
 				</hgroup>
 				<p>
-型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装し、かつ参照を持つ場合について。参照先に自身を包含するデータの一部を指定するとエラーになる。なぜなら、そのデータが参照先と参照元どちらを含むフィールドを先に解放するかの保証がないため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時には参照先が存在しないかもしれない (フィールドの解放順は定義順によるが、フィールドを逆順で定義するような型も同時に存在しうるため、フィールド側の型は解放順に依存できない)。
+<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型が参照を持つ場合について。その参照のライフタイムにその型を包含した型に由来するものを指定できない。なぜならその場合、参照元と参照先のフィールドが同じ型に含まれる事になり、それらの解放順が問題になる (フィールドの解放順は定義順の逆順ではあるが、借用チェッカーの管理粒度ではどのフィールドのライフタイムも同じ扱いであり、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時の参照先の有無は保証できない)。
 				</p>
 				<section>
 					<h2>補足: <code>dropck_eyepatch</code></h2>
 					<p>
-上記の制約は <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッド内で参照を使用しない場合でも働く。これが不要な場合、<time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/dropck-eyepatch.html"><code>dropck_eyepatch</code></a> でそれを無視するようにもできる (具体的には参照のライフタイム指定子に <code>#[may_dangle]</code> を指定)。
+<time>2024 年現在</time>まだ不安定な機能だが、<a href="https://doc.rust-lang.org/beta/unstable-book/language-features/dropck-eyepatch.html"><code>dropck_eyepatch</code></a> がいくらか緩和策になる。例えば、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッドで問題の参照にふれていなくても同様のエラーになるが、これには簡単に対応できる。詳しくは <a href="https://doc.rust-lang.org/nomicon/dropck.html#an-escape-hatch">Rustnomicon</a> を参照 (それによると将来的にはより洗練された機構が提供されそうな気配…)。
 					</p>
 				</section> <section>
 					<h2>サンプル</h2>
