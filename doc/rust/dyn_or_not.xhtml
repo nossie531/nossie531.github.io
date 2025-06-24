@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: dyn 互換の確認</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+トレイトが <code>dyn</code> 互換かどうかをマークする方法について。
+		</p>
+		<section>
+			<h1>背景</h1>
+			<p>
+トレイトが <code>dyn</code> 互換かどうかは重要である。しかし、Rust の文法はこれをトレイト全体の内容から判断する。トレイトに何かマークをつけるようなスタイルではない。そのため、コードリーディング時に瞬間的な判断ができない。また、メソッドの追加や削除で思いがけず <code>dyn</code> 互換かどうかまでもを変更してしまうかもしれない。
+			</p> <p>
+このような心配は <code>dyn</code> 互換かどうかを明示的にマークできれば不要になる。
+			</p>
+			<aside class="normal moan">
+				<p>
+Rust の不備？
+				</p> <p>
+言語レベルでより直接的なサポートがあれば良かったのだが…。
+				</p>
+			</aside>
+		</section> <section>
+			<h1>対策</h1>
+			<section>
+				<h1>dyn 互換</h1>
+				<p>
+『<a href="dyn_impl.xhtml">dyn 型の実装</a>』が <code>dyn</code> 互換の型にしか使えないのを利用する。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+pub trait MyTrait {
+    fn some_method(&amp;self);
+}
+
+impl dyn MyTrait {}
+</code></pre>
+				</section>
+			</section>
+			<section>
+				<h1>dyn 非互換</h1>
+				<p>
+<code>dyn</code> 非互換のマーカートレイトを基底にする。そして、マーカートレイトに <code>dyn</code> 非互換にするダミーメソッドを入れておく。このダミーメソッドは呼ばれても問題ないが、絶対に呼ばれたくないなら『<a href="voldemort.xhtml">Voldemort パターン</a> - <a href="voldemort.xhtml#virtualPrivate">トレイトメソッドの仮想的な非公開化</a>』も使える。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+pub trait MyTrait: NotDyn {
+    fn some_method(&amp;self);
+}
+
+pub trait NotDyn {
+    #[doc(hidden)]
+    fn __do_not_call() {}
+}
+
+impl&lt;T: ?Sized&gt; NotDyn for T {}
+</code></pre>
+				</section>
+			</section>
+		</section> <section>
+			<h1>クレート紹介</h1>
+			<dl class="normal">
+				<dt>
+<a href="https://crates.io/crates/dyn_safe">dyn_safe</a>
+				</dt>
+				<dd>
+					<p>
+ここで紹介した方法をトレイトへの属性マクロで実現してくれるクレート。
+					</p> <p>
+トレイトに <code>#[dyn_safe(true)]</code> のように指定するだけで機能する。
+					</p>
+				</dd>
+			</dl>
+		</section>
+	</body>
+</html>
