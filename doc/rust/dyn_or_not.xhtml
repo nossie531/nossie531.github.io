@@ -71,15 +71,13 @@ impl&lt;T: ?Sized&gt; NotDyn for T {}
 			<h1>クレート紹介</h1>
 			<dl class="normal">
 				<dt>
-<a href="https://crates.io/crates/dyn_safe">dyn_safe</a>
+<a href="https://crates.io/crates/dyn_compatible">dyn_compatible</a>
 				</dt>
 				<dd>
 					<p>
-ここで紹介した方法をトレイトへの属性マクロで実現してくれるクレート。
+ここで紹介した方法をトレイトへの属性マクロで実現するクレート。
 					</p> <p>
-トレイトに <code>#[dyn_safe(true)]</code> のように指定するだけで機能する。
-					</p> <p>
-ただし、v0.0.4 現在、トレイトに型引数がある場合には対応していないようだ。
+トレイトに <code>#[dyn_compatible(true)]</code> のように指定するだけで機能する。
 					</p>
 				</dd>
 			</dl>
