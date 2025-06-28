@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: スライスの分割と split_at_mut 系の関数</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+スライスへの可変借用の分割には専用のメソッドが必要になる。
+		</p> 
+		<aside class="normal">
+			<p>
+このメモの背景。
+			</p> <p>
+知らないと <code>unsafe</code> を使うことになりやすい。
+			</p>
+		</aside>
+		<section>
+			<h1>背景</h1>
+			<p>
+スライスの各要素は構造体の各フィールドと異なり、そのままでは別々に排他参照を得る事ができない。これは要素のインデックスが動的になるパターンにおいて、重複を検出する手段がないためである。
+			</p>
+			<section>
+				<h2>構造体の場合</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut obj = MyStruct {a: 0, b: 0};
+    let a = &amp;mut obj.a;
+    let b = &amp;mut obj.b;
+    *a += 1;
+    *b += 1;
+    assert_eq!(obj.a, obj.b);
+}
+
+struct MyStruct {
+    a: i32,
+    b: i32,
+}
+</code></pre>
+			</section> <section>
+				<h2>スライスの場合</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut obj = [0, 0];
+    let a = &amp;mut obj[0];
+    let b = <mark class="error">&amp;mut obj[1]</mark>;
+    *a += 1;
+    *b += 1;
+    assert_eq!(obj[0], obj[1]);
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0499]</mark><mark class="title">: cannot borrow `obj[_]` as mutable more than once at a time</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:13
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let a = &amp;mut obj[0];
+<mark class="info">  |</mark>             <mark class="info">----------- first mutable borrow occurs here</mark>
+<mark class="info">4 |</mark>     let b = &amp;mut obj[1];
+<mark class="info">  |</mark>             <mark class="error">^^^^^^^^^^^ second mutable borrow occurs here</mark>
+<mark class="info">5 |</mark>     *a += 1;
+<mark class="info">  |</mark>     <mark class="info">------- first borrow later used here</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: use `.split_at_mut(position)` to obtain two mutable non-overlapping sub-slices
+</samp></pre>
+			</section>
+		</section> <section>
+			<h1>メソッド</h1>
+			<p>
+スライスを重複なく分割できれば、複数の排他参照を提供できる。
+			</p> <p>
+以下はそうした分割を保証したメソッドの抜粋である。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.split_at_mut">split_at_mut</a></code>
+				</dt>
+				<dd>位置指定して分割 <span class="nw">(範囲外はパニック)</span></dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.split_at_mut_checked">split_at_mut_checked</a></code>
+				</dt>
+				<dd>位置指定して分割 <span class="nw">(範囲外は結果なし)</span></dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.split_at_mut_unchecked">split_at_mut_unchecked</a></code>
+				</dt>
+				<dd>位置指定して分割 <span class="nw">(範囲外は未定義)&#x3000;</span></dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.split_first_mut">split_first_mut</a></code>
+				</dt>
+				<dd>先頭とその他に分割</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.split_last_mut">split_last_mut</a></code>
+				</dt>
+				<dd>末尾とその他に分割</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.iter_mut">iter_mut</a></code>
+				</dt>
+				<dd>イテレータでの分割 (要素ごと)</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.slice.html">slice</a>::<a href="https://doc.rust-lang.org/std/primitive.slice.html#method.split_mut">split_mut</a></code>
+				</dt>
+				<dd>イテレータでの分割 (グループごと)</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.str.html">str</a>::<a href="https://doc.rust-lang.org/std/primitive.str.html#method.split_at_mut">split_at_mut</a></code>
+				</dt>
+				<dd>位置指定して分割 <span class="nw">(範囲外はパニック)</span></dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/primitive.str.html">str</a>::<a href="https://doc.rust-lang.org/std/primitive.str.html#method.split_at_mut_checked">split_at_mut_checked</a></code>
+				</dt>
+				<dd>位置指定して分割 <span class="nw">(範囲外は結果なし)</span></dd>
+			</dl>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut obj = [0, 0];
+    let (a, b) = obj.split_at_mut(1);
+    a[0] += 1;
+    b[0] += 1;
+    assert_eq!(obj[0], obj[1]);
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>

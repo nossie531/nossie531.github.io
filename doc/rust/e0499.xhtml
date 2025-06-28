@@ -78,7 +78,38 @@ fn main() {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="nll_fp">パターン C</h1>
+					<h1>パターン C</h1>
+					<div class="subTitle">スライスの分割</div>
+				</hgroup>
+				<p>
+詳しくは『<a href="split_at_mut.xhtml">スライスの分割と split_at_mut 系の関数</a>』を参照。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut obj = [0, 0];
+    let a = &amp;mut obj[0];
+    let b = <mark class="error">&amp;mut obj[1]</mark>;
+    *a += 1;
+    *b += 1;
+    assert_eq!(obj[0], obj[1]);
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0499]</mark><mark class="title">: cannot borrow `obj[_]` as mutable more than once at a time</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:13
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let a = &amp;mut obj[0];
+<mark class="info">  |</mark>             <mark class="info">----------- first mutable borrow occurs here</mark>
+<mark class="info">4 |</mark>     let b = &amp;mut obj[1];
+<mark class="info">  |</mark>             <mark class="error">^^^^^^^^^^^ second mutable borrow occurs here</mark>
+<mark class="info">5 |</mark>     *a += 1;
+<mark class="info">  |</mark>     <mark class="info">------- first borrow later used here</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: use `.split_at_mut(position)` to obtain two mutable non-overlapping sub-slices
+</samp></pre>
+			</section> <section>
+				<hgroup>
+					<h1 id="nll_fp">パターン D</h1>
 					<div class="subTitle">NLL の偽陽性</div>
 				</hgroup>
 				<p>
