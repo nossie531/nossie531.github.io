@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 0 230 60">
+	<style>
+text.code {
+	font-family: "Consolas", monospace;
+	font-size: 12px;
+}
+#vec {
+	fill: white;
+}
+#elm {
+	fill: none;
+	stroke: black;
+}
+#shrink {
+	fill: none;
+	stroke: gray;
+}
+#remove {
+	fill: none;
+	stroke: red;
+}
+#swap {
+	fill: none;
+	stroke: dimgray;
+	marker-start: url(#arrow);
+	marker-end: url(#arrow);
+}
+	</style>
+	<defs>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M0,-0.5 L 0,0.5 -6,3 -6,-3" fill="context-stroke"/>
+		</marker>
+	</defs>
+	<g transform="translate(40, 20)">
+		<text class="code" x="-5" y="13" text-anchor="end">Vec</text>
+		<rect id="vec" width="160" height="20"/>
+		<path id="remove" d="M 40,0 l 20,20 m 0,-20 l -20,20"/>
+		<path id="shrink" d="M 153,7 l -3,3 3,3 m -3,-6 l -3,3 3,3"/>
+		<path id="swap" d="M 148,20.5 l -2,5 q -2,5 -8,5 h -76 q -6,0 -8,-5 l -2,-5"/>
+		<path id="elm"
+			d="M 0,0 h 160 v 20 h -160 v -20 z
+			   m 20,0 v 20 m 20,-20 v 20 m 20,-20 v 20 m 20,-20 v 20
+			   m 20,-20 v 20 m 20,-20 v 20 m 20,-20 v 20"/>
+	</g>
+</svg>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Vec::swap_remove</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.swap_remove">swap_remove</a></code> メソッドは要素を素早く削除できる。
+		</p> 
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+知っていると便利なマイナー機能なのでメモ。なお、<time>2025 年現在</time>の多くの他の言語における標準ライブラリでは同等の機能が存在しない (簡単に自作できるからだろう)。
+			</p>
+		</aside>
+		<section>
+			<h1>背景</h1>
+			<p>
+<code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>::<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.remove">remove</a></code> メソッドは指定したインデックスの要素を削除する。ただし、このメソッドは時間がかかる場合がある。なぜなら、内部配列から指定した要素を削除するには、その後続の要素を全て一つずつずらしてから、内部配列を縮小する必要がある。
+			</p>
+			<figure class="normal">
+				<iframe src="img/vec_remove.svg" style="height: 6rem;"/>
+				<figcaption><code>Vec::remove</code> のイメージ</figcaption>
+			</figure>
+			<p>
+そこで、順序が適当でよい場合に限り、削除する要素と最後の要素を交換してから、内部配列を縮小する方法がよく使われる。<code>Vec::swap_remove</code> はまさにこれを行う。
+			</p>
+			<figure class="normal">
+				<iframe src="img/vec_swap_remove.svg" style="height: 6rem;"/>
+				<figcaption><code>Vec::swap_remove</code> のイメージ</figcaption>
+			</figure>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下は Rustdoc の Examples からの引用。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut v = vec!["foo", "bar", "baz", "qux"];
+
+    assert_eq!(v.swap_remove(1), "bar");
+    assert_eq!(v, ["foo", "qux", "baz"]);
+    
+    assert_eq!(v.swap_remove(0), "foo");
+    assert_eq!(v, ["baz", "qux"]);
+}
+</code></pre>
+		</section>
+	</body>
+</html>

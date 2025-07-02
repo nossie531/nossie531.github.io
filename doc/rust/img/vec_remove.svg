@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 0 230 60">
+	<style>
+text.code {
+	font-family: "Consolas", monospace;
+	font-size: 12px;
+}
+#vec {
+	fill: white;
+}
+#elm {
+	fill: none;
+	stroke: black;
+}
+#shrink {
+	fill: none;
+	stroke: gray;
+}
+#remove {
+	fill: none;
+	stroke: red;
+}
+#move {
+	fill: none;
+	stroke: dimgray;
+	marker-end: url(#arrow);
+}
+	</style>
+	<defs>
+		<path id="move" d="M 0,0 c -1.5,11 -12,10 -14,5 l -2,-5"/>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M0,-0.5 L 0,0.5 -6,3 -6,-3" fill="context-stroke"/>
+		</marker>
+	</defs>
+	<g transform="translate(40, 20)">
+		<text class="code" x="-5" y="13" text-anchor="end">Vec</text>
+		<rect id="vec" width="160" height="20"/>
+		<path id="remove" d="M 40,0 l 20,20 m 0,-20 l -20,20"/>
+		<path id="shrink" d="M 153,7 l -3,3 3,3 m -3,-6 l -3,3 3,3"/>
+		<use href="#move" x="68" y="20.5"/>
+		<use href="#move" x="88" y="20.5"/>
+		<use href="#move" x="108" y="20.5"/>
+		<use href="#move" x="128" y="20.5"/>
+		<use href="#move" x="148" y="20.5"/>
+		<path id="elm"
+			d="M 0,0 h 160 v 20 h -160 v -20 z
+			   m 20,0 v 20 m 20,-20 v 20 m 20,-20 v 20 m 20,-20 v 20
+			   m 20,-20 v 20 m 20,-20 v 20 m 20,-20 v 20"/>
+	</g>
+</svg>
