@@ -28,6 +28,9 @@
 
 		// Google Analytics との連携を設定。
 		#setupGoogleAnalytics() {
+			/* cookie_domain について。
+			2025 年現在、Firefox は他のブラウザよりクッキーの制限が厳しい。
+			サイトはサブドメイン内にあるため、これがないとエラーになる。*/
 			const gtagId = "G-X01B3QVSC1";
 			window.gtag = gtag;
 			window.dataLayer = window.dataLayer || [];
@@ -44,11 +47,15 @@
 
 			function setDataLayer() {
 				gtag("js", new Date());
-				gtag("config", gtagId);
+				gtag("config", gtagId, {cookie_domain: domain()});
 			}
 
 			function gtag() {
 				window.dataLayer.push(arguments);
+			}
+
+			function domain() {
+				return new URL(location).hostname;
 			}
 		}
 	}
