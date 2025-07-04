@@ -28,11 +28,7 @@
 
 		// Google Analytics との連携を設定。
 		#setupGoogleAnalytics() {
-			/* cookie_domain: "auto" について。
-			Google Analytics の仕様によると、これがデフォルトのはずなのだが、
-			何故か、2025 年現在、Firefox 139 ではこれがないとエラーになる。*/
 			const gtagId = "G-X01B3QVSC1";
-			const myOpt = {cookie_domain: "auto"};
 			window.gtag = gtag;
 			window.dataLayer = window.dataLayer || [];
 			setGtagJs();
@@ -47,8 +43,8 @@
 			}
 
 			function setDataLayer() {
-				gtag("js", new Date(), myOpt);
-				gtag("config", gtagId, myOpt);
+				gtag("js", new Date());
+				gtag("config", gtagId);
 			}
 
 			function gtag() {
