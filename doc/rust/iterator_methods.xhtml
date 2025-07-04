@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Iterator の各種メソッド</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> のメソッドは大量にある。
+		</p> <p>
+忘れた頃にいつも探しているので用途別にまとめた。
+		</p> <p>
+(まとめていないものもあるので要注意！)
+		</p>
+		<section>
+			<h1>移動系</h1>
+			<p>
+イテレータを進めたり戻したりするメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.next"><code>next</code></a>
+				</dt>
+				<dd>
+イテレータを 1 個だけ進めて値を取得。
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.nth"><code>nth</code></a>
+				</dt>
+				<dd>
+イテレータを n + 1 個だけ進めて値を取得。
+				</dd>
+			</dl>
+		</section> <section>
+			<h1>判定系</h1>
+			<p>
+対象のイテレータが条件を満たすかを判定するメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.all"><code>all</code></a>
+				</dt>
+				<dd>全ての要素が条件を満たすかを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.any"><code>any</code></a>
+				</dt>
+				<dd>任意の要素が条件を満たすかを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.is_sorted"><code>is_sorted</code></a>
+				</dt>
+				<dd>要素が昇順にソート済かを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.is_sorted_by"><code>is_sorted_by</code></a>
+				</dt>
+				<dd>比較関数を指定、要素が昇順にソート済かを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.is_sorted_by"><code>is_sorted_by_key</code></a>
+				</dt>
+				<dd>基準関数を指定、要素が昇順にソート済かを判定。</dd>
+			</dl>
+		</section> <section>
+			<h1>比較系</h1>
+			<p>
+二つのイテレータ x と y の要素の並びを比較するメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.eq"><code>eq</code></a>
+				</dt>
+				<dd>並びが一致するかを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.ne"><code>ne</code></a>
+				</dt>
+				<dd>並びが一致しないかを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.lt"><code>lt</code></a>
+				</dt>
+				<dd>並びを辞書順で比較、x &lt; y かを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.le"><code>le</code></a>
+				</dt>
+				<dd>並びを辞書順で比較、x ≤ y かを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.gt"><code>gt</code></a>
+				</dt>
+				<dd>並びを辞書順で比較、x &gt; y かを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.ge"><code>ge</code></a>
+				</dt>
+				<dd>並びを辞書順で比較、x ≥ y かを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.cmp"><code>cmp</code></a>
+				</dt>
+				<dd>並びを辞書順で比較、順序関係を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.partial_cmp"><code>partial_cmp</code></a>
+				</dt>
+				<dd>並びを辞書順で比較、半順序関係を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.eq_by"><code>eq_by</code></a>
+				</dt>
+				<dd>比較関数を指定、並びが一致するかを判定。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.cmp_by"><code>cmp_by</code></a>
+				</dt>
+				<dd>比較関数を指定、並びを辞書順で比較、順序関係を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.partial_cmp_by"><code>partial_cmp_by</code></a>
+				</dt>
+				<dd>比較関数を指定、並びを辞書順で比較、半順序関係を取得。</dd>
+			</dl>
+		</section> <section>
+			<h1>探索系</h1>
+			<p>
+要素のインデックスを取得するメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.position"><code>position</code></a>
+				</dt>
+				<dd>条件に合う要素を先頭から検索、インデックスを取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.rposition"><code>rposition</code></a>
+				</dt>
+				<dd>条件に合う要素を末尾から検索、インデックスを取得。</dd>
+			</dl>
+		</section> <section>
+			<h1>集約系</h1>
+			<p>
+複数の要素から一つの値を得るメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.count"><code>count</code></a>
+				</dt>
+				<dd>要素数の取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.sum"><code>sum</code></a>
+				</dt>
+				<dd>全要素を加算。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.product"><code>product</code></a>
+				</dt>
+				<dd>全要素を積算。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.reduce"><code>reduce</code></a>
+				</dt>
+				<dd>汎用的な集約処理、初期値なし。</dd>
+				<dt id="fold">
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fold"><code>fold</code></a>
+				</dt>
+				<dd>汎用的な集約処理、初期値あり。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.try_reduce"><code>try_reduce</code></a>
+				</dt>
+				<dd><code>reduce</code> の失敗可能版。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.try_fold"><code>try_fold</code></a>
+				</dt>
+				<dd><code>fold</code> の失敗可能版。</dd>
+			</dl>
+		</section> <section>
+			<h1>単体取得系</h1>
+			<p>
+条件を満たす要素を一つだけ取得するメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt id="find">
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.find"><code>find</code></a>
+				</dt>
+				<dd>条件に合う要素を先頭から検索。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.last"><code>last</code></a>
+				</dt>
+				<dd>末尾の要素を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.min"><code>min</code></a>
+				</dt>
+				<dd>最小値を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.min"><code>max</code></a>
+				</dt>
+				<dd>最大値を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.min_by"><code>min_by</code></a>
+				</dt>
+				<dd>比較関数を指定、最小値を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.min_by"><code>max_by</code></a>
+				</dt>
+				<dd>比較関数を指定、最大値を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.min_by_key"><code>min_by_key</code></a>
+				</dt>
+				<dd>基準関数を指定、最小値を取得。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.min_by_key"><code>max_by_key</code></a>
+				</dt>
+				<dd>基準関数を指定、最大値を取得。</dd>
+			</dl>
+		</section> <section>
+			<h1>複数取得系</h1>
+			<p>
+条件を満たす要素を取得するイテレータを生成するメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.take"><code>take</code></a>
+				</dt>
+				<dd>続く n 個の要素を対象とする。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.skip"><code>skip</code></a>
+				</dt>
+				<dd>続く n 個の要素を無視する。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.take_while"><code>take_while</code></a>
+				</dt>
+				<dd>指定条件が連続する限り要素を対象とする。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.skip_while"><code>skip_while</code></a>
+				</dt>
+				<dd>指定条件が連続する限り要素を無視する。</dd>
+				<dt id="filter">
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.filter"><code>filter</code></a>
+				</dt>
+				<dd>条件を満たす要素を全て対象とする。</dd>
+			</dl>
+		</section> <section>
+			<h1>写像系</h1>
+			<p>
+元のイテレータの要素を写像し、新しいイテレータを生成するメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt id="map">
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.map"><code>map</code></a>
+				</dt>
+				<dd>写像の方法を指定して写像。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.enumerate"><code>enumerate</code></a>
+				</dt>
+				<dd>要素を連番とのタプルにして写像。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.copied"><code>copied</code></a>
+				</dt>
+				<dd>要素をコピーして写像。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.copied"><code>cloned</code></a>
+				</dt>
+				<dd>要素をクローンして写像。</dd>
+			</dl>
+		</section> <section>
+			<h1>制御系</h1>
+			<p>
+イテレータ全体の挙動を変更するメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.step_by"><code>step_by</code></a>
+				</dt>
+				<dd>元の並びを一定間隔で読み飛ばすイテレータを生成。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.rev"><code>rev</code></a>
+				</dt>
+				<dd>元の並びを記録して反転するイテレータを生成。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.cycle"><code>cycle</code></a>
+				</dt>
+				<dd>元の並びを記録して反復するイテレータを生成。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.peekable"><code>peekable</code></a>
+				</dt>
+				<dd>前進なしで繰り返し値を読めるイテレータを生成。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fuse"><code>fuse</code></a>
+				</dt>
+				<dd>『<a href="iterator_fuse.xhtml">Iterator::fuse と FusedIterator</a>』を参照。</dd>
+			</dl>
+		</section> <section>
+			<h1>合成分解系</h1>
+			<p>
+イテレータを合成したり分解したりするメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.chain"><code>chain</code></a>
+				</dt>
+				<dd>
+二つのイテレータを直列に連結したイテレータを生成。
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.zip"><code>zip</code></a>
+				</dt>
+				<dd>
+二つのイテレータを元に、ペアタプルのイテレータを生成。
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.unzip"><code>unzip</code></a>
+				</dt>
+				<dd>
+ペアタプルのイテレータを元に、二つのコレクションを生成。
+				</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.partition"><code>partition</code></a>
+				</dt>
+				<dd>
+イテレータの各要素を条件判定、二つのコレクションを生成。
+				</dd>
+				<dt id="flatten">
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.flatten"><code>flatten</code></a>
+				</dt>
+				<dd>
+イテレータのイテレータを元に、平坦化したイテレータを生成。
+				</dd>
+			</dl>
+		</section> <section>
+			<h1>副作用系</h1>
+			<p>
+走査と同時に副作用を伴う処理を意図したメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.for_each"><code>for_each</code></a>
+				</dt>
+				<dd>各要素に操作を適用、戻り値はなし。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.inspect"><code>inspect</code></a>
+				</dt>
+				<dd>各要素に操作を適用、戻り値は同じ並びのイテレータ。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.for_each"><code>try_for_each</code></a>
+				</dt>
+				<dd><code>for_each</code> の失敗可能版。</dd>
+			</dl>
+		</section> <section>
+			<h1>複合操作系</h1>
+			<p>
+他のグループのメソッドを少し改変したメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.find_map"><code>find_map</code></a>
+				</dt>
+				<dd><a href="#find"><code>find</code></a> して <a href="#map"><code>map</code></a> の複合操作。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.filter_map"><code>filter_map</code></a>
+				</dt>
+				<dd><a href="#filter"><code>filter</code></a> して <a href="#map"><code>map</code></a> の複合操作。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.flat_map"><code>flat_map</code></a>
+				</dt>
+				<dd><a href="#map"><code>map</code></a> して <a href="#flatten"><code>flatten</code></a> の複合操作。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.scan"><code>scan</code></a>
+				</dt>
+				<dd><a href="#fold"><code>fold</code></a> の集計過程を列挙するイテレータを生成。</dd>
+			</dl>
+		</section> <section>
+			<h1>特殊操作系</h1>
+			<p>
+他のどのグループにも属さないが重要なメソッド。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.size_hint"><code>size_hint</code></a>
+				</dt>
+				<dd>残り要素数の下限値と上限値。</dd>
+				<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.by_ref"><code>by_ref</code></a>
+				</dt>
+				<dd>イテレータを分断。</dd>
+			</dl>
+		</section>
+	</body>
+</html>
