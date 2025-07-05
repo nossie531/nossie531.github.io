@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Iterator::sum と Iterator::product</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<code><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.sum">sum</a></code> メソッドと <code><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.product">product</a></code> メソッドについて。 
+		</p> 
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+知っていると便利なマイナー機能なのでメモ。<time>2025 年現在</time>、他の言語では標準ライブラリに同等の機能を持たない方針のものも多い (他メソッドで代用できるため)。
+			</p>
+		</aside>
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+<code><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.sum">sum</a></code> はイテレータの全要素の総和を求める。
+			</p> <p>
+<code><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.product">product</a></code> はイテレータの全要素の総乗を求める。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let vals = vec![1, 2, 3, 4, 5].into_iter();
+    let sum = vals.clone().sum::&lt;i32&gt;();
+    let prd = vals.clone().product::&lt;i32&gt;();
+    assert_eq!(sum, 15);
+    assert_eq!(prd, 120);
+}
+</code></pre>
+		</section> <section>
+			<h1>他メソッドでの代用</h1>
+			<p>
+同じ処理は <code><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.reduce">reduce</a></code> や <code><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fold">fold</a></code> でも書ける。
+			</p>
+			<p>
+ただし、<code>sum</code> や <code>product</code> を使ったほうが短くなりやすい。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let vals = vec![1, 2, 3, 4, 5].into_iter();
+    let sum1 = vals.clone().sum::&lt;i32&gt;();
+    let sum2 = vals.clone().reduce(|a, x| a + x).unwrap();
+    let sum3 = vals.clone().fold(0, |a, x| a + x);
+    assert_eq!(sum1, sum2);
+    assert_eq!(sum1, sum3);
+}
+</code></pre>
+		</section> <section>
+			<h1>明示的な型パラメタ</h1>
+			<p>
+よくある使い方の範囲では、型パラメタを明示している箇所について､「ここは型推論できるのでは？」と思える。しかし、これは「何を集約するか？」だけでなく「何を何に対して集約するか？」まで汎用性を持たせた対償となっている。
+			</p> <p>
+なお、この汎用性は <a href="https://doc.rust-lang.org/std/iter/trait.Sum.html"><code>Sum</code></a> トレイトや <a href="https://doc.rust-lang.org/std/iter/trait.Product.html"><code>Product</code></a> トレイトにより実現されている。
+			</p>
+			<section>
+				<h2>サンプル 1</h2>
+				<p>
+以下では、<code>&amp;i32</code> を <code>i32</code> に対して集約している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let vals = vec![&amp;1, &amp;2, &amp;3, &amp;4, &amp;5].into_iter();
+    let sum = vals.clone().sum::&lt;i32&gt;();
+    assert_eq!(sum, 15);
+}
+</code></pre>
+			</section> <section>
+				<h2>サンプル 2</h2>
+				<p>
+以下では、<code>Sum</code> を実装して独自の総和を定義している。
+				</p>
+<pre><code class="language-rust">
+use std::iter::Sum;
+
+fn main() {
+    let items = vec!["foo", "bar", "baz"].into_iter();
+    let sum = items.sum::&lt;MySummary&gt;();
+    assert_eq!(sum.0, "foo-bar-baz");
+}
+
+struct MySummary(String);
+
+impl&lt;'a&gt; Sum&lt;&amp;'a str&gt; for MySummary {
+    fn sum&lt;I: Iterator&lt;Item = &amp;'a str&gt;&gt;(iter: I) -&gt; Self {
+        let mut ret = String::new();
+        for item in iter {
+            ret += if ret.is_empty() { "" } else { "-" };
+            ret += &amp;item.to_string();
+        }
+
+        Self(ret)
+    }
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>

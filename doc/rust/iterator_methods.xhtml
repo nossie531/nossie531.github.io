@@ -86,11 +86,11 @@
 					<dt>
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.sum"><code>sum</code></a>
 					</dt>
-					<dd>全要素の総和の取得。</dd>
+					<dd>全要素の総和の取得<sup class="tail"><a href="#link-1">[1]</a></sup>。</dd>
 					<dt>
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.product"><code>product</code></a>
 					</dt>
-					<dd>全要素の総乗の取得。</dd>
+					<dd>全要素の総乗の取得<sup class="tail"><a href="#link-1">[1]</a></sup>。</dd>
 					<dt>
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.reduce"><code>reduce</code></a>
 					</dt>
@@ -156,7 +156,7 @@
 					<dt>
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fuse"><code>fuse</code></a>
 					</dt>
-					<dd>『<a href="iterator_fuse.xhtml">Iterator::fuse と FusedIterator</a>』を参照。</dd>
+					<dd> <code>None</code> による終了を保証<sup class="tail"><a href="#link-2">[2]</a></sup>。</dd>
 				</dl>
 			</section> <section>
 				<h1>単体読取</h1>
@@ -381,5 +381,16 @@
 				</dl>
 			</section>
 		</section>
+		<footer>
+			<section>
+				<h1>リンク</h1>
+				<dl class="links">
+					<dt id="link-1">[1]</dt>
+					<dd><a href="iterator_sum.xhtml">Iterator::sum と Iterator::product</a></dd>
+					<dt id="link-2">[2]</dt>
+					<dd><a href="iterator_fuse.xhtml">Iterator::fuse と FusedIterator</a></dd>
+				</dl>
+			</section>
+		</footer>
 	</body>
 </html>

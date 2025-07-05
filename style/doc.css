@@ -126,6 +126,20 @@
 		border-radius: 0.25ch;
 	}
 
+	sup:has(> a) {
+		position: relative;
+		font-size: 70%;
+		z-index: 1;
+		top: -0.5em;
+	}
+
+	sup.tail:has(> a) {
+		display: inline-block;
+		width: 1em;
+		margin-right: -1em;
+		left: 0.25ch;
+	}
+
 	div.math {
 		margin: 0.5em 0;
 		overflow-x: auto;
@@ -429,6 +443,16 @@
 
 	section > h3:not(.noTitle)::before {
 		content: "▶ ";
+	}
+
+	footer > section > dl.links {
+		display: grid;
+		grid-template-columns: max-content 1fr;
+		column-gap: 1ch;
+
+		> dd {
+			margin-left: 0;
+		}
 	}
 
 	hr.split {
