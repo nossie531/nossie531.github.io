@@ -47,25 +47,6 @@
 					<dd>条件を満たすまで後方イテレータで戻り、インデックスを取得。</dd>
 				</dl>
 			</section> <section>
-				<h1>副作用</h1>
-				<p>
-走査と同時に副作用を伴う処理を意図したメソッド。
-				</p>
-				<dl class="normal lowProfile">
-					<dt>
-<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.for_each"><code>for_each</code></a>
-					</dt>
-					<dd>各要素に操作を適用、戻り値はなし。</dd>
-					<dt>
-<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.inspect"><code>inspect</code></a>
-					</dt>
-					<dd>各要素に操作を適用、戻り値は同じ並びのイテレータ。</dd>
-					<dt>
-<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.for_each"><code>try_for_each</code></a>
-					</dt>
-					<dd><code>for_each</code> の失敗可能版。</dd>
-				</dl>
-			</section> <section>
 				<h1>判定</h1>
 				<p>
 対象のイテレータが条件を満たすかを判定する。
@@ -105,11 +86,11 @@
 					<dt>
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.sum"><code>sum</code></a>
 					</dt>
-					<dd>全要素を加算。</dd>
+					<dd>全要素の総和の取得。</dd>
 					<dt>
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.product"><code>product</code></a>
 					</dt>
-					<dd>全要素を積算。</dd>
+					<dd>全要素の総乗の取得。</dd>
 					<dt>
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.reduce"><code>reduce</code></a>
 					</dt>
@@ -265,6 +246,25 @@
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.scan"><code>scan</code></a>
 					</dt>
 					<dd><a href="#fold"><code>fold</code></a> の集計過程を列挙。</dd>
+				</dl>
+			</section> <section>
+				<h1>副作用</h1>
+				<p>
+走査と同時に副作用を伴う処理を意図したメソッド。
+				</p>
+				<dl class="normal lowProfile">
+					<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.for_each"><code>for_each</code></a>
+					</dt>
+					<dd>各要素に操作を適用、戻り値はなし。</dd>
+					<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.inspect"><code>inspect</code></a>
+					</dt>
+					<dd>各要素に操作を適用、戻り値は同じ並びのイテレータ。</dd>
+					<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.for_each"><code>try_for_each</code></a>
+					</dt>
+					<dd><code>for_each</code> の失敗可能版。</dd>
 				</dl>
 			</section> <section>
 				<h1>その他</h1>
