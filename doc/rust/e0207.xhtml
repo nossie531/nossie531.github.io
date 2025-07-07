@@ -94,7 +94,7 @@ impl&lt;<mark class="error">T</mark>&gt; MyType {}
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0207]</mark><mark class="title">: the type parameter `T` is not constrained by the impl trait, self type, or predicates</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:2:6
+<mark class="info"> --&gt;</mark> src\lib.rs:2:6
 <mark class="info">  |</mark>
 <mark class="info">2 |</mark> impl&lt;T&gt; MyType {}
 <mark class="info">  |</mark>      <mark class="error">^ unconstrained type parameter</mark>
@@ -126,7 +126,7 @@ impl&lt;<mark class="error">T</mark>&gt; MyType {
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0207]</mark><mark class="title">: the type parameter `T` is not constrained by the impl trait, self type, or predicates</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:2:6
+<mark class="info"> --&gt;</mark> src\lib.rs:2:6
 <mark class="info">  |</mark>
 <mark class="info">2 |</mark> impl&lt;T&gt; MyType {
 <mark class="info">  |</mark>      <mark class="error">^ unconstrained type parameter</mark>
@@ -158,7 +158,7 @@ impl&lt;T, <mark class="error">U</mark>&gt; MyType&lt;T&gt; where T: MyTrait&lt;
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0207]</mark><mark class="title">: the type parameter `U` is not constrained by the impl trait, self type, or predicates</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:3:10
+<mark class="info"> --&gt;</mark> src\lib.rs:3:10
 <mark class="info">  |</mark>
 <mark class="info">3 |</mark> impl&lt;T, U&gt; MyType&lt;T&gt; where T: MyTrait&lt;U&gt; {}
 <mark class="info">  |</mark>         <mark class="error">^ unconstrained type parameter</mark>
