@@ -95,12 +95,12 @@ impl&lt;'r&gt; Add&lt;&amp;'r P3&gt; for &amp;P3 {
 			<section>
 				<h2>関連バグ</h2>
 				<p>
-<time>2025 年現在</time>､『<a href="e0275.xhtml#bug">E0275 - トレイト確認の無限再帰 - バグ</a>』があるため、左辺が参照型の場合について理想的な表現ができない。この影響でトレイトが二つ必要になる。
+<time>2025 年現在</time>､『<a href="e0275.xhtml#bug">E0275 - トレイト確認の無限再帰 - バグ</a>』があるため、左辺が参照型の場合について理想的な表現ができない。この影響で値と参照の境界が個別に必要になる。
 				</p>
 			</section> <section>
 				<h2>サンプル</h2>
 				<p>
-以下では、前のサンプルで定義したのと同じ型 <code>P3</code> を二つのトレイトで抽象化している。ここでトレイト <code>Value</code> は <code>+</code> 演算子の左辺が値型の場合を、トレイト <code>ValueRef</code> は <code>+</code> 演算子の左辺が参照型の場合を処理する。
+以下では、前のサンプルで定義したのと同じ型 <code>P3</code> を抽象化している。
 				</p>
 <pre><code class="language-rust">
 use std::ops::Add;
@@ -113,8 +113,8 @@ fn main() {
 
 fn add&lt;T&gt;(x: Option&lt;T&gt;, y: Option&lt;T&gt;, def: &amp;T) -&gt; T
 where
-    T: Value,
-    for&lt;'a&gt; &amp;'a T: ValueRef&lt;T&gt;
+    T: Value&lt;T&gt;,
+    for&lt;'a&gt; &amp;'a T: Value&lt;T&gt;
 {
     match (x, y) {
         (None, None) =&gt; def + def,
@@ -124,17 +124,11 @@ where
     }
 }
 
-trait Value: Sized
-where Self: Add&lt;Output = Self&gt; + for&lt;'a&gt; Add&lt;&amp;'a Self, Output = Self&gt; {}
+trait Value&lt;R&gt;: Sized
+where Self: Add&lt;R, Output = R&gt; + for&lt;'a&gt; Add&lt;&amp;'a R, Output = R&gt; {}
 
-impl&lt;T&gt; Value for T
-where T: Add&lt;Output = Self&gt; + for&lt;'a&gt; Add&lt;&amp;'a Self, Output = Self&gt; {}
-
-trait ValueRef&lt;V&gt;: Sized
-where Self: Add&lt;V, Output = V&gt; + for&lt;'a&gt; Add&lt;&amp;'a V, Output = V&gt; {}
-
-impl&lt;T, V&gt; ValueRef&lt;V&gt; for T
-where T: Add&lt;V, Output = V&gt; + for&lt;'a&gt; Add&lt;&amp;'a V, Output = V&gt; {}
+impl&lt;L, R&gt; Value&lt;R&gt; for L
+where L: Add&lt;R, Output = R&gt; + for&lt;'a&gt; Add&lt;&amp;'a R, Output = R&gt; {}
 
 // -- `P3` definition -- //
 
