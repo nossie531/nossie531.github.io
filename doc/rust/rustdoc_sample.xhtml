@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: rustdoc でのサンプルコード</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+rustdoc におけるサンプルコードの扱いについて。
+		</p>
+		<section>
+			<h1>基本</h1>
+			<p>
+サンプルは Markdown のコードブロック (<code>```</code> から <code>```</code> まで) で記載される。
+			</p> <p>
+このようにして書かれたサンプルは単体テストと同じように自動テストの対象になる。
+			</p>
+			<section>
+				<h2>非表示行の指定</h2>
+				<p>
+サンプル内のハッシュ ('<code>#</code>') とスペース ('<code> </code>') で始まる行はドキュメント化時に隠される。
+				</p> <p>
+これにより例えば、<code>use</code> 文などのテストの準備段階のコードを見せないようにできる。
+				</p> <p>
+補足: 後述の <a href="#tips">TIPS</a> ではこれをややトリッキーな形で活用している。
+				</p>
+			</section> <section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+/// Returns factorial of `n`.
+/// 
+/// # Examples
+/// 
+/// ```
+/// # use rust_test::*;
+/// assert_eq!(factorial(1), 1);
+/// assert_eq!(factorial(2), 2);
+/// assert_eq!(factorial(3), 6);
+/// ```
+pub fn factorial(n: u32) -&gt; u32 {
+    match n {
+        0 | 1 =&gt; 1,
+        _ =&gt; factorial(n - 1) * n
+    }
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>言語</h1>
+			<p>
+デフォルトの言語は <code>rust</code> である。この場合、言語名は省略できる。
+			</p> <p>
+<code>rust</code> 以外の言語では文書化テストは実行されない。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+/// Read csv format string.
+///
+/// # CSV Examples
+/// 
+/// ```csv
+/// v11,v12,v13
+/// v21,v22,v23
+/// ```
+/// 
+/// # Examples
+/// 
+/// ```rust
+/// # use rust_test::*;
+/// let csv = read_csv("v11,v12,v13\nv21,v22,v23,");
+/// assert_eq!(csv[1][2], "v23");
+/// ```
+pub fn read_csv(text: &amp;str) -&gt; Vec&lt;Vec&lt;&amp;str&gt;&gt; {
+    let mut ret = Vec::new();
+    for line in text.split('\n') {
+        let mut record = Vec::new();
+        for value in line.split(',') {
+            record.push(value);
+        }
+        ret.push(record);
+    }
+
+    ret
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>属性</h1>
+			<p>
+属性をつけると文書化テストの挙動が変わる。
+			</p> <p>
+ここでは代表的なものをいくつか紹介する (他は<a href="https://doc.rust-lang.org/rustdoc/write-documentation/documentation-tests.html#attributes">公式資料</a>を参照)。
+			</p>
+			<doc-nav-sub/>
+			<p>
+補足: 言語に明示的に <code>rust</code> と記述した場合、言語と属性はカンマで区切る。
+			</p>
+			<section>
+				<hgroup>
+					<h1><code>ignore</code></h1>
+					<div class="subTitle">コードの無視</div>
+				</hgroup>
+				<p>
+コンパイルも実行もされなくなる。ただし、Rust のコードとしては認識される。そのため、文書化テスト内でも構文強調が効く環境では、Rust 用の強調スタイルが使われる。
+				</p> <p>
+これは未完成のコードテンプレートの記述などに役立つ。
+				</p>
+<pre><code class="language-rust">
+/// Executes function with log.
+///
+/// # Examples
+///
+/// ```ignore
+/// # use rust_test::*;
+/// exec_with_log("test", /* Your function */);
+/// ```
+pub fn exec_with_log&lt;F: FnMut()&gt;(name: &amp;str, mut f: F) {
+    println!("start `{name}`.");
+    f();
+    println!("end `{name}`.");
+}
+</code></pre>
+			</section> <section>
+				<hgroup>
+					<h1><code>should_panic</code></h1>
+					<div class="subTitle">パニック発生の確認</div>
+				</hgroup>
+				<p>
+パニックの発生をもってテスト成功と判定されるようになる。
+				</p> <p>
+これはパニックが発生すべき状況の説明などに役立つ。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+/// Executes function with log.
+///
+/// # Examples
+///
+/// ```should_panic
+/// # use rust_test::*;
+/// divide(3, 0);
+/// ```
+pub fn divide(ntr: i32, dtr: i32) -&gt; i32 {
+    ntr / dtr
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1><code>no_run</code></h1>
+					<div class="subTitle">コンパイル成功のみ確認</div>
+				</hgroup>
+				<p>
+コンパイルの成功のみが確認されるようになる。コードは実行されない。
+				</p> <p>
+これはテストを簡単に実行できない場合、例えば外部入出力を使う場合などに役立つ。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
+
+/// Reads first line of `file`.
+/// 
+/// # Examples
+/// 
+/// ```no_run
+/// # use rust_test::*;
+/// # use std::fs::File;
+/// #
+/// # let file = File::open("example.txt").unwrap();
+/// #
+/// let ret = read_first_line(&amp;file).unwrap();
+/// assert_eq!(ret, Some("test".to_string()));
+/// ```
+pub fn read_first_line(file: &amp;File) -&gt; io::Result&lt;Option&lt;String&gt;&gt; {
+    let mut reader = BufReader::new(file);
+    let mut line = String::new();
+    let cnt = reader.read_line(&amp;mut line)?;
+    let ret = if cnt == 0 { None } else { Some(line) };
+    Ok(ret)
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="compile_fail"><code>compile_fail</code></h1>
+					<div class="subTitle">コンパイル失敗を確認</div>
+				</hgroup>
+				<p>
+コンパイルの失敗をもってテスト成功と判定されるようになる。
+				</p> <p>
+これは代表的な誤ったコーディング例を示す場合などに役立つ。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::ops::RangeInclusive;
+
+/// Returns minimum and maximum element of the collection.
+///
+/// # Examples
+///
+/// ```
+/// # use rust_test::*;
+/// let ret = min_max([1, 2, 3].iter());
+/// assert_eq!(*ret.as_ref().unwrap().start(), 1);
+/// assert_eq!(*ret.as_ref().unwrap().end(), 3);
+/// ```
+///
+/// # Illegal Examples
+///
+/// ```compile_fail
+/// # use rust_test::*;
+/// let ret = min_max([1, 2, 3]);
+/// assert_eq!(*ret.as_ref().unwrap().start(), 1);
+/// assert_eq!(*ret.as_ref().unwrap().end(), 3);
+/// ```
+pub fn min_max&lt;'a, I&gt;(values: I) -&gt; Option&lt;RangeInclusive&lt;i32&gt;&gt;
+where
+    I: Iterator&lt;Item = &amp;'a i32&gt;,
+{
+    let mut ret = None as Option&lt;RangeInclusive&lt;i32&gt;&gt;;
+    for value in values {
+        ret = ret
+            .map(|x| *x.start().min(value)..=*x.end().max(value))
+            .or(Some(*value..=*value));
+    }
+
+    ret
+}
+</code></pre>
+				</section> 
+			</section>
+		</section> <section>
+			<h1 id="tips">TIPS</h1>
+			<section>
+				<h1 id="qmark"><code>?</code> 演算子の適用</h1>
+				<p>
+ダミー関数と非表示行を活用して、テストコードのルート階層で <code>?</code> 演算子が使えるようにできる。なお､『<a href="qmark_operator.xhtml">? 演算子の使いどころ</a>』で紹介するように、本来なら <code>?</code> 演算子は戻り値の型が <a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> や <a href="https://doc.rust-lang.org/std/result/enum.Result.html"><code>Result</code></a> の関数内でしか使えない。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::collections::HashMap;
+
+/// Reads first line of `file`.
+/// 
+/// # Examples
+/// 
+/// ```
+/// # use rust_test::*;
+/// # use std::collections::HashMap;
+/// # fn _ret_opt() -&gt; Option&lt;&amp;'static str&gt; {
+/// let map = HashMap::from_iter([("a", 2), ("b", 4), ("c", 1)]);
+/// let ret = max_count_key(&amp;map)?;
+/// assert_eq!(ret, "b");
+/// # None
+/// # }
+/// ```
+pub fn max_count_key&lt;'a&gt;(map: &amp;HashMap&lt;&amp;'a str, i32&gt;) -&gt; Option&lt;&amp;'a str&gt; {
+    map.iter().max_by_key(|x| x.1).map(|x| *x.0)
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<h1>ビルド確認の簡単化</h1>
+				<p>
+ダミー関数と非表示行を活用して、ビルド確認のみのコードを <code>no_run</code> を使うよりも簡単化できる。この方法を使うと、<code>no_run</code> においてもなお必要なテスト対象に渡すアイテムを揃えるコードが不要になる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
+
+/// Reads first line of `file`.
+/// 
+/// # Examples
+/// 
+/// ```
+/// # use rust_test::*;
+/// # use std::fs::File;
+/// # fn _no_run(file: File) {
+/// let ret = read_first_line(&amp;file).unwrap();
+/// assert_eq!(ret, Some("test".to_string()));
+/// # }
+/// ```
+pub fn read_first_line(file: &amp;File) -&gt; io::Result&lt;Option&lt;String&gt;&gt; {
+    let mut reader = BufReader::new(file);
+    let mut line = String::new();
+    let cnt = reader.read_line(&amp;mut line)?;
+    let ret = if cnt == 0 { None } else { Some(line) };
+    Ok(ret)
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>

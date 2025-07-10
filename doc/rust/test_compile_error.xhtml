@@ -32,9 +32,9 @@
 				<li>
 アンダースコアで始まる関数は未使用でも警告が出ない。
 				</li> <li>
-文書化出力のみを <code>#[doc(hidden)]</code> 属性で抑制できる。
+<code>#[doc(hidden)]</code> 属性で文書化出力のみを抑制できる。
 				</li> <li>
-文書化テストの <code>compile_fail</code> ブロックでコンパイルエラーを確認できる。
+<code>compile_fail</code> で文書化テストのコンパイルエラーを確認できる<sup class="tail"><a href="#link-1">[1]</a></sup>。
 				</li>
 			</ul>
 		</section> <section>
@@ -86,5 +86,16 @@ fn _dummy_for_doc_test() {
 }
 </code></pre>
 		</section>
+		<footer>
+			<section>
+				<h1>リンク</h1>
+				<dl class="links">
+					<dt id="link-1">[1]</dt>
+					<dd>
+<a href="rustdoc_sample.xhtml">rustdoc でのサンプルコード</a> - <a href="rustdoc_sample.xhtml#compile_fail"><code>compile_fail</code></a>
+					</dd>
+				</dl>
+			</section>
+		</footer>
 	</body>
 </html>
