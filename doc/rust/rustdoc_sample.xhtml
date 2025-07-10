@@ -253,7 +253,7 @@ where
 <pre><code class="language-rust">
 use std::collections::HashMap;
 
-/// Reads first line of `file`.
+/// Returns key of the largest counter entry from map.
 /// 
 /// # Examples
 /// 
@@ -275,7 +275,7 @@ pub fn max_count_key&lt;'a&gt;(map: &amp;HashMap&lt;&amp;'a str, i32&gt;) -&gt; 
 			</section> <section>
 				<h1>ビルド確認の簡単化</h1>
 				<p>
-ダミー関数と非表示行を活用して、ビルド確認のみのコードを <code>no_run</code> を使うよりも簡単化できる。この方法を使うと、<code>no_run</code> においてもなお必要なテスト対象に渡すアイテムを揃えるコードが不要になる。
+ダミー関数と非表示行を活用して、ビルド確認のみのコードを <code>no_run</code> を使うよりも簡単化できる。この方法を使うと、テスト対象に渡すアイテムを揃えるコードが不要になる。
 				</p>
 				<section>
 					<h2>サンプル</h2>
