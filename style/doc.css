@@ -183,14 +183,6 @@
 		background-color: revert;
 	}
 
-	*.mt {
-		font-family: var(--mono-font);
-	}
-
-	*.nw {
-		white-space: nowrap;
-	}
-
 	@media all and (width > 46rem) {
 		m|math[display="block"] {
 			padding-left: 1.5rem;
@@ -683,6 +675,14 @@
 
 	*.todo {
 		color: var(--x-color);
+	}
+
+	*.mt {
+		font-family: var(--mono-font);
+	}
+
+	*.nw {
+		white-space: nowrap;
 	}
 }
 

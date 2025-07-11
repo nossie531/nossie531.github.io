@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Option の各種メソッド</title>
+		<meta name="robots" content="noindex,nofollow,noarchive"/>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> が実装するトレイトやメソッドは大量にある。
+		</p> <p>
+忘れた頃にいつも探しているので用途別にまとめた。
+		</p> <p>
+(まとめていないものもあるので要注意！)
+		</p>
+		<section>
+			<h1>単体</h1>
+			<p>
+主に一つの <code>Option</code> のみが関わるメソッド。
+			</p>
+			<section>
+				<h1>判定</h1>
+				<p>
+対象の <code>Option</code> が条件を満たすかを判定する。 
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_some"><code>is_some</code></a> </dt>
+					<dd> 値があるかを判定。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_none"><code>is_none</code></a> </dt>
+					<dd> 値がないかを判定。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_some_and"><code>is_some_and</code></a> </dt>
+					<dd> 値があるか、そして値が指定条件を満たすかを判定。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_none_or"><code>is_none_or</code></a> </dt>
+					<dd> 値がないか、または値が指定条件を満たすかを判定。</dd>
+				</dl>
+			</section> <section>
+				<h1>写像</h1>
+				<p>
+元の <code>Option</code> の写像となる値を取得する。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.expect"><code>expect</code></a> </dt>
+					<dd> <code>unwrap</code> のパニックメッセージ指定版。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap"><code>unwrap</code></a> </dt>
+					<dd> 値があれば取得、ないとパニック。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or"><code>unwrap_or</code></a> </dt>
+					<dd> 値があれば取得、ないと指定値で代替。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default"><code>unwrap_or_default</code></a> </dt>
+					<dd> 値があれば取得、ないと既定値で代替。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else"><code>unwrap_or_else</code></a> </dt>
+					<dd> 値があれば取得、ないと生成関数で代替。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_unchecked"><code>unwrap_unchecked</code></a> </dt>
+					<dd> 値があれば取得、ないと未定義動作。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map"><code>map</code></a> </dt>
+					<dd> 値があれば写像関数を使用、ないと <code>None</code> で代替。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map_or"><code>map_or</code></a> </dt>
+					<dd> 値があれば写像関数を使用、ないと指定値で代替。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map_or_else"><code>map_or_else</code></a> </dt>
+					<dd> 値があれば写像関数を使用、ないと生成関数で代替。</dd>
+					<dt> <code>Option&lt;&amp;T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.cloned">cloned</a></code> </dt>
+					<dd> 値があればクローンを使用、ないと <code>None</code> で代替。</dd>
+					<dt> <code>Option&lt;&amp;T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.copied">copied</a></code> </dt>
+					<dd> 値があればコピーを使用、ないと <code>None</code> で代替。</dd>
+					<dt> <code>Option&lt;&amp;mut T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.cloned-1">cloned</a></code> </dt>
+					<dd> 値があればクローンを使用、ないと <code>None</code> で代替。</dd>
+					<dt> <code>Option&lt;&amp;mut T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.copied-1">copied</a></code> </dt>
+					<dd> 値があればコピーを使用、ないと <code>None</code> で代替。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.filter"><code>filter</code></a> </dt>
+					<dd> 値を追加条件つきで取得、なければ <code>None</code> で代替。</dd>
+				</dl>
+			</section> <section>
+				<h1>参照</h1>
+				<p>
+<code>Option</code> への参照から、参照を保持する <code>Option</code> を生成する。<br/>
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_ref"><code>as_ref</code></a> </dt>
+					<dd> <code>&amp;Option&lt;T&gt;</code> から <code>Option&lt;&amp;T&gt;</code> を生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_mut"><code>as_mut</code></a> </dt>
+					<dd> <code>&amp;mut Option&lt;T&gt;</code> から <code>Option&lt;&amp;mut T&gt;</code> を生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_deref"><code>as_deref</code></a> </dt>
+					<dd> <code>&amp;Option&lt;T&gt;</code> から <code>Option&lt;&amp;T::Target&gt;</code> を生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_deref_mut"><code>as_deref_mut</code></a> </dt>
+					<dd> <code>&amp;mut Option&lt;T&gt;</code> から <code>Option&lt;&amp;mut T::Target&gt;</code> を生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_pin_ref"><code>as_pin_ref</code></a> </dt>
+					<dd> <code>Pin&lt;&amp;Option&lt;T&gt;&gt;</code> から <code>Option&lt;Pin&lt;&amp;T&gt;&gt;</code> を生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_pin_mut"><code>as_pin_mut</code></a> </dt>
+					<dd> <code>Pin&lt;&amp;mut Option&lt;T&gt;&gt;</code> から <code>Option&lt;Pin&lt;&amp;mut T&gt;&gt;</code> を生成。</dd>
+				</dl>
+				<dl class="normal lowProfile" style="margin-top: calc(-1 * var(--gap));">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-From%3C%26Option%3CT%3E%3E-for-Option%3C%26T%3E"><code>From&lt;&amp;'a Option&lt;T&gt;&gt; for Option&lt;&amp;'a T&gt;</code></a> </dt>
+					<dd> <code>as_ref</code> の呼出元。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-From%3C%26mut+Option%3CT%3E%3E-for-Option%3C%26mut+T%3E"><code>From&lt;&amp;'a mut Option&lt;T&gt;&gt; for Option&lt;&amp;'a mut T&gt;</code></a> </dt>
+					<dd> <code>as_mut</code> の呼出元。</dd>
+
+				</dl>
+			</section> <section>
+				<h1>派生</h1>
+				<p>
+<code>T</code> がトレイトを実装していれば、<code>Option&lt;T&gt;</code> にもそれを引き継げるものが多い。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Clone-for-Option%3CT%3E"><code>Clone for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a></dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Copy-for-Option%3CT%3E"><code>Copy for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a></dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Debug-for-Option%3CT%3E"><code>Debug for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/fmt/trait.Debug.html"><code>Debug</code></a></dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Default-for-Option%3CT%3E"><code>Default for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a></dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Eq-for-Option%3CT%3E"><code>Eq for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html"><code>Eq</code></a></dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Ord-for-Option%3CT%3E"><code>Ord for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html"><code>Ord</code></a></dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-PartialEq-for-Option%3CT%3E"><code>PartialEq for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html"><code>PartialEq</code></a></dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-PartialOrd-for-Option%3CT%3E"><code>PartialOrd for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/cmp/trait.PartialOrd.html"><code>PartialOrd</code></a></dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Hash-for-Option%3CT%3E"><code>Hash for Option&lt;T&gt;</code></a> </dt>
+					<dd> ⇒ <a href="https://doc.rust-lang.org/std/hash/trait.Hash.html"><code>Hash</code></a></dd>
+				</dl>
+			</section> <section>
+				<h1>変更</h1>
+				<p>
+<code>Option</code> の値を変更する。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.insert"><code>insert</code></a> </dt>
+					<dd> 値を設定、そして可変参照を取得。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.get_or_insert"><code>get_or_insert</code></a> </dt>
+					<dd> 値がなければ設定、そして可変参照を取得。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.get_or_insert_default"><code>get_or_insert_default</code></a> </dt>
+					<dd> 値がなければ既定値を設定、そして可変参照を取得。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.get_or_insert_with"><code>get_or_insert_with</code></a> </dt>
+					<dd> 値がなければ生成関数を実行、そして可変参照を取得。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.take"><code>take</code></a> </dt>
+					<dd> 値の所有権を取得し、<code>None</code> で埋める。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.take_if"><code>take_if</code></a> </dt>
+					<dd> 値が条件にあえば所有権ごと取得し、<code>None</code> で埋める。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.replace"><code>replace</code></a> </dt>
+					<dd> 値の所有権を取得し、代替値で埋める。</dd>
+				</dl>
+			</section> <section>
+				<h1>副作用</h1>
+				<p>
+<code>Option</code> の外への副作用を意図した処理を実行する。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.inspect"><code>inspect</code></a> </dt>
+					<dd> 値に操作を適用後、引数をそのまま戻り値に流用。</dd>
+				</dl>
+			</section> 
+		</section> <section>
+			<h1>複合</h1>
+			<p>
+二つの <code>Option</code> を使うメソッド。
+			</p>
+			<section>
+				<h1>合成分解</h1>
+				<p>
+<code>x</code> と <code>y</code> とを合成したり元に戻したりする。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.and"><code>and</code></a> </dt>
+					<dd> 両方ともあれば y を取得、他は <code>None</code> を取得。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.or"><code>or</code></a> </dt>
+					<dd> 片方でもあれば x 優先で取得、他は <code>None</code> を取得。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.xor"><code>xor</code></a> </dt>
+					<dd> 片方のみあればそれを取得、他は <code>None</code> を取得。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.and_then"><code>and_then</code></a> </dt>
+					<dd> <code>and</code> の y が生成関数で渡され、x があればそれを使用。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.or_else"><code>or_else</code></a> </dt>
+					<dd> <code>or</code> の y が生成関数で渡され、x がないとそれを使用。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.zip"><code>zip</code></a> </dt>
+					<dd> 二つの <code>Option</code> からペアタプルの <code>Option</code> を合成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unzip"><code>unzip</code></a> </dt>
+					<dd> ペアタプルの <code>Option</code> を二つの <code>Option</code> に分解。</dd>
+				</dl>
+			</section> <section>
+				<h1>平坦化</h1>
+				<p>
+入れ子を平坦化する。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.flatten"><code>flatten</code></a> </dt>
+					<dd> 自身の <code>Option</code> の入れ子を一段だけ少なくする。</dd>
+				</dl>
+			</section>
+		</section> <section>
+			<h1>連携</h1>
+			<p>
+他の型と連携するメソッド。
+			</p>
+			<section>
+				<h1>結果型</h1>
+				<p>
+<code>Option</code> から <code>Result</code> を生成する。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.ok_or"><code>ok_or</code></a> </dt>
+					<dd> 値があれば <code>Ok</code> でラップ、なければ指定値で代替。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.ok_or_else"><code>ok_or_else</code></a> </dt>
+					<dd> 値があれば <code>Ok</code> でラップ、なければ生成関数で代替。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.transpose"><code>transpose</code></a> </dt>
+					<dd> <code>Option&lt;Result&lt;T, E&gt;</code> から <code>Result&lt;Option&lt;T&gt;, E&gt;</code> を生成。</dd>
+				</dl>
+			</section> <section>
+				<h1>反復子を出力 <span class="navNone">(<code>Iterator</code> ← <code>Option</code>)</span></h1>
+				<p>
+<code>None</code> なら 0 個、<code>Some</code> なら 1 個の並びを生成する<sup class="tail"><a href="#link-1">[1]</a></sup>。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_slice"><code>as_slice</code></a> </dt>
+					<dd> 不変参照へのスライスを生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_mut_slice"><code>as_mut_slice</code></a> </dt>
+					<dd> 可変参照へのスライスを生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.iter"><code>iter</code></a> </dt>
+					<dd> 不変参照へのイテレータを生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.iter_mut"><code>iter_mut</code></a> </dt>
+					<dd> 可変参照へのイテレータを生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-IntoIterator-for-Option%3CT%3E"><code>IntoIterator for Option&lt;T&gt;</code></a> </dt>
+					<dd> 値を消費してイテレータを生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-IntoIterator-for-%26Option%3CT%3E"><code>IntoIterator for &amp;'a Option&lt;T&gt;</code></a> </dt>
+					<dd> <code>iter</code> の呼出元。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-IntoIterator-for-%26Option%3CT%3E"><code>IntoIterator for &amp;'a mut Option&lt;T&gt;</code></a> </dt>
+					<dd> <code>iter_mut</code> の呼出元。</dd>
+				</dl>
+			</section> <section>
+				<h1>反復子を入力 <span class="navNone">(<code>Option</code> ← <code>Iterator</code>)</span></h1>
+				<p>
+要素を集めて結果を生成、<code>None</code> が混ざると結果も <code>None</code> になる。
+				</p>
+				<dl class="normal lowProfile">
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Sum%3COption%3CU%3E%3E-for-Option%3CT%3E"><code>Sum&lt;Option&lt;U&gt;&gt; for Option&lt;T&gt;</code></a> </dt>
+					<dd> 総和を生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-Product%3COption%3CU%3E%3E-for-Option%3CT%3E"><code>Product&lt;Option&lt;U&gt;&gt; for Option&lt;T&gt;</code></a> </dt>
+					<dd> 総積を生成。</dd>
+					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#impl-FromIterator%3COption%3CA%3E%3E-for-Option%3CV%3E"><code>FromIterator&lt;Option&lt;A&gt;&gt; for Option&lt;V&gt;</code></a> </dt>
+					<dd> コレクションを生成。</dd>
+				</dl>
+				<p>
+注: <code>FromIterator</code> と <code>IntoIterator</code> は逆操作というわけではない。
+				</p>
+			</section>
+		</section> 
+		<footer>
+			<section>
+				<h1>リンク</h1>
+				<dl class="links">
+					<dt id="link-1">[1]</dt>
+					<dd>
+<a href="option_as_iterator.xhtml">Option や Result と Iterator</a>
+					</dd>
+				</dl>
+			</section>
+		</footer>
+	</body>
+</html>
