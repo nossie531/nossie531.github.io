@@ -293,7 +293,10 @@
 		margin: 1rem 0;
 		text-align: center;
 
+		& > img,
 		& > iframe {
+			box-sizing: border-box;
+			max-width: 100%;
 			border: thin dashed hsla(0, 0%, 0%, 0.25);
 			vertical-align: bottom;
 		}
@@ -308,11 +311,6 @@
 
 		& > figcaption::after {
 			content: "]";
-		}
-
-		& > iframe {
-			box-sizing: border-box;
-			max-width: 100%;
 		}
 	}
 
