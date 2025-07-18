@@ -10,12 +10,12 @@ line.resultBar { stroke-width: 0.5; stroke: black; }
 	<g transform="translate(25, 10)">
 		<text text-anchor="end" x="85" y="10">
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 1.0101010</tspan>
+			<tspan><tspan dy="4">*</tspan> 1.0101010</tspan>
 		</text>
 		<text text-anchor="end" x="85" y="25">
 			<tspan>+</tspan>
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-8</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 1.0101010</tspan>
+			<tspan><tspan dy="4">*</tspan> 1.0101010</tspan>
 		</text>
 		<line class="resultBar" x1="-15" x2="87.5" y1="32" y2="32"/>
 	</g>
@@ -23,18 +23,18 @@ line.resultBar { stroke-width: 0.5; stroke: black; }
 	<g transform="translate(25, 70)">
 		<text text-anchor="end" x="85" y="10">
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 1.0101010</tspan>
+			<tspan><tspan dy="4">*</tspan> 1.0101010</tspan>
 		</text>
 		<text text-anchor="end" x="85" y="25">
 			<tspan>+</tspan>
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 0.0000101</tspan>
+			<tspan><tspan dy="4">*</tspan> 0.0000101</tspan>
 		</text>
 		<text text-anchor="start" x="85" y="25">01010</text>
 		<line class="resultBar" x1="-15" x2="120" y1="32" y2="32"/>
 		<text text-anchor="end" x="85" y="45">
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 1.0101111</tspan>
+			<tspan><tspan dy="4">*</tspan> 1.0101111</tspan>
 		</text>
 		<text text-anchor="start" x="85" y="45"><tspan class="del">01010</tspan></text>
 	</g>

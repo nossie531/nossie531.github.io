@@ -10,22 +10,22 @@ line.resultBar { stroke-width: 0.5; stroke: black; }
 	<g transform="translate(25, 10)">
 		<text text-anchor="end" x="85" y="10">
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 1.1111111</tspan>
+			<tspan><tspan dy="4">*</tspan> 1.1111111</tspan>
 		</text>
 		<text text-anchor="end" x="85" y="25">
 			<tspan>−</tspan>
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 1.1111000</tspan>
+			<tspan><tspan dy="4">*</tspan> 1.1111000</tspan>
 		</text>
 		<line class="resultBar" x1="-15" x2="87.5" y1="32" y2="32"/>
 		<text text-anchor="end" x="85" y="45">
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 0.0000111</tspan>
+			<tspan><tspan dy="4">*</tspan> 0.0000111</tspan>
 		</text>
 		<text text-anchor="end" x="85" y="60">
 			<tspan>=</tspan>
 			<tspan>2<tspan class="sup" dx="1" dy="-4">-8</tspan></tspan>
-			<tspan><tspan dy="4">×</tspan> 1.11<tspan class="ins">00000</tspan></tspan>
+			<tspan><tspan dy="4">*</tspan> 1.11<tspan class="ins">00000</tspan></tspan>
 		</text>
 	</g>
 </svg>
