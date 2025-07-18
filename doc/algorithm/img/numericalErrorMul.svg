@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 170 70">
+	<style>
+text { font-size: 10px; font-family: "Verdana", sans-serif; }
+tspan.del { fill: red; text-decoration: line-through; }
+tspan.sup { font-size: smaller; }
+line.resultBar { stroke-width: 0.5; stroke: black; }
+	</style>
+	<g transform="translate(25, 10)">
+		<text text-anchor="end" x="85" y="10">
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
+			<tspan><tspan dy="4">*</tspan> 1.0101010</tspan>
+		</text>
+		<text text-anchor="end" x="85" y="25">
+			<tspan>×</tspan>
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-4</tspan></tspan>
+			<tspan><tspan dy="4">*</tspan> 1.0100111</tspan>
+		</text>
+		<line class="resultBar" x1="-15" x2="140" y1="32" y2="32"/>
+		<text text-anchor="end" x="85" y="45">
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-7</tspan></tspan>
+			<tspan><tspan dy="4">*</tspan> 1.1011101</tspan>
+		</text>
+		<text text-anchor="start" x="85" y="45"><tspan class="del">11001100</tspan></text>
+	</g>
+</svg>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 125 85">
+	<style>
+text { font-size: 10px; font-family: "Verdana", sans-serif; }
+tspan.ins { fill: red; }
+tspan.sup { font-size: smaller; }
+line.resultBar { stroke-width: 0.5; stroke: black; }
+	</style>
+	<g transform="translate(25, 10)">
+		<text text-anchor="end" x="85" y="10">
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 1.1111111</tspan>
+		</text>
+		<text text-anchor="end" x="85" y="25">
+			<tspan>−</tspan>
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 1.1111000</tspan>
+		</text>
+		<line class="resultBar" x1="-15" x2="87.5" y1="32" y2="32"/>
+		<text text-anchor="end" x="85" y="45">
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 0.0000111</tspan>
+		</text>
+		<text text-anchor="end" x="85" y="60">
+			<tspan>=</tspan>
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-8</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 1.11<tspan class="ins">00000</tspan></tspan>
+		</text>
+	</g>
+</svg>

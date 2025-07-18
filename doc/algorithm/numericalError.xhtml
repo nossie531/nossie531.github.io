@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:m="http://www.w3.org/1998/Math/MathML"
+	  xml:lang="ja">
+	<head>
+		<title>補足: 数値誤差</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+各種の数値誤差について。
+		</p>
+		<section>
+			<h1 id="rounding">丸め誤差</h1>
+			<p>
+桁数の制約に起因する誤差。
+			</p>
+			<aside class="normal moan">
+				<p>
+定義の揺れ。
+				</p> <p>
+「丸め誤差」の定義には､『<a href="#numRound">端数部の丸め</a>』と『<a href="opeRound">演算時の丸め</a>』の両方を含める場合が多い。しかし、前者の意味のみで捉えている解説書もある。そのため、誤解を避けるには、より広い意味の「数値誤差」やより狭い意味の用語を使うほうが良いだろう。
+				</p>
+			</aside>
+			<section>
+				<h1 id="numRound">端数部の丸め</h1>
+				<p>
+格納先の桁数への丸めにより発生する誤差。
+				</p> <p>
+例えば、0.1 は 2 進数では循環小数 0.0001(1001) になる。そのため、有限のビット列には収まらない。入りきらない桁については四捨五入や切り捨てなどの処理が必要になる。
+				</p>
+			</section> <section>
+				<h1 id="opeRound">演算時の丸め</h1>
+				<p>
+各種の算術演算 (加減乗除) に固有の丸めによる誤差。
+				</p>
+				<section>
+					<h1 id="subCan">桁落ち</h1>
+					<p>
+加減算での絶対値の減少により発生する誤差。
+					</p> <p>
+演算による結果の最上位桁が左辺や右辺のそれより右にずれる事で発生する。
+					</p> 
+					<figure class="normal">
+						<iframe src="img/numericalErrorSubCan.svg" style="width: 12.5rem; height: 8.5rem;"/>
+						<figcaption>8bit の仮数での計算例</figcaption>
+					</figure>
+					<p>
+これは近い値どうしでの減算、または絶対値が近い正の値と負の値との加算において、著しく有効桁数を減少させてしまう。絶対誤差だけは小さいが、この後に絶対値の大きな値を掛けた場合などはそれすらも致命的になる。
+					</p>
+				</section> <section>
+					<h1 id="absorp">情報落ち</h1>
+					<p>
+加減算での桁合せにより発生する誤差。
+					</p> <p>
+加減算において、絶対値の小さい側の下位のビット列は有効桁でないため無視される。
+					</p>
+					<figure class="normal">
+						<iframe src="img/numericalErrorAbsorp.svg" style="width: 15.5rem; height: 13rem;"/>
+						<figcaption>8bit の仮数での計算例</figcaption>
+					</figure>
+					<p>
+絶対値の差が大きいほど無視されるビット数も多くなる。ただし、前述のとおり単体の演算では有効桁数への影響はない。問題が顕在化するのは、大きな値に小さな値を何度も加減算するような場合である。
+					</p>
+				</section> <section>
+					<h1 id="other">その他</h1>
+					<p>
+乗除算の無効桁の丸めにより発生する誤差。
+					</p>
+					<figure class="normal">
+						<iframe src="img/numericalErrorMul.svg" style="width: 17rem; height: 7rem;"/>
+						<figcaption>8bit の仮数での計算例</figcaption>
+					</figure>
+					<p>
+乗除算では有効桁数も減らず、一部のビットが結果に全く影響を与えなくなる事もない。
+					</p> <p>
+そのため、桁落ちや情報落ちに比べると、問題になる事は少ない。
+					</p>
+				</section>
+			</section>
+		</section> <section>
+			<h1>打切り誤差</h1>
+			<p>
+無限級数の打切りに起因する誤差。
+			</p> <p>
+Taylor 展開などによる無限級数展開をそのままアルゴリズムにすると、無限ループになってしまう。そこで、誤差が十分に小さくなったと判断した時点で処理を打ち切る。この時の誤差が打切り誤差である。
+			</p>
+		</section>
+	</body>
+</html>

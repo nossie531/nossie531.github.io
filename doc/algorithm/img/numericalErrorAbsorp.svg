@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 155 130">
+	<style>
+text { font-size: 10px; font-family: "Verdana", sans-serif; }
+tspan.del { fill: red; text-decoration: line-through; }
+tspan.sup { font-size: smaller; }
+line.resultBar { stroke-width: 0.5; stroke: black; }
+	</style>
+	<g transform="translate(25, 10)">
+		<text text-anchor="end" x="85" y="10">
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 1.0101010</tspan>
+		</text>
+		<text text-anchor="end" x="85" y="25">
+			<tspan>+</tspan>
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-8</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 1.0101010</tspan>
+		</text>
+		<line class="resultBar" x1="-15" x2="87.5" y1="32" y2="32"/>
+	</g>
+	<text x="65" y="60" text-anchor="middle">↓</text>
+	<g transform="translate(25, 70)">
+		<text text-anchor="end" x="85" y="10">
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 1.0101010</tspan>
+		</text>
+		<text text-anchor="end" x="85" y="25">
+			<tspan>+</tspan>
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 0.0000101</tspan>
+		</text>
+		<text text-anchor="start" x="85" y="25">01010</text>
+		<line class="resultBar" x1="-15" x2="120" y1="32" y2="32"/>
+		<text text-anchor="end" x="85" y="45">
+			<tspan>2<tspan class="sup" dx="1" dy="-4">-3</tspan></tspan>
+			<tspan><tspan dy="4">×</tspan> 1.0101111</tspan>
+		</text>
+		<text text-anchor="start" x="85" y="45"><tspan class="del">01010</tspan></text>
+	</g>
+</svg>
