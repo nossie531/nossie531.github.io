@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:m="http://www.w3.org/1998/Math/MathML"
+	  xml:lang="ja">
+	<head>
+		<title>指数関数とスケーリング</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+指数関数 <m:math><m:mi>exp</m:mi><m:mo stretchy="false">(</m:mo><m:mi>x</m:mi><m:mo stretchy="false">)</m:mo></m:math> の冪級数展開で誤差を減らす手法について。
+		</p>
+		<section>
+			<h1>冪級数展開</h1>
+			<p>
+指数関数の計算には冪級数展開系のアルゴリズムがよく使われる。
+			</p> <p>
+代表的なのは Taylor 展開で、その応用に Pade 近似がある。ここでは Taylor 展開を対象に説明しているが、Pade 近似など他のアルゴリズムにもその内容は当てはまる。
+			</p> 
+			<section>
+				<h2>Taylor 展開</h2>
+<m:math display="block">
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>x</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:mo>=</m:mo>
+	<m:mrow>
+		<m:munderover>
+			<m:mo>∑</m:mo>
+			<m:mrow><m:mi>k</m:mi><m:mo>=</m:mo><m:mi>0</m:mi></m:mrow>
+			<m:mi>∞</m:mi>
+		</m:munderover>
+		<m:mfrac>
+			<m:mn>1</m:mn>
+			<m:mrow><m:mi>k</m:mi><m:mo>!</m:mo></m:mrow>
+		</m:mfrac>
+		<m:msup>
+			<m:mi>x</m:mi>
+			<m:mi>k</m:mi>
+		</m:msup>
+	</m:mrow>
+</m:math>
+			</section>
+		</section> <section>
+			<h1>誤差の原因</h1>
+			<p>
+主な誤差の原因は以下の二つである。
+			</p>
+			<ul>
+				<li><a href="numericalError.xhtml#trunc">打切り誤差</a></li>
+				<li><a href="numericalError.xhtml#absorp">情報落ち</a></li>
+			</ul>
+			<p>
+どちらの誤差も <m:math><m:mi>x</m:mi></m:math> の絶対値が大きいほど拡大する。
+			</p> <p>
+なぜなら、打切り誤差は複数の <m:math><m:msup><m:mi>x</m:mi><m:mi>k</m:mi></m:msup></m:math> を含んでいる。
+			</p> <p>
+そして、情報落ちは <m:math><m:msup><m:mi>x</m:mi><m:mi>k</m:mi></m:msup></m:math> と <m:math><m:msup><m:mi>x</m:mi><m:mrow><m:mi>k</m:mi><m:mo>+</m:mo><m:mn>1</m:mn></m:mrow></m:msup></m:math> の絶対値の差から生じる。
+			</p>
+		</section> <section>
+			<h1>スケーリング</h1>
+			<p>
+上記より、誤差を減らすには指数関数の引数を小さくすればよい事が分かった。よって、式に以下のような変形を行う。これはつまり、底 <m:math>e</m:math> の指数関数の一部を 2 の冪乗で肩代わりし、それがビットシフトで高速に計算できるのを利用している。
+			</p>
+<m:math display="block">
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>x</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:mo>=</m:mo>
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>k</m:mi>
+		<m:mi>ln</m:mi>
+		<m:mn>2</m:mn>
+		<m:mo>+</m:mo>
+		<m:mi>r</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+	<m:mo>=</m:mo>
+	<m:msup>
+		<m:mn>2</m:mn>
+		<m:mi>k</m:mi>
+	</m:msup>
+	<m:mrow>
+		<m:mi>exp</m:mi>
+		<m:mo stretchy="false">(</m:mo>
+		<m:mi>r</m:mi>
+		<m:mo stretchy="false">)</m:mo>
+	</m:mrow>
+</m:math>
+			<p>
+ここで、<m:math><m:mi>k</m:mi></m:math> は <m:math><m:mi>r</m:mi></m:math> の絶対値がなるべく小さくなる整数とする。
+			</p> <p>
+これにより以下が達成でき、情報落ちは殆ど問題にならなくなる。
+			</p>
+<m:math display="block">
+	<m:mrow>
+	<m:mo stretchy="false">|</m:mo>
+	<m:mi>r</m:mi>
+	<m:mo stretchy="false">|</m:mo>
+	</m:mrow>
+	<m:mo>≤</m:mo>
+	<m:mrow>
+		<m:mi>ln</m:mi><m:mn>2</m:mn>
+		<m:mo>/</m:mo>
+		<m:mn>2</m:mn>
+	</m:mrow>
+	<m:mo>≈</m:mo>
+	<m:mn>0.3466</m:mn>
+</m:math> 
+		</section>
+	</body>
+</html>
