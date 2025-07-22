@@ -197,7 +197,7 @@
 他の型と連携するメソッド。
 			</p>
 			<section>
-				<h1>結果型</h1>
+				<h1>結果型 <span class="navNone">(<code>Result</code> ← <code>Option</code>)</span></h1>
 				<p>
 <code>Option</code> から <code>Result</code> を生成する。
 				</p>
@@ -207,7 +207,7 @@
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.ok_or_else"><code>ok_or_else</code></a> </dt>
 					<dd> 値があれば <code>Ok</code> でラップ、なければ生成関数で代替。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.transpose"><code>transpose</code></a> </dt>
-					<dd> <code>Option&lt;Result&lt;T, E&gt;</code> から <code>Result&lt;Option&lt;T&gt;, E&gt;</code> を生成。</dd>
+					<dd> <code>Option&lt;Result&lt;T, E&gt;&gt;</code> から <code>Result&lt;Option&lt;T&gt;, E&gt;</code> を生成。</dd>
 				</dl>
 			</section> <section>
 				<h1>反復子を出力 <span class="navNone">(<code>Iterator</code> ← <code>Option</code>)</span></h1>
