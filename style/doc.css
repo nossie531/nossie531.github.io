@@ -272,6 +272,34 @@
 		}
 	}
 
+	details.normal {
+		margin-left: calc(var(--gap) * -1);
+		margin-right: calc(var(--gap) * -1);
+		padding-left: calc(var(--gap) * +1);
+		padding-right: calc(var(--gap) * +1);
+
+		&[open] {
+			box-shadow: var(--mask-color) 0 0 0 0.5rem;
+			background-color: var(--mask-color);
+		}
+
+		&:not([open]) {
+			margin-top: calc(var(--gap) * -1);
+			margin-bottom: calc(var(--gap) * -1);
+			padding-top: calc(var(--gap) * +1);
+			padding-bottom: calc(var(--gap) * +1);
+		}
+
+		> summary {
+			width: fit-content;
+			cursor: pointer;
+		}
+
+		&:not([open]) > summary {
+			color: var(--disable-color);
+		}
+	}
+
 	table.normal {
 		margin: 1em 0;
 		border-collapse: collapse;

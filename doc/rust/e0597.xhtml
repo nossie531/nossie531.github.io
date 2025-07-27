@@ -20,6 +20,13 @@
 		<section>
 			<h1>パターン</h1>
 			<doc-nav-sub/>
+			<aside class="normal old">
+				<p>
+Rust 2024 での改良点
+				</p> <p>
+現在のエディションではパターン <a href="#ptnC1">C1</a> と <a href="#ptnC2">C2</a> は発生しない<sup class="tail"><a href="#link-1">[1]</a></sup>。
+				</p>
+			</aside>
 			<section>
 				<hgroup>
 					<h1>パターン A</h1>
@@ -90,22 +97,26 @@ fn use_static_ref(_: &amp;'static i32) {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnC1">パターン C1</h1>
+					<h1 id="ptnC1">
+<span class="navNone">改良済: </span><del>パターン C1</del>
+					</h1>
 					<div class="subTitle">明示的な <code>Drop</code> トレイトとブロック式の末尾</div>
 				</hgroup>
-				<p>
+				<details class="normal">
+					<summary>[旧情報]</summary>
+					<p>
 <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型が参照を持つ場合について。ブロック式の末尾にその型があり、かつそれがブロック内のローカル変数を参照しているとエラーになる。なぜなら、ブロック内のローカル変数はブロック式の末尾よりも先に解放される。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先が存在しなくなってしまう。
-				</p>
-				<section>
-					<h2>エラーの解決方法</h2>
-					<p>
+					</p>
+					<section>
+						<h2>エラーの解決方法</h2>
+						<p>
 後述のエラーメッセージの <q>help</q> にある通り、ブロック式の末尾をローカル変数として切り出せばよい。これにより、値の破棄順序を逆転できる。
-					</p>
-				</section> <section>
-					<h2>サンプル</h2>
-					<p>
+						</p>
+					</section> <section>
+						<h2>サンプル</h2>
+						<p>
 以下では、<code>OnDrop(&amp;local)</code> がブロック式の末尾にある。しかし、その破棄による <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が実行される時点で、<code>local</code> はすでに破棄され使えなくなっている。
-					</p>
+						</p>
 <pre><code class="language-rust">
 fn main() {
     let val = {
@@ -146,25 +157,30 @@ impl Drop for OnDrop&lt;'_&gt; {
 <mark class="info">4 |</mark>         <mark class="edit">let x =</mark> *OnDrop(&amp;local).0<mark class="edit">; x</mark>
 <mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                  <mark class="edit">+++</mark>
 </samp></pre>
-				</section>
+					</section>
+				</details>
 			</section> <section>
 				<hgroup>
-					<h1>パターン C2</h1>
+					<h1 id="#ptnC2">
+<span class="navNone">改良済: </span><del>パターン C2</del>
+					</h1>
 					<div class="subTitle">暗黙的な <code>Drop</code> トレイトとブロック式の末尾</div>
 				</hgroup>
-				<p>
-基本は<a href="#ptnC1">パターン C1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化が静的か動的かは問わない。
-				</p>
-				<section>
-					<h2>サンプル</h2>
+				<details class="normal">
+					<summary>[旧情報]</summary>
 					<p>
-以下では、<code>MyType(&amp;local).as_trait()</code> がブロック式の末尾にある。しかし、その破棄により <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が実行されるかもしれない時点で、<code>local</code> はすでに破棄され使えなくなってしまっている。
+基本は<a href="#ptnC1">パターン C1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化が静的か動的かは問わない。
 					</p>
+					<section>
+						<h2>サンプル</h2>
+						<p>
+以下では、<code>MyType(&amp;local).as_trait()</code> がブロック式の末尾にある。しかし、その破棄により <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が実行されるかもしれない時点で、<code>local</code> はすでに破棄され使えなくなってしまっている。
+						</p>
 <pre><code class="language-rust">
 fn main() {
     let val = {
         let local = 42;
-		MyType(<mark class="error">&amp;local</mark>).as_trait().val()
+			MyType(<mark class="error">&amp;local</mark>).as_trait().val()
     };
 
     println!("{}", val);
@@ -210,7 +226,8 @@ impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
 <mark class="info">4 |</mark>         <mark class="edit">let x =</mark> MyType(&amp;local).as_trait().val()<mark class="edit">; x</mark>
 <mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                                <mark class="edit">+++</mark>
 </samp></pre>
-				</section>
+					</section>
+				</details>
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnD1">パターン D1</h1>
@@ -331,5 +348,16 @@ impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
 				</p>
 			</section>
 		</section>
+		<footer>
+			<section>
+				<h1>リンク</h1>
+				<dl class="links">
+					<dt id="link-1">[1]</dt>
+					<dd>
+<a href="https://doc.rust-lang.org/beta/edition-guide/rust-2024/temporary-tail-expr-scope.html">Rust Edition Guide: Tail expression temporary scope</a>
+					</dd>
+				</dl>
+			</section>
+		</footer>
 	</body>
 </html>
