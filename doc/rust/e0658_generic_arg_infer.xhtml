@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0658 - '_' によるジェネリクス定数の推論</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0658]</mark><mark class="title">: using `_` for array lengths is unstable</mark>
+</samp></pre>
+		<p>
+ジェネリクス定数を '<code>_</code>' で推論しようとした。
+		</p>
+		<aside class="normal">
+			<p>
+Coming Soon?
+			</p> <p>
+このエラーは近日中に発生しないよう改善される見込み<a href="https://blog.rust-lang.org/inside-rust/2025/03/05/inferred-const-generic-arguments/">らしい</a>。
+			</p>
+		</aside>
+		<section>
+			<h1>原因</h1>
+			<p>
+これは <time>2025 年現在</time>の Rust の制限である。
+			</p> <p>
+ナイトリー版が必要になるが、不安定な機能 <code>generic_arg_infer</code> で問題を改善できる。
+			</p>
+		</section> <section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">配列の要素数の省略</div>
+				</hgroup>
+				<p>
+配列の要素が省略されているパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let arr = [1, 2, 3] as [u32; <mark class="error">_</mark>];
+    assert_eq!(arr, [1u32, 2, 3]);
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0658]</mark><mark class="title">: using `_` for array lengths is unstable</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:34
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let arr = [1, 2, 3] as [u32; _];
+<mark class="info">  |</mark>                                  <mark class="error">^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: see issue #85077 &lt;<a href="https://github.com/rust-lang/rust/issues/85077">https://github.com/rust-lang/rust/issues/85077</a>&gt; for more information
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">型引数の省略</div>
+				</hgroup>
+				<p>
+関数などの型引数が省略されているパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let vec = Vector([1.0, 2.0, 2.0]);
+	let abs = vec_abs::&lt;<mark class="error">_</mark>&gt;(&amp;vec);
+    assert_eq!(abs, 3.0);
+}
+
+fn vec_abs&lt;const N: usize&gt;(vec: &amp;Vector&lt;N&gt;) -&gt; f32 {
+    vec.0.iter().map(|x| x * x).sum::&lt;f32&gt;().sqrt()
+}
+
+struct Vector&lt;const N: usize&gt;(pub [f32; N]);
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0658]</mark><mark class="title">: const arguments cannot yet be inferred with `_`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:25
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let abs = vec_abs::&lt;_&gt;(&amp;vec);
+<mark class="info">  |</mark>                         <mark class="error">^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: see issue #85077 &lt;<a href="https://github.com/rust-lang/rust/issues/85077">https://github.com/rust-lang/rust/issues/85077</a>&gt; for more information
+</samp></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
