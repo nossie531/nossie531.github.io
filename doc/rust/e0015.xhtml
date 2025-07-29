@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0015 - const 文脈での非 const 関数</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0015]</mark><mark class="title">: cannot call non-const function `my_func` in constants</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0015]</mark><mark class="title">: cannot use `for` loop on `std::ops::RangeInclusive&lt;u32&gt;` in constant functions</mark>
+</samp></pre>
+		<p>
+<code>const</code> 文脈で非 <code>const</code> 関数を使用した。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+単純に <code>const</code> 文脈で非 <code>const</code> 関数を使用している。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    const VAL: i32 = <mark class="error">my_func(3, 2)</mark>;
+    assert_eq!(VAL, 5);
+}
+
+fn my_func(x: i32, y: i32) -&gt; i32 {
+    x + y
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0015]</mark><mark class="title">: cannot call non-const function `my_func` in constants</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:22
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     const VAL: i32 = my_func(3, 2);
+<mark class="info">  |</mark>                      <mark class="error">^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: calls in constants are limited to constant functions, tuple structs and tuple variants
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="forLoop">パターン B</h1>
+					<div class="subTitle"><code>for</code> ループ</div>
+				</hgroup>
+				<p>
+<code>const</code> 文脈中で <code>for</code> ループ構文を使用している。
+				</p> <p>
+これは不可能である。なぜなら、<code>for</code> ループ構文の <code>in</code> の対象には <a href="https://doc.rust-lang.org/std/iter/trait.IntoIterator.html"><code>IntoIterator</code></a> トレイトを実装した型が必要になる。そして、<code>IntoIterator</code> の各メソッドは <code>const</code> 関数ではない。
+				</p>
+				<aside class="normal">
+					<p>
+不安定な機能。
+					</p> <p>
+そもそも、2025 年現在､『<a href="e0379.xhtml">E0379 - トレイトでの const 関数</a>』で紹介する通り、安定板ではトレイトのメソッドは <code>const</code> になれない。また、たとえなれたとしても <code>const</code> 関数になるかは微妙である。この辺りは、不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/const-trait-impl.html"><code>const_trait_impl</code></a> と <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/const-for.html"><code>const_for</code></a> の行く末を見守る事になりそうである (<code>const_for</code> はまだ未実装)。
+					</p>
+				</aside>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、5 の階乗を計算している。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(fact(5), 120);
+}
+
+const fn fact(n: u32) -&gt; u32 {
+    let mut ret = 1;
+    for i in <mark class="error">1..=n</mark> {
+        ret *= i;
+    }
+    ret
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0015]</mark>: cannot use `for` loop on `std::ops::RangeInclusive&lt;u32&gt;` in constant functions
+<mark class="info"> --&gt;</mark> src\main.rs:7:14
+<mark class="info">  |</mark>
+<mark class="info">7 |</mark>     for i in 1..=n {
+<mark class="info">  |</mark>              <mark class="error">^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: calls in constant functions are limited to constant functions, tuple structs and tuple variants
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+<code>for</code> 構文は使えないが、<code>while</code> や <code>loop</code> は使える。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(fact(5), 120);
+}
+
+const fn fact(n: u32) -&gt; u32 {
+    let mut ret = 1;
+    let mut i = 1;
+    while i &lt;= n {
+        ret *= i;
+        i += 1;
+    }
+    ret
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>

@@ -18,13 +18,6 @@
 トレイトで <code>const</code> 関数を宣言した。
 		</p>
 		<section>
-			<h1>原因</h1>
-			<p>
-これは <time>2024 年現在</time>の Rust の制限である。
-			</p> <p>
-不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/const-trait-impl.html"><code>const_trait_impl</code></a> では、この制限を緩和しようとしている。ただし、この機能は現在はまだ変更が活発で、使用例を記載してもすぐに陳腐化しそうなため割愛する。
-			</p>
-		</section> <section>
 			<h1>影響</h1>
 			<p>
 以下は <code>const</code> 文脈でよくある状況。
@@ -34,14 +27,15 @@
 					<p>
 <a href="https://doc.rust-lang.org/std/ops/trait.Add.html"><code>Add</code></a> などの四則演算トレイトが使えない。
 					</p> <p>
-これにより、Rust 標準にない複素数型のような型の計算がしにくくなる。
+これにより、Rust 標準にない複素数型のような型の計算ができない。<br/>
+なお、標準の数値型についてはコンパイラが何とかしてくれる。
 					</p>
 				</li> <li>
 					<p>
 <a href="https://doc.rust-lang.org/std/iter/trait.IntoIterator.html"><code>IntoIterator</code></a> などのトレイトが使えない。
 					</p> <p>
-これにより、for ループ構文が機能しなくなる。<br/>
-詳しくは､『<a href="e0658_const_for.xhtml">E0658 - const 文脈での for ループ</a>』を参照。
+これにより、for ループ構文が完全に使えなくなってしまう。<br/>
+参考:『<a href="e0015.xhtml#forLoop">E0015 - const 文脈での非 const 関数 - for ループ</a>』
 					</p>
 				</li>
 			</ul>
@@ -91,6 +85,57 @@ impl Flag for MyType {
 <mark class="info">  |</mark>
 <mark class="info">  =</mark> <mark class="title">note</mark>: calls in constants are limited to constant functions, tuple structs and tuple variants
 </samp></pre>
+		</section> <section>
+			<h1>不安定な機能</h1>
+			<p>
+不安定な機能 <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/const-trait-impl.html"><code>const_trait_impl</code></a> はトレイトでも <code>const</code> 関数を使えるようにする。
+			</p>
+			<section>
+				<h2>サンプル - 基本形</h2>
+<pre><code class="language-rust">
+#![feature(const_trait_impl)]
+
+fn main() {
+    const FLAG: bool = MyType(1).is_ok();
+    assert!(FLAG);
+}
+
+#[const_trait]
+trait Flag {
+    fn is_ok(&amp;self) -&gt; bool;
+}
+
+struct MyType(i32);
+impl const Flag for MyType {
+    fn is_ok(&amp;self) -&gt; bool {
+        self.0 != 0
+    }
+}
+</code></pre>
+			</section> <section>
+				<h2>サンプル - 四則演算</h2>
+<pre><code class="language-rust">
+#![feature(const_trait_impl)]
+#![feature(const_ops)]
+
+use std::ops::Add;
+
+fn main() {
+    const NUM: MyNum = MyNum(1) + MyNum(2);
+    assert_eq!(NUM.0, 3);
+}
+
+struct MyNum(i32);
+
+impl const Add for MyNum {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -&gt; Self::Output {
+        Self(self.0 + rhs.0)
+    }
+}
+</code></pre>
+			</section>
 		</section>
 	</body>
 </html>
