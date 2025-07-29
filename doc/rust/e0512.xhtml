@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0512 - transumute でのサイズの不一致</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0512]</mark><mark class="title">: cannot transmute between types of different sizes, or dependently-sized types</mark>
+</samp></pre>
+		<p>
+<a href="https://doc.rust-lang.org/std/mem/fn.transmute.html"><code>transmute</code></a> 関数の入力型と出力型でサイズが一致していない。
+		</p>
+		<section>
+			<h1>背景</h1>
+			<p>
+<a href="https://doc.rust-lang.org/std/mem/fn.transmute.html"><code>transmute</code></a> 関数は型変換系のメソッドでビット列はそのままに型変換した事にする。
+			</p> <p>
+もちろんこの関数は <code>unsafe</code> である。また、他の <code>unsafe</code> な機能と比べても、誤用すると意味不明な挙動になりやすく、より危険である。そのため、なるべくこの関数を使わないで済むように <code>std</code> や <code>core</code> では多くの実用的な変換がすでに用意されている。
+			</p> <p>
+そして、この関数は入力型と出力型のサイズが異なる場合、コンパイルエラーを発生させる (2025 年現在、Rust はユーザにはこうした型チェックを提供しないため、この関数は特別な扱いをされているようだ)。なお、この安全策すら取り払った <a href="https://doc.rust-lang.org/std/mem/fn.transmute_copy.html"><code>transmute_copy</code></a> もある。
+			</p>
+		</section> <section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<aside class="normal moan">
+				<p>
+バグについて。
+				</p> <p>
+パターン B1 と B2 は入力型と出力型のサイズが同じでもエラーになってしまう。<br/>
+これらは GitHub でも<a href="https://github.com/rust-lang/rust/issues/116585">報告</a>されているが、サイズの判定がどうにも怪しいらしい。
+				</p>
+			</aside>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+実際に入力型と出力型のサイズが異なるパターン。
+				</p>
+<pre><code class="language-rust">
+use std::mem;
+
+pub fn conv(src: [u32; 3]) -&gt; [u8; 8] {
+    unsafe { <mark class="error">mem::transmute::&lt;[u32; 3], [u8; 8]&gt;</mark>([0, 0, 1]) }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0512]</mark><mark class="title">: cannot transmute between types of different sizes, or dependently-sized types</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:4:14
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     unsafe { mem::transmute::&lt;[u32; 3], [u8; 8]&gt;([0, 0, 1]) }
+<mark class="info">  |</mark>              <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: source type: `[u32; 3]` (96 bits)
+<mark class="info">  =</mark> <mark class="title">note</mark>: target type: `[u8; 8]` (64 bits)
+</samp></pre>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B1</h1>
+					<div class="subTitle"><code>PhantomData</code> が関連するバグ</div>
+				</hgroup>
+				<p>
+フィールドに <code><a href="https://doc.rust-lang.org/std/marker/struct.PhantomData.html">PhantomData</a>&lt;T&gt;</code> と型パラメタを持つ型が混在すると発生する。
+				</p> <p>
+<code>PhantomData&lt;T&gt;</code> はダミーである。そのため、本来なら <code>T</code> が何であれサイズに関係ないはずである。しかし、なぜかこれを含むとサイズについて指摘されてしまう。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::{marker::PhantomData, mem};
+
+pub fn conv&lt;T: Sized, U1, U2&gt;(src: MyType&lt;T, U1&gt;) -&gt; MyType&lt;T, U2&gt; {
+    unsafe { <mark class="error">mem::transmute::&lt;MyType&lt;T, U1&gt;, MyType&lt;T, U2&gt;&gt;</mark>(src) }
+}
+
+#[repr(transparent)]
+pub struct MyType&lt;T, U&gt; {
+    fld1: T,
+    fld2: PhantomData&lt;U&gt;,
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0512]</mark><mark class="title">: cannot transmute between types of different sizes, or dependently-sized types</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:4:14
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     unsafe { mem::transmute::&lt;MyType&lt;T, U1&gt;, MyType&lt;T, U2&gt;&gt;(src) }
+<mark class="info">  |</mark>              <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: source type: `MyType&lt;T, U1&gt;` (size can vary because of T)
+<mark class="info">  =</mark> <mark class="title">note</mark>: target type: `MyType&lt;T, U2&gt;` (size can vary because of T)
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B2</h1>
+					<div class="subTitle">ジェネリクス定数が関連するバグ</div>
+				</hgroup>
+				<p>
+型の型パラメタに通常のものと未使用のジェネリクス定数が混在すると発生する。
+				</p> <p>
+ジェネリクス定数は未使用でもエラーにはならない。そして、本来なら未使用なのでそれが何であれサイズには関係ないはずである。しかし、なぜかこれを含むとサイズについて指摘されてしまう。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::mem;
+
+fn conv&lt;T, const N: usize&gt;(src: MyType&lt;T, N&gt;) -&gt; MyType&lt;T, 3&gt; {
+    unsafe { <mark class="error">mem::transmute</mark>(src) }
+}
+
+pub struct MyType&lt;T, const N: usize&gt; {
+    val: T,
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0512]</mark><mark class="title">: cannot transmute between types of different sizes, or dependently-sized types</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:4:14
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     unsafe { mem::transmute(src) }
+<mark class="info">  |</mark>              <mark class="error">^^^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: source type: `MyType&lt;T, N&gt;` (size can vary because of T)
+<mark class="info">  =</mark> <mark class="title">note</mark>: target type: `MyType&lt;T, 3&gt;` (size can vary because of T)
+</samp></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
