@@ -71,7 +71,7 @@
 					<dt> <code>Option&lt;&amp;mut T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.copied-1">copied</a></code> </dt>
 					<dd> 値があればコピーを使用、ないと <code>None</code> で代替。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.filter"><code>filter</code></a> </dt>
-					<dd> 値を追加条件つきで取得、なければ <code>None</code> で代替。</dd>
+					<dd> 値があれば条件つきで取得、ないと <code>None</code> で代替。</dd>
 				</dl>
 			</section> <section>
 				<h1>参照</h1>
@@ -163,7 +163,7 @@
 			<section>
 				<h1>合成分解</h1>
 				<p>
-<code>x</code> と <code>y</code> とを合成したり元に戻したりする。
+<code>x</code> と <code>y</code> の合成やその逆操作を行う。
 				</p>
 				<dl class="normal lowProfile">
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.and"><code>and</code></a> </dt>
