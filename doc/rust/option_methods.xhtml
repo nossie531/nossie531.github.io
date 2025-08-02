@@ -34,9 +34,9 @@
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_none"><code>is_none</code></a> </dt>
 					<dd> 値がないかを判定。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_some_and"><code>is_some_and</code></a> </dt>
-					<dd> 値があるか、そして値が指定条件を満たすかを判定。</dd>
+					<dd> 値があるか、そして値が条件にあうかを判定。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.is_none_or"><code>is_none_or</code></a> </dt>
-					<dd> 値がないか、または値が指定条件を満たすかを判定。</dd>
+					<dd> 値がないか、または値が条件にあうかを判定。</dd>
 				</dl>
 			</section> <section>
 				<h1>写像</h1>
@@ -139,11 +139,11 @@
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.get_or_insert_with"><code>get_or_insert_with</code></a> </dt>
 					<dd> 値がなければ生成関数を実行、そして可変参照を取得。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.take"><code>take</code></a> </dt>
-					<dd> 値の所有権を取得し、<code>None</code> で埋める。</dd>
+					<dd> 値を所有権ごと取得、空きは <code>None</code> で代替。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.take_if"><code>take_if</code></a> </dt>
-					<dd> 値が条件にあえば所有権ごと取得し、<code>None</code> で埋める。</dd>
+					<dd> 値が条件にあえば所有権ごと取得、空きは <code>None</code> で代替。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.replace"><code>replace</code></a> </dt>
-					<dd> 値の所有権を取得し、代替値で埋める。</dd>
+					<dd> 値を所有権ごと取得、空きは指定値で代替。</dd>
 				</dl>
 			</section> <section>
 				<h1>副作用</h1>
