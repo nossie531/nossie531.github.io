@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: macro_rules での入れ子ルールの慣習</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<code>macro_rules</code> での入れ子ルールを分かりやすくするための慣習について。
+		</p>
+		<aside class="normal">
+			<p>
+筆者はこの方法を非推奨 (理由は<a href="#prosCons">後述</a>)。
+			</p> <p>
+ここで紹介しているのは、筆者自身がこの方法に驚いたためである。
+			</p>
+		</aside>
+		<section>
+			<h1>詳細</h1>
+			<p>
+<code>macro_rules</code> での入れ子ルールは複雑になりうる。
+			</p> <p>
+その対策として、ルールのブランチに <code>@</code> から始まる名前をつけ、サブルールとして利用する例がたまに見られる。
+			</p> <p>
+なお、<code>@</code> から始めるのはただの慣習ではあるが (他と区別できれば何でも良い)、この方法は割と知られているため、他の文字より将来の変更に強いかもしれない。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::collections::BTreeMap;
+
+macro_rules! text_map {
+    {$($key:literal $(: $val: literal)?),*} =&gt; {
+        BTreeMap::&lt;&amp;str, &amp;str&gt;::from_iter([
+            $(text_map!(@entry $key $(: $val)?)),*
+        ])
+    };
+    (@entry $key:literal) =&gt; {
+        ($key, "")
+    };
+    (@entry $key:literal: $val:literal) =&gt; {
+        ($key, $val)
+    };
+}
+
+fn main() {
+    let map = text_map! {
+        "foo": "hoge",
+        "bar": "piyo",
+        "baz": "fuga",
+        "qux"
+    };
+    assert_eq!(map, BTreeMap::from_iter([
+        ("foo", "hoge"),
+        ("bar", "piyo"),
+        ("baz", "fuga"),
+        ("qux", "")
+    ]));
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1 id="prosCons">利点と欠点</h1>
+			<p>
+この方法には利点と欠点があるが、筆者としてはやや後者が勝るように思える。利点は見通しの良さ、欠点は公開レベルが本体ルールとサブルールとで同じになる点にある。利点は主にマクロの作者にとってだが、欠点は主にマクロの利用者にとってのものになる。これでは後者を優先したくなるのは仕方なく思える。
+			</p>
+		</section> <section>
+			<h1>代替案</h1>
+			<p>
+複数の <code>macro_rules</code> を用意しても似た効果が得られる。これならサブルールの公開レベルも調整できる (記述位置が本体ルールと別になるため、サブルール的なニュアンスは少し薄れるかもしれないが…)。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+use std::collections::BTreeMap;
+
+macro_rules! text_map {
+    {$($key:literal $(: $val: literal)?),*} =&gt; {
+        BTreeMap::&lt;&amp;str, &amp;str&gt;::from_iter([
+            $(private::text_map_entry!($key $(: $val)?)),*
+        ])
+    }
+}
+
+mod private {
+    macro_rules! text_map_entry {
+        ($key:literal) =&gt; {
+            ($key, "")
+        };
+        ($key:literal: $val:literal) =&gt; {
+            ($key, $val)
+        };
+    }
+    pub(crate) use text_map_entry;
+}
+
+fn main() {
+    let map = text_map! {
+        "foo": "hoge",
+        "bar": "piyo",
+        "baz": "fuga",
+        "qux"
+    };
+    assert_eq!(map, BTreeMap::from_iter([
+        ("foo", "hoge"),
+        ("bar", "piyo"),
+        ("baz", "fuga"),
+        ("qux", "")
+    ]));
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
