@@ -65,6 +65,11 @@
 					<h1>パターン A1</h1>
 					<div class="subTitle">基本形 (<code>Clone</code> 実装なし)</div>
 				</hgroup>
+				<p>
+単純に条件を満たした場合について。
+				</p>
+				<section>
+					<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
     let var = MyType();
@@ -102,14 +107,17 @@ impl MyType {
 <mark class="info">8 |</mark> struct MyType();
 <mark class="info">  |</mark> <mark class="edit">^^^^^^^^^^^^^ consider implementing `Clone` for this type</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン A2</h1>
 					<div class="subTitle">基本形 (<code>Clone</code> 実装あり)</div>
 				</hgroup>
 				<p>
-前のパターンとほぼ同じだが、元から <code>Clone</code> 実装があるため微妙にメッセージが変わる。
+前のパターンとほぼ同じだが、<code>Clone</code> を実装済の場合、微妙にメッセージが変わる。
 				</p>
+				<section>
+					<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
     let var = MyType();
@@ -144,14 +152,65 @@ impl MyType {
 <mark class="info">3 |</mark>     let var_ref = &amp;var<mark class="edit">.clone()</mark>;
 <mark class="info">  |</mark>                       <mark class="edit">++++++++</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン B</h1>
 					<div class="subTitle"><code>Drop</code> トレイトの影響</div>
 				</hgroup>
-				<p class="todo">
-					TODO: 書きかけ
+				<p>
+変数が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型から参照される場合、その参照のライフタイムはスコープを抜けるまでになる。なぜなら、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が呼ばれるのはスコープを抜けたタイミングだからである。なお、仮に参照元が <code>Drop</code> を実装しなければ、参照のライフタイムは使用に問題ない範囲で短縮される。このライフタイムの違いにより、エラーの有無が変化しうる。
 				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let var = MyValue(1);
+    let _var_ref = var.new_ref();
+    var.consume();
+}
+
+#[derive(Clone)]
+struct MyValue(i32);
+
+impl MyValue {
+    fn consume(self) {}
+
+    fn new_ref(&amp;self) -&gt; MyRef&lt;'_&gt; {
+        MyRef(&amp;self.0)
+    }
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0505]</mark><mark class="title">: cannot move out of `var` because it is borrowed</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:5
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let var = MyValue(1);
+<mark class="info">  |</mark>         <mark class="info">--- binding `var` declared here</mark>
+<mark class="info">3 |</mark>     let _var_ref = var.new_ref();
+<mark class="info">  |</mark>                    <mark class="info">--- borrow of `var` occurs here</mark>
+<mark class="info">4 |</mark>     var.consume();
+<mark class="info">  |</mark>     <mark class="error">^^^ move out of `var` occurs here</mark>
+<mark class="info">5 |</mark> }
+<mark class="info">  |</mark> <mark class="info">- borrow might be used here, when `_var_ref` is dropped and runs the `Drop` code for type `MyRef`</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: if `MyValue` implemented `Clone`, you could clone the value
+<mark class="info"> --&gt;</mark> src\main.rs:7:1
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let _var_ref = var.new_ref();
+<mark class="info">  |</mark>                    <mark class="info">--- you could clone this value</mark>
+<mark class="info">...</mark>
+<mark class="info">7 |</mark> struct MyValue(i32);
+<mark class="info">  |</mark> <mark class="edit">^^^^^^^^^^^^^^ consider implementing `Clone` for this type</mark>
+</samp></pre>
+				</section>
 			</section>
 		</section>
 	</body>
