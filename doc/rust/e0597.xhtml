@@ -242,11 +242,6 @@ impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
 				<p>
 参照を含む型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する場合について。その参照先には同じタイミングで解放されるものを指定できない。そして、借用チェッカーはフィールドの解放順 (定義の逆順) までは見ない。つまり、問題の型のフィールドと兄弟関係にあるフィールドの参照は指定できなくなる。そうでなければ、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先の有無が保証できなくなってしまう。
 				</p>
-				<!--
-				<p>
-参照を含み、かつ <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型について。その参照のライフタイムにその型を包含した型に由来するものを指定できない。なぜならその場合、参照元と参照先のフィールドが同じ型に含まれる事になり、それらの解放順が問題になる (フィールドの解放順は定義順の逆順ではあるが、借用チェッカーの管理粒度ではどのフィールドのライフタイムも同じ扱いであり、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時の参照先の有無は保証できない)。
-				</p>
-				-->
 				<section>
 					<h2>補足: <code>dropck_eyepatch</code></h2>
 					<p>
