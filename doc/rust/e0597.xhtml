@@ -98,14 +98,16 @@ fn use_static_ref(_: &amp;'static i32) {
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnC1">
-<span class="navNone">改良済: </span><del>パターン C1</del>
+<del>パターン C1</del> <span class="navNone">(改良済)</span>
 					</h1>
-					<div class="subTitle">明示的な <code>Drop</code> トレイトとブロック式の末尾</div>
+					<div class="subTitle">
+明示的な <code>Drop</code> トレイトとブロック式の末尾
+					</div>
 				</hgroup>
 				<details class="normal">
 					<summary>[旧情報]</summary>
 					<p>
-<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型が参照を持つ場合について。ブロック式の末尾にその型があり、かつそれがブロック内のローカル変数を参照しているとエラーになる。なぜなら、ブロック内のローカル変数はブロック式の末尾よりも先に解放される。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先が存在しなくなってしまう。
+参照を含む型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する場合について。ブロック式の末尾にその型があり、かつそれがブロック内のローカル変数を参照しているとエラーになる。なぜなら、ブロック内のローカル変数はブロック式の末尾よりも先に解放される。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先が存在しなくなってしまう。
 					</p>
 					<section>
 						<h2>エラーの解決方法</h2>
@@ -162,9 +164,11 @@ impl Drop for OnDrop&lt;'_&gt; {
 			</section> <section>
 				<hgroup>
 					<h1 id="#ptnC2">
-<span class="navNone">改良済: </span><del>パターン C2</del>
+<del>パターン C2</del> <span class="navNone">(改良済)</span>
 					</h1>
-					<div class="subTitle">暗黙的な <code>Drop</code> トレイトとブロック式の末尾</div>
+					<div class="subTitle"
+>暗黙的な <code>Drop</code> トレイトとブロック式の末尾
+					</div>
 				</hgroup>
 				<details class="normal">
 					<summary>[旧情報]</summary>
@@ -231,11 +235,18 @@ impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
 			</section> <section>
 				<hgroup>
 					<h1 id="ptnD1">パターン D1</h1>
-					<div class="subTitle">明示的な <code>Drop</code> トレイトとフィールド間の参照</div>
+					<div class="subTitle">
+明示的な <code>Drop</code> トレイトとフィールド間の参照
+					</div>
 				</hgroup>
 				<p>
-<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型が参照を持つ場合について。その参照のライフタイムにその型を包含した型に由来するものを指定できない。なぜならその場合、参照元と参照先のフィールドが同じ型に含まれる事になり、それらの解放順が問題になる (フィールドの解放順は定義順の逆順ではあるが、借用チェッカーの管理粒度ではどのフィールドのライフタイムも同じ扱いであり、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時の参照先の有無は保証できない)。
+参照を含む型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する場合について。その参照先には同じタイミングで解放されるものを指定できない。そして、借用チェッカーはフィールドの解放順 (定義の逆順) までは見ない。つまり、問題の型のフィールドと兄弟関係にあるフィールドの参照は指定できなくなる。そうでなければ、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先の有無が保証できなくなってしまう。
 				</p>
+				<!--
+				<p>
+参照を含み、かつ <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型について。その参照のライフタイムにその型を包含した型に由来するものを指定できない。なぜならその場合、参照元と参照先のフィールドが同じ型に含まれる事になり、それらの解放順が問題になる (フィールドの解放順は定義順の逆順ではあるが、借用チェッカーの管理粒度ではどのフィールドのライフタイムも同じ扱いであり、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時の参照先の有無は保証できない)。
+				</p>
+				-->
 				<section>
 					<h2>補足: <code>dropck_eyepatch</code></h2>
 					<p>
@@ -283,7 +294,9 @@ impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
 			</section> <section>
 				<hgroup>
 					<h1>パターン D2</h1>
-					<div class="subTitle">暗黙的な <code>Drop</code> トレイトとフィールド間の参照</div>
+					<div class="subTitle">
+暗黙的な <code>Drop</code> トレイトとフィールド間の参照
+					</div>
 				</hgroup>
 				<p>
 基本は<a href="#ptnD1">パターン D1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化は動的である (抽象化が静的ならば、全体を格納する型は各部での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> の実装有無を把握できるため)。
