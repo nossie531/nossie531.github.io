@@ -24,7 +24,7 @@
 				<p>
 Rust 2024 での改良点
 				</p> <p>
-現在のエディションではパターン <a href="#ptnC1">C1</a> と <a href="#ptnC2">C2</a> は発生しない<sup class="tail"><a href="#link-1">[1]</a></sup>。
+現在のエディションではパターン <a href="#blockTail">D</a> は発生しない。
 				</p>
 			</aside>
 			<section>
@@ -97,24 +97,67 @@ fn use_static_ref(_: &amp;'static i32) {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1 id="ptnC1">
-<del>パターン C1</del> <span class="navNone">(改良済)</span>
+					<h1 id="siblingRef">パターン C</h1>
+					<div class="subTitle">
+<code>Drop</code> トレイトの影響 (兄弟フィールドの参照防止)
+					</div>
+				</hgroup>
+				<p>
+詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#siblingRef">兄弟フィールドの参照防止</a>』を参照。
+<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても発生する場合もある。)
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut data = MyData::default();
+    data.on_drop = Some(OnDrop(<mark class="error">&amp;data.id</mark>));
+}
+
+#[derive(Default)]
+struct MyData&lt;'a&gt; {
+    id: i32,
+    on_drop: Option&lt;OnDrop&lt;'a&gt;&gt;,
+}
+
+struct OnDrop&lt;'a&gt;(&amp;'a i32);
+impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0597]</mark><mark class="title">: `data.id` does not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:38
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let mut data = MyData::default();
+<mark class="info">  |</mark>         <mark class="info">-------- binding `data` declared here</mark>
+<mark class="info">3 |</mark>     data.on_drop = Some(OnDrop(&amp;data.id));
+<mark class="info">  |</mark>                                <mark class="error">^^^^^^^^ borrowed value does not live long enough</mark>
+<mark class="info">4 |</mark> }
+<mark class="info">  |</mark> <mark class="info">-</mark>
+<mark class="info">  |</mark> <mark class="info">|</mark>
+<mark class="info">  |</mark> <mark class="info">`data.id` dropped here while still borrowed</mark>
+<mark class="info">  |</mark> <mark class="info">borrow might be used here, when `data` is dropped and runs the destructor for type `MyData&lt;'_&gt;`</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="blockTail">
+<del>パターン D</del> <span class="navNone">(改良済)</span>
 					</h1>
 					<div class="subTitle">
-明示的な <code>Drop</code> トレイトとブロック式の末尾
+<code>Drop</code> トレイトの影響 (ブロック式の末尾)
 					</div>
 				</hgroup>
 				<details class="normal">
 					<summary>[旧情報]</summary>
 					<p>
-参照を含む型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する場合について。ブロック式の末尾にその型があり、かつそれがブロック内のローカル変数を参照しているとエラーになる。なぜなら、ブロック内のローカル変数はブロック式の末尾よりも先に解放される。そのため、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先が存在しなくなってしまう。
+詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#blockTail">ブロック式の末尾処理</a>』を参照。
+<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても発生する場合もある。)
 					</p>
 					<section>
-						<h2>エラーの解決方法</h2>
-						<p>
-後述のエラーメッセージの <q>help</q> にある通り、ブロック式の末尾をローカル変数として切り出せばよい。これにより、値の破棄順序を逆転できる。
-						</p>
-					</section> <section>
 						<h2>サンプル</h2>
 						<p>
 以下では、<code>OnDrop(&amp;local)</code> がブロック式の末尾にある。しかし、その破棄による <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が実行される時点で、<code>local</code> はすでに破棄され使えなくなっている。
@@ -163,186 +206,6 @@ impl Drop for OnDrop&lt;'_&gt; {
 				</details>
 			</section> <section>
 				<hgroup>
-					<h1 id="#ptnC2">
-<del>パターン C2</del> <span class="navNone">(改良済)</span>
-					</h1>
-					<div class="subTitle"
->暗黙的な <code>Drop</code> トレイトとブロック式の末尾
-					</div>
-				</hgroup>
-				<details class="normal">
-					<summary>[旧情報]</summary>
-					<p>
-基本は<a href="#ptnC1">パターン C1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化が静的か動的かは問わない。
-					</p>
-					<section>
-						<h2>サンプル</h2>
-						<p>
-以下では、<code>MyType(&amp;local).as_trait()</code> がブロック式の末尾にある。しかし、その破棄により <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が実行されるかもしれない時点で、<code>local</code> はすでに破棄され使えなくなってしまっている。
-						</p>
-<pre><code class="language-rust">
-fn main() {
-    let val = {
-        let local = 42;
-			MyType(<mark class="error">&amp;local</mark>).as_trait().val()
-    };
-
-    println!("{}", val);
-}
-
-trait MyTrait {
-    fn val(&amp;self) -&gt; i32;
-}
-
-struct MyType&lt;'a&gt;(&amp;'a i32);
-impl&lt;'a&gt; MyType&lt;'a&gt; {
-    fn as_trait(self) -&gt; impl MyTrait + 'a {
-        self
-    }
-}
-
-impl&lt;'a&gt; MyTrait for MyType&lt;'a&gt; {
-    fn val(&amp;self) -&gt; i32 {
-        *self.0
-    }
-}
-</code></pre>
-<pre><samp class="console-rustc">
-<mark class="error">error[E0597]</mark><mark class="title">: `local` does not live long enough</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:4:16
-<mark class="info">  |</mark>
-<mark class="info">3 |</mark>         let local = 42;
-<mark class="info">  |</mark>             <mark class="info">----- binding `local` declared here</mark>
-<mark class="info">4 |</mark>         MyType(&amp;local).as_trait().val()
-<mark class="info">  |</mark>         <mark class="info">-------</mark><mark class="error">^^^^^^</mark><mark class="info">-----------</mark>-
-<mark class="info">  |</mark>         <mark class="info">|</mark>      <mark class="error">|</mark>
-<mark class="info">  |</mark>         <mark class="info">|</mark>      <mark class="error">borrowed value does not live long enough</mark>
-<mark class="info">  |</mark>         <mark class="info">a temporary with access to the borrow is created here ...</mark>
-<mark class="info">5 |</mark>     };
-<mark class="info">  |</mark>     <mark class="info">-- ... and the borrow might be used here, when that temporary is dropped and runs the destructor for type `impl MyTrait + '_`</mark>
-<mark class="info">  |</mark>     <mark class="info">|</mark>
-<mark class="info">  |</mark>     <mark class="info">`local` dropped here while still borrowed</mark>
-<mark class="info">  |</mark>
-<mark class="info">  =</mark> <mark class="title">note</mark>: the temporary is part of an expression at the end of a block;
-          consider forcing this temporary to be dropped sooner, before the block's local variables are dropped
-<mark class="info">help: for example, you could save the expression's value in a new local variable `x` and then make `x` be the expression at the end of the block</mark>
-<mark class="info">  |</mark>
-<mark class="info">4 |</mark>         <mark class="edit">let x =</mark> MyType(&amp;local).as_trait().val()<mark class="edit">; x</mark>
-<mark class="info">  |</mark>         <mark class="edit">+++++++</mark>                                <mark class="edit">+++</mark>
-</samp></pre>
-					</section>
-				</details>
-			</section> <section>
-				<hgroup>
-					<h1 id="ptnD1">パターン D1</h1>
-					<div class="subTitle">
-明示的な <code>Drop</code> トレイトとフィールド間の参照
-					</div>
-				</hgroup>
-				<p>
-参照を含む型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する場合について。その参照先には同じタイミングで解放されるものを指定できない。そして、借用チェッカーはフィールドの解放順 (定義の逆順) までは見ない。つまり、問題の型のフィールドと兄弟関係にあるフィールドの参照は指定できなくなる。そうでなければ、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行時に参照先の有無が保証できなくなってしまう。
-				</p>
-				<section>
-					<h2>補足: <code>dropck_eyepatch</code></h2>
-					<p>
-<time>2024 年現在</time>まだ不安定な機能だが、<a href="https://doc.rust-lang.org/beta/unstable-book/language-features/dropck-eyepatch.html"><code>dropck_eyepatch</code></a> がいくらか緩和策になる。例えば、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> メソッドで問題の参照にふれていなくても同様のエラーになるが、これには簡単に対応できる。詳しくは <a href="https://doc.rust-lang.org/nomicon/dropck.html#an-escape-hatch">Rustnomicon</a> を参照 (それによると将来的にはより洗練された機構が提供されそうな気配…)。
-					</p>
-				</section> <section>
-					<h2>サンプル</h2>
-					<p>
-以下では、<code>OnDrop</code> での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> 実行に関連して、<code>data</code> に参照元である <code>OnDrop</code> と参照先である <code>&amp;data.id</code> の両方を格納できないようにされている。
-					</p>
-<pre><code class="language-rust">
-fn main() {
-    let mut data = MyData::default();
-    data.on_drop = Some(OnDrop(<mark class="error">&amp;data.id</mark>));
-}
-
-#[derive(Default)]
-struct MyData&lt;'a&gt; {
-    id: i32,
-    on_drop: Option&lt;OnDrop&lt;'a&gt;&gt;,
-}
-
-struct OnDrop&lt;'a&gt;(&amp;'a i32);
-impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
-    fn drop(&amp;mut self) {
-        println!("ID [{}] is drpoped.", self.0)
-    }
-}
-</code></pre>
-<pre><samp class="console-rustc">
-<mark class="error">error[E0597]</mark><mark class="title">: `data.id` does not live long enough</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:3:38
-<mark class="info">  |</mark>
-<mark class="info">2 |</mark>     let mut data = MyData::default();
-<mark class="info">  |</mark>         <mark class="info">-------- binding `data` declared here</mark>
-<mark class="info">3 |</mark>     data.on_drop = Some(OnDrop(&amp;data.id));
-<mark class="info">  |</mark>                                <mark class="error">^^^^^^^^ borrowed value does not live long enough</mark>
-<mark class="info">4 |</mark> }
-<mark class="info">  |</mark> <mark class="info">-</mark>
-<mark class="info">  |</mark> <mark class="info">|</mark>
-<mark class="info">  |</mark> <mark class="info">`data.id` dropped here while still borrowed</mark>
-<mark class="info">  |</mark> <mark class="info">borrow might be used here, when `data` is dropped and runs the destructor for type `MyData&lt;'_&gt;`</mark>
-</samp></pre>
-				</section>
-			</section> <section>
-				<hgroup>
-					<h1>パターン D2</h1>
-					<div class="subTitle">
-暗黙的な <code>Drop</code> トレイトとフィールド間の参照
-					</div>
-				</hgroup>
-				<p>
-基本は<a href="#ptnD1">パターン D1</a> と同じ。ただし、このパターンでは <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する具体的な型ではなく、その可能性があるトレイトにより抽象化された型が使われる。なおこの場合、抽象化は動的である (抽象化が静的ならば、全体を格納する型は各部での <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> の実装有無を把握できるため)。
-				</p>
-				<section>
-					<h2>サンプル</h2>
-					<p>
-以下では、<code>MyTrait</code> で実行されうる <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> に関連して、<code>data</code> に参照元である <code>MyTrait</code> と参照先である <code>&amp;data.id</code> の両方を格納できないようにされている。
-					</p>
-<pre><code class="language-rust">
-fn main() {
-    let mut data = MyData::default();
-    data.my_trait = Some(Box::new(MyType(<mark class="error">&amp;data.id</mark>)));
-    data.my_trait.unwrap().print_id();
-}
-
-#[derive(Default)]
-struct MyData&lt;'a&gt; {
-    id: i32,
-    my_trait: Option&lt;Box&lt;dyn MyTrait&lt;'a&gt; + 'a&gt;&gt;,
-}
-
-trait MyTrait&lt;'a&gt; {
-    fn print_id(&amp;self); 
-}
-
-struct MyType&lt;'a&gt;(&amp;'a i32);
-impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
-    fn print_id(&amp;self) {
-        println!("ID is [{}].", self.0);
-    }
-}
-</code></pre>
-<pre><samp class="console-rustc">
-<mark class="error">error[E0597]</mark><mark class="title">: `data.id` does not live long enough</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:3:42
-<mark class="info">  |</mark>
-<mark class="info">2 |</mark>     let mut data = MyData::default();
-<mark class="info">  |</mark>         <mark class="info">-------- binding `data` declared here</mark>
-<mark class="info">3 |</mark>     data.my_trait = Some(Box::new(MyType(&amp;data.id)));
-<mark class="info">  |</mark>                                          <mark class="error">^^^^^^^^ borrowed value does not live long enough</mark>
-<mark class="info">4 |</mark>     data.my_trait.unwrap().print_id();
-<mark class="info">5 |</mark> }
-<mark class="info">  |</mark> <mark class="info">-</mark>
-<mark class="info">  |</mark> <mark class="info">|</mark>
-<mark class="info">  |</mark> <mark class="info">`data.id` dropped here while still borrowed</mark>
-<mark class="info">  |</mark> <mark class="info">borrow might be used here, when `data` is dropped and runs the destructor for type `MyData&lt;'_&gt;`</mark>
-</samp></pre>
-				</section>
-			</section> <section>
-				<hgroup>
 					<h1>パターン E</h1>
 					<div class="subTitle">HRTB の機能制限</div>
 				</hgroup>
@@ -356,16 +219,5 @@ impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
 				</p>
 			</section>
 		</section>
-		<footer>
-			<section>
-				<h1>リンク</h1>
-				<dl class="links">
-					<dt id="link-1">[1]</dt>
-					<dd>
-<a href="https://doc.rust-lang.org/beta/edition-guide/rust-2024/temporary-tail-expr-scope.html">Rust Edition Guide: Tail expression temporary scope</a>
-					</dd>
-				</dl>
-			</section>
-		</footer>
 	</body>
 </html>

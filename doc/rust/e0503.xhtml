@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: E0503 - 可変借用中の使用</title>
+		<title>Rust メモ: E0503 - 可変参照中の値の使用</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -15,9 +15,44 @@
 <mark class="error">error[E0503]</mark><mark class="title">: cannot use `val` because it was mutably borrowed</mark>
 </samp></pre>
 		<p>
-可変借用中のアイテムをその借用外から使用した。
+可変参照中の値をその参照外から使用した。
 		</p>
 		<section>
+			<h1>注意点</h1>
+			<p>
+このエラー自体のルールは単純である。
+			</p> <p>
+しかし、エラーを読み解くには、参照まわりのその他の知識も必要になる事がある。
+			</p> <p>
+例えば､『<a href="e_ref_lifetime.xhtml">ライフタイムの延長</a>』の影響があると、初見では納得しにくいエラーになる。 
+			</p>
+		</section> <section>
+			<h1>メッセージ</h1>
+			<p>
+メッセージの構成はだいたい以下のようになる。
+			</p>
+			<dl class="normal">
+				<dt>要約部</dt>
+				<dd>
+					<ul>
+						<li>
+参照中の移動が検出された変数名
+						</li>
+					</ul>
+				</dd>
+				<dt>詳細部</dt>
+				<dd>
+					<ul>
+						<li>
+参照の発生個所 ← エラー個所より前方
+						</li> <li>
+値の使用個所　 ← エラー個所
+						</li> <li>
+参照の使用箇所 ← エラー個所より後方 
+						</li>
+					</ul>
+				</dd>
+			</dl>
 			<h1>パターン</h1>
 			<doc-nav-sub/>
 			<section>
@@ -26,8 +61,10 @@
 					<div class="subTitle">基本形</div>
 				</hgroup>
 				<p>
-以下では、<code>mut_val</code> での <code>val</code> の可変借用中に <code>val</code> を使用している。
+最も単純なパターン。
 				</p>
+				<section>
+					<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
     let mut val = 42;
@@ -51,9 +88,51 @@ fn work&lt;T&gt;(_x: T) {
 <mark class="info">5 |</mark>     work(mut_val);
 <mark class="info">  |</mark>          <mark class="info">------- borrow later used here</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
-					<h1>パターン B</h1>
+					<h1 id="withDrop">パターン B</h1>
+					<div class="subTitle"><code>Drop</code> トレイトの影響</div>
+				</hgroup>
+				<p>
+詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#exLifetime">ライフタイムの延長</a>』を参照。
+<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても発生する場合もある。)
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = 1;
+    let _mut_var = MyMutRef(&amp;mut var);
+    work(<mark class="error">var</mark>);
+}
+
+fn work&lt;T&gt;(_x: T) {
+    // nop.
+}
+
+struct MyMutRef&lt;'a&gt;(&amp;'a mut i32);
+impl Drop for MyMutRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0503]</mark><mark class="title">: cannot use `var` because it was mutably borrowed</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:10
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let _mut_var = MyMutRef(&amp;mut var);
+<mark class="info">  |</mark>                             <mark class="info">-------- `var` is borrowed here</mark>
+<mark class="info">4 |</mark>     work(var);
+<mark class="info">  |</mark>          <mark class="error">^^^ use of borrowed `var`</mark>
+<mark class="info">5 |</mark> }
+<mark class="info">  |</mark> <mark class="info">- borrow might be used here, when `_mut_var` is dropped and runs the `Drop` code for type `MyMutRef`</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン C</h1>
 					<div class="subTitle">NLL の制限</div>
 				</hgroup>
 				<p>

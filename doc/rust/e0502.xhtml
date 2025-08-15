@@ -66,12 +66,14 @@
 			<doc-nav-sub/>
 			<section>
 				<hgroup>
-					<h1>パターン A</h1>
+					<h1>パターン A1</h1>
 					<div class="subTitle">不変参照中の可変参照</div>
 				</hgroup>
 				<p>
-以下では、不変参照中に可変参照を行っている。
+不変参照中に可変参照を行うパターン。
 				</p>
+				<section>
+					<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
     let mut data = 0;
@@ -91,14 +93,17 @@ fn main() {
 <mark class="info">5 |</mark>     println!("{}", data_ref);
 <mark class="info">  |</mark>                    <mark class="info">-------- immutable borrow later used here</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
-					<h1>パターン B</h1>
+					<h1>パターン A2</h1>
 					<div class="subTitle">可変参照中の不変参照</div>
 				</hgroup>
 				<p>
-以下では、可変参照中に不変参照を行っている。
+可変参照中に不変参照を行うパターン。
 				</p>
+				<section>
+					<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
     let mut data = 0;
@@ -118,6 +123,44 @@ fn main() {
 <mark class="info">5 |</mark>     *data_mut = 1;
 <mark class="info">  |</mark>     <mark class="info">------------- mutable borrow later used here</mark>
 </samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="withDrop">パターン B</h1>
+					<div class="subTitle"><code>Drop</code> トレイトの影響</div>
+				</hgroup>
+				<p>
+詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#exLifetime">ライフタイムの延長</a>』を参照。
+<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても発生する場合もある。)
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = 0;
+    let _refs = MyRef(&amp;var);
+    *<mark class="error">&amp;mut var</mark> = 1;
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0502]</mark><mark class="title">: cannot borrow `var` as mutable because it is also borrowed as immutable</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:6
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let _refs = MyRef(&amp;var);
+<mark class="info">  |</mark>                       <mark class="info">---- immutable borrow occurs here</mark>
+<mark class="info">4 |</mark>     *&amp;mut var = 1;
+<mark class="info">  |</mark>      <mark class="error">^^^^^^^^ mutable borrow occurs here</mark>
+<mark class="info">5 |</mark> }
+<mark class="info">  |</mark> <mark class="info">- immutable borrow might be used here, when `_refs` is dropped and runs the `Drop` code for type `MyRef`</mark>
+</samp></pre>
+				</section>
 			</section> 
 		</section>
 	</body>

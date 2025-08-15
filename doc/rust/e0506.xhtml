@@ -54,7 +54,18 @@
 				</dd>
 			</dl>
 		</section> <section>
-			<h1>サンプル</h1>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+最も単純なパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
     let mut var = 0;
@@ -74,6 +85,47 @@ fn main() {
 <mark class="info">5 |</mark>     println!("{var}, {var_ref}");
 <mark class="info">  |</mark>                       <mark class="info">------- borrow later used here</mark>
 </samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="withDrop">パターン B</h1>
+					<div class="subTitle"><code>Drop</code> トレイトの影響</div>
+				</hgroup>
+				<p>
+詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#exLifetime">ライフタイムの延長</a>』を参照。
+<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても発生する場合もある。)
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = 1;
+    let _refs = MyRef(&amp;var);
+    <mark class="error">var = 2</mark>;
+    dbg!(var);
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0506]</mark><mark class="title">: cannot assign to `var` because it is borrowed</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let _refs = MyRef(&amp;var);
+<mark class="info">  |</mark>                       <mark class="info">---- `var` is borrowed here</mark>
+<mark class="info">4 |</mark>     var = 2;
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^ `var` is assigned to here but it was already borrowed</mark>
+<mark class="info">5 |</mark>     dbg!(var);
+<mark class="info">6 |</mark> }
+<mark class="info">  |</mark> <mark class="info">- borrow might be used here, when `_refs` is dropped and runs the `Drop` code for type `MyRef`</mark>
+</samp></pre>
+				</section>
+			</section>
 		</section>
 	</body>
 </html>

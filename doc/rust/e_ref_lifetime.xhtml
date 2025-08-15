@@ -17,20 +17,21 @@
 		<section>
 			<h1>関連エラー</h1>
 			<p>
-以下はよくあるエラー。
+以下は関連するエラー。
 			</p>
-<pre><samp class="console-rustc">
-<mark class="error">error[E0502]</mark><mark class="title">: cannot borrow `data` as mutable because it is also borrowed as immutable</mark>
-</samp></pre>
-<pre><samp class="console-rustc">
-<mark class="error">error[E0502]</mark><mark class="title">: cannot borrow `data` as immutable because it is also borrowed as mutable</mark>
-</samp></pre>
-<pre><samp class="console-rustc">
-<mark class="error">error[E0503]</mark><mark class="title">: cannot use `data` because it was mutably borrowed</mark>
-</samp></pre>
-<pre><samp class="console-rustc">
-<mark class="error">error[E0506]</mark><mark class="title">: cannot assign to `target.something` because it is borrowed</mark>
-</samp></pre>
+			<ul>
+				<li>
+<a href="e0502.xhtml">[E0502] 不変参照と可変参照の同時使用</a>
+				</li> <li>
+<a href="e0503.xhtml">[E0503] 可変参照中の値の使用</a>
+				</li> <li>
+<a href="e0505.xhtml">[E0505] 参照中の変数の移動</a>
+				</li> <li>
+<a href="e0506.xhtml">[E0506] 参照中の変数への書込</a>
+				</li> <li>
+and more...
+				</li>
+			</ul>
 		</section> <section>
 			<h1>基本ロジック</h1>
 			<p>
@@ -254,6 +255,11 @@ struct Data&lt;'a&gt; {
 <mark class="info">  |</mark>     <mark class="error">mutable borrow later used here</mark>
 </samp></pre>
 				</section>
+			</section> <section>
+				<h1><code>Drop</code> トレイトの影響</h1>
+				<p>
+詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#exLifetime">ライフタイムの延長</a>』を参照。
+				</p>
 			</section>
 		</section>
 	</body>

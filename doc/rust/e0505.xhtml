@@ -155,11 +155,12 @@ impl MyType {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1>パターン B</h1>
+					<h1 id="withDrop">パターン B</h1>
 					<div class="subTitle"><code>Drop</code> トレイトの影響</div>
 				</hgroup>
 				<p>
-変数が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する型から参照される場合、その参照のライフタイムはスコープを抜けるまでになる。なぜなら、<a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が呼ばれるのはスコープを抜けたタイミングだからである。なお、仮に参照元が <code>Drop</code> を実装しなければ、参照のライフタイムは使用に問題ない範囲で短縮される。このライフタイムの違いにより、エラーの有無が変化しうる。
+詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#exLifetime">ライフタイムの延長</a>』を参照。
+<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても発生する場合もある。)
 				</p>
 				<section>
 					<h2>サンプル</h2>
