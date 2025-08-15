@@ -104,7 +104,7 @@ fn use_static_ref(_: &amp;'static i32) {
 				</hgroup>
 				<p>
 詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#siblingRef">兄弟フィールドの参照防止</a>』を参照。
-<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても発生する場合もある。)
+<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても考慮が必要。)
 				</p>
 				<section>
 					<h2>サンプル</h2>
@@ -155,7 +155,7 @@ impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
 					<summary>[旧情報]</summary>
 					<p>
 詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#blockTail">ブロック式の末尾処理</a>』を参照。
-<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても発生する場合もある。)
+<br/> (注: <code>Drop</code> トレイトを直接的に扱っていなくても考慮が必要。)
 					</p>
 					<section>
 						<h2>サンプル</h2>
