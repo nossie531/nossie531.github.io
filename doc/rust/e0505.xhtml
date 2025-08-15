@@ -166,8 +166,8 @@ impl MyType {
 <pre><code class="language-rust">
 fn main() {
     let var = MyValue(1);
-    let _var_ref = <mark class="error">var</mark>.new_ref();
-    var.consume();
+    let _var_ref = var.new_ref();
+    <mark class="error">var</mark>.consume();
 }
 
 #[derive(Clone)]
@@ -199,7 +199,7 @@ impl Drop for MyRef&lt;'_&gt; {
 <mark class="info">4 |</mark>     var.consume();
 <mark class="info">  |</mark>     <mark class="error">^^^ move out of `var` occurs here</mark>
 <mark class="info">5 |</mark> }
-<mark class="info">  |</mark> - borrow might be used here, when `_var_ref` is dropped and runs the `Drop` code for type `MyRef`
+<mark class="info">  |</mark> <mark class="info">- borrow might be used here, when `_var_ref` is dropped and runs the `Drop` code for type `MyRef`</mark>
 <mark class="info">  |</mark>
 <mark class="info">help</mark>: consider cloning the value if the performance cost is acceptable
 <mark class="info">  |</mark>
