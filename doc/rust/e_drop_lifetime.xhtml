@@ -44,11 +44,19 @@ Rust 2024 での改良点。
 					<h2>注意点</h2>
 					<p>
 <code>Drop</code> が見える範囲になくてもこのパターンになりうる。なぜなら、その型そのものが <code>Drop</code> を実装していなくても、そのフィールドの型が同じように参照を含んで <code>Drop</code> を実装しているならば、親の型にその影響が派生する。
+					</p> <p>
+例えば、<code>std</code> の <a href="https://doc.rust-lang.org/std/cell/struct.Ref.html"><code>Ref</code></a> は <code>Drop</code> を実装しない。しかし、そのフィールドは <code>Drop</code> を実装する。そのため、<code>Ref</code> はこのパターンの原因になりうる。
 					</p>
+					<aside class="normal moan">
+						<p>仕様の不備？</p>
+						<p>
+つまり、型がこのパターンの原因になるかを知るには、全てのフィールドのソースコードを再帰的に調べなければならない。筆者としては、文書化されない特徴がコンパイルエラーの原因になるのはヤバイと思う…。
+						</p>
+					</aside>
 				</section> <section>
 					<h2>関連エラー</h2>
 					<p>
-このパターンは以下のエラーコードにつながる。
+このパターンは以下のエラーにつながる。
 					</p>
 					<ul>
 						<li>
@@ -153,7 +161,7 @@ impl Drop for MyRef2&lt;'_&gt; {
 				</section> <section>
 					<h2>関連エラー</h2>
 					<p>
-このパターンはエラーコード <a href="e0597.xhtml">E0597</a> の<a href="e0597.xhtml#siblingRef">該当エラー</a>につながる。
+このパターンは <a href="e0597.xhtml">E0597</a> の<a href="e0597.xhtml#siblingRef">特定パターン</a>につながる。
 					</p>
 				</section> <section>
 					<h2>サンプル (<code>Drop</code> あり)</h2>
@@ -265,7 +273,7 @@ impl&lt;'a&gt; MyTrait&lt;'a&gt; for MyType&lt;'a&gt; {
 					</section> <section>
 						<h2>関連エラー</h2>
 						<p>
-このパターンはエラーコード <a href="e0597.xhtml">E0597</a> の<a href="e0597.xhtml#blockTail">該当エラー</a>につながる。
+このパターンは <a href="e0597.xhtml">E0597</a> の<a href="e0597.xhtml#blockTail">特定パターン</a>につながる。
 						</p>
 					</section> <section>
 						<h2>サンプル (<code>Drop</code> あり)</h2>
