@@ -88,8 +88,8 @@ fn main() {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="withDrop">パターン B</h1>
-					<div class="subTitle"><code>Drop</code> トレイトの影響</div>
+					<h1 id="withDrop">パターン B1</h1>
+					<div class="subTitle"><code>Drop</code> トレイトの影響 (通常版)</div>
 				</hgroup>
 				<p>
 詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#exLifetime">ライフタイムの延長</a>』を参照。
@@ -124,6 +124,182 @@ impl Drop for MyRef&lt;'_&gt; {
 <mark class="info">6 |</mark> }
 <mark class="info">  |</mark> <mark class="info">- borrow might be used here, when `_refs` is dropped and runs the `Drop` code for type `MyRef`</mark>
 </samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B2</h1>
+					<div class="subTitle"><code>Drop</code> トレイトの影響 (複数の文での自己更新)</div>
+				</hgroup>
+				<p>
+これは前のパターンの特殊版で、<code>Drop</code> トレイトでライフタイムが延長された参照元が残った状態で、その参照元を更新すると発生する。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = MyType(1);
+    let refs = var.refs();
+    <mark class="error">var = refs.new_value()</mark>;
+    dbg!(var.0);
+}
+
+struct MyType(i32);
+
+impl MyType {
+    fn refs(&amp;self) -&gt; MyRef&lt;'_&gt; {
+        MyRef(&amp;self.0)
+    }
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+
+impl MyRef&lt;'_&gt; {
+    fn new_value(&amp;self) -&gt; MyType {
+        MyType(self.0 + 1)
+    }
+}
+
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0);
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0506]</mark><mark class="title">: cannot assign to `var` because it is borrowed</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let refs = var.refs();
+<mark class="info">  |</mark>                <mark class="info">--- `var` is borrowed here</mark>
+<mark class="info">4 |</mark>     var = refs.new_value();
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^^^^^^^^ `var` is assigned to here but it was already borrowed</mark>
+<mark class="info">5 |</mark>     dbg!(var.0);
+<mark class="info">6 |</mark> }
+<mark class="info">  |</mark> <mark class="info">- borrow might be used here, when `refs` is dropped and runs the `Drop` code for type `MyRef`</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+更新値の導出と設定を分けると良い。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = MyType(1);
+    let refs = var.refs();
+    let new_value = refs.new_value();
+    drop(refs);
+    var = new_value;
+    dbg!(var.0);
+}
+
+struct MyType(i32);
+
+impl MyType {
+    fn refs(&amp;self) -&gt; MyRef&lt;'_&gt; {
+        MyRef(&amp;self.0)
+    }
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+
+impl MyRef&lt;'_&gt; {
+    fn new_value(&amp;self) -&gt; MyType {
+        MyType(self.0 + 1)
+    }
+}
+
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0);
+    }
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B3</h1>
+					<div class="subTitle"><code>Drop</code> トレイトの影響 (一つの文での自己更新)</div>
+				</hgroup>
+				<p>
+これは前のパターンの特殊版で、問題となる処理が一文に短縮されている。これにより、文内での一時的な値が絡むため、メッセージが少しだけ変化する。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = MyType(1);
+    <mark class="error">var = var.refs().new_value()</mark>;
+    dbg!(var.0);
+}
+
+struct MyType(i32);
+
+impl MyType {
+    fn refs(&amp;self) -&gt; MyRef&lt;'_&gt; {
+        MyRef(&amp;self.0)
+    }
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+
+impl MyRef&lt;'_&gt; {
+    fn new_value(&amp;self) -&gt; MyType {
+        MyType(self.0 + 1)
+    }
+}
+
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0);
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0506]</mark><mark class="title">: cannot assign to `var` because it is borrowed</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     var = var.refs().new_value();
+<mark class="info">  |</mark>     <mark class="error">^^^^^^</mark><mark class="info">----------</mark><mark class="error">^^^^^^^^^^^^</mark><mark class="info">- ... and the borrow might be used here, when that temporary is dropped and runs the `Drop` code for type `MyRef`</mark>
+<mark class="info">  |</mark>     <mark class="error">|     </mark><mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="error">|     </mark><mark class="info">`var` is borrowed here</mark>
+<mark class="info">  |</mark>     <mark class="error">|     </mark><mark class="info">a temporary with access to the borrow is created here ...</mark>
+<mark class="info">  |</mark>     <mark class="error">`var` is assigned to here but it was already borrowed</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+前のパターンと同様、更新値の導出と設定を分けると良い。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = MyType(1);
+    let new_value = var.refs().new_value();
+    var = new_value;
+    dbg!(var.0);
+}
+
+struct MyType(i32);
+
+impl MyType {
+    fn refs(&amp;self) -&gt; MyRef&lt;'_&gt; {
+        MyRef(&amp;self.0)
+    }
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+
+impl MyRef&lt;'_&gt; {
+    fn new_value(&amp;self) -&gt; MyType {
+        MyType(self.0 + 1)
+    }
+}
+
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0);
+    }
+}
+</code></pre>
 				</section>
 			</section>
 		</section>
