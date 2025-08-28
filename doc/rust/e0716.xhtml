@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: E0716 - 参照中の中間値の破棄</title>
+		<title>Rust メモ: E0716 - 一時的な値の参照中の破棄</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -15,25 +15,25 @@
 <mark class="error">error[E0716]</mark><mark class="title">: temporary value dropped while borrowed</mark>
 </samp></pre>
 		<p>
-参照中に中間値が破棄された。
+一時的な値が参照中に破棄された。
 		</p>
 		<section>
 			<h1>パターン</h1>
 			<doc-nav-sub/>
 			<section>
 				<hgroup>
-					<h1>パターン A</h1>
+					<h1 id="basic">パターン A</h1>
 					<div class="subTitle">基本形</div>
 				</hgroup>
 				<p>
-殆どの場合、式内の中間値の破棄は、文末 (セミコロンの位置) にて行われる。
+殆どの場合、式内の一時的な値は、文末 (セミコロンの位置) で破棄される。
 				</p> <p>
-そのため、それ以降にその中間値に由来する参照を使用するとエラーになる。
+そのため、それ以降にそれに由来する参照を使用するとエラーになる。
 				</p>
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、式内の中間値 <code>Foo::new()</code> から、メソッド <code>val_ref()</code> で参照をたどり、その結果を変数 <code>ref_to_temp</code> へと保存して利用している。しかし、<code>ref_to_temp</code> へと値を保存する文の文末にてすでに参照先の中間値は破棄されてしまっている。
+以下では、一時的な値 <code>Foo::new()</code> の参照を <code>val_ref()</code> でたどり、結果を <code>ref_to_temp</code> に保存している。しかし、一時的な値はその文末ですぐに破棄されてしまう。そのため、以降にその参照にアクセスがあればエラーとなる。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -74,7 +74,7 @@ impl Foo {
 				</section> <section>
 					<h2>解決策</h2>
 					<p>
-エラーメッセージの <q>help</q> にある通り、中間値をローカル変数に保存する。
+エラーメッセージの <q>help</q> にある通り、一時的な値をローカル変数に保存する。
 					</p>
 					<aside class="normal">
 						<p>
@@ -89,17 +89,15 @@ Rust 以外の多くの言語では、ローカル変数に計算過程の中間
 			</section> <section>
 				<hgroup>
 					<h1>パターン B</h1>
-					<div class="subTitle">借用式</div>
+					<div class="subTitle">参照式</div>
 				</hgroup>
 				<p>
-借用式 (<code>&amp;<var>x</var></code>) の演算対象 (<code><var>x</var></code>) がアドレスでなく通常の値の場合、必要に応じて現在のスコープに値が自動保存され、式の結果はそこへの参照となる。そのためこの場合、中間値を生成した文より後でも、スコープ内ならばその中間値への参照を使える。
-				</p> <p>
-つまり、借用式では中間値と参照まわりのエラーはあまり起きない。ただそれでも、中間値の参照を静的参照として利用したりすると、やはりエラーになる。
+参照式 (<code>&amp;<var>x</var></code>) は必要に応じて現在のスコープに演算対象 (<code><var>x</var></code>) を保存する。そのため、一時的な値に由来する参照でも、この場合は<a href="#basic">基本形</a>のパターンとは異なり、その参照がすぐに使えなくなる事はない。ただし、スコープを超えた利用ではやはりエラーになる。
 				</p>
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、借用式内の中間値 <code>Foo::new()</code> のフィールド <code>val</code> への参照が、変数 <code>ref_to_temp</code> から参照できるよう、中間値が自動保存されている。しかし、その中間値は静的に保存されているわけではない。そのため、<code>ref_to_temp</code> は、関数 <code>use_ref</code> の引数にはなれない。
+以下では、参照式により一時的な値に由来する <code>Foo::new().val</code> がスコープに保存される。そのため、それを参照する <code>ref_to_temp</code> の使用は妥当である。しかし、関数 <code>use_ref</code> の引数のライフタイムは <code>'static</code> であるため、その保存期間を超えてしまっている。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -131,6 +129,67 @@ impl Foo {
 <mark class="info">  |</mark>     <mark class="info">-------------------- argument requires that borrow lasts for `'static`</mark>
 <mark class="info">4 |</mark> }
 <mark class="info">  |</mark> <mark class="info">- temporary value is freed at the end of this statement</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="withDrop">パターン C</h1>
+					<div class="subTitle"><code>Drop</code> トレイトの影響</div>
+				</hgroup>
+				<p>
+詳しくは『<a href="e_drop_lifetime.xhtml">Drop トレイトのライフタイムへの影響</a> - <a href="e_drop_lifetime.xhtml#exLifetime">ライフタイムの延長</a>』を参照。
+<br /> (注: <code>Drop</code> トレイトを直接的に扱っていなくても考慮が必要。)
+				</p>
+				<section>
+					<h2>基本形との関係</h2>
+					<p>
+このパターンは変数をバインドだけして使用しないレアケースで発生する。<br/>
+変数を使用すると、<a href="#basic">基本形</a>のパターンのメッセージに変わる。
+					</p>
+				</section> <section>
+					<h2>サンプル</h2>
+					<p>
+<code>_var</code> を使用すると<a href="#basic">基本形</a>のパターンのメッセージに変わる<br/>
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let _var = temp().my_ref();
+}
+
+fn temp() -&gt; MyType {
+    MyType(0)
+}
+
+struct MyType(i32);
+impl MyType {
+    pub fn my_ref(&amp;self) -&gt; MyRef&lt;'_&gt; {
+        MyRef(&amp;self.0)
+    }
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="info">error[E0716]</mark><mark class="title">: temporary value dropped while borrowed</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:16
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let _var = temp().my_ref();
+<mark class="info">  |</mark>                <mark class="error">^^^^^^</mark>         <mark class="info">- temporary value is freed at the end of this statement</mark>
+<mark class="info">  |</mark>                <mark class="error">|</mark>
+<mark class="info">  |</mark>                <mark class="error">creates a temporary value which is freed while still in use</mark>
+<mark class="info">3 |</mark> }
+<mark class="info">  |</mark> <mark class="info">- borrow might be used here, when `_var` is dropped and runs the `Drop` code for type `MyRef`</mark>
+<mark class="info">  |</mark>
+<mark class="info">help</mark>: consider using a `let` binding to create a longer lived value
+<mark class="info">  |</mark>
+<mark class="info">2</mark> <mark class="edit">~</mark>     <mark class="edit">let binding = temp();</mark>
+<mark class="info">3</mark> <mark class="edit">~</mark>     let _var = <mark class="edit">binding</mark>.my_ref();
+<mark class="info">  |</mark>
 </samp></pre>
 				</section>
 			</section>

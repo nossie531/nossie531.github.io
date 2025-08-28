@@ -68,6 +68,8 @@ Rust 2024 での改良点。
 						</li> <li>
 <a href="e0506.xhtml">[E0506] 参照中の変数への書込</a> → <a href="e0506.xhtml#withDrop">該当パターン</a>
 						</li> <li>
+<a href="e0716.xhtml">[E0716] 一時的な値の参照中の破棄</a> → <a href="e0716.xhtml#withDrop">該当パターン</a>
+						</li> <li>
 and more?
 						</li>
 					</ul>
@@ -87,7 +89,7 @@ fn main() {
 struct MyRef&lt;'a&gt;(&amp;'a i32);
 impl Drop for MyRef&lt;'_&gt; {
     fn drop(&amp;mut self) {
-        println!("ID [{}] is drpoped.", self.0)
+        println!("ID [{}] is drpoped.", self.0);
     }
 }
 </code></pre>
@@ -126,7 +128,7 @@ impl&lt;'a&gt; MyRef1&lt;'a&gt; {
 struct MyRef2&lt;'a&gt;(&amp;'a i32);
 impl Drop for MyRef2&lt;'_&gt; {
     fn drop(&amp;mut self) {
-        println!("ID [{}] is drpoped.", self.0)
+        println!("ID [{}] is drpoped.", self.0);
     }
 }
 </code></pre>
@@ -142,6 +144,27 @@ impl Drop for MyRef2&lt;'_&gt; {
 <mark class="info">6 |</mark> }
 <mark class="info">  |</mark> <mark class="info">- borrow might be used here, when `_refs` is dropped and runs the destructor for type `MyRef1&lt;'_&gt;`</mark>
 </samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+<code>Drop</code> ありなしどちらの場合も、適切な位置で <a href="https://doc.rust-lang.org/std/mem/fn.drop.html"><code>drop</code></a> を実行すると良い。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = 1;
+    let refs = MyRef(&amp;var);
+    drop(refs);
+    var = 2;
+    dbg!(var);
+}
+
+struct MyRef&lt;'a&gt;(&amp;'a i32);
+impl Drop for MyRef&lt;'_&gt; {
+    fn drop(&amp;mut self) {
+        println!("ID [{}] is drpoped.", self.0);
+    }
+}
+</code></pre>
 				</section>
 			</section> <section>
 				<hgroup>
@@ -183,7 +206,7 @@ struct MyData&lt;'a&gt; {
 struct OnDrop&lt;'a&gt;(&amp;'a i32);
 impl&lt;'a&gt; Drop for OnDrop&lt;'a&gt; {
     fn drop(&amp;mut self) {
-        println!("ID [{}] is drpoped.", self.0)
+        println!("ID [{}] is drpoped.", self.0);
     }
 }
 </code></pre>
@@ -294,7 +317,7 @@ fn main() {
 struct OnDrop&lt;'a&gt;(&amp;'a i32);
 impl Drop for OnDrop&lt;'_&gt; {
     fn drop(&amp;mut self) {
-        println!("ID [{}] is drpoped.", self.0)
+        println!("ID [{}] is drpoped.", self.0);
     }
 }
 </code></pre>
