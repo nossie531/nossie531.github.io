@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 自動テストでの条件付きコンパイル</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+テスト時にのみ有効になる『<a href="conditional_compile.xhtml">条件付きコンパイル</a>』について。
+		</p>
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+単体テストだけでなく、結合テストも含めたテスト時の挙動を変えたい場合がある。しかし、構成オプション <code>test</code> はこの目的には使えない。この解決策がかなりトリッキーだったため、よくある場合も含めてメモしておく。
+			</p>
+		</aside>
+		<section>
+			<h1>単体テスト</h1>
+			<p>
+<code>test</code> 構成オプションが使える。
+			</p><p>
+なお、この構成オプションはテストモードでのビルド時にのみ有効化される。そのため、結合テストにおいて、テストモードでビルドした <code>tests</code> ディレクトリのコードから、通常モードでビルドした <code>src</code> ディレクトリのコードを実行する場合、<code>src</code> 側のコードにある <code>test</code> は無効化される。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+<pre><code class="language-rust">
+pub fn my_func() -&gt; bool {
+    #[cfg(test)]
+    println!("`my_func` is called.");
+
+    true
+}
+
+#[test]
+fn test() {
+    assert_eq!(my_func(), true);
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>+ 結合テスト</h1>
+			<p>
+専用のフィーチャーを作り <code>dev-dependencies</code> で適用する。
+			</p> <p>
+(<code>dev-dependencies</code> ではそのクレート自身を指定できる。)
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<figure class="file">
+					<figcaption>cargo.toml</figcaption>
+<pre><code class="language-toml">
+[package]
+name = "rust_test"
+version = "0.1.0"
+edition = "2024"
+
+[dev-dependencies]
+rust_test = { path = ".", features = ["log"] }
+
+[features]
+log = []
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>src/lib.rs</figcaption>
+<pre><code class="language-rust">
+pub fn my_func() -&gt; bool {
+    #[cfg(feature = "log")]
+    println!("`my_func` is called.");
+
+    true
+}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>tests/test.rs</figcaption>
+<pre><code class="language-rust">
+use rust_test::my_func;
+
+#[test]
+fn test() {
+    assert_eq!(my_func(), true);
+}
+</code></pre>
+				</figure>
+			</section>
+		</section>
+	</body>
+</html>
