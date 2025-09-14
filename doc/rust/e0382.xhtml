@@ -237,12 +237,10 @@ struct Sub(i32);
 			</section> <section>
 				<hgroup>
 					<h1>パターン C</h1>
-					<div class="subTitle">
-						ループ内のムーブ
-					</div>
+					<div class="subTitle">ループ内のムーブ</div>
 				</hgroup>
 				<p>
-前のループで値がムーブ済で失われているパターン。
+前回ループのムーブにより値が失われているパターン。
 				</p>
 				<section>
 					<h2>サンプル</h2>
@@ -281,12 +279,35 @@ impl MyType {
 <mark class="info">10 |</mark>     fn show_value(self) {
 <mark class="info">   |</mark>                   <mark class="edit">^^^^</mark>
 </samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+ムーブで失われた変数を再設定するとよい。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = MyType(42);
+    for _ in 0..3 {
+        var.show_value();
+        var = MyType(42);
+    }
+}
+
+struct MyType(i32);
+impl MyType {
+    fn show_value(self) {
+        println!("val: {}", self.0)
+    }
+}
+</code></pre>
 				</section>
 			</section>
 		</section> <section>
-			<h1>解決策</h1>
+			<h1>解決策 (共通)</h1>
 			<p>
-以下の解決策はパターン A1 を例にしている。
+全てのパターンで以下の解決策が使える。
+			</p> <p>
+(解決策の各例はパターン A1 を基にしている)。
 			</p>
 			<doc-nav-sub/>
 			<section>
