@@ -12,16 +12,16 @@
 			<h1><doc-title/></h1>
 		</header>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0382]</mark><mark class="title">: use of moved value: `val`</mark>
+<mark class="error">error[E0382]</mark><mark class="title">: use of moved value: `var`</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0382]</mark><mark class="title">: borrow of moved value: `val`</mark>
+<mark class="error">error[E0382]</mark><mark class="title">: borrow of moved value: `var`</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0382]</mark><mark class="title">: use of partially moved value: `val`</mark>
+<mark class="error">error[E0382]</mark><mark class="title">: use of partially moved value: `var`</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0382]</mark><mark class="title">: borrow of partially moved value: `val`</mark>
+<mark class="error">error[E0382]</mark><mark class="title">: borrow of partially moved value: `var`</mark>
 </samp></pre>
 		<p>
 ムーブ済の変数にアクセスしようとした。
@@ -40,17 +40,17 @@
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、<code>func(val)</code> による <code>val</code> のムーブ後に <code>val</code> を使用している。
+以下では、<code>func(var)</code> による <code>var</code> のムーブ後に <code>var</code> を使用している。
 					</p>
 <pre><code class="language-rust">
 fn main() {
-    let val = MyType(42);
-    func(val);
-    <mark class="error">val</mark>.show_value();
+    let var = MyType(42);
+    func(var);
+    <mark class="error">var</mark>.show_value();
 }
 
-fn func(val: MyType) {
-    _ = val;
+fn func(var: MyType) {
+    _ = var;
 }
 
 struct MyType(i32);
@@ -61,27 +61,27 @@ impl MyType {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0382]</mark><mark class="title">: use of moved value: `val`</mark>
+<mark class="error">error[E0382]</mark><mark class="title">: use of moved value: `var`</mark>
 <mark class="info">  --&gt;</mark> src\main.rs:4:5
 <mark class="info">   |</mark>
-<mark class="info">2  |</mark>     let val = MyType(42);
-<mark class="info">   |</mark>         <mark class="info">--- move occurs because `val` has type `MyType`, which does not implement the `Copy` trait</mark>
-<mark class="info">3  |</mark>     func(val);
+<mark class="info">2  |</mark>     let var = MyType(42);
+<mark class="info">   |</mark>         <mark class="info">--- move occurs because `var` has type `MyType`, which does not implement the `Copy` trait</mark>
+<mark class="info">3  |</mark>     func(var);
 <mark class="info">   |</mark>          <mark class="info">--- value moved here</mark>
-<mark class="info">4  |</mark>     val.show_value();
+<mark class="info">4  |</mark>     var.show_value();
 <mark class="info">   |</mark>     <mark class="error">^^^ value used here after move</mark>
 <mark class="info">   |</mark>
 <mark class="edit">note</mark>: consider changing this parameter type in function `func` to borrow instead if owning the value isn't necessary
 <mark class="info">  --&gt;</mark> src\main.rs:7:14
 <mark class="info">   |</mark>
-<mark class="info">7  |</mark> fn func(val: MyType) {
+<mark class="info">7  |</mark> fn func(var: MyType) {
 <mark class="info">   |</mark>    <mark class="info">----</mark>      <mark class="edit">^^^^^^ this parameter takes ownership of the value</mark>
 <mark class="info">   |</mark>    <mark class="info">|</mark>
 <mark class="info">   |</mark>    <mark class="info">in this function</mark>
 <mark class="edit">note</mark>: if `MyType` implemented `Clone`, you could clone the value
 <mark class="info">  --&gt;</mark> src\main.rs:11:1
 <mark class="info">   |</mark>
-<mark class="info">3  |</mark>     func(val);
+<mark class="info">3  |</mark>     func(var);
 <mark class="info">   |</mark>          <mark class="info">--- you could clone this value</mark>
 <mark class="info">...</mark>
 <mark class="info">11 |</mark> struct MyType(i32);
@@ -99,17 +99,17 @@ impl MyType {
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、<code>func(val)</code> による <code>val</code> のムーブ後に <code>val</code> を参照している。
+以下では、<code>func(var)</code> による <code>var</code> のムーブ後に <code>var</code> を参照している。
 					</p>
 <pre><code class="language-rust">
 fn main() {
-    let val = MyType(42);
-    func(val);
-    <mark class="error">val</mark>.show_value();
+    let var = MyType(42);
+    func(var);
+    <mark class="error">var</mark>.show_value();
 }
 
-fn func(val: MyType) {
-    _ = val;
+fn func(var: MyType) {
+    _ = var;
 }
 
 struct MyType(i32);
@@ -120,27 +120,27 @@ impl MyType {
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0382]</mark><mark class="title">: borrow of moved value: `val`</mark>
+<mark class="error">error[E0382]</mark><mark class="title">: borrow of moved value: `var`</mark>
 <mark class="info">  --&gt;</mark> src\main.rs:4:5
 <mark class="info">   |</mark>
-<mark class="info">2  |</mark>     let val = MyType(42);
-<mark class="info">   |</mark>         <mark class="info">--- move occurs because `val` has type `MyType`, which does not implement the `Copy` trait</mark>
-<mark class="info">3  |</mark>     func(val);
+<mark class="info">2  |</mark>     let var = MyType(42);
+<mark class="info">   |</mark>         <mark class="info">--- move occurs because `var` has type `MyType`, which does not implement the `Copy` trait</mark>
+<mark class="info">3  |</mark>     func(var);
 <mark class="info">   |</mark>          <mark class="info">--- value moved here</mark>
-<mark class="info">4  |</mark>     val.show_value();
+<mark class="info">4  |</mark>     var.show_value();
 <mark class="info">   |</mark>     <mark class="error">^^^ value borrowed here after move</mark>
 <mark class="info">   |</mark>
 <mark class="edit">note</mark>: consider changing this parameter type in function `func` to borrow instead if owning the value isn't necessary
 <mark class="info">  --&gt;</mark> src\main.rs:7:14
 <mark class="info">   |</mark>
-<mark class="info">7  |</mark> fn func(val: MyType) {
+<mark class="info">7  |</mark> fn func(var: MyType) {
 <mark class="info">   |</mark>    <mark class="info">----</mark>      <mark class="edit">^^^^^^ this parameter takes ownership of the value</mark>
 <mark class="info">   |</mark>    <mark class="info">|</mark>
 <mark class="info">   |</mark>    <mark class="info">in this function</mark>
 <mark class="edit">note</mark>: if `MyType` implemented `Clone`, you could clone the value
 <mark class="info">  --&gt;</mark> src\main.rs:11:1
 <mark class="info">   |</mark>
-<mark class="info">3  |</mark>     func(val);
+<mark class="info">3  |</mark>     func(var);
 <mark class="info">   |</mark>          <mark class="info">--- you could clone this value</mark>
 <mark class="info">...</mark>
 <mark class="info">11 |</mark> struct MyType(i32);
@@ -159,9 +159,9 @@ impl MyType {
 					<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
-    let val = MyType(Sub(42));
-    func(val.0);
-    <mark class="error">val</mark>.show_sub();
+    let var = MyType(Sub(42));
+    func(var.0);
+    <mark class="error">var</mark>.show_sub();
 }
 
 fn func(sub: Sub) {
@@ -178,15 +178,15 @@ impl MyType {
 struct Sub(i32);
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0382]</mark><mark class="title">: use of partially moved value: `val`</mark>
+<mark class="error">error[E0382]</mark><mark class="title">: use of partially moved value: `var`</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:4:5
 <mark class="info">  |</mark>
-<mark class="info">3 |</mark>     func(val.0);
+<mark class="info">3 |</mark>     func(var.0);
 <mark class="info">  |</mark>          <mark class="info">----- value partially moved here</mark>
-<mark class="info">4 |</mark>     val.show_sub();
+<mark class="info">4 |</mark>     var.show_sub();
 <mark class="info">  |</mark>     <mark class="error">^^^ value used here after partial move</mark>
 <mark class="info">  |</mark>
-<mark class="info">  =</mark> <mark class="title">note</mark>: partial move occurs because `val.0` has type `Sub`, which does not implement the `Copy` trait
+<mark class="info">  =</mark> <mark class="title">note</mark>: partial move occurs because `var.0` has type `Sub`, which does not implement the `Copy` trait
 </samp></pre>
 				</section>
 			</section> <section>
@@ -200,13 +200,13 @@ struct Sub(i32);
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、<code>func(val.0)</code> による <code>val</code> の部分的ムーブ後に <code>val</code> を参照している。 
+以下では、<code>func(var.0)</code> による <code>var</code> の部分的ムーブ後に <code>var</code> を参照している。 
 					</p>
 <pre><code class="language-rust">
 fn main() {
-    let val = MyType(Sub(42));
-    func(val.0);
-    <mark class="error">val</mark>.show_sub();
+    let var = MyType(Sub(42));
+    func(var.0);
+    <mark class="error">var</mark>.show_sub();
 }
 
 fn func(sub: Sub) {
@@ -223,15 +223,63 @@ impl MyType {
 struct Sub(i32);
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="info">error[E0382]</mark><mark class="title">: borrow of partially moved value: `val`</mark>
+<mark class="info">error[E0382]</mark><mark class="title">: borrow of partially moved value: `var`</mark>
 <mark class="info"> --&gt;</mark> src\main.rs:4:5
 <mark class="info">  |</mark>
-<mark class="info">3 |</mark>     func(val.0);
+<mark class="info">3 |</mark>     func(var.0);
 <mark class="info">  |</mark>          <mark class="info">----- value partially moved here</mark>
-<mark class="info">4 |</mark>     val.show_sub();
+<mark class="info">4 |</mark>     var.show_sub();
 <mark class="info">  |</mark>     <mark class="error">^^^ value borrowed here after partial move</mark>
 <mark class="info">  |</mark>
-<mark class="info">  =</mark> <mark class="title">note</mark>: partial move occurs because `val.0` has type `Sub`, which does not implement the `Copy` trait
+<mark class="info">  =</mark> <mark class="title">note</mark>: partial move occurs because `var.0` has type `Sub`, which does not implement the `Copy` trait
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン C</h1>
+					<div class="subTitle">
+						ループ内のムーブ
+					</div>
+				</hgroup>
+				<p>
+前のループで値がムーブ済で失われているパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では <code>var.show_value()</code> で <code>var</code> が失われるためループできない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let var = MyType(42);
+    for _ in 0..3 {
+        <mark class="error">var</mark>.show_value();
+    }
+}
+
+struct MyType(i32);
+impl MyType {
+    fn show_value(self) {
+        println!("val: {}", self.0)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0382]</mark><mark class="title">: use of moved value: `var`</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:4:9
+<mark class="info">   |</mark>
+<mark class="info">2  |</mark>     let var = MyType(42);
+<mark class="info">   |</mark>         <mark class="info">--- move occurs because `var` has type `MyType`, which does not implement the `Copy` trait</mark>
+<mark class="info">3  |</mark>     for _ in 0..3 {
+<mark class="info">   |</mark>     <mark class="info">------------- inside of this loop</mark>
+<mark class="info">4  |</mark>         var.show_value();
+<mark class="info">   |</mark>         <mark class="error">^^^</mark> <mark class="info">------------ `var` moved due to this method call, in previous iteration of loop</mark>
+<mark class="info">   |</mark>
+<mark class="edit">note</mark>: `MyType::show_value` takes ownership of the receiver `self`, which moves `var`
+<mark class="info">  --&gt;</mark> src\main.rs:10:19
+<mark class="info">   |</mark>
+<mark class="info">10 |</mark>     fn show_value(self) {
+<mark class="info">   |</mark>                   <mark class="edit">^^^^</mark>
 </samp></pre>
 				</section>
 			</section>
@@ -251,13 +299,13 @@ struct Sub(i32);
 				</p>
 <pre><code class="language-rust">
 fn main() {
-    let val = MyType(42);
-    func(&amp;val);
-    val.show_value();
+    let var = MyType(42);
+    func(&amp;var);
+    var.show_value();
 }
 
-fn func(val: &amp;MyType) {
-    _ = val;
+fn func(var: &amp;MyType) {
+    _ = var;
 }
 
 struct MyType(i32);
@@ -277,13 +325,13 @@ impl MyType {
 				</p>
 <pre><code class="language-rust">
 fn main() {
-    let val = MyType(42);
-    func(val.clone());
-    val.show_value();
+    let var = MyType(42);
+    func(var.clone());
+    var.show_value();
 }
 
-fn func(val: MyType) {
-    _ = val;
+fn func(var: MyType) {
+    _ = var;
 }
 
 #[derive(Clone)]
@@ -304,13 +352,13 @@ impl MyType {
 				</p>
 <pre><code class="language-rust">
 fn main() {
-    let val = MyType(42);
-    func(val);
-    val.show_value();
+    let var = MyType(42);
+    func(var);
+    var.show_value();
 }
 
-fn func(val: MyType) {
-    _ = val;
+fn func(var: MyType) {
+    _ = var;
 }
 
 #[derive(Clone, Copy)]
