@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../../../style/import/prism.css"/>
+		<script src="../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-09-18" cite="https://doc.rust-lang.org/reference/trait-bounds.html#implied-bounds">
+			<h2 id="implied-bounds">
+				<a class="header" href="#implied-bounds">暗黙の境界</a></h2>
+				<p>
+ライフタイム境界はしばしば型を妥当にするよう推論される。
+				</p>
+<pre><code class="language-rust">fn requires_t_outlives_a&lt;'a, T&gt;(x: &amp;'a T) {}
+</code></pre>
+				<p>
+型 <code>&amp;'a T</code> が妥当であるには、型パラメタ <code>T</code> は <code>'a</code> より長生きである事が要求される。これが推論されるのは、関数のシグネチャが型 <code>&amp;'a T</code> を含んで、それが <code>T: 'a</code> が守られると妥当になるためである。
+				</p> <p>
+暗黙の境界は全ての関数のパラメタと出力のために追加される。<code>requires_t_outlives_a</code> の内側では <code>T: 'a</code> が守られると仮定でき、明示的にそれを指定しなくてもよい:
+				</p>
+<pre><code class="language-rust">fn requires_t_outlives_a_not_implied&lt;'a, T: 'a&gt;() {}
+
+fn requires_t_outlives_a&lt;'a, T&gt;(x: &amp;'a T) {
+    // This compiles, because `T: 'a` is implied by
+    // the reference type `&amp;'a T`.
+    requires_t_outlives_a_not_implied::&lt;'a, T&gt;();
+}
+</code></pre>
+<pre><code class="language-rust">fn not_implied&lt;'a, T&gt;() {
+    // This errors, because `T: 'a` is not implied by
+    // the function signature.
+    requires_t_outlives_a_not_implied::&lt;'a, T&gt;();
+}
+</code></pre>
+				<p>
+ライフタイム境界のみが暗示され、トレイト境界はまだ明示的に追加しなければならない。以下の例はそのためエラーになる:
+				</p>
+<pre><code class="language-rust">use std::fmt::Debug;
+struct IsDebug&lt;T: Debug&gt;(T);
+// error[E0277]: `T` doesn't implement `Debug`
+fn doesnt_specify_t_debug&lt;T&gt;(x: IsDebug&lt;T&gt;) {}
+</code></pre>
+				<p>
+ライフタイム境界は任意の型における型の定義や impl ブロックにおいても推論される:
+				</p>
+<pre><code class="language-rust">
+struct Struct&lt;'a, T&gt; {
+    // This requires `T: 'a` to be well-formed
+    // which is inferred by the compiler.
+    field: &amp;'a T,
+}
+
+enum Enum&lt;'a, T&gt; {
+    // This requires `T: 'a` to be well-formed,
+    // which is inferred by the compiler.
+    //
+    // Note that `T: 'a` is required even when only
+    // using `Enum::OtherVariant`.
+    SomeVariant(&amp;'a T),
+    OtherVariant,
+}
+
+trait Trait&lt;'a, T: 'a&gt; {}
+
+// This would error because `T: 'a` is not implied by any type
+// in the impl header.
+//     impl&lt;'a, T&gt; Trait&lt;'a, T&gt; for () {}
+
+// This compiles as `T: 'a` is implied by the self type `&amp;'a T`.
+impl&lt;'a, T&gt; Trait&lt;'a, T&gt; for &amp;'a T {}
+</code></pre>
+		</blockquote>
+	</body>
+</html>
+

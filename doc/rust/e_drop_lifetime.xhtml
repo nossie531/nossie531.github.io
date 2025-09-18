@@ -41,16 +41,25 @@ Rust 2024 での改良点。
 参照を含む型が <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html"><code>Drop</code></a> トレイトを実装する場合について。その型による参照はその使用が終了した時点では解放されず、スコープが終了し <a href="https://doc.rust-lang.org/std/ops/trait.Drop.html#tymethod.drop"><code>drop</code></a> が呼ばれるまで維持される。このライフタイムの延長により、参照の制限を受ける範囲が増える。
 				</p>
 				<section>
-					<h2>注意点</h2>
+					<h2>影響の連鎖</h2>
 					<p>
-<code>Drop</code> が見える範囲になくてもこのパターンになりうる。なぜなら、その型そのものが <code>Drop</code> を実装していなくても、そのフィールドの型が同じように参照を含んで <code>Drop</code> を実装しているならば、親の型にその影響が派生する。
+<code>Drop</code> が見える範囲になくてもこのパターンになりうる。なぜなら、その型そのものが <code>Drop</code> を実装していなくても、そのフィールドの型が同じように参照を含んで <code>Drop</code> を実装しているならば、親の型にその影響が連鎖していく。
 					</p> <p>
 例えば、<code>std</code> の <a href="https://doc.rust-lang.org/std/cell/struct.Ref.html"><code>Ref</code></a> は <code>Drop</code> を実装しない。しかし、そのフィールドは <code>Drop</code> を実装する。そのため、<code>Ref</code> はこのパターンの原因になりうる。
 					</p>
+				</section> <section>
+					<h2 id="rustdoc">影響の連鎖 + rustdoc</h2>
+					<p>
+上記の影響の連鎖のため、型がこのパターンの原因になるかを知るには、全てのフィールドの型について、再帰的にソースコードを辿らなければならない。
+					</p> <p>
+そして、<time>2025 年現在</time>、rustdoc はこの情報を文書化してくれない。そのため、殆どの場合で存在する非公開フィールドにより、この追跡が不可能になってしまう。
+					</p>
 					<aside class="normal moan">
-						<p>仕様の不備？</p>
 						<p>
-つまり、型がこのパターンの原因になるかを知るには、全てのフィールドのソースコードを再帰的に調べなければならない。筆者としては、文書化されない特徴がコンパイルエラーの原因になるのはヤバイと思う…。
+rustdoc の同種の問題について。
+						</p> <p>
+コンパイルの可否に影響する内容が文書化されない事例がいくつかある。<br/>
+今後、随時まとめていく予定 →『rustdoc の情報不足』
 						</p>
 					</aside>
 				</section> <section>

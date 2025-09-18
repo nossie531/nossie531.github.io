@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 暗黙のライフタイム境界</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+暗黙のライフタイム境界について。
+		</p> 
+		<section>
+			<h1>サンプル</h1>
+			<p>
+型がライフタイム境界なしに成立しない場合、自動的にライフタイム境界が導入される。
+			</p> <p>
+例えば、<code>&amp;'a T</code> からは <code>T: 'a</code> が導入される。
+			</p>
+		</section> <section>
+			<h1>仕様</h1>
+			<div>
+<doc-quote src="quote/reference/trait-bounds.xhtml"/>
+			</div>
+		</section> <section>
+			<h1 id="rustdoc">rustdoc</h1>
+			<p>
+<time>2025 年現在</time>、rustdoc は暗黙のライフタイムを文書化してくれない。理想的には、コード上は暗黙でも文書上は明示して欲しいのだが…。仕方がないので筆者はなるべく暗黙のライフタイムを使わないようにしている。
+			</p> <p>
+なお、既定では非公開フィールドも文書化されない。そのため、非公開フィールド由来の暗黙のライフタイムは完全にステルス化されてしまう。
+			</p> <p>
+ちなみに、この問題は本質的な欠点ではあるものの、実用的な影響は大きくない。なぜなら、フィールドとそれに紐づくライフタイムは、通常ならインスタンスの生成メソッドにより提供される。そのため、暗黙的なライフタイムもその時点では確実に明示的になる (結果、型の段階で気づけるか、生成メソッドの段階まで気づかないか、程度の差となる)。
+			</p>
+			<aside class="normal moan">
+				<p>
+rustdoc の同種の問題について。
+				</p> <p>
+コンパイルの可否に影響する内容が文書化されない事例がいくつかある。<br/>
+今後、随時まとめていく予定 →『rustdoc の情報不足』
+				</p>
+			</aside>
+		</section>
+	</body>
+</html>
