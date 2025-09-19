@@ -43,23 +43,21 @@ Rust 2024 での改良点。
 				<section>
 					<h2>影響の連鎖</h2>
 					<p>
-<code>Drop</code> が見える範囲になくてもこのパターンになりうる。なぜなら、その型そのものが <code>Drop</code> を実装していなくても、そのフィールドの型が同じように参照を含んで <code>Drop</code> を実装しているならば、親の型にその影響が連鎖していく。
+<code>Drop</code> が見える範囲になくても、このパターンになる事がある。なぜなら、その型そのものが <code>Drop</code> を実装していなくても、そのフィールドの型が同じように参照を含んで <code>Drop</code> を実装していれば、親の型にその影響が連鎖していく。そのため、このパターンが発生するかは、最終的に全てのフィールドについて、再帰的にソースコードをたどらなければならない。
 					</p> <p>
-例えば、<code>std</code> の <a href="https://doc.rust-lang.org/std/cell/struct.Ref.html"><code>Ref</code></a> は <code>Drop</code> を実装しない。しかし、そのフィールドは <code>Drop</code> を実装する。そのため、<code>Ref</code> はこのパターンの原因になりうる。
-					</p>
+身近でよく問題になるのは、<code>std</code> の <a href="https://doc.rust-lang.org/std/cell/struct.Ref.html"><code>Ref</code></a> である。この型は <code>Drop</code> を実装しない。しかし、そのフィールドは <code>Drop</code> を実装する。そのため、<code>Ref</code> はこのパターンの原因になりうる。
+					</p> 
 				</section> <section>
-					<h2 id="rustdoc">影響の連鎖 + rustdoc</h2>
-					<p>
-上記の影響の連鎖のため、型がこのパターンの原因になるかを知るには、全てのフィールドの型について、再帰的にソースコードを辿らなければならない。
-					</p> <p>
-そして、<time>2025 年現在</time>、rustdoc はこの情報を文書化してくれない。そのため、殆どの場合で存在する非公開フィールドにより、この追跡が不可能になってしまう。
+					<h2>影響の連鎖 + rustdoc</h2>
+					<p id="rustdoc">
+<time>2025 年現在</time>、rustdoc はこの情報を文書化してくれない。そのため、殆どの場合で存在する非公開フィールドにより、この追跡が不可能になってしまう。
 					</p>
 					<aside class="normal moan">
 						<p>
 rustdoc の同種の問題について。
 						</p> <p>
-コンパイルの可否に影響する内容が文書化されない事例がいくつかある。<br/>
-今後、随時まとめていく予定 →『rustdoc の情報不足』
+rustdoc が重要な情報を隠してしまう例は他にもある。<br/>
+詳しくは『<a href="rustdoc_incomplete.xhtml">rustdoc の情報不足</a>』を参照してほしい。
 						</p>
 					</aside>
 				</section> <section>

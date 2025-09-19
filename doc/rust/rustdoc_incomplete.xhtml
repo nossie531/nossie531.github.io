@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: rustdoc の情報不足</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+rustdoc は重要な情報を見えなくしてしまう場合がある。
+		</p>
+		<aside class="normal moan">
+			<p>
+仕様の不備？
+			</p> <p>
+API の仕様書さえあれば、少なくともコンパイルの可否は判断できるべきである。<br/>
+しかし、現状の Rust はそうなっていない。これは明らかな欠点と言えるだろう…。
+			</p>
+		</aside>
+		<section>
+			<h1>リンク</h1>
+			<p>
+以下はよく見るパターン (他にもあるらしい)。
+			</p>
+			<ul>
+				<li>
+<a href="e_drop_lifetime.xhtml#rustdoc">Drop トレイトのライフタイムへの影響</a>
+				</li> <li>
+<a href="implied_lifetime_bound.xhtml#rustdoc">暗黙のライフタイム境界</a>
+				</li>
+			</ul>
+		</section>
+	</body>
+</html>
