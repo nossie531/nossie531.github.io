@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../../../style/import/prism.css"/>
+		<link rel="stylesheet" href="style/md.css"/>
+		<script src="../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-04-10" cite="https://doc.rust-lang.org/reference/subtyping.html">
+			<h1>サブタイプ化と変性</h1>
+			<p>
+サブタイプ化は暗黙的で型のチェックや推論のどの段階でもおきうる。
+			</p> <p>
+サブタイプ化は二つの場合に限定される: ライフタイムにおける変性そして高階ライフタイムを伴う型どうしのものである。もし型からライフタイプを除けば、ただサブタイプ化は型が同じかにのみよるだろう。
+			</p> <p>
+以下の例について考えると: 文字列リテラルは常に <code>`static</code> ライフタイムを持つ。それでもなお、<code>s</code> を <code>t</code> へ代入できる。
+			</p>
+<pre><code class="language-rust">fn bar&lt;'a&gt;() {
+    let s: &amp;'static str = "hi";
+    let t: &amp;'a str = s;
+}
+</code></pre>
+			<p>
+<code>'static</code> はライフタイムパラメタ <code>'a</code> よりも長生きするため、<code>&amp;'static str</code> は <code>&amp;'a str</code> のサブタイプになる。
+			</p>
+			<h2>変性</h2>
+			<p>
+変性はジェネリクス型がその引数に関連して持つ性質である。ジェネリクス型のパラメタ中の変性は、そのパラメタのサブタイプ化がどのようにその型のサブタイプ化に影響するかという事である。
+			</p>
+			<ul>
+				<li>
+<code>F&lt;T&gt;</code> が <code>T</code> について<em>共変</em>の場合、もし <code>T</code> が <code>U</code> のサブタイプなら <code>F&lt;T&gt;</code> が <code>F&lt;U&gt;</code> のサブタイプだと含意される (“素通り” サブタイプ)
+				</li>
+			</ul> <ul>
+				<li>
+<code>F&lt;T&gt;</code> が <code>T</code> について<em>反変</em>の場合、もし <code>T</code> が <code>U</code> のサブタイプなら <code>F&lt;U&gt;</code> が <code>F&lt;T&gt;</code> のサブタイプだと含意される
+				</li>
+			</ul> <ul>
+				<li>
+<code class="hljs">F&lt;T&gt;</code> が <code>T</code> について<em>不変</em>の場合、それら以外となる (サブタイプ化の関係は派生しない)
+				</li>
+			</ul>
+			<p>
+型の変性は自動的に以下のように決定される
+			</p>
+			<table>
+				<thead>
+					<tr>
+						<th>型</th>
+						<th><code>'a</code> での変性</th>
+						<th><code>T</code> での変性</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td><code>&amp;'a T</code></td><td>共変</td><td>共変</td></tr>
+					<tr><td><code>&amp;'a mut T</code></td><td>共変</td><td>不変</td></tr>
+					<tr><td><code>*const T</code></td><td></td><td>共変</td></tr>
+					<tr><td><code>*mut T</code></td><td></td><td>不変</td></tr>
+					<tr><td><code>[T]</code> and <code>[T; n]</code></td><td></td><td>共変</td></tr>
+					<tr><td><code>fn() -&gt; T</code></td><td></td><td>共変</td></tr>
+					<tr><td><code>fn(T) -&gt; ()</code></td><td></td><td>反変</td></tr>
+					<tr><td><code>std::cell::UnsafeCell&lt;T&gt;</code></td><td></td><td>不変</td></tr>
+					<tr><td><code>std::marker::PhantomData&lt;T&gt;</code></td><td></td><td>共変</td></tr>
+					<tr><td><code>dyn Trait&lt;T&gt; + 'a</code></td><td>共変</td><td>不変</td></tr>
+				</tbody>
+			</table>
+			<p>
+その他 <code>struct</code>, <code>enum</code>, そして <code>union</code> 型はそれらのフィールドの型の変性を見て決定される。もしパラメタが位置によって異なる変性で使われていれば、そのパラメタは不変になる。例えば、以下の構造体は <code>'a</code> と <code>T</code> では共変で <code>'b</code>, <code>'c</code>, そして <code>U</code> では不変である。
+			</p>
+<pre><code class="language-rust">use std::cell::UnsafeCell;
+struct Variance&lt;'a, 'b, 'c, T, U: 'a&gt; {
+    x: &amp;'a U,               // This makes `Variance` covariant in 'a, and would
+                            // make it covariant in U, but U is used later
+    y: *const T,            // Covariant in T
+    z: UnsafeCell&lt;&amp;'b f64&gt;, // Invariant in 'b
+    w: *mut U,              // Invariant in U, makes the whole struct invariant
+
+    f: fn(&amp;'c ()) -&gt; &amp;'c () // Both co- and contravariant, makes 'c invariant
+                            // in the struct.
+}
+</code></pre>
+			<p>
+<code>struct</code>, <code>enum</code>, または <code>union</code> の外で使われる時は、パラメタのその変性はそれぞれの位置ごとに分けて判定される。
+			</p>
+<pre><code class="language-rust">fn generic_tuple&lt;'short, 'long: 'short&gt;(
+    // 'long is used inside of a tuple in both a co- and invariant position.
+    x: (&amp;'long u32, UnsafeCell&lt;&amp;'long u32&gt;),
+) {
+    // As the variance at these positions is computed separately,
+    // we can freely shrink 'long in the covariant position.
+    let _: (&amp;'short u32, UnsafeCell&lt;&amp;'long u32&gt;) = x;
+}
+
+fn takes_fn_ptr&lt;'short, 'middle: 'short&gt;(
+    // 'middle is used in both a co- and contravariant position.
+    f: fn(&amp;'middle ()) -&gt; &amp;'middle (),
+) {
+    // As the variance at these positions is computed separately,
+    // we can freely shrink 'middle in the covariant position
+    // and extend it in the contravariant position.
+    let _: fn(&amp;'static ()) -&gt; &amp;'short () = f;
+}
+</code></pre>
+		</blockquote>
+	</body>
+</html>
+

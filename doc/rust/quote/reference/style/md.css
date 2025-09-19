@@ -1,0 +1,26 @@
+blockquote {
+	table {
+		margin: 0 auto;
+		border-collapse: collapse;
+	}
+	table td {
+		padding: 3px 20px;
+		border: thin var(--base0-color) solid;
+	}
+	table thead {
+		background: var(--edge-color);
+	}
+	table thead tr {
+		border: thin var(--base0-color) solid;
+	}
+	table thead td {
+		font-weight: bold;
+		border: none;
+	}
+	table thead th {
+		padding: 3px 20px;
+	}
+	table tbody tr:nth-child(2n) {
+		background: var(--neutral1-color);
+	}
+}

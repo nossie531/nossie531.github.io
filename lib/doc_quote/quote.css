@@ -49,8 +49,8 @@ div.info {
 blockquote {
 	margin: 0 calc(var(--gap) * -1);
 	padding: 0 calc(var(--gap) * 1);
-	border: thin dashed;
-	background: var(--light-color);
+	border: thin dashed var(--key1-color);
+	background: var(--nest-color);
 
 	&::before, &::after {
 		content: "";
@@ -144,7 +144,7 @@ blockquote {
 		max-width: 100%;
 		padding: 0 0.5ch;
 		border: thin dashed;
-		border-color: var(--fg-color);
+		border-color: var(--key1-color);
 		background-color: var(--bg-em-color);
 
 		&:focus-within {
