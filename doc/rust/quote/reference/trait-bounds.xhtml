@@ -10,17 +10,18 @@
 	<body>
 		<blockquote data-time="2025-09-18" cite="https://doc.rust-lang.org/reference/trait-bounds.html#implied-bounds">
 			<h2 id="implied-bounds">
-				<a class="header" href="#implied-bounds">暗黙の境界</a></h2>
-				<p>
+				<a class="header" href="#implied-bounds">暗黙の境界</a>
+			</h2>
+			<p>
 ライフタイム境界はしばしば型を妥当にするよう推論される。
-				</p>
+			</p>
 <pre><code class="language-rust">fn requires_t_outlives_a&lt;'a, T&gt;(x: &amp;'a T) {}
 </code></pre>
-				<p>
+			<p>
 型 <code>&amp;'a T</code> が妥当であるには、型パラメタ <code>T</code> は <code>'a</code> より長生きである事が要求される。これが推論されるのは、関数のシグネチャが型 <code>&amp;'a T</code> を含んで、それが <code>T: 'a</code> が守られると妥当になるためである。
-				</p> <p>
+			</p> <p>
 暗黙の境界は全ての関数のパラメタと出力のために追加される。<code>requires_t_outlives_a</code> の内側では <code>T: 'a</code> が守られると仮定でき、明示的にそれを指定しなくてもよい:
-				</p>
+			</p>
 <pre><code class="language-rust">fn requires_t_outlives_a_not_implied&lt;'a, T: 'a&gt;() {}
 
 fn requires_t_outlives_a&lt;'a, T&gt;(x: &amp;'a T) {
@@ -35,17 +36,17 @@ fn requires_t_outlives_a&lt;'a, T&gt;(x: &amp;'a T) {
     requires_t_outlives_a_not_implied::&lt;'a, T&gt;();
 }
 </code></pre>
-				<p>
+			<p>
 ライフタイム境界のみが暗示され、トレイト境界はまだ明示的に追加しなければならない。以下の例はそのためエラーになる:
-				</p>
+			</p>
 <pre><code class="language-rust">use std::fmt::Debug;
 struct IsDebug&lt;T: Debug&gt;(T);
 // error[E0277]: `T` doesn't implement `Debug`
 fn doesnt_specify_t_debug&lt;T&gt;(x: IsDebug&lt;T&gt;) {}
 </code></pre>
-				<p>
+			<p>
 ライフタイム境界は任意の型における型の定義や impl ブロックにおいても推論される:
-				</p>
+			</p>
 <pre><code class="language-rust">
 struct Struct&lt;'a, T&gt; {
     // This requires `T: 'a` to be well-formed
