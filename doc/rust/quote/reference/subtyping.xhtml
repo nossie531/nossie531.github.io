@@ -46,27 +46,29 @@
 			<p>
 型の変性は自動的に以下のように決定される
 			</p>
-			<table>
-				<thead>
-					<tr>
-						<th>型</th>
-						<th><code>'a</code> での変性</th>
-						<th><code>T</code> での変性</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr><td><code>&amp;'a T</code></td><td>共変</td><td>共変</td></tr>
-					<tr><td><code>&amp;'a mut T</code></td><td>共変</td><td>不変</td></tr>
-					<tr><td><code>*const T</code></td><td></td><td>共変</td></tr>
-					<tr><td><code>*mut T</code></td><td></td><td>不変</td></tr>
-					<tr><td><code>[T]</code> and <code>[T; n]</code></td><td></td><td>共変</td></tr>
-					<tr><td><code>fn() -&gt; T</code></td><td></td><td>共変</td></tr>
-					<tr><td><code>fn(T) -&gt; ()</code></td><td></td><td>反変</td></tr>
-					<tr><td><code>std::cell::UnsafeCell&lt;T&gt;</code></td><td></td><td>不変</td></tr>
-					<tr><td><code>std::marker::PhantomData&lt;T&gt;</code></td><td></td><td>共変</td></tr>
-					<tr><td><code>dyn Trait&lt;T&gt; + 'a</code></td><td>共変</td><td>不変</td></tr>
-				</tbody>
-			</table>
+			<div class="table-wrapper">
+				<table style="width: max-content">
+					<thead>
+						<tr>
+							<th>型</th>
+							<th><code>'a</code> での変性</th>
+							<th><code>T</code> での変性</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><code>&amp;'a T</code></td><td>共変</td><td>共変</td></tr>
+						<tr><td><code>&amp;'a mut T</code></td><td>共変</td><td>不変</td></tr>
+						<tr><td><code>*const T</code></td><td></td><td>共変</td></tr>
+						<tr><td><code>*mut T</code></td><td></td><td>不変</td></tr>
+						<tr><td><code>[T]</code> and <code>[T; n]</code></td><td></td><td>共変</td></tr>
+						<tr><td><code>fn() -&gt; T</code></td><td></td><td>共変</td></tr>
+						<tr><td><code>fn(T) -&gt; ()</code></td><td></td><td>反変</td></tr>
+						<tr><td><code>std::cell::UnsafeCell&lt;T&gt;</code></td><td></td><td>不変</td></tr>
+						<tr><td><code>std::marker::PhantomData&lt;T&gt;</code></td><td></td><td>共変</td></tr>
+						<tr><td><code>dyn Trait&lt;T&gt; + 'a</code></td><td>共変</td><td>不変</td></tr>
+					</tbody>
+				</table>
+			</div>
 			<p>
 その他 <code>struct</code>, <code>enum</code>, そして <code>union</code> 型はそれらのフィールドの型の変性を見て決定される。もしパラメタが位置によって異なる変性で使われていれば、そのパラメタは不変になる。例えば、以下の構造体は <code>'a</code> と <code>T</code> では共変で <code>'b</code>, <code>'c</code>, そして <code>U</code> では不変である。
 			</p>
