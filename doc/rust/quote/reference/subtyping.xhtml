@@ -16,7 +16,7 @@
 			</p> <p>
 サブタイプ化は二つの場合に限定される: ライフタイムにおける変性そして高階ライフタイムを伴う型どうしのものである。もし型からライフタイプを除けば、ただサブタイプ化は型が同じかにのみよるだろう。
 			</p> <p>
-以下の例について考えると: 文字列リテラルは常に <code>`static</code> ライフタイムを持つ。それでもなお、<code>s</code> を <code>t</code> へ代入できる。
+以下の例について考えると: 文字列リテラルは常に <code>'static</code> ライフタイムを持つ。それでもなお、<code>s</code> を <code>t</code> へ代入できる。
 			</p>
 <pre><code class="language-rust">fn bar&lt;'a&gt;() {
     let s: &amp;'static str = "hi";
