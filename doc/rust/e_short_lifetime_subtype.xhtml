@@ -18,30 +18,21 @@
 『<a href="e_short_lifetime.xhtml">error - ライフタイムの不足</a>』の<a href="subtype.xhtml">サブタイプ</a>についての派生パターン。
 		</p>
 		<section>
-			<h1>背景情報</h1>
-			<p>
-不変参照は被参照型のサブタイプが波及するが、可変参照にこの効果はない。
-			</p>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
 			<section>
-				<h2>不変参照の場合 (共変)</h2>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">可変参照と不変</div>
+				</hgroup>
 				<p>
-型 <code>S</code> が型 <code>T</code> のサブタイプなら、<code>&amp;S</code> は <code>&amp;T</code> のサブタイプになる。
-				</p> <p>
-なぜなら、<code>&amp;T</code> からは <code>T</code> を取得できればよいが、<code>&amp;S</code> はこれを満足できる。
+不変参照と可変参照はサブタイプについて、それぞれ共変と不変である。つまり、<code>S</code> が <code>T</code> のサブタイプなら <code>&amp;S</code> は <code>&amp;T</code> のサブタイプになるが、<code>&amp;mut S</code> は <code>&amp; mut T</code> のサブタイプにはならない。そのため、可変参照にサブタイプによる互換性を想定するとエラーになる。
 				</p>
-			</section> <section>
-				<h2>可変参照の場合 (不変)</h2>
-				<p>
-型 <code>S</code> が型 <code>T</code> のサブタイプでも、<code>&amp;mut S</code> と <code>&amp;mut T</code> は互いに互いのサブタイプにならない。
-				</p> <p>
-なぜなら、<code>&amp;mut T</code> には <code>T</code> を設定できなければならないが、<code>&amp;mut S</code> はこれを満足できない。また、<code>&amp;mut S</code> は <code>S</code> を取得できなければならないが、<code>&amp;mut T</code> はこれを満足できない。
-				</p>
-			</section>
-		</section> <section>
-			<h1>サンプル</h1>
-			<p>
-以下では、<code>Ref&lt;'static&gt;</code> は <code>Ref&lt;'a&gt;</code> のサブタイプであるが、<code>&amp;'a mut Ref&lt;'static&gt;</code> は <code>&amp;'a mut Ref&lt;'a&gt;</code> のサブタイプではない。そのため、前者の値を後者の値として戻している箇所でエラーになる。
-			</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>Ref&lt;'static&gt;</code> は <code>Ref&lt;'a&gt;</code> のサブタイプなのだが、<code>&amp;'a mut Ref&lt;'static&gt;</code> は <code>&amp;'a mut Ref&lt;'a&gt;</code> のサブタイプではない。そのため、前者の値を後者の値として戻している箇所でエラーになる。
+					</p>
 <pre><code class="language-rust">
 fn func&lt;'a&gt;(arg: &amp;'a mut Ref&lt;'static&gt;) -&gt; &amp;'a mut Ref&lt;'a&gt; {
     <mark class="error">arg</mark>
@@ -62,6 +53,44 @@ struct Ref&lt;'a&gt;(&amp;'a i32);
 <mark class="info">  =</mark> <mark class="title">note</mark>: mutable references are invariant over their type parameter
 <mark class="info">  =</mark> <mark class="title">help</mark>: see &lt;<a href="https://doc.rust-lang.org/nomicon/subtyping.html">https://doc.rust-lang.org/nomicon/subtyping.html</a>&gt; for more information about variance
 </samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">型パラメタと不変</div>
+				</hgroup>
+				<p>
+型定義における型パラメタの変性はフィールドの内容により決定される。フィールドがその型パラメタを最初から不変として扱っている場合、またはフィールドごとに扱いが異なる場合、その型パラメタは不変になる。そのため、これらの型パラメタからのサブタイプの波及を想定するとエラーになる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、型 <code>MyType&lt;T&gt;</code> の型パラメタ <code>T</code> はコールバックの入力と出力の両方に使われているため不変となる。つまり、<code>MyType&lt;&amp;'static str&gt;</code> は <code>MyType&lt;&amp;'a str&gt;</code> のサブタイプではない。そのため、前者の値を後者の値として戻している箇所でエラーになる。
+					</p>
+<pre><code class="language-rust">
+fn func&lt;'a&gt;(arg: &amp;'a MyType&lt;&amp;'static str&gt;) -&gt; &amp;'a MyType&lt;&amp;'a str&gt; {
+	<mark class="error">arg</mark>
+}
+
+struct MyType&lt;T&gt; {
+    callback: fn(T) -&gt; T,
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: lifetime may not live long enough</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">1 |</mark> fn func&lt;'a&gt;(arg: &amp;'a MyType&lt;&amp;'static str&gt;) -&gt; &amp;'a MyType&lt;&amp;'a str&gt; {
+<mark class="info">  |</mark>         <mark class="info">-- lifetime `'a` defined here</mark>
+<mark class="info">2 |</mark>     arg
+<mark class="info">  |</mark>     <mark class="error">^^^ returning this value requires that `'a` must outlive `'static`</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: requirement occurs because of the type `MyType&lt;&amp;str&gt;`, which makes the generic argument `&amp;str` invariant
+<mark class="info">  =</mark> <mark class="title">note</mark>: the struct `MyType&lt;T&gt;` is invariant over the parameter `T`
+<mark class="info">  =</mark> <mark class="title">help</mark>: see &lt;<a href="https://doc.rust-lang.org/nomicon/subtyping.html">https://doc.rust-lang.org/nomicon/subtyping.html</a>&gt; for more information about variance
+</samp></pre>
+				</section>
+			</section>
 		</section>
 	</body>
 </html>

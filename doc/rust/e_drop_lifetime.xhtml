@@ -48,8 +48,8 @@ Rust 2024 での改良点。
 身近でよく問題になるのは、<code>std</code> の <a href="https://doc.rust-lang.org/std/cell/struct.Ref.html"><code>Ref</code></a> である。この型は <code>Drop</code> を実装しない。しかし、そのフィールドは <code>Drop</code> を実装する。そのため、<code>Ref</code> はこのパターンの原因になりうる。
 					</p> 
 				</section> <section>
-					<h2>影響の連鎖 + rustdoc</h2>
-					<p id="rustdoc">
+					<h2 id="rustdoc">影響の連鎖 + rustdoc</h2>
+					<p>
 <time>2025 年現在</time>、rustdoc はこの情報を文書化してくれない。そのため、殆どの場合で存在する非公開フィールドにより、この追跡が不可能になってしまう。
 					</p>
 					<aside class="normal moan">

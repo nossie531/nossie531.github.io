@@ -26,6 +26,30 @@
 			<div>
 <doc-quote src="quote/reference/subtyping.xhtml"/>
 			</div>
+		</section> <section>
+			<h1>rustdoc</h1>
+			<p>
+2025 年現在、rustdoc は型パラメタの変性を文書化してくれない。 
+			</p> <p>
+なお、既定では非公開フィールドも文書化されない。そのため、非公開フィールドで使用されている型パラメタの変性は完全にステルス化されてしまう。
+			</p>
+			<aside class="normal moan">
+				<p>
+rustdoc の同種の問題について。
+				</p> <p>
+rustdoc が重要な情報を隠してしまう例は他にもある。<br/>
+詳しくは『<a href="rustdoc_incomplete.xhtml">rustdoc の情報不足</a>』を参照してほしい。
+				</p>
+			</aside>
+		</section> <section>
+			<h1>関連エラー</h1>
+			<ul>
+				<li>
+<a href="e_short_lifetime_subtype.xhtml">[error] ライフタイムの不足 × サブタイプ</a>
+				</li> <li>
+<a href="e0521_subtype.xhtml">[E0521] 参照引数の流出 × サブタイプ</a>
+				</li>
+			</ul>
 		</section>
 	</body>
 </html>
