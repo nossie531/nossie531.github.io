@@ -1,0 +1,21 @@
+@charset "utf-8";
+
+table.api {
+	table-layout: fixed;
+	width: auto;
+
+	tr > th {
+		text-align: left;
+		white-space: nowrap;
+	}
+
+	tr > td {
+		text-align: left;
+		white-space: nowrap;
+	}
+
+	tr > * > code {
+		background-color: transparent;
+	}
+}
+

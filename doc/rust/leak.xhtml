@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: leak 系メソッド</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<link rel="stylesheet" href="style/leak.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+動的メモリ上の型に見られる <code>leak</code> 系メソッドについて。
+		</p> 
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+名前からは意図的なメモリリークをおこす用途不明のメソッドに思える。<br/>
+ところが、有効な活用方法があると<a href="https://users.rust-lang.org/t/static-reference-to-generic-default-value/132816">紹介</a>してもらったのでメモしておく。
+			</p>
+		</aside>
+		<section>
+			<h1>主な用途</h1>
+			<p>
+これらのメソッドは動的に取得した領域を、プログラム終了まで固定領域として使用し続けるのに用いる。参照がまだ生きている点を除けば、これは名前の由来のメモリリークと似た状況である (一応、戻そうと思えば <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.from_raw">Box</a>::<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.from_raw">from_raw</a></code> 関数などで再び解放が可能になる)。
+			</p>
+		</section> <section>
+			<h1>メソッド一覧</h1>
+			<p>
+以下は <code>std</code> クレート内の該当メソッドの一覧である。
+			</p> <p>
+どのメソッドも <code>self</code> を消費して可変参照を戻す。
+			</p>
+			<table class="normal api">
+				<tr>
+					<th> <code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>&lt;T, A&gt;</code> </th>
+					<td> <code>fn <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.leak">leak</a>&lt;'a&gt;(self) -&gt; &amp;'a mut T where A: 'a</code> </td>
+				</tr> <tr>
+					<th> <code><a href="https://doc.rust-lang.org/std/vec/struct.Vec.html">Vec</a>&lt;T, A&gt;</code> </th>
+					<td> <code>fn <a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.leak">leak</a>&lt;'a&gt;(self) -&gt; &amp;'a mut [T] where A: 'a</code> </td>
+				</tr> <tr>
+					<th> <code><a href="https://doc.rust-lang.org/std/string/struct.String.html">String</a></code> </th>
+					<td> <code>fn <a href="https://doc.rust-lang.org/std/string/struct.String.html#method.leak">leak</a>&lt;'a&gt;(self) -&gt; &amp;'a mut str</code> </td>
+				</tr> <tr>
+					<th> <code><a href="https://doc.rust-lang.org/std/ffi/struct.OsString.html">OsString</a></code> </th>
+					<td> <code>fn <a href="https://doc.rust-lang.org/std/ffi/struct.OsString.html#method.leak">leak</a>&lt;'a&gt;(self) -&gt; &amp;'a mut OsStr</code> </td>
+				</tr> <tr>
+					<th> <code><a href="https://doc.rust-lang.org/std/path/struct.PathBuf.html">PathBuf</a></code> </th>
+					<td> <code>fn <a href="https://doc.rust-lang.org/std/path/struct.PathBuf.html#method.leak">leak</a>&lt;'a&gt;(self) -&gt; &amp;'a mut Path</code> </td>
+				</tr>
+			</table>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、型パラメタ <code>T</code> に対応する既定値への参照を取得している。 
+			</p>
+<pre><code class="language-rust">
+se std::any::{Any, TypeId};
+use std::collections::BTreeMap;
+use std::sync::Mutex;
+
+pub fn default_ref&lt;T&gt;() -&gt; &amp;'static T
+where
+    T: Any + Default + Send + Sync,
+{
+    static MAP: Mutex&lt;BTreeMap&lt;TypeId, &amp;'static (dyn Any + Send + Sync)&gt;&gt; =
+        Mutex::new(BTreeMap::new());
+
+    MAP.lock()
+        .unwrap()
+        .entry(TypeId::of::&lt;T&gt;())
+        .or_insert_with(|| Box::leak(Box::new(T::default())))
+        .downcast_ref()
+        .unwrap()
+}
+</code></pre>
+		</section>
+	</body>
+</html>
