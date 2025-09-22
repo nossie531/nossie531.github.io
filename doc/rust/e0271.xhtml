@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0271 - 関連型の不一致</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0271]</mark><mark class="title">: type mismatch resolving `&lt;TypeX as Trait&gt;::Assoc == TypeY`</mark>
+</samp></pre>
+		<p>
+『<a href="associated_type.xhtml">関連型</a>』が期待する型と異なっていた。
+		</p>
+		<section>
+			<h1>原因</h1>
+			<p>
+関連型まで指定されたトレイト境界があり、対象の型はそれに適合する事が期待されていた。しかし、指定されたトレイトは実装していたものの、そこから導かれる関連型が指定されたものと別の型だった。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>func</code> に渡される <code>u32</code> 型が引数型 <code>T</code> の境界に適合せずエラーになる。なぜなら、<code>u32</code> 型は <code>Unsigned</code> トレイトを実装するが、<code>Unsigned::Signed</code> により導かれる型は <code>i64</code> ではなく <code>i32</code> になる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    func(<mark class="error">1_u32</mark>);
+}
+
+fn func&lt;T&gt;(val: T) where T: Unsigned&lt;Signed=i64&gt; {
+    println!("{}", val.negative());
+}
+
+trait Unsigned {
+    type Signed;
+    fn negative(&amp;self) -&gt; Self::Signed;
+}
+
+impl Unsigned for u32 {
+    type Signed = i32;
+    fn negative(&amp;self) -&gt; Self::Signed {
+        -(*self as i32)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0271]</mark><mark class="title">: type mismatch resolving `&lt;u32 as Unsigned&gt;::Signed == i64`</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:2:10
+<mark class="info">   |</mark>
+<mark class="info">2  |</mark>     func(1_u32);
+<mark class="info">   |</mark>     <mark class="info">----</mark> <mark class="error">^^^^^ type mismatch resolving `&lt;u32 as Unsigned&gt;::Signed == i64`</mark>
+<mark class="info">   |</mark>     <mark class="info">|</mark>
+<mark class="info">   |</mark>     <mark class="info">required by a bound introduced by this call</mark>
+<mark class="info">   |</mark>
+<mark class="edit">note</mark>: expected this to be `i64`
+<mark class="info">  --&gt;</mark> src\main.rs:15:19
+<mark class="info">   |</mark>
+<mark class="info">15 |</mark>     type Signed = i32;
+<mark class="info">   |</mark>                   <mark class="edit">^^^</mark>
+<mark class="edit">note</mark>: required by a bound in `func`
+<mark class="info">  --&gt;</mark> src\main.rs:5:38
+<mark class="info">   |</mark>
+<mark class="info">5  |</mark> fn func&lt;T&gt;(val: T) where T: Unsigned&lt;Signed=i64&gt; {
+<mark class="info">   |</mark>                                      <mark class="edit">^^^^^^^^^^ required by this bound in `func`</mark>
+</samp></pre>
+		</section>
+	</body>
+</html>
