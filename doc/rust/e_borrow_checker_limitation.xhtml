@@ -163,13 +163,15 @@ fn or_default(map: &amp;mut HashMap&lt;i32, i32&gt;, key: i32) -&gt; &amp;mut i3
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1>将来</h1>
+					<h1 id="polonius">将来</h1>
 					<div class="subTitle"> Polonius </div>
 				</hgroup>
 				<p>
 参照と借用を個別に追跡する方式。
 				</p> <p>
 前のバージョンにあった不自然な偽陽性がなくなっている。
+				</p> <p>
+試用には､『<a href="nightly_unstable.xhtml">ナイトリー版での不安定な機能の試用</a> - <a href="nightly_unstable.xhtml#rustflags">新しい処理系統</a>』を参照されたい。
 				</p>
 				<aside class="normal">
 					<p>
@@ -178,30 +180,6 @@ fn or_default(map: &amp;mut HashMap&lt;i32, i32&gt;, key: i32) -&gt; &amp;mut i3
 Polonius は William Shakespeare 作の悲劇『Hamlet』の登場人物の名前である。彼は説教好きで過干渉な人物として描かれている。そして、その説教の一節に "Neither a borrower nor a lender be" (借りるな貸すな) という言葉がある。
 					</p>
 				</aside>
-				<section>
-					<h2>試用版</h2>
-					<p>
-開発中の Polonius を試したい場合、以下が必要になる。
-					</p>
-					<ul>
-						<li>
-							<p>
-ナイトリー版を有効化<br/>
-(具体的な方法は『<a href="switch_version.xhtml">バージョンの切替</a>』を参照)
-							</p>
-						</li>
-						<li>
-							<p>
-ビルド時のコマンドライン引数で Polonius を有効化。<br/>
-(以下は <code>.cargo/config.toml</code> ファイルからの引数の指定方法)
-							</p>
-<pre><code class="language-toml">
-[build]
-rustflags = ["-Zpolonius"]
-</code></pre>
-						</li>
-					</ul>
-				</section>
 			</section>
 		</section>
 	</body>

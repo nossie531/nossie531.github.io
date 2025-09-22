@@ -99,6 +99,13 @@ struct Wrap&lt;T&gt;(T);
 条件は基本形と似ている。まず、基本形と同様、実装対象の型と境界の型は、型パラメタ部分以外の型の構造とトレイトが同じになる。ただし、基本形では実装対象の型のパラメタ部分を他の型で包含したのが境界の型になるが、このパターンではそれが逆になる。
 				</p>
 				<section>
+					<h2 id="next-solver">新しいトレイトソルバー</h2>
+					<p>
+この問題は開発中の next-solver を使うと発生しなくなる。<br/>
+					</p> <p>
+試用には､『<a href="nightly_unstable.xhtml">ナイトリー版での不安定な機能の試用</a> - <a href="nightly_unstable.xhtml#rustflags">新しい処理系統</a>』を参照されたい。
+					</p>
+				</section> <section>
 					<h2>サンプル</h2>
 					<p>
 以下では、<code>MyTrait</code> の実装対象の型 <code>&amp;'a Wrap&lt;T&gt;</code> に境界の型 <code>&amp;'a T</code> がある。ここで、両者はどちらも <code>MyTrait</code> を実装し、前者は後者の <code>T</code> を <code>Wrap</code> で包含しており、バグの条件を満たしている。なお、<code>MyTrait</code> の実装型には <code>&amp;'a i32</code> もあるが、トレイト実装どうしが衝突するのを予防するため、エラーとなる側も確認されてしまう。
@@ -143,30 +150,6 @@ struct Wrap&lt;T&gt;(T);
 <mark class="title">For more information about this error, try `rustc --explain E0275`.</mark>
 <mark class="error">error</mark><mark class="title">:</mark> could not compile `rust_test` (bin "rust_test") due to 1 previous error
 </samp></pre>
-				</section> <section>
-					<h2>新しいトレイトソルバー</h2>
-					<p>
-開発中のトレイトソルバーではこの問題が発生しない。
-					</p> <p>
-試用手順は以下の通り。
-					</p>
-					<ul>
-						<li>
-							<p>
-ナイトリー版を有効化<br/>
-(具体的な方法は『<a href="switch_version.xhtml">バージョンの切替</a>』を参照)
-							</p>
-						</li> <li>
-							<p>
-ビルド時のコマンドライン引数で新しいトレイトソルバーを有効化。<br/>
-(以下は <code>.cargo/config.toml</code> ファイルからの引数の指定方法)
-							</p>
-<pre><code class="language-toml">
-[build]
-rustflags = ["-Znext-solver"]
-</code></pre>
-						</li>
-					</ul>
 				</section>
 			</section>
 		</section>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: ナイトリー版での不安定な機能の試用</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+ナイトリー版では正式採用されていない不安定な機能を試用できる。
+		</p>
+		<section>
+			<h1>ナイトリー版の導入</h1>
+			<p>
+ここで紹介する方法はどれもナイトリー版の有効化が必要になる。
+			</p> <p>
+有効化の方法については『<a href="switch_version.xhtml">バージョンの切替</a>』を参照されたい。
+			</p>
+		</section> <section>
+			<h1 id="feature">API や文法の試用</h1>
+			<p>
+<code>std</code> や <code>core</code> の新しい API、そして新しい文法は <code>feature</code> 属性から導入できる。
+			</p> <p>
+新しい API の場合、機能名は rustdoc の対応するアイテムに載っている。
+			</p> <p>
+新しい文法の場合、機能名は “<a href="https://doc.rust-lang.org/nightly/unstable-book/index.html">The Unstable Book</a>” の該当ページに載っている。
+			</p>
+			<section>
+				<h2>サンプル - API の試用</h2>
+				<p>
+以下では、不安定な機能 <code>allocator_api</code> を有効化している。<br/>
+これにより、<code><a href="https://doc.rust-lang.org/std/boxed/struct.Box.html">Box</a>::<a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.try_new">try_new</a></code> が使えるようになる。
+				</p>
+<pre><code class="language-rust">
+#![feature(allocator_api)]
+
+fn main() {
+    let Ok(new_box) = Box::try_new(42) else {
+        println!("Out of memory error!");
+        return;
+    };
+
+    println!("Box {new_box} is allocated.")
+}
+</code></pre>
+			</section> <section>
+				<h2>サンプル - 文法の試用</h2>
+				<p>
+以下では、不安定な機能 <a href="https://doc.rust-lang.org/nightly/unstable-book/language-features/try-blocks.html"><code>try_blocks</code></a> を有効化している。<br/>
+これにより、<code>try</code> キーワードを使えるようになる。
+				</p>
+<pre><code class="language-rust">
+#![feature(try_blocks)]
+
+use std::num::ParseIntError;
+
+fn main() {
+    let result: Result&lt;i32, ParseIntError&gt; = try {
+        "1".parse::&lt;i32&gt;()?
+            + "2".parse::&lt;i32&gt;()?
+            + "3".parse::&lt;i32&gt;()?
+    };
+    assert_eq!(result, Ok(6));
+
+    let result: Result&lt;i32, ParseIntError&gt; = try {
+        "1".parse::&lt;i32&gt;()?
+            + "foo".parse::&lt;i32&gt;()?
+            + "3".parse::&lt;i32&gt;()?
+    };
+    assert!(result.is_err());
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1 id="rustflags">処理系統の試用</h1>
+			<p>
+新しい処理系統は <code>rustflags</code> オプションから導入できる。
+			</p> <p>
+このオプションは本来は各種のコンパイルの挙動の調整用だが、新しい処理系統の開発にも流用されているようである。ただ、使用可能な機能名を一覧にした公式の資料は見つけられなかった。おそらく、コンパイラの開発段階で非公式に導入されるためだろう。ちなみに、筆者が知っているのは以下の二つである。
+			</p>
+			<dl class="normal lowProfile">
+				<dt>polonius</dt>
+				<dd>新しい借用チェッカー <sup><a href="#link-1">[1]</a></sup></dd>
+				<dt>next-solver</dt>
+				<dd>新しいトレイトソルバー <sup><a href="#link-2">[2]</a></sup></dd>
+			</dl>
+			<p>
+<code>rustflags</code> オプションは <code>.cargo/config.toml</code> ファイルからも指定できる。<br/>
+これは IDE からビルドする場合には必須になる。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下は <code>.cargo/config.toml</code> ファイルで Polonius を有効化する場合の内容である。
+				</p>
+<pre><code class="language-toml">
+[build]
+rustflags = ["-Zpolonius"]
+</code></pre>
+			</section>
+		</section>
+		<footer>
+			<section>
+				<h1>リンク</h1>
+				<dl class="links">
+					<dt id="link-1">[1]</dt>
+					<dd>
+<a href="e_borrow_checker_limitation.xhtml">借用チェッカーの制限</a> - <a href="e_borrow_checker_limitation.xhtml#polonius">Polonius</a>
+					</dd>
+					<dt id="link-2">[2]</dt>
+					<dd>
+<a href="e0275.xhtml">E0275 トレイト確認の無限再帰</a> - <a href="e0275.xhtml#next-solver">next-solver</a>
+					</dd>
+				</dl>
+			</section>
+		</footer>
+	</body>
+</html>
