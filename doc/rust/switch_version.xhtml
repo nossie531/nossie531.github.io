@@ -14,7 +14,7 @@
 		<p>
 ビルドツールのバージョンの切替について。
 		</p> <p>
-ナイトリーへの変更方法を例に紹介している。
+(ナイトリーへの変更方法を例に紹介している。)
 		</p> 
 		<section>
 			<h1>インストール</h1>
@@ -32,23 +32,43 @@
 他の方法や優先順位については、後述の『<a href="#spec">補足: 仕様詳細</a>』を参照。
 			</p>
 			<section>
-				<h2>ディレクトリ単位の設定</h2>
+				<h2>デフォルトの切替</h2>
 				<p>
-プロジェクトのルートディレクトリに <code>rust-toolchain.toml</code> を配置。
-				</p> <p>
-IDE と連携させる場合、この方法が必須になる。
+以下のコマンドを実行する。
 				</p>
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> rustup default nightly
+</code></pre>
+				<p>
+なお、この方法は IDE からのビルド時にも有効である。
+				</p>
+			</section> <section>
+				<h2>ディレクトリ単位の切替</h2>
+				<p>
+プロジェクトのルートディレクトリに <code>rust-toolchain.toml</code> を配置する。
+				</p> 
 <pre><code class="language-toml">
 [toolchain]
 channel = "nightly"
 </code></pre>
-			</section> <section>
-				<h2>デフォルトの切替</h2>
 				<p>
-以下のコマンドを実行。
+なお、この方法は IDE からのビルド時にも有効である。
+				</p>
+			</section> <section>
+				<h2>一時的な切替</h2>
+				<p>
+コマンドをバージョン指定で実行する。
+				</p> <p>
+<code>rustup</code> からの場合、以下のように実行する。
 				</p>
 <pre><code class="console">
-<mark class="prompt">&gt;</mark> rustup default nightly
+<mark class="prompt">&gt;</mark> rustup run nightly cargo build
+</code></pre>
+				<p>
+<code>cargo</code> からの場合、以下のように実行する。
+				</p>
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo +nightly build
 </code></pre>
 			</section>
 		</section> <section>
