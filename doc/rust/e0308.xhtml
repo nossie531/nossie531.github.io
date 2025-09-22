@@ -15,7 +15,7 @@
 <mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
 </samp></pre>
 		<p>
-値の型が期待されるのと異なっている。
+期待された型と使用された型が異なっている。
 		</p>
 		<section>
 			<h1>パターン</h1>
@@ -31,70 +31,69 @@
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、<code>i32</code> 型が期待される箇所で、<code>f32</code> 型の値を使っている。
+以下では、<code>i32</code> 型が期待される箇所で、<code>u32</code> 型の値を使っている。
 					</p>
 <pre><code class="language-rust">
 fn main() {
-    let x = 4.2 as f32;
-    let r = increment(<mark class="error">x</mark>);
-    println!("{x} + 1 = {r}");
-}
-
-fn increment(x: i32) -&gt; i32 {
-    x + 1
+    let mut _var1 = 42_i32;
+    let _var2 = 42_u32;
+	_var1 = <mark class="error">_var2</mark>;
 }
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:3:23
+<mark class="error">error[E0308]</mark>: mismatched types
+<mark class="info"> --&gt;</mark> src\main.rs:4:13
 <mark class="info">  |</mark>
-<mark class="info">3 |</mark>     let r = increment(x);
-<mark class="info">  |</mark>             <mark class="info">---------</mark> <mark class="error">^ expected `i32`, found `f32`</mark>
-<mark class="info">  |</mark>             <mark class="info">|</mark>
-<mark class="info">  |</mark>             <mark class="info">arguments to this function are incorrect</mark>
-<mark class="info">  |</mark>
-<mark class="edit">note</mark>: function defined here
-<mark class="info"> --&gt;</mark> src\main.rs:7:4
-<mark class="info">  |</mark>
-<mark class="info">7 |</mark> fn increment(x: i32) -&gt; i32 {
-<mark class="info">  |</mark>    <mark class="edit">^^^^^^^^^</mark> <mark class="info">------</mark>
+<mark class="info">2 |</mark>     let mut _var1 = 42_i32;
+<mark class="info">  |</mark>                     <mark class="info">------ expected due to this value</mark>
+<mark class="info">3 |</mark>     let _var2 = 42_u32;
+<mark class="info">4 |</mark>     _var1 = _var2;
+<mark class="info">  |</mark>             <mark class="error">^^^^^ expected `i32`, found `u32`</mark>
 </samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+可能ならキャストするとよい。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut _var1 = 42_i32;
+    let _var2 = 42_u32;
+    _var1 = _var2 as i32;
+}
+</code></pre>
 				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン B</h1>
-					<div class="subTitle">クロージャが関連</div>
+					<div class="subTitle">クロージャ型 vs クロージャ型</div>
 				</hgroup>
 				<p>
-クロージャの型はたとえ引数や戻り値の型が同じでも一つ一つ異なる。<br/>
+クロージャの型はたとえ引数や戻り値の型が同じでもそれぞれ異なる。<br/>
 そのため、それらに互換性があると想定するとエラーになる。
 				</p>
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、変数 <code>closure</code> の参照先を切替ようとしている。
+以下では、2 行目のクロージャの型に 3 行目のクロージャを代入しようとしている。
 					</p>
 <pre><code class="language-rust">
 fn main() {
-    let mut closure = &amp;(|| false);
-    assert_eq!(closure(), false);
-
-    closure = <mark class="error">&amp;(|| true)</mark>;
-    assert_eq!(closure(), true)
+    let mut _var = &amp;(|| false);
+	_var = <mark class="error">&amp;(|| true)</mark>;
 }
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:5:15
+<mark class="info"> --&gt;</mark> src\main.rs:3:9
 <mark class="info">  |</mark>
-<mark class="info">2 |</mark>     let mut closure = &amp;(|| false);
-<mark class="info">  |</mark>                         <mark class="info">-- the expected closure</mark>
-<mark class="info">...</mark>
-<mark class="info">5 |</mark>     closure = &amp;(|| true);
-<mark class="info">  |</mark>               <mark class="error">^^^^^^^^^^ expected `&amp;{closure@main.rs:2:25}`, found `&amp;{closure@main.rs:5:17}`</mark>
+<mark class="info">2 |</mark>     let mut _var = &amp;(|| false);
+<mark class="info">  |</mark>                      <mark class="info">-- the expected closure</mark>
+<mark class="info">3 |</mark>     _var = &amp;(|| true);
+<mark class="info">  |</mark>            <mark class="error">^^^^^^^^^^ expected `&amp;{closure@main.rs:2:22}`, found `&amp;{closure@main.rs:3:11}`</mark>
 <mark class="info">  |</mark>
-<mark class="info">  =</mark> <mark class="title">note</mark>: expected reference `&amp;<mark class="em">{closure@src\main.rs:2:25: 2:27}</mark>`
-<mark class="info">   </mark>          found reference `&amp;<mark class="em">{closure@src\main.rs:5:17: 5:19}</mark>`
+<mark class="info">  =</mark> <mark class="title">note</mark>: expected reference `<mark class="em">&amp;{closure@src\main.rs:2:22: 2:24}</mark>`
+<mark class="info">   </mark> <mark class="title">    </mark>     found reference `<mark class="em">&amp;{closure@src\main.rs:3:11: 3:13}</mark>`
 <mark class="info">  =</mark> <mark class="title">note</mark>: no two closures, even if identical, have the same type
 <mark class="info">  =</mark> <mark class="title">help</mark>: consider boxing your closure and/or using it as a trait object
 </samp></pre>
@@ -105,18 +104,156 @@ fn main() {
 					</p>
 <pre><code class="language-rust">
 fn main() {
-    let mut closure = &amp;(|| false) as &amp;dyn Fn() -&gt; _;
-    assert_eq!(closure(), false);
-
-    closure = &amp;(|| true);
-    assert_eq!(closure(), true)
+    let mut _var = &amp;(|| false) as &amp;dyn Fn() -&gt; _;
+    _var = &amp;(|| true);
 }
 </code></pre>
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="withTypeInference">パターン C</h1>
-					<div class="subTitle">型推論が関連</div>
+					<h1>パターン C</h1>
+					<div class="subTitle">関数アイテム型 vs 関数アイテム型</div>
+				</hgroup>
+				<p>
+関数アイテム型はたとえ引数や戻り値の型が同じでもそれぞれ異なる。<br/>
+そのため、それらに互換性があると想定するとエラーになる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>f1</code> 型の変数に <code>f2</code> 型を代入しようとしている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut _var = f1;
+    _var = <mark class="error">f2</mark>;
+}
+
+fn f1() {}
+fn f2() {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:9
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let mut _var = f1;
+<mark class="info">  |</mark>                    <mark class="info">-- expected due to this value</mark>
+<mark class="info">3 |</mark>     _var = f2;
+<mark class="info">  |</mark>            <mark class="error">^^ expected fn item, found a different fn item</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: expected fn item `fn() <mark class="em">{f1}</mark>`
+<mark class="info">   </mark> <mark class="title">    </mark>     found fn item `fn() <mark class="em">{f2}</mark>`
+<mark class="info">  =</mark> <mark class="title">note</mark>: different fn items have unique types, even if their signatures are the same
+<mark class="info">  =</mark> <mark class="title">help</mark>: consider casting both fn items to fn pointers using `as fn()`
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+関数アイテム型を関数ポインタ型にキャストするとよい。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut _var = f1 as fn();
+    _var = f2;
+}
+
+fn f1() {}
+fn f2() {}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン D</h1>
+					<div class="subTitle">関数アイテム型 vs 関数ポインタ型</div>
+				</hgroup>
+				<p>
+関数アイテム型は関数ポインタ型を受け入れない (逆は可能)。<br/>
+そのため、それらに互換性があると想定するとエラーになる。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、関数アイテム型の変数に関数ポインタ型を代入しようとしている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut _var = f1;
+    _var = <mark class="error">f2 as fn()</mark>;
+}
+
+fn f1() {}
+fn f2() {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:12
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let mut _var = f1;
+<mark class="info">  |</mark>                    <mark class="info">-- expected due to this value</mark>
+<mark class="info">3 |</mark>     _var = f2 as fn();
+<mark class="info">  |</mark>            <mark class="info">^^^^^^^^^^ expected fn item, found fn pointer</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: expected fn item `fn() <mark class="em">{f1}</mark>`
+<mark class="info">   </mark> <mark class="title">    </mark>  found fn pointer `fn()`
+<mark class="info">  =</mark> <mark class="title">help</mark>: consider casting the fn item to a fn pointer: `f1 as fn()`
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+関数アイテム型を関数ポインタ型にキャストするとよい。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut _var = f1 as fn();
+    _var = f2 as fn();
+}
+
+fn f1() {}
+fn f2() {}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン E</h1>
+					<div class="subTitle">HRTB ライフタイム vs 通常ライフタイム</div>
+				</hgroup>
+				<p>
+<a href="hrtb.xhtml">HRTB</a> を扱える型を期待していたが、特定のライフタイムのみ扱える型が使用された。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、任意のライフタイム引数を扱える関数ポインタに、<code>'static</code> のみしか扱えない関数ポインタを代入しようとしている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut _var = with_hrtb as fn(&amp;_);
+    _var = <mark class="error">with_static as fn(&amp;'static _)</mark>;
+}
+
+fn with_hrtb(s: &amp; str) {
+    println!("{s}");
+}
+
+fn with_static(s: &amp;'static str) {
+    println!("{s}");
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0308]</mark>: mismatched types
+<mark class="info"> --&gt;</mark> src\main.rs:3:11
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     var = with_static as fn(&amp;'static _);
+<mark class="info">  |</mark>           <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ one type is more general than the other</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> note: expected fn pointer `<mark class="em">for&lt;'a&gt;</mark> fn(<mark class="em">&amp;'a _</mark>)`
+<mark class="info">   </mark>          found fn pointer `fn(<mark class="em">&amp;'static _</mark>)`
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="withTypeInference">パターン F</h1>
+					<div class="subTitle">HRTB ライフタイムを含んだ型推論</div>
 				</hgroup>
 				<p>
 型推論により型パラメタが <a href="hrtb.xhtml">HRTB</a> を含む型だと期待されるとエラーになる。<br/>
@@ -135,37 +272,40 @@ fn main() {
 以下では、関数 <code>callback</code> の型パラメタ <code>F</code> の境界、そしてその実引数 <code>identity</code> の型から、型パラメタ <code>O</code> が <code>HRTB</code> によるライフタイム <code>'a</code> を含むと期待されてしまう。
 					</p>
 <pre><code class="language-rust">
+use std::fmt::Display;
+
 fn main() {
-    let input = &amp;42;
-    let result = <mark class="error">callback(identity, input)</mark>;
-    assert_eq!(result, input);
+    <mark class="error">callback(identity, &amp;42)</mark>;
+}
+
+fn callback&lt;F, I, O&gt;(f: F, input: &amp;I)
+where
+    F: for&lt;'a&gt; Fn(&amp;'a I) -&gt; O,
+    I: Display,
+    O: Display,
+{
+    println!("input: {}", input);
+    println!("result: {}", f(input))
 }
 
 fn identity(x: &amp;i32) -&gt; &amp;i32 {
     x
 }
-
-fn callback&lt;F, I, O&gt;(f: F, input: &amp;I) -&gt; O
-where
-    F: for&lt;'a&gt; Fn(&amp;'a I) -&gt; O
-{
-    f(input)
-}
 </code></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0308]</mark><mark class="title">: mismatched types</mark>
-<mark class="info">  --&gt;</mark> src\main.rs:3:18
-<mark class="info">   |</mark>
-<mark class="info">3  |</mark>     let result = callback(identity, input);
-<mark class="info">   |</mark>                  <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^ one type is more general than the other</mark>
-<mark class="info">   |</mark>
-<mark class="info">   =</mark> note: expected reference `&amp;'a _`
-<mark class="info"></mark>              found reference `&amp;_`
+<mark class="info"> --&gt;</mark> src\main.rs:4:5
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     callback(identity, &amp;42);
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^ one type is more general than the other</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> note: expected reference `<mark class="em">&amp;'a</mark> _`
+<mark class="info">   </mark>          found reference `<mark class="em">&amp;</mark>_`
 <mark class="edit">note</mark>: the lifetime requirement is introduced here
-<mark class="info">  --&gt;</mark> src\main.rs:13:29
-<mark class="info">   |</mark>
-<mark class="info">13 |</mark>     F: for&lt;'a&gt; Fn(&amp;'a I) -&gt; O
-<mark class="info">   |</mark>                             <mark class="edit">^</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:9:29
+<mark class="info">  |</mark>
+<mark class="info">9 |</mark>     F: for&lt;'a&gt; Fn(&amp;'a I) -&gt; O,
+<mark class="info">  |</mark>                             <mark class="edit">^</mark>
 </samp></pre>
 				</section> <section>
 					<h2>解決策 1</h2>
@@ -173,21 +313,25 @@ where
 以下では、推論すべき箇所を型パラメタではなく関連型で表現している。なお、<code>FnHelper</code> は <a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a> トレイトを通常のトレイトとして扱えるようにするためのヘルパトレイトである。
 					</p>
 <pre><code class="language-rust">
+use std::fmt::Display;
+
 fn main() {
     let input = &amp;42;
-    let result = callback(identity, input);
-    assert_eq!(result, input);
+    callback(identity, input);
+}
+
+fn callback&lt;F, I&gt;(f: F, input: &amp;I)
+where
+    for&lt;'a&gt; F: FnHelper&lt;&amp;'a I&gt;,
+    for&lt;'a&gt; &lt;F as FnHelper&lt;&amp;'a I&gt;&gt;::Output: Display,
+    I: Display,
+{
+    println!("input: {}", input);
+    println!("result: {}", f(input))
 }
 
 fn identity(x: &amp;i32) -&gt; &amp;i32 {
     x
-}
-
-fn callback&lt;F, I&gt;(f: F, input: &amp;I) -&gt; &lt;F as FnHelper&lt;&amp;I&gt;&gt;::Output
-where
-    F: for&lt;'a&gt; FnHelper&lt;&amp;'a I&gt;
-{
-    f(input)
 }
 
 trait FnHelper&lt;I&gt;: Fn(I) -&gt; &lt;Self as FnHelper&lt;I&gt;&gt;::Output {
@@ -204,26 +348,30 @@ where
 				</section> <section>
 					<h2>解決策 2</h2>
 					<p>
-以下でも、推論すべき箇所を型パラメタではなく関連型で表現している。ただし、前の解決策とは異なり、<code>FnHelper</code> の代わりに <time>2024 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/nightly/unstable-book/language-features/unboxed-closures.html"><code>unboxed_closures</code></a> を利用している。
+以下でも、推論すべき箇所を型パラメタではなく関連型で表現している。ただし、前の解決策とは異なり、<code>FnHelper</code> の代わりに <time>2025 年現在</time>まだ不安定な機能 <a href="https://doc.rust-lang.org/nightly/unstable-book/language-features/unboxed-closures.html"><code>unboxed_closures</code></a> を利用している。
 					</p>
 <pre><code class="language-rust">
 #![feature(unboxed_closures)]
 
+use std::fmt::Display;
+
 fn main() {
     let input = &amp;42;
-    let result = callback(identity, input);
-    assert_eq!(result, input);
+    callback(identity, input);
+}
+
+fn callback&lt;F, I&gt;(f: F, input: &amp;I)
+where
+    for&lt;'a&gt; F: Fn&lt;(&amp;'a I,)&gt;,
+    for&lt;'a&gt; &lt;F as FnOnce&lt;(&amp;'a I,)&gt;&gt;::Output: Display,
+    I: Display,
+{
+    println!("input: {}", input);
+    println!("result: {}", f(input))
 }
 
 fn identity(x: &amp;i32) -&gt; &amp;i32 {
     x
-}
-
-fn callback&lt;F, I&gt;(f: F, input: &amp;I) -&gt; &lt;F as FnOnce&lt;(&amp;I,)&gt;&gt;::Output
-where
-    F: for&lt;'a&gt; Fn&lt;(&amp;'a I,)&gt;
-{
-    f(input)
 }
 </code></pre>
 				</section>
