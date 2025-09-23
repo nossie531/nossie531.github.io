@@ -15,47 +15,75 @@
 <abbr>HRTB</abbr> (Higher-Rank Trait Bounds) によるライフタイム注釈について。
 		</p>
 		<section>
-			<h1>基本</h1>
-			<section>
-				<h2>通常版との差異</h2>
-				<dl class="normal">
-					<dt>通常のライフタイム注釈</dt>
-					<dd>
-						<p>
+			<h1>概要</h1>
+			<p>
+HRTB と通常のライフタイム注釈には以下の違いがある。
+			</p>
+			<dl class="normal">
+				<dt>通常のライフタイム注釈</dt>
+				<dd>
+					<p>
 アイテムの文脈に依存したスコープを対象とする。
-						</p> <p>
-例えば、関数の呼出元やインスタンスの生成元のスコープが対象となる。
-						</p>
-					</dd>
-					<dt>HRTB によるライフタイム注釈</dt>
-					<dd>
-						<p>
+					</p> <p>
+例えば、関数の呼出元や値の生成元のスコープが対象となる。
+					</p>
+				</dd>
+				<dt>HRTB によるライフタイム注釈</dt>
+				<dd>
+					<p>
 アイテムの文脈によらない任意のスコープを対象とする。
-						</p> <p>
+					</p> <p>
 例えば、コールバックの呼出元のスコープが対象となる。
-						</p>
-					</dd>
-				</dl>
-			</section> <section>
-				<h2>書式</h2>
+					</p>
+				</dd>
+			</dl>
+		</section> <section>
+			<h1>書式</h1>
+			<p>
+明示的な場合と暗黙的な場合とがある。
+			</p>
+			<section>
+				<h1>明示的</h1>
 				<p>
-トレイト境界の左辺または右辺の先頭で <code>for&lt;'<var>a</var>&gt;</code> のように宣言する<br/>
-(複数必要な場合、<code>for&lt;'<var>a</var>, '<var>b</var>&gt;</code> のようにカンマで区切る)。
+<code>for</code> キーワードを利用する。記述位置は型の先頭、またはトレイト境界の左辺か右辺の先頭、書式は <code>for&lt;'<var>a</var>&gt;</code> のようなスタイルになる。複数の注釈が必要な場合、<code>for&lt;'<var>a</var>, '<var>b</var>&gt;</code> のようにカンマで区切る。
 				</p>
 			</section> <section>
-				<h2>ライフタイム省略</h2>
+				<h1>暗黙的</h1>
 				<p>
-HRTB によるライフタイム注釈がクロージャの引数や返値に適用されるパターンでは、関数の引数や返値における通常のライフタイム注釈と同様、ライフタイムの記載を省略できる (例: ライフタイム注釈が一つしかない場合など) 。
+関数ポインタ型や呼出可能トレイト (<a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnMut.html"><code>FnMut</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnOnce.html"><code>FnOnce</code></a>) の関数宣言風の境界の記法では、関数の場合と同様のライフタイム注釈の省略ルールが、HRTB のそれについても適用される。そのため、<code>for</code> キーワードは必須ではなくなる。
 				</p>
 			</section>
 		</section> <section>
 			<h1>サンプル</h1>
 			<section>
-				<h1>クロージャ</h1>
+				<h1>関数ポインタ型</h1>
 				<p>
-以下では、関数 <code>get_cmp_text</code> でクロージャを扱うために HRTB が使用されている。
-				</p> <p>
-なお、このパターンはライフタイムが一つしかないため HRTB ごと省略可能。
+以下では、関数ポインタ型のライフタイムに、HRTB が使用されている。<br/>
+(このサンプルは <code>for</code> キーワードを使わない形式でも書ける。)
+				</p>
+<pre><code class="language-rust">
+use std::cmp::Ordering;
+
+type Comparator = for&lt;'a&gt; fn(&amp;'a i32, &amp;'a i32) -&gt; Ordering;
+
+fn main() {
+    let text = get_cmp_text(i32::cmp, 1, 2);
+    assert_eq!(text, "&lt;");
+}
+
+fn get_cmp_text(cmp: Comparator, x: i32, y: i32) -&gt; String {
+    match cmp(&amp;x, &amp;y) {
+        Ordering::Less =&gt; "&lt;",
+        Ordering::Equal =&gt; "=",
+        Ordering::Greater =&gt; "&gt;",
+    }.to_string()
+}
+</code></pre>
+			</section> <section>
+				<h1>トレイト境界 1</h1>
+				<p>
+以下では、呼出可能トレイトによる境界に、HRTB が使用されている。<br/>
+(このサンプルは <code>for</code> キーワードを使わない形式でも書ける。)
 				</p>
 <pre><code class="language-rust">
 use std::cmp::Ordering;
@@ -77,16 +105,52 @@ where
 }
 </code></pre>
 			</section> <section>
-				<h1>GAT - 1</h1>
+				<h1>トレイト境界 2</h1>
 				<p>
-以下では、関数 <code>sum</code> で <a href="associated_type.xhtml#gat">GAT</a> を用いたトレイトについて HRTB を使用している。
+以下では、通常のトレイトによる境界に、HRTB が使用されている。<br/>
+(このサンプルは <code>for</code> キーワードを使わない形式では書けない。)
+				</p>
+<pre><code class="language-rust">
+use std::cmp::Ordering;
+
+fn main() {
+    let text = get_cmp_text(IntComparator(), 1, 2);
+    assert_eq!(text, "&lt;");
+}
+
+fn get_cmp_text&lt;C&gt;(comparator: C, x: i32, y: i32) -&gt; String
+where
+    C: for&lt;'a&gt; Comparator&lt;&amp;'a i32, &amp;'a i32&gt;,
+{
+    match comparator.cmp(&amp;x, &amp;y) {
+        Ordering::Less =&gt; "&lt;",
+        Ordering::Equal =&gt; "=",
+        Ordering::Greater =&gt; "&gt;",
+    }.to_string()
+}
+
+struct IntComparator();
+impl&lt;'a&gt; Comparator&lt;&amp;'a i32, &amp;'a i32&gt; for IntComparator {
+    fn cmp(&amp;self, x: &amp;'a i32, y: &amp;'a i32) -&gt; Ordering {
+        x.cmp(y)
+    }
+}
+
+trait Comparator&lt;X, Y&gt; {
+    fn cmp(&amp;self, x: X, y: Y) -&gt; Ordering;
+}
+</code></pre>
+			</section> <section>
+				<h1>GAT との連携 1</h1>
+				<p>
+以下では、<a href="associated_type.xhtml#gat">GAT</a> つきのトレイト <code>IntCollection</code> が使われている。そして、関数 <code>summary</code> の境界では、GAT により導出される型を、HRTB を含んだ形式で表現している。
 				</p>
 <pre><code class="language-rust">
 use std::slice::Iter;
 
 fn main() {
     let vec = vec![1, 2, 3];
-    assert_eq!(sum(vec), 6);
+    assert_eq!(summary(vec), 6);
 }
 
 trait IntCollection {
@@ -101,7 +165,7 @@ impl IntCollection for Vec&lt;i32&gt; {
     }
 }
 
-fn sum&lt;T&gt;(ints: T) -&gt; i32
+fn summary&lt;T&gt;(ints: T) -&gt; i32
 where
     T: for&lt;'a&gt; IntCollection&lt;IntStream&lt;'a&gt; = Iter&lt;'a, i32&gt;&gt;
 {
@@ -109,9 +173,9 @@ where
 }
 </code></pre>
 			</section> <section>
-				<h1>GAT - 2</h1>
+				<h1>GAT との連携 2</h1>
 				<p>
-以下では、関数 <code>average</code> で <a href="associated_type.xhtml#gat">GAT</a> を用いたトレイトについて HRTB を使用している。
+以下では、<a href="associated_type.xhtml#gat">GAT</a> つきのトレイト <code>IntCollection</code> が使われている。そして、関数 <code>average</code> の境界では、GAT により導出される型の境界を、HRTB を含んだ形式で表現している。
 				</p>
 <pre><code class="language-rust">
 use std::slice::Iter;
