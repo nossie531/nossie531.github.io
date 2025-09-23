@@ -54,11 +54,50 @@ HRTB と通常のライフタイム注釈には以下の違いがある。
 				</p>
 			</section>
 		</section> <section>
+			<h1>高度な話題</h1>
+			<section>
+				<h1 id="limitation">制限</h1>
+				<p>
+<time>2025 年現在</time>、HRTB にはまだ制限が多い。
+				</p>
+				<section>
+					<h2>関連エラー</h2>
+					<ul>
+						<li>
+<a href="e_hrtb_limitation.xhtml">[error] HRTB の機能制限</a>
+						</li> <li>
+<a href="e_hrtb_gat.xhtml">[error] HRTB の機能制限 × GAT</a>
+						</li> <li>
+<a href="e0597_hrtb_limitation.xhtml">[E0597] HRTB の機能制限</a>
+						</li> <li>
+<a href="e0597_hrtb_gat.xhtml">[E0597] HRTB の機能制限 × GAT</a>
+						</li>
+					</ul>
+				</section>
+			</section> <section>
+				<h1 id="typeInference">型推論</h1>
+				<p>
+型推論の結果は HRTB を含まない。HRTB の箇所は型推論せずに明示しなければならない。これは例えば、<code>as for&lt;'a&gt; fn(&amp;'a _)</code> のようなキャストで実現される。
+				</p> <p>
+このルールは、HRTB を含んだ型推論が唯一のコンパイル手段であっても揺るがない。コンパイラはそのような型推論よりもエラーを選ぶ。これは奇妙に思えるかもしれないが、HRTB のような高階型への型推論が妥当な場面では、より具体的な型への型推論も妥当な場合が多い。このルールは単純さとそうした曖昧なケースの排除を両立している。
+				</p>
+				<section>
+					<h2>関連エラー</h2>
+					<ul>
+						<li>
+<a href="e0308.xhtml">[E0308] 型の不一致</a> - <a href="e0308.xhtml#hrtbTypeInference">HRTB を期待する型推論</a>
+						</li> <li>
+<a href="e0599.xhtml">[E0599] 無効なメソッドの呼出</a> - <a href="e0599.xhtml#hrtbTypeInference">HRTB を期待する型推論</a>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</section> <section>
 			<h1>サンプル</h1>
 			<section>
 				<h1>関数ポインタ型</h1>
 				<p>
-以下では、関数ポインタ型のライフタイムに、HRTB が使用されている。<br/>
+以下では、関数ポインタ型のライフタイム注釈に、HRTB が使用されている。<br/>
 (このサンプルは <code>for</code> キーワードを使わない形式でも書ける。)
 				</p>
 <pre><code class="language-rust">
@@ -208,22 +247,6 @@ where
 }
 </code></pre>
 			</section>
-		</section> <section>
-			<h1 id="limitation">制限</h1>
-			<p>
-<time>2024 年現在</time>、HRTB には以下の制限がある。
-			</p>
-			<ul>
-				<li>
-<a href="e_hrtb_limitation.xhtml">[error] HRTB の機能制限</a>
-				</li> <li>
-<a href="e_hrtb_gat.xhtml">[error] HRTB の機能制限 × GAT</a>
-				</li> <li>
-<a href="e0597_hrtb_limitation.xhtml">[E0597] HRTB の機能制限</a>
-				</li> <li>
-<a href="e0597_hrtb_gat.xhtml">[E0597] HRTB の機能制限 × GAT</a>
-				</li>
-			</ul>
 		</section>
 	</body>
 </html>

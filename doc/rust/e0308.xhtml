@@ -252,24 +252,24 @@ fn with_static(s: &amp;'static str) {
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="withTypeInference">パターン F</h1>
-					<div class="subTitle">HRTB ライフタイムを含んだ型推論</div>
+					<h1 id="hrtbTypeInference">パターン F</h1>
+					<div class="subTitle">HRTB を期待する型推論</div>
 				</hgroup>
 				<p>
-型推論により型パラメタが <a href="hrtb.xhtml">HRTB</a> を含む型だと期待されるとエラーになる。<br/>
-(注: ライフタイム省略により <code>for&lt;...&gt;</code> 構文を使わない HRTB もありうる)。
+『<a href="hrtb.xhtml">HRTB</a> - <a href="typeInference">型推論</a>』で紹介する通り、HRTB を含んだ型は型推論できない。
+				</p> <p>
+そのため、関連型にそれらを含んだ型を期待していてもエラーになる。
 				</p>
-				<section>
-					<h2>制限の利用と回避</h2>
+				<aside class="normal moan">
+					<p id="next-solver">エラーの内容について。</p>
 					<p>
-多くの場合、この制限は有用である。例えば、<code><a href="https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html">Iterator</a>::<a href="https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html#method.scan">scan</a></code> のクロージャ引数では、この制限により戻り値に引数由来のライフタイムが含まれるのを禁止している。
-					</p> <p>
-そして、この制限が邪魔な場合、後述の解決策で解除できる。
+よく見るとエラーメッセージの内容が不自然である。また、他の <a href="e0308.xhtml">E0308</a> のエラーとは原因が明らかに異なる。なお、<time>2025 年現在</time>、開発中のトレイトソルバーである <a href="nightly_unstable.xhtml#next-solver">next-solver</a> を試用すると、ID は <a href="e0271.xhtml">E0271</a> になり、メッセージも妥当なものになっていた。
 					</p>
-				</section> <section>
+				</aside>
+				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、関数 <code>callback</code> の型パラメタ <code>F</code> の境界、そしてその実引数 <code>identity</code> の型から、型パラメタ <code>O</code> が <code>HRTB</code> によるライフタイム <code>'a</code> を含むと期待されてしまう。
+以下では、関数 <code>callback</code> の型パラメタ <code>F</code> の境界、そしてその実引数 <code>identity</code> の型から、<code>Fn::Output</code> である <code>O</code> が <code>HRTB</code> によるライフタイム <code>'a</code> を含むと期待している。
 					</p>
 <pre><code class="language-rust">
 use std::fmt::Display;

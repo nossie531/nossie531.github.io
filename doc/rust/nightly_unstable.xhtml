@@ -85,9 +85,18 @@ fn main() {
 			</p>
 			<dl class="normal lowProfile">
 				<dt>polonius</dt>
-				<dd>新しい借用チェッカー <sup><a href="#link-1">[1]</a></sup></dd>
-				<dt>next-solver</dt>
-				<dd>新しいトレイトソルバー <sup><a href="#link-2">[2]</a></sup></dd>
+				<dd>
+					新しい借用チェッカー
+					<sup><a href="#link-1">[1]</a></sup>
+				</dd>
+				<dt id="next-solver">next-solver</dt>
+				<dd>新しいトレイトソルバー 
+					<sup>
+						<a href="#link-2">[2]</a>
+						<a href="#link-3">[3]</a>
+						<a href="#link-4">[4]</a>
+					</sup>
+				</dd>
 			</dl>
 			<p>
 <code>rustflags</code> オプションは <code>.cargo/config.toml</code> ファイルからも指定できる。<br/>
@@ -114,7 +123,15 @@ rustflags = ["-Zpolonius"]
 					</dd>
 					<dt id="link-2">[2]</dt>
 					<dd>
-<a href="e0275.xhtml">E0275 トレイト確認の無限再帰</a> - <a href="e0275.xhtml#next-solver">next-solver</a>
+<a href="e0275.xhtml">[E0275] トレイト確認の無限再帰</a> - <a href="e0275.xhtml#next-solver">next-solver</a>
+					</dd>
+					<dt id="link-3">[3]</dt>
+					<dd>
+<a href="e0308.xhtml">[E0308] 型の不一致</a> - <a href="e0308.xhtml#next-solver">next-solver</a>
+					</dd>
+					<dt id="link-3">[4]</dt>
+					<dd>
+<a href="e0599.xhtml">[E0599] 無効なメソッドの呼出</a> - <a href="e0599.xhtml#next-solver">next-solver</a>
 					</dd>
 				</dl>
 			</section>

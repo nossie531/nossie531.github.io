@@ -101,11 +101,68 @@ impl&lt;T: UpperHex&gt; MyValue&lt;T&gt; {
 <mark class="info">  |</mark>         <mark class="edit">|</mark>
 <mark class="info">  |</mark>         <mark class="edit">unsatisfied trait bound introduced here</mark>
 </samp></pre>
-				</section> <section>
-					<h2>他エラーとの関係性</h2>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="hrtbTypeInference">パターン C</h1>
+					<div class="subTitle">HRTB を期待する型推論</div>
+				</hgroup>
+				<p>
+『<a href="hrtb.xhtml">HRTB</a> - <a href="typeInference">型推論</a>』で紹介する通り、HRTB を含んだ型は型推論できない。
+				</p> <p>
+そのため、型推論により型が決定された変数は、HRTB を境界とする実装に適合しない。
+				</p>
+				<aside class="normal moan">
+					<p id="next-solver">エラーの内容について。</p>
 					<p>
-型が境界に一致するかついて。『<a href="e0308.xhtml">E0308 - 型の不一致</a>』の<a href="e0308.xhtml#withTypeInference">パターン F</a> で取り上げたのと同じ型推論の影響を受ける。そのため、境界がクロージャについてのもので、それに型推論や HRTB が絡みそうな場合、そちらの情報も参照してほしい。
+エラーメッセージの内容がよく見ると不自然である。なお、<time>2025 年現在</time>、開発中のトレイトソルバーである <a href="nightly_unstable.xhtml#next-solver">next-solver</a> を試用した場合、妥当なメッセージが出力されていた。
 					</p>
+				</aside>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>MyType&lt;T&gt;::method</code> を呼ぶには、型パラメタ <code>T</code> が HRTB を含んだ境界を満たす必要がある。しかし、<code>_</code> による型推論は、通常のライフタイム注釈しか推論できない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let var = MyType(|_| {});
+	var.<mark class="error">method</mark>();
+}
+
+struct MyType&lt;T&gt;(T);
+impl&lt;T&gt; MyType&lt;T&gt; where T: Fn(&amp;i32) {
+    fn method(&amp;self) {}
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: no method named `method` found for struct `MyType&lt;{closure@src\main.rs:2:22: 2:25}&gt;` in the current scope</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:3:9
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     var.method();
+<mark class="info">  |</mark>         <mark class="error">^^^^^^ method not found in `MyType&lt;{closure@main.rs:2:22}&gt;`</mark>
+<mark class="info">...</mark>
+<mark class="info">6 |</mark> struct MyType&lt;T&gt;(T);
+<mark class="info">  |</mark> <mark class="info">---------------- method `method` not found for this struct</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: the method was found for
+<mark class="info">   </mark>       - `MyType&lt;T&gt;`
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+HRTB を期待する箇所の参照を推論せずに明示するとよい。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let var = MyType(|_arg: &amp;_| {});
+    var.method();
+}
+
+struct MyType&lt;T&gt;(T);
+impl&lt;T&gt; MyType&lt;T&gt; where T: Fn(&amp;i32) {
+    fn method(&amp;self) {}
+}
+</code></pre>
 				</section>
 			</section>
 		</section>

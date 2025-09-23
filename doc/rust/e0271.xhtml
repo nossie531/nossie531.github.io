@@ -23,10 +23,21 @@
 トレイト境界が関連型まで指定されており、対象の型はそれに適合する事が期待されていた。しかし、対象の型は指定されたトレイトについては実装していたものの、トレイトの関連型として導かれるのは指定された型とは異なる型だった。
 			</p>
 		</section> <section>
-			<h1>サンプル</h1>
-			<p>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+単純に関連型が一致しないパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、<code>func</code> に渡される <code>u32</code> 型が引数型 <code>T</code> の境界に適合せずエラーになる。なぜなら、<code>u32</code> 型は <code>Unsigned</code> トレイトを実装するが、<code>Unsigned::Signed</code> として導かれる型は <code>i64</code> ではなく <code>i32</code> になる。
-			</p>
+					</p>
 <pre><code class="language-rust">
 fn main() {
     func(<mark class="error">1_u32</mark>);
@@ -68,6 +79,16 @@ impl Unsigned for u32 {
 <mark class="info">5  |</mark> fn func&lt;T&gt;(val: T) where T: Unsigned&lt;Signed=i64&gt; {
 <mark class="info">   |</mark>                                      <mark class="edit">^^^^^^^^^^ required by this bound in `func`</mark>
 </samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">Comming soon?</div>
+				</hgroup>
+				<p>
+<time>2025 年現在</time>、次期トレイトソルバーとして期待される next-solver が出力しているエラー。これは元は E0308 として出力されていた。詳しくは､『<a href="e0308.xhtml">E0308</a> - <a href="e0308.xhtml#hrtbTypeInference">HRTB を期待する型推論</a>』を参照されたい。
+				</p>
+			</section>
 		</section>
 	</body>
 </html>
