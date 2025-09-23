@@ -20,12 +20,12 @@
 		<section>
 			<h1>原因</h1>
 			<p>
-関連型まで指定されたトレイト境界があり、対象の型はそれに適合する事が期待されていた。しかし、指定されたトレイトは実装していたものの、そこから導かれる関連型が指定されたものと別の型だった。
+トレイト境界が関連型まで指定されており、対象の型はそれに適合する事が期待されていた。しかし、対象の型は指定されたトレイトについては実装していたものの、トレイトの関連型として導かれるのは指定された型とは異なる型だった。
 			</p>
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-以下では、<code>func</code> に渡される <code>u32</code> 型が引数型 <code>T</code> の境界に適合せずエラーになる。なぜなら、<code>u32</code> 型は <code>Unsigned</code> トレイトを実装するが、<code>Unsigned::Signed</code> により導かれる型は <code>i64</code> ではなく <code>i32</code> になる。
+以下では、<code>func</code> に渡される <code>u32</code> 型が引数型 <code>T</code> の境界に適合せずエラーになる。なぜなら、<code>u32</code> 型は <code>Unsigned</code> トレイトを実装するが、<code>Unsigned::Signed</code> として導かれる型は <code>i64</code> ではなく <code>i32</code> になる。
 			</p>
 <pre><code class="language-rust">
 fn main() {
