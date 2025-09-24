@@ -211,7 +211,7 @@
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.skip"><code>skip</code></a>
 					</dt>
 					<dd>続く n 個の要素を無視する。</dd>
-					<dt>
+					<dt id="take_while">
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.take_while"><code>take_while</code></a>
 					</dt>
 					<dd>指定条件が連続する限り要素を対象とする。</dd>
@@ -242,6 +242,10 @@
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.flat_map"><code>flat_map</code></a>
 					</dt>
 					<dd><a href="#map"><code>map</code></a> して <a href="#flatten"><code>flatten</code></a> の複合操作。</dd>
+					<dt>
+<a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.map_while"><code>map_while</code></a>
+					</dt>
+					<dd><a href="#map"><code>map</code></a> して <a href="#take_while"><code>take_while</code></a> の複合操作。</dd>
 					<dt>
 <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.scan"><code>scan</code></a>
 					</dt>
