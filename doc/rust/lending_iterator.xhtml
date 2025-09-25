@@ -66,7 +66,7 @@ Lending Iterator 系のトレイトを利用する型について。
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、トレイト <code>MutAddressIterator</code> が Lending Iterator になっている。
+以下では、トレイト <code>MutRefIterator</code> が Lending Iterator になっている。
 					</p>
 <pre><code class="language-rust">
 fn main() {
@@ -77,7 +77,7 @@ fn main() {
     assert_eq!(iter.next(), None);
 }
 
-trait MutAddressIterator {
+trait MutRefIterator {
     type Item: ?Sized;
     fn next(&amp;mut self) -&gt; Option&lt;&amp;mut Self::Item&gt;;
 }
@@ -95,7 +95,7 @@ impl&lt;'arr, T&gt; WindowsMut&lt;'arr, T&gt; {
     }
 }
 
-impl&lt;'arr, T&gt; MutAddressIterator for WindowsMut&lt;'arr, T&gt; {
+impl&lt;'arr, T&gt; MutRefIterator for WindowsMut&lt;'arr, T&gt; {
     type Item = [T];
 
     fn next(&amp;mut self) -&gt; Option&lt;&amp;mut Self::Item&gt; {
