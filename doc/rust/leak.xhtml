@@ -58,6 +58,8 @@
 			<p>
 以下では、型パラメタ <code>T</code> に対応する既定値への参照を取得している。 
 			</p>
+			<section>
+				<h2>グローバル版</h2>
 <pre><code class="language-rust">
 use std::any::{Any, TypeId};
 use std::collections::BTreeMap;
@@ -65,7 +67,7 @@ use std::sync::Mutex;
 
 pub fn default_ref&lt;T&gt;() -&gt; &amp;'static T
 where
-    T: Any + Default + Send + Sync,
+    T: Any + Default + Send + Sync + ?Sized,
 {
     static MAP: Mutex&lt;BTreeMap&lt;TypeId, &amp;'static (dyn Any + Send + Sync)&gt;&gt; =
         Mutex::new(BTreeMap::new());
@@ -78,6 +80,33 @@ where
         .unwrap()
 }
 </code></pre>
+			</section>
+			<section>
+				<h2>スレッドローカル版</h2>
+<pre><code class="language-rust">
+use std::any::{Any, TypeId};
+use std::cell::RefCell;
+use std::collections::btree_map::BTreeMap;
+
+pub fn default_ref&lt;T&gt;() -&gt; &amp;'static T
+where
+    T: Any + Default + ?Sized,
+{
+    thread_local! {
+        static MAP: RefCell&lt;BTreeMap&lt;TypeId, &amp;'static dyn Any&gt;&gt; =
+        RefCell::new(BTreeMap::new());
+    }
+
+    MAP.with(|x| {
+        x.borrow_mut()
+            .entry(TypeId::of::&lt;T&gt;())
+            .or_insert_with(|| Box::leak(Box::new(T::default())))
+            .downcast_ref()
+            .unwrap()
+    })
+}
+</code></pre>
+			</section>
 		</section>
 	</body>
 </html>
