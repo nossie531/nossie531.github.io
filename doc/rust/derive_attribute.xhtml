@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: derive 属性</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<code>derive</code> 属性について。
+		</p> 
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+<code>derive</code> 属性は型にトレイトを自動実装するのに使う。
+			</p> <p>
+これは内部的には手続きマクロを利用していて、フィールドの宣言情報などを読み、そこからよくある実装コードを自動で導出している。
+			</p>
+		</section> <section>
+			<h1><code>std</code> での利用例 </h1>
+			<p>
+以下は <code>std</code> における <code>derive</code> 属性に対応するトレイトの一覧である。それぞれのトレイトの概要と導出の動作についてまとめている。また、トレイトには他のトレイトを前提にするものもあり、それらについても触れている (例: <code>Copy</code> は <code>Clone</code> が前提)。
+			</p>
+			<dl class="normal">
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/fmt/trait.Debug.html">Debug</a></code>
+				</dt>
+				<dd>
+					<p>
+概要: 値の内容をデバッグ書式で出力する。<br/>
+導出: 型名や各フィールドの値を出力する。
+					</p>
+				</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/default/trait.Default.html">Default</a></code>
+				</dt>
+				<dd>
+					<p>
+概要: 既定値を生成する。<br/>
+導出: 全てのフィールドを既定値で生成する。
+					</p>
+				</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/clone/trait.Clone.html">Clone</a></code>
+				</dt>
+				<dd>
+					<p>
+概要: 元の値をクローンして新しい値を作る。<br/>
+導出: 全てのフィールドの値をクローンする。
+					</p>
+				</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/core/marker/trait.Copy.html">Copy</a>: Clone</code>
+				</dt>
+				<dd>
+					<p>
+概要: 値のコピー (自動的なクローン) を可能にする。<br/>
+導出: マーカートレイトのため宣言のみの導出となる。
+					</p>
+				</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html">Eq</a>: PartialEq</code>
+				</dt>
+				<dd>
+					<p>
+概要: 二つの値の同値関係を判定する。<br/>
+導出: マーカートレイトのため宣言のみの導出となる。
+					</p>
+				</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/cmp/trait.PartialEq.html">PartialEq</a></code>
+				</dt>
+				<dd>
+					<p>
+概要: 二つの値の半同値関係を判定する (<code>==</code> や <code>!=</code> 演算子でも使用) 。<br/>
+導出: 全てのフィールドの値が等しいかを判定する。
+					</p>
+				</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/cmp/trait.Ord.html">Ord</a>: Eq, PartialOrd</code>
+				</dt>
+				<dd>
+					<p>
+概要: 二つの値の順序関係を判定する。<br/>
+導出: マーカートレイトのため宣言のみの導出となる。
+					</p>
+				</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/cmp/trait.PartialOrd.html">PartialOrd</a>: PartialEq</code>
+				</dt>
+				<dd>
+					<p>
+概要: 二つの値の半順序関係を判定する (<code>&lt;</code> や <code>&gt;</code> 演算子でも使用)。<br/>
+導出: 全てのフィールドの値を宣言順に並べて辞書式で比較する。
+					</p>
+				</dd>
+				<dt>
+<code><a href="https://doc.rust-lang.org/std/hash/trait.Hash.html">Hash</a></code>
+				</dt>
+				<dd>
+					<p>
+概要: 値からハッシュ値を計算する。<br/>
+導出: 全てのフィールドの値をハッシュに利用する。
+					</p>
+				</dd>
+			</dl>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、<code>Point</code> に <code>Default</code>, <code>Clone</code>, <code>Copy</code>, <code>Debug</code> を実装している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let o = Point::default();
+    let mut p = o; // copy.
+    p.x = 3;
+    p.y = 4;
+    assert_eq!(format!("{o:?}"), "Point { x: 0, y: 0 }");
+    assert_eq!(format!("{p:?}"), "Point { x: 3, y: 4 }");
+    assert_eq!(p.abs(), 5.0);
+}
+
+#[derive(Default, Clone, Copy, Debug)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl Point {
+    pub fn abs(&amp;self) -&gt; f32 {
+        ((self.x * self.x + self.y * self.y) as f32).sqrt()
+    }
+}
+</code></pre>
+			<p>
+これは以下のコードと等しい。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let o = Point::default();
+    let mut p = o; // copy.
+    p.x = 3;
+    p.y = 4;
+    assert_eq!(format!("{o:?}"), "Point { x: 0, y: 0 }");
+    assert_eq!(format!("{p:?}"), "Point { x: 3, y: 4 }");
+    assert_eq!(p.abs(), 5.0);
+}
+
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl Point {
+    pub fn abs(&amp;self) -&gt; f32 {
+        ((self.x * self.x + self.y * self.y) as f32).sqrt()
+    }
+}
+
+impl Default for Point {
+    fn default() -&gt; Self {
+        Self {
+            x: Default::default(),
+            y: Default::default(),
+        }
+    }
+}
+
+impl Clone for Point {
+    fn clone(&amp;self) -&gt; Self {
+        Self {
+            x: self.x.clone(),
+            y: self.y.clone(),
+        }
+    }
+}
+
+impl Copy for Point {}
+
+impl std::fmt::Debug for Point {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::fmt::Result {
+        f.debug_struct("Point")
+            .field("x", &amp;self.x)
+            .field("y", &amp;self.y)
+            .finish()
+    }
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>型パラメタの影響</h1>
+			<p>
+型が型パラメタを持つ場合でも、<code>derive</code> 属性を使える。
+			</p> <p>
+ただしこの場合、型パラメタを対象のトレイトで境界づけるトレイトが多い。
+			</p> <p>
+つまり、<code>#[derive(SomeTrait)] SomeType&lt;T&gt;</code> からは導出される実装は、<code>T: SomeTrait</code> の制限を含む場合が多く、この制限が妥当でない限り <code>derive</code> 属性は使えない。
+			</p>
+			<section>
+				<h2>サンプル 1 (<code>derive</code> 可能)</h2>
+				<p>
+以下では <code>MyType&lt;T&gt;</code> は <code>Clone</code> と <code>PartialEq</code> を自動実装している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let var1 = MyType(42);
+    let var2 = var1.clone();
+    assert!(var1 == var2);
+}
+
+#[derive(Clone, PartialEq)]
+struct MyType&lt;T&gt;(T);
+</code></pre>
+			<p>
+これは以下のコードと等しい。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let var1 = MyType(42);
+    let var2 = var1.clone();
+    assert!(var1 == var2);
+}
+
+struct MyType&lt;T&gt;(T);
+
+impl&lt;T: Clone&gt; Clone for MyType&lt;T&gt; {
+    fn clone(&amp;self) -&gt; Self {
+        Self(self.0.clone())
+    }
+}
+
+impl&lt;T: Eq&gt; PartialEq for MyType&lt;T&gt; {
+    fn eq(&amp;self, other: &amp;Self) -&gt; bool {
+        self.0 == other.0
+    }
+}
+</code></pre>
+			</section> <section>
+				<h2>サンプル 2 (<code>derive</code> 不可)</h2>
+				<p>
+以下では <code>MyVec&lt;T&gt;</code> は <code>Clone</code> と <code>PartialEq</code> を自動実装している。<br/>
+しかし、<code>Default</code> については独自にコードを書いて実装している。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let values = values(1, 3);
+    assert_eq!(values.0, vec![1, 1, 1]);
+}
+
+fn values&lt;T: Clone&gt;(value: T, len: usize) -&gt; MyVec&lt;T&gt; {
+    let mut ret = MyVec::default();
+    for _ in 0..len {
+        ret.0.push(value.clone());
+    }
+
+    ret
+}
+
+#[derive(Clone, PartialEq)]
+struct MyVec&lt;T&gt;(Vec&lt;T&gt;);
+
+impl&lt;T&gt; Default for MyVec&lt;T&gt; {
+    fn default() -&gt; Self {
+        Self(Default::default())
+    }
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
