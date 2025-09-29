@@ -193,7 +193,7 @@ impl std::fmt::Debug for Point {
 </code></pre>
 			</section>
 		</section> <section>
-			<h1>型パラメタの影響</h1>
+			<h1 id="typeParam">型パラメタの影響</h1>
 			<p>
 型が型パラメタを持つ場合でも、<code>derive</code> 属性を使える。
 			</p> <p>
@@ -202,6 +202,16 @@ impl std::fmt::Debug for Point {
 つまり、<code>#[derive(SomeTrait)] SomeType&lt;T&gt;</code> からは導出される実装は、<code>T: SomeTrait</code> の制限を含む場合が多く、この制限が妥当でない限り <code>derive</code> 属性は使えない。
 			</p>
 			<section>
+				<h2>関連エラー</h2>
+				<p>
+<code>derive</code> 属性を無理に使うと以下のようなエラーが発生する。
+				</p>
+				<ul>
+					<li>
+<a href="e0277.xhtml">[E0277] トレイト境界への不適合</a> - <a href="e0277.xhtml#deriveAttribute"><code>derive</code> 属性</a>
+					</li>
+				</ul>
+			</section> <section>
 				<h2>サンプル 1 (<code>derive</code> 可能)</h2>
 				<p>
 以下では <code>MyType&lt;T&gt;</code> は <code>Clone</code> と <code>PartialEq</code> を自動実装している。
