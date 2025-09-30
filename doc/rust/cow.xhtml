@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Cow</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<a href="https://doc.rust-lang.org/std/borrow/enum.Cow.html"><code>Cow</code></a> 型 (clone-on-write の略) について。
+		</p> 
+		<section>
+			<h1>概要</h1>
+			<p>
+以下の特徴を持つスマートポインタ。
+			</p>
+			<ul>
+				<li>
+					<p>
+列挙体で参照方式 (<a href="https://doc.rust-lang.org/std/borrow/enum.Cow.html#variant.Borrowed"><code>Borrowed</code></a>) と所有方式 (<a href="https://doc.rust-lang.org/std/borrow/enum.Cow.html#variant.Owned"><code>Owned</code></a>) の二つの形態がある。
+					</p>
+				</li> <li>
+					<p>
+書込処理は <a href="https://doc.rust-lang.org/std/borrow/enum.Cow.html#method.to_mut"><code>to_mut</code></a> メソッドで所有方式 (<code>Owned</code>) にしてから実施する。
+					</p>
+				</li>
+			</ul>
+			<p>
+※ 参照方式 (<code>Borrowed</code>) で <code>to_mut</code> が呼ばれると、参照先がクローンされて所有される。
+			</p>
+			<section>
+				<h2>よくある用法</h2>
+				<p>
+既定値なら参照で共有し、カスタム値に変化した場合にだけ所有にする。
+				</p> <p>
+既定値を参照するデータが多い場合、これは大量のメモリの節約になる。
+				</p>
+			</section>
+		</section> <section>
+			<hgroup>
+				<h1>サンプル 1</h1>
+				<div class="subTitle">動作の確認</div>
+			</hgroup>
+			<p>
+以下では、参照と所有の二つの形態それぞれで、読込と書込を実施している。
+			</p>
+<pre><code class="language-rust">
+use std::borrow::Cow;
+
+fn main() {
+    let mut cow1 = Cow::&lt;i32&gt;::Borrowed(&amp;42);
+    let mut cow2 = Cow::&lt;i32&gt;::Owned(42);
+
+    assert_eq!(*cow1, 42);
+    assert_eq!(*cow2, 42);
+
+    *Cow::to_mut(&amp;mut cow1) += 1;
+    *Cow::to_mut(&amp;mut cow2) += 1;
+
+    assert_eq!(*cow1, 43);
+    assert_eq!(*cow2, 43);
+}
+</code></pre>
+		</section> <section>
+			<hgroup>
+				<h1>サンプル 2</h1>
+				<div class="subTitle">よくある用法</div>
+			</hgroup>
+			<p>
+以下では、<code>text0</code> と <code>text1</code> は既定値を共有して参照している。<br/>
+そして、<code>text2</code> と <code>text3</code> はそれぞれ独自の値を所有している。
+			</p>
+<pre><code class="language-rust">
+use std::borrow::Cow;
+
+fn main() {
+    let text0 = &amp;mut TextHolder::new();
+    let text1 = &amp;mut TextHolder::new();
+    let text2 = &amp;mut TextHolder::new();
+    let text3 = &amp;mut TextHolder::new();
+
+    text2.add_em();
+    text3.set_custom("Custom text");
+
+    assert_eq!(text0.get(), text1.get());
+    assert_eq!(text2.get(), "Default text!");
+    assert_eq!(text3.get(), "Custom text");
+}
+
+struct TextHolder(Cow&lt;'static, str&gt;);
+
+impl TextHolder {
+    fn new() -&gt; Self {
+        static TEXT: &amp;str = "Default text";
+        Self(Cow::Borrowed(TEXT))
+    }
+
+    fn get(&amp;self) -&gt; &amp;str {
+        &amp;*self.0
+    }
+
+    fn add_em(&amp;mut self) {
+        Cow::to_mut(&amp;mut self.0).push_str("!");
+    }
+
+    fn set_custom(&amp;mut self, value: &amp;str) {
+        self.0 = Cow::Owned(value.to_string());
+    }
+}
+</code></pre>
+		</section>
+	</body>
+</html>
