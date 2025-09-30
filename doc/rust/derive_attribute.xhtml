@@ -199,7 +199,7 @@ impl std::fmt::Debug for Point {
 			</p> <p>
 ただしこの場合、型パラメタを対象のトレイトで境界づけるトレイトが多い。
 			</p> <p>
-つまり、<code>#[derive(SomeTrait)] SomeType&lt;T&gt;</code> からは導出される実装は、<code>T: SomeTrait</code> の制限を含む場合が多く、この制限が妥当でない限り <code>derive</code> 属性は使えない。
+つまり、<code>#[derive(SomeTrait)] SomeType&lt;T&gt;</code> から導出される実装は、<code>T: SomeTrait</code> の制限を含む場合が多く、この制限が妥当でない限り <code>derive</code> 属性は使えない。
 			</p>
 			<section>
 				<h2>関連エラー</h2>
