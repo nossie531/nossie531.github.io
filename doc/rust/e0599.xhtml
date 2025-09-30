@@ -57,8 +57,8 @@ struct MyValue();
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1>パターン B</h1>
-					<div class="subTitle">境界への不適合</div>
+					<h1>パターン B1</h1>
+					<div class="subTitle">境界への不適合 (通常版)</div>
 				</hgroup>
 				<p>
 呼び出そうとしたメソッドは型にあるが、境界に適合しないパターン。
@@ -100,6 +100,60 @@ impl&lt;T: UpperHex&gt; MyValue&lt;T&gt; {
 <mark class="info">  |</mark>         <mark class="edit">^^^^^^^^</mark>  <mark class="info">----------</mark>
 <mark class="info">  |</mark>         <mark class="edit">|</mark>
 <mark class="info">  |</mark>         <mark class="edit">unsatisfied trait bound introduced here</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup id="deriveAttribute">
+					<h1>パターン B2</h1>
+					<div class="subTitle">境界への不適合 (<code>derive</code> 属性版)</div>
+				</hgroup>
+				<p>
+呼び出そうとしたメソッドは型にあるが、そのメソッドが <code>derive</code> 属性により導入されたトレイトのメソッドで、その境界に適合しないパターン。
+				</p> <p>
+『<a href="derive_attribute.xhtml">derive 属性</a> - <a href="derive_attribute.xhtml#typeParam">型パラメタの影響</a>』で紹介する通り、<code>derive</code> 属性は型パラメタについての境界を導入する場合が多い。この境界に違反するとエラーになる。なお、下記のサンプルではエラーメッセージがその境界 <code>T: Default</code> について指摘しているが、ソース中に該当箇所が存在しない。そのため、混乱しやすい。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>MyVec&lt;T&gt;</code> の <code>Deault</code> の実装は <code>derive</code> 属性に由来するため、<code>T: Default</code> の境界を持つ。しかし、<code>MyVec::&lt;T&gt;::default()</code> における <code>T</code> は <code>Clone</code> しか実装していない。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let values = values(1, 3);
+    assert_eq!(values.0, vec![1, 1, 1]);
+}
+
+fn values&lt;T: Clone&gt;(value: T, len: usize) -&gt; MyVec&lt;T&gt; {
+    let mut ret = MyVec::&lt;T&gt;::<mark class="error">default</mark>();
+    for _ in 0..len {
+        ret.0.push(value.clone());
+    }
+
+    ret
+}
+
+#[derive(Default, Clone, PartialEq)]
+struct MyVec&lt;T&gt;(Vec&lt;T&gt;);
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: the function or associated item `default` exists for struct `MyVec&lt;T&gt;`, but its trait bounds were not satisfied</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:7:31
+<mark class="info">   |</mark>
+<mark class="info"> 7 |</mark>     let mut ret = MyVec::&lt;T&gt;::default();
+<mark class="info">   |</mark>                               <mark class="error">^^^^^^^ function or associated item cannot be called on `MyVec&lt;T&gt;` due to unsatisfied trait bounds</mark>
+<mark class="info">...</mark>
+<mark class="info">16 |</mark> struct MyVec&lt;T&gt;(Vec&lt;T&gt;);
+<mark class="info">   |</mark> <mark class="info">--------------- function or associated item `default` not found for this struct because it doesn't satisfy `MyVec&lt;T&gt;: Default`</mark>
+<mark class="info">   |</mark>
+<mark class="edit">note</mark>: trait bound `T: Default` was not satisfied
+<mark class="info">  --&gt;</mark> src\main.rs:15:10
+<mark class="info">   |</mark> 
+<mark class="info">15 |</mark> #[derive(Default, Clone, PartialEq)]
+<mark class="info">   |</mark>          <mark class="edit">^^^^^^^ unsatisfied trait bound introduced in this `derive` macro</mark>
+<mark class="info">help</mark>: consider restricting the type parameter to satisfy the trait bound
+<mark class="info">   |</mark>
+<mark class="info"> 6 |</mark> fn values&lt;T: Clone&gt;(value: T, len: usize) -&gt; MyVec&lt;T&gt; <mark class="edit">where T: Default</mark> {
+<mark class="info">   |</mark>                                                       <mark class="edit">++++++++++++++++</mark>
 </samp></pre>
 				</section>
 			</section> <section>
