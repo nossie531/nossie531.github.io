@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: ManuallyDrop</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<a href="https://doc.rust-lang.org/std/mem/struct.ManuallyDrop.html"><code>ManuallyDrop</code></a> 型について。
+		</p> 
+		<section>
+			<h1>概要</h1>
+			<p>
+ドロップ時のデストラクタの呼出を抑制するラッパー。
+			</p>
+			<section>
+				<h2>よくある用法</h2>
+				<p>
+型のドロップ時、各フィールドのデストラクタは既定ではフィールドの宣言順で実行される。ここで、各フィールドを <code>ManuallyDrop</code> 型でラップして、<code>Drop::drop</code> メソッドをオーバーライドすれば、その順序が制御できるようになる。
+				</p>
+			</section> <section>
+				<h2><code>forget</code> との違い</h2>
+				<p>
+ドロップ時のデストラクタの抑制と言えば、<a href="https://doc.rust-lang.org/std/mem/fn.forget.html"><code>forget</code></a> 関数が連想される。
+				</p> <p>
+ただし、<code>forget</code> 関数は引数を消費しつつ、デストラクタは実行しない動作をする。
+				</p> <p>
+一方で、<code>ManuallyDrop</code> 型はラップ対象のデストラクタを抑制するだけで、必要ならばデストラクタを手動で実行できる。また、ラップ対象の消費もその後で独立して行える。
+				</p>
+			</section>
+		</section> <section>
+			<hgroup>
+				<h1>サンプル 1</h1>
+				<div class="subTitle">動作の確認</div>
+			</hgroup>
+			<p>
+以下では、単純にデストラクタの動作を抑制している。
+			</p>
+<pre><code class="language-rust">
+use std::mem::ManuallyDrop;
+
+fn main() {
+    let dropped = &amp;mut false;
+    let var = ManuallyDrop::new(Var::new(42, dropped));
+    assert_eq!(var.value, 42);
+
+    consume(var);
+    
+    assert_eq!(*dropped, false);
+}
+
+fn consume&lt;T&gt;(_x: T) {
+    // nop.
+}
+
+struct Var&lt;'a, T&gt; {
+    value: T,
+    dropped: &amp;'a mut bool,
+}
+
+impl&lt;'a, T&gt; Var&lt;'a, T&gt; {
+    pub fn new(value: T, dropped: &amp;'a mut bool) -&gt; Self {
+        Self { value, dropped }
+    }
+}
+
+impl&lt;T&gt; Drop for Var&lt;'_, T&gt; {
+    fn drop(&amp;mut self) {
+        *self.dropped = true;
+    }
+}
+</code></pre>
+		</section> <section>
+			<hgroup>
+				<h1>サンプル 2</h1>
+				<div class="subTitle">よくある用法</div>
+			</hgroup>
+			<p>
+以下では、<code>MyType</code> 型のドロップ手順を変更している。
+			</p>
+			<figure class="file">
+				<figcaption>main.rs</figcaption>
+<pre><code class="language-rust">
+mod util;
+use std::mem::ManuallyDrop;
+use util::*;
+
+fn main() {
+    let logger = Logger::new();
+    let var = MyType::new(logger.clone());
+    drop(var);
+    assert_eq!(&amp;logger.logs()[0], "[2] is dropped.");
+    assert_eq!(&amp;logger.logs()[1], "[0] is dropped.");
+}
+
+#[allow(dead_code)]
+struct MyType {
+    f0: ManuallyDrop&lt;Val&lt;i32&gt;&gt;,
+    f1: ManuallyDrop&lt;Val&lt;i32&gt;&gt;,
+    f2: ManuallyDrop&lt;Val&lt;i32&gt;&gt;,
+}
+
+impl MyType {
+    pub fn new(logger: Logger) -&gt; Self {
+        Self {
+            f0: ManuallyDrop::new(Val::new(0, logger.clone())),
+            f1: ManuallyDrop::new(Val::new(1, logger.clone())),
+            f2: ManuallyDrop::new(Val::new(2, logger.clone())),
+        }
+    }
+}
+
+impl Drop for MyType {
+    fn drop(&amp;mut self) {
+        unsafe { ManuallyDrop::drop(&amp;mut self.f2) }
+        unsafe { ManuallyDrop::drop(&amp;mut self.f0) }
+    }
+}
+</code></pre>
+			</figure>
+			<figure class="file">
+				<figcaption>util.rs</figcaption>
+<pre><code class="language-rust">
+use std::fmt::Display;
+use std::rc::Rc;
+use std::cell::{Ref, RefCell};
+
+pub struct Val&lt;T: Display&gt; {
+    value: T,
+    logger: Logger,
+}
+
+impl&lt;T: Display&gt; Val&lt;T&gt; {
+    pub fn new(value: T, logger: Logger) -&gt; Self {
+        Self { value, logger }
+    }
+}
+
+impl&lt;T: Display&gt; Drop for Val&lt;T&gt; {
+    fn drop(&amp;mut self) {
+        let log = format!("[{}] is dropped.", self.value);
+        self.logger.log(&amp;log);
+    }
+}
+
+#[derive(Clone)]
+pub struct Logger(Rc&lt;RefCell&lt;Vec&lt;String&gt;&gt;&gt;);
+
+impl Logger {
+    pub fn new() -&gt; Self {
+        Self(Rc::new(RefCell::new(Vec::new())))
+    }
+
+    pub fn logs(&amp;self) -&gt; Ref&lt;'_, Vec&lt;String&gt;&gt; {
+        self.0.borrow()
+    }
+
+    pub fn log(&amp;self, text: &amp;str) {
+        self.0.borrow_mut().push(text.to_string());
+    }
+}
+</code></pre>
+			</figure>
+		</section>
+	</body>
+</html>
