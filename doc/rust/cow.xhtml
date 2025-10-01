@@ -87,7 +87,8 @@ fn main() {
     text2.add_em();
     text3.set_custom("Custom text");
 
-    assert_eq!(text0.get(), text1.get());
+    assert_eq!(text0.get(), "Default text");
+    assert_eq!(text1.get(), "Default text");
     assert_eq!(text2.get(), "Default text!");
     assert_eq!(text3.get(), "Custom text");
 }
