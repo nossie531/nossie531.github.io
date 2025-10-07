@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: error - const や static における型推論</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: missing type for `const` item</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: missing type for `static` item</mark>
+</samp></pre>
+		<p>
+<code>const</code> または <code>static</code> のアイテムで型推論を使おうとした。
+		</p>
+		<section>
+			<h1>原因</h1>
+			<p>
+『<a href="no_type_inference.xhtml">型推論の未対応箇所</a>』によると、<code>const</code> や <code>static</code> のアイテムでは型推論が使えない。
+			</p> <p>
+そのため、型を指定しないとエラーになる。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+<pre><code class="language-rust">
+pub const <mark class="error">VAL</mark> = 1_i32;
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: missing type for `const` item</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:1:14
+<mark class="info">  |</mark>
+<mark class="info">1 |</mark> pub const VAL = 1_i32;
+<mark class="info">  |</mark>              <mark class="error">^</mark> <mark class="info">help: provide a type for the constant: `: i32`</mark>
+</samp></pre>
+		</section> <section>
+			<h1>解決策</h1>
+			<p>
+以下のように型を明示するとよい。
+			</p>
+<pre><code class="language-rust">
+pub const VAL: i32 = 1_i32;
+</code></pre>
+		</section>
+	</body>
+</html>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0121 - 型推論の未対応箇所での '_' の使用</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0121]</mark><mark class="title">: the placeholder `_` is not allowed within types on item signatures for return types</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0121]</mark><mark class="title">: the placeholder `_` is not allowed within types on item signatures for constants</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0121]</mark><mark class="title">: the placeholder `_` is not allowed within types on item signatures for static variables</mark>
+</samp></pre>
+		<p>
+型推論の未対応箇所で '<code>_</code>' を使おうとした。
+		</p>
+		<section>
+			<h1>原因</h1>
+			<p>
+『<a href="no_type_inference.xhtml">型推論の未対応箇所</a>』では型推論の未対応箇所を紹介している。
+			</p> <p>
+それらの箇所で '<code>_</code>' を使ってしまうとエラーになる。
+			</p>
+		</section> <section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">関数の返値型での型推論</div>
+				</hgroup>
+				<p>
+関数の返値型において、'<code>_</code>' で型推論しようとした。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、'<code>_</code>' で関数 <code>func</code> の返値型を型推論している。
+					</p>
+<pre><code class="language-rust">
+fn func() -&gt; <mark class="error">_</mark> {
+    true
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0121]</mark><mark class="title">: the placeholder `_` is not allowed within types on item signatures for return types</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:1:14
+<mark class="info">  |</mark>
+<mark class="info">1 |</mark> fn func() -&gt; _ {
+<mark class="info">  |</mark>              <mark class="error">^</mark>
+<mark class="info">  |</mark>              <mark class="error">|</mark>
+<mark class="info">  |</mark>              <mark class="error">not allowed in type signatures</mark>
+<mark class="info">  |</mark>              <mark class="error">help: replace with the correct return type: `bool`</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+以下のように型を明示するとよい。
+					</p>
+<pre><code class="language-rust">
+fn func() -&gt; bool {
+    true
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B1</h1>
+					<div class="subTitle"><code>const</code> や <code>static</code> での型推論 (通常型)</div>
+				</hgroup>
+				<p>
+<code>const</code> または <code>static</code> のアイテムにおいて、'<code>_</code>' で通常の型を型推論しようとした。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、'<code>_</code>' で型 <code>Option&lt;T&gt;</code> の型パラメタ <code>T</code> を型推論している。
+					</p>
+<pre><code class="language-rust">
+pub static OPT: Option&lt;<mark class="error">_</mark>&gt; = Some(false);
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0121]</mark><mark class="title">: the placeholder `_` is not allowed within types on item signatures for static variables</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:1:24
+<mark class="info">  |</mark>
+<mark class="info">1 |</mark> pub static OPT: Option&lt;_&gt; = Some(false);
+<mark class="info">  |</mark>                        <mark class="error">^ not allowed in type signatures</mark>
+<mark class="info">  |</mark>
+<mark class="info">help</mark>: replace this with a fully-specified type
+<mark class="info">  |</mark>
+<mark class="info">1</mark> <mark class="error">-</mark> pub static OPT: <mark class="error">Option&lt;_&gt;</mark> = Some(false);
+<mark class="info">1</mark> <mark class="edit">+</mark> pub static OPT: <mark class="edit">Option&lt;bool&gt;</mark> = Some(false);
+<mark class="info">  |</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+以下のように型を明示するとよい。
+					</p>
+<pre><code class="language-rust">
+pub static OPT: Option&lt;bool&gt; = Some(false);
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup id="arrayLen">
+					<h1>パターン B2</h1>
+					<div class="subTitle"><code>const</code> や <code>static</code> での型推論 (要素数)</div>
+				</hgroup>
+				<p>
+<code>const</code> または <code>static</code> のアイテムにおいて、'<code>_</code>' で配列の要素数を型推論しようとした。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、'<code>_</code>' で型 <code>[bool; N]</code> の型パラメタ <code>N</code> を型推論している。
+					</p>
+<pre><code class="language-rust">
+pub const ARR: [bool; <mark class="error">_</mark>] = [false, false, true];
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0121]</mark><mark class="title">: the placeholder `_` is not allowed within types on item signatures for constants</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:1:23
+<mark class="info">  |</mark>
+<mark class="info">1 |</mark> pub const ARR: [bool; _] = [false, false, true];
+<mark class="info">  |</mark>                       <mark class="error">^ not allowed in type signatures</mark>
+<mark class="info">  |</mark>
+<mark class="info">help</mark>: replace this with a fully-specified type
+<mark class="info">  |</mark>
+<mark class="info">1</mark> <mark class="error">-</mark> pub const ARR: <mark class="error">[bool; _]</mark> = [false, false, true];
+<mark class="info">1</mark> <mark class="edit">+</mark> pub const ARR: <mark class="edit">[bool; 3]</mark> = [false, false, true];
+<mark class="info">  |</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+以下のように要素数を明示するとよい。
+					</p>
+<pre><code class="language-rust">
+pub static ARR: [bool; 3] = [false, false, true];
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>

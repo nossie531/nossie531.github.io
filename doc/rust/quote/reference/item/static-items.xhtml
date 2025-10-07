@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../../../../style/import/prism.css"/>
+		<script src="../../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-06-14" cite="https://doc.rust-lang.org/1.63.0/reference/items/static-items.html">
+			<h1 id="static-items">
+<a class="header" href="#static-items">静的アイテム</a>
+			</h1>
+			<blockquote>
+				<p>
+<strong><sup>Syntax</sup></strong><br/>
+<em>StaticItem</em> :<br/>
+&#xA0;&#xA0; <code>static</code> <code>mut</code><sup>?</sup> <a href="../identifiers.html">IDENTIFIER</a> <code>:</code> <a href="../types.html#type-expressions"><em>Type</em></a>
+( <code class="hljs">=</code> <a href="../expressions.html"><em>Expression</em></a> )<sup>?</sup> <code>;</code>
+				</p>
+			</blockquote>
+			<p>
+<em>静的アイテム</em> は<a href="constant-items.html">定数</a>と似ているが、プログラム内の明確なメモリ位置を表す。静的値への全ての参照は同じメモリの位置を指す。静的アイテムは <code>static</code> ライフタイムを持ち、それは Rust プログラム内の全ての他のライフタイムより長生きする。静的アイテムはプログラム終了時に <a href="../destructors.html"><code>drop</code></a> を呼ばない。
+			</p> <p>
+静的な初期化子はコンパイル時に評価される<a href="../const_eval.html#constant-expressions">定数式</a>になる。静的な初期化子は他の静的値を参照するかもしれない。
+			</p> <p>
+<a href="../interior-mutability.html">内部可変</a>でない型を含んだ <code>mut</code> でない静的アイテムは、読取専用メモリに配置されるかもしれない。
+			</p> <p>
+静的値への全てのアクセスは安全だが、静的値には幾つかの制限がある:
+			</p>
+			<ul>
+				<li>
+型はスレッドセーフなアクセスが可能になるように <code>Sync</code> トレイト境界を持たなければならない。
+				</li> <li>
+定数は静的アイテムを参照できない。
+				</li>
+			</ul>
+			<p>
+初期化式は<a href="external-blocks.html">外部ブロック</a>内では省略しなければならず、独立した静的アイテムには提供されなければならない。
+			</p>
+			<hr class="omit"/>
+		</blockquote>
+	</body>
+</html>
+

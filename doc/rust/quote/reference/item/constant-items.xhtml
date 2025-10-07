@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../../../../style/import/prism.css"/>
+		<script src="../../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-06-27" cite="https://doc.rust-lang.org/1.63.0/reference/items/constant-items.html">
+			<h1 id="constant-items">
+				<a class="header" href="#constant-items">定数アイテム</a>
+			</h1>
+			<blockquote>
+				<p>
+<strong><sup>Syntax</sup></strong><br/>
+<em>ConstantItem</em> :<br/>
+&#xA0;&#xA0; <code>const</code> ( <a href="../identifiers.html">IDENTIFIER</a> | <code>_</code> ) <code>:</code> <a href="../types.html#type-expressions"><em>Type</em></a> ( <code>=</code> <a href="../expressions.html"><em>Expression</em></a> )<sup>?</sup> <code>;</code>
+				</p>
+			</blockquote>
+			<p>
+<em>定数アイテム</em>はプログラム中の特定のメモリ位置と関連しない、命名可能な<em><a href="../const_eval.html#constant-expressions">定数値</a></em>である。定数は基本的にどこで使用されてもインライン化、つまり使用時に関連する文脈へと直接にコピーされる。これには外部クレートからの定数や、<a href="../special-types-and-traits.html#copy"><code>Copy</code></a> でない型の使用も含む。同じ定数への参照は必ずしも同じメモリアドレスへの参照を保証しない。
+			</p> <p>
+定数は明示的に型付けされなければならない。その型は <code>'static</code> ライフタイムを持たなければならない: 初期化子中のあらゆる参照は <code>'static</code> ライフタイムを持たなければならない。
+			</p> <p>
+定数は他の定数のアドレスを参照するかもしれず、その場合そのアドレスは適用可能な箇所に省略されたライフタイムを持つ、その他 - 殆どの場合で - 既定の <code>static</code> ライフタイムになる。(<a href="../lifetime-elision.html#static-lifetime-elision">静的ライフタイムの省略</a>を参照。) ただし、コンパイラは定数を何度も勝手に変換できる規則のため、アドレスの参照先は一定しないかもしれない。
+			</p>
+<pre><code class="language-rust">const BIT1: u32 = 1 &lt;&lt; 0;
+const BIT2: u32 = 1 &lt;&lt; 1;
+
+const BITS: [u32; 2] = [BIT1, BIT2];
+const STRING: &amp;'static str = &quot;bitstring&quot;;
+
+struct BitsNStrings&lt;'a&gt; {
+    mybits: [u32; 2],
+    mystring: &amp;'a str,
+}
+
+const BITS_N_STRINGS: BitsNStrings&lt;'static&gt; = BitsNStrings {
+    mybits: BITS,
+    mystring: STRING,
+};
+</code></pre>
+			<p>
+定数式は<a href="traits.html">トレイトの定義</a>でのみ省略できる。
+			</p>
+			<hr class="omit"/>
+		</blockquote>
+	</body>
+</html>
+

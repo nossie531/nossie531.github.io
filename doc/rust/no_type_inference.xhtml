@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 型推論の未対応箇所</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+型推論の未対応箇所について。
+		</p>
+		<section>
+			<h1>関連エラー</h1>
+			<p>
+以下のエラーはこの問題に関連している。
+			</p>
+			<ul>
+				<li>
+<a href="e_global_type_inference.xhtml">[error] const や static における型推論</a>
+				</li> <li>
+<a href="e0121.xhtml">[E0121] 型推論の未対応箇所での '_' の使用</a>
+				</li>
+			</ul>
+		</section> <section>
+			<h1>関数の返値型</h1>
+			<p>
+関数の返値型は型推論できない。
+			</p> <p>
+これは <time>2025 年現在</time>の他の多くの言語と同じである。<br/>
+(一部の言語、Haskell や ML では関数の内容から返値型を推論できる。)
+			</p>
+		</section> <section>
+			<h1>const と static</h1>
+			<p>
+<code>const</code> または <code>static</code> のアイテムは型推論が効かない。
+			</p> <p>
+これは設計思想を反映しての仕様らしい。
+			</p> <p>
+<time>2025 年現在</time>、この仕様には賛否両論がある。
+			</p>
+			<aside class="normal moan">
+				<p>
+個人的な感想。
+				</p> <p>
+筆者としては現在の設計思想におおむね満足している。ただ、配列の要素数の手動での指定が必要になる<a href="e0121.xhtml#arrayLen">問題</a>だけは、何とかしてほしいと思う。
+				</p>
+			</aside>
+			<section>
+				<h2>現在の設計思想</h2>
+				<p>
+Rust を含めた多くの言語、Java や C# などでは型推論はローカルな文脈にのみ適用され、グローバルなアイテムでは型の明示が必要になる (Haskell や ML で関数の返値型まで推論できる理由の一つはこの制限がないためでもある)。
+				</p>
+			</section> <section>
+				<h2>改革派の動向</h2>
+				<p>
+<code>const</code> や <code>static</code> の文脈にも型推論を適用可能にする RFC が<a href="https://github.com/rust-lang/rfcs/pull/3546">提案</a>されている。
+				</p> <p>
+ただし、これは少なくともすぐに承認されるような流れではない。
+				</p>
+			</section> <section>
+				<h2> <code>const</code> の仕様</h2>
+<doc-quote src="quote/reference/item/constant-items.xhtml"/>
+			</section> <section>
+				<h2> <code>static</code> の仕様</h2>
+<doc-quote src="quote/reference/item/static-items.xhtml"/>
+			</section>
+		</section>
+	</body>
+</html>
