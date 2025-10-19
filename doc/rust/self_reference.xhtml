@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 自己参照型</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+自己参照型の作成方法について。
+		</p> 
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+Rust の自己参照型には独特の作法があり、周辺知識が必須となる。
+			</p>
+		</aside>
+		<section>
+			<h1>背景情報</h1>
+			<p>
+自己参照型では自身のフィールドが自身の他のフィールドを参照する。
+			</p> 
+			<section>
+				<h2>自己参照型の利点</h2>
+				<p>
+コードがシンプルになる事がある。
+				</p> <p>
+例えば、親型と子型とがあり、子型から親型が参照される場合、それらをまとめた自己参照型が作れる。これがあると、親型と子型をまとめて作成して持ちまわれる。一方、これができないと、まず親型の値から作成して配置、次にそれを参照する子型の値を作成、そして両者それぞれを持ちまわる必要がある。
+				</p> 
+			</section> <section>
+				<h2>自己参照型の欠点</h2>
+				<p>
+値が移動されると自身への参照が壊れる。
+				</p> <p>
+なお、値の移動は GC のない言語では日常である (GC があれば自由に参照を増やせるため、値の移動そのものが不要になる)。そのため、GC のない言語では自己参照型はあまり使われない。特に Rust では、参照が壊れるのを予防するために、アンセーフなしでは自己参照型を作れなくなっている。
+				</p>
+			</section>
+		</section> <section>
+			<h1>実現方法</h1>
+			<p>
+以下の型を使用する。
+			</p>
+			<dl class="normal">
+				<dt><a href="https://doc.rust-lang.org/std/pin/struct.Pin.html"><code>Pin</code></a></dt>
+				<dd>
+					<p>
+ラップ対象の移動を制限する型 (対象が <code>Unpin</code> を実装すれば移動可)。
+					</p>
+				</dd>
+				<dt><a href="https://doc.rust-lang.org/std/marker/trait.Unpin.html"><code>Unpin</code></a></dt>
+				<dd>
+					<p>
+ほとんどの型で自動実装されるトレイト。
+					</p>
+				</dd>
+				<dt><a href="https://doc.rust-lang.org/std/marker/struct.PhantomPinned.html"><code>PhantomPinned</code></a></dt>
+				<dd>
+					<p>
+自動実装される <code>Unpin</code> を解除するマーカー型。
+					</p>
+				</dd>
+			</dl>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では <code>ChildWithParent </code> 型が自己参照型になっている。
+			</p>
+<pre><code class="language-rust">
+use std::{marker::PhantomPinned, pin::Pin};
+
+fn main() {
+    let cwp = child_with_parent();
+    assert_eq!(cwp.child().name, "ME");
+    assert_eq!(cwp.child().parent.name, "MAMA");
+}
+
+fn child_with_parent() -&gt; Pin&lt;Box&lt;ChildWithParent&gt;&gt; {
+    let parent = Parent { name: "MAMA" };
+    ChildWithParent::new(parent, "ME")
+}
+
+struct Parent {
+    name: &amp;'static str,
+}
+
+struct Child&lt;'a&gt; {
+    name: &amp;'static str,
+    parent: &amp;'a Parent,
+}
+
+struct ChildWithParent {
+    child: Option&lt;Child&lt;'static&gt;&gt;,
+    _parent: Parent,
+    _pp: PhantomPinned,
+}
+
+impl ChildWithParent {
+    pub fn new(parent: Parent, name: &amp;'static str) -&gt; Pin&lt;Box&lt;Self&gt;&gt; {
+        let mut ret = Box::pin(Self {
+            child: None,
+            _parent: parent,
+            _pp: PhantomPinned,
+        });
+
+        let parent_ref = unsafe { &amp;*(&amp;ret._parent as *const _) };
+        let child = Child { name, parent: parent_ref };
+
+        unsafe {
+            ret.as_mut().get_unchecked_mut().child = Some(child);
+        }
+
+        ret
+    }
+
+    pub fn child(&amp;self) -&gt; &amp;Child&lt;'_&gt; {
+        self.child.as_ref().unwrap()
+    }
+}
+</code></pre>
+		</section>
+	</body>
+</html>
