@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: 内部可変性のある型</title>
+		<title>Rust メモ: 内部可変型</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -14,16 +14,16 @@
 		<section>
 			<h1>基礎知識</h1>
 			<p>
-内部可変性のある型は、可変と指定されていなくても、特例として値を変更できる。
+内部可変型は、可変と指定されていなくても、特例として値を変更できる。
 			</p> <p>
 これは例えば、不変参照により共有される値の更新などで必要となる。
 			</p> <p>
-ただし、内部可変性を乱用するとコードが読みにくくなるので注意が必要。
+ただし、この機能を乱用するとコードが読みにくくなるので注意が必要。
 			</p>
 		</section> <section>
 			<h1>標準の型</h1>
 			<p>
-標準で提供される内部可変性のある型について。
+標準で提供される内部可変型について。
 			</p>
 			<section>
 				<h2 id="UnsafeCell"><code>UnsafeCell</code></h2>
@@ -33,7 +33,7 @@
 			</section> <section>
 				<h2><code>UnsafeCell</code> 以外</h2>
 				<p>
-<a href="#UnsafeCell"><code>UnsafeCell</code></a> をそのまま使うのは、あまりお勧めできない。なぜなら、内部可変性は普段なら Rust が保証してくれる読込と書込の排他性、それから書込と書込の排他性を失わせる。そのため、バグを書きやすくなる。一方、<a href="#UnsafeCell"><code>UnsafeCell</code></a> を利用して実装された他の標準の型では、そうした問題をうまく回避できる理論的背景がある場合が多い。そのため、可能な限りそちらを採用した方がよい。
+<a href="#UnsafeCell"><code>UnsafeCell</code></a> をそのまま使うのは、あまりお勧めできない。なぜなら、内部可変型は普段なら Rust が保証してくれる読込と書込の排他性、それから書込と書込の排他性を失わせる。そのため、バグを書きやすくなる。一方、<a href="#UnsafeCell"><code>UnsafeCell</code></a> を利用して実装された他の標準の型では、そうした問題をうまく回避できる理論的背景がある場合が多い。そのため、可能な限りそちらを採用した方がよい。
 				</p>
 			</section> <section>
 				<h2>代表的な型の一覧</h2>

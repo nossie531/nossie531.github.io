@@ -154,9 +154,9 @@ struct Data {
 しかし、この代案は以下のレアケースの考慮が漏れている。
 					</p>
 				</section> <section>
-					<h2>内部可変性による裏事情</h2>
+					<h2>内部可変型の裏事情</h2>
 					<p>
-内部可変型には <code>get_mut</code>, <code>from_mut</code> 関数を持つものがある。これらは、内部可変型と可変参照型とを相互変換できる (参考:『<a href="interior_mutability_xxx_mut.xhtml">内部可変性と get_mut, from_mut 系の関数</a>』)。
+内部可変型には <code>get_mut</code>, <code>from_mut</code> 関数を持つものがある。これらは、内部可変型と可変参照型とを相互変換できる (参考:『<a href="interior_mutability_xxx_mut.xhtml">内部可変型における get_mut, from_mut 系の関数</a>』)。
 					</p> <p>
 この変換において、変換先を得る代わりに、変換元への操作は全て禁止しなければならない。そうしないと、変換元か変換先のどちらかは内部可変型への参照型のため、一方からの読取と他方からの書込がともに許される区間ができてしまう。
 					</p> <p>

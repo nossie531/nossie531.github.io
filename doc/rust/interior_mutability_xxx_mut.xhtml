@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: 内部可変性と get_mut, from_mut 系の関数</title>
+		<title>Rust メモ: 内部可変型における get_mut, from_mut 系の関数</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<link rel="stylesheet" href="style/interior_mutability_xxx_mut.css"/>
 		<script src="../../lib/doc.js"></script>
@@ -13,12 +13,12 @@
 			<h1><doc-title/></h1>
 		</header>
 		<p>
-内部可変性のある型の <code>get_mut</code> 関数と <code>from_mut</code> 関数について。
+内部可変型の <code>get_mut</code> 関数と <code>from_mut</code> 関数について。
 		</p>
 		<section>
 			<h1>基礎知識</h1>
 			<p>
-『<a href="interior_mutability.xhtml">内部可変性のある型</a>』では、可変と指定されていなくても、特例として値を変更できる。
+『<a href="interior_mutability.xhtml">内部可変型</a>』では、可変と指定されていなくても、特例として値を変更できる。
 			</p> <p>
 しかし、これだと普段は Rust が保証してくれる読込と書込の排他性、それから書込と書込の排他性が保証されなくなってしまう。そのため、それらの型では独自のルールで別途それらの排他性を保証している場合が多い。例えば、<a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html"><code>RefCell</code></a> 型ではその内部値へのアクセス前に、競合する操作を他で実行中でないか、動的に確認するようになっている。
 			</p>
@@ -27,9 +27,9 @@
 <code>get_mut</code> 関数
 			</h1>
 			<p>
-上記のように、内部可変性のある型では、各操作の排他性の保証のために独自のルールを持つものが多い。しかし、内部可変性のある型への可変参照がある場合、もはやそのルールに従わなくてもよい。なぜなら、可変参照は参照先の専有を意味しているからである。
+上記のように、内部可変型は各操作の排他性の保証のために独自のルールを持つものが多い。しかし、内部可変型への可変参照がある場合は、もはやそのルールに従わなくてもよい。なぜなら、可変参照は参照先の専有を意味しているからである。
 			</p> <p>
-そのため、内部可変性のある型では、その可変参照からは値を自由に操作できるよう、<code>get_mut</code> という名称の関数がある場合が多く、そこから内部の値への可変参照が得られる。
+そのため、内部可変型では、その可変参照からは値を自由に操作できるよう、<code>get_mut</code> という名称の関数がある場合が多く、そこから内部の値への可変参照が得られる。
 			</p> <p>
 以下は <code>get_mut</code> 関数の代表例である。
 			</p>
