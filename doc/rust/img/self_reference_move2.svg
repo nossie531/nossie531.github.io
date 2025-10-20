@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 200">
+	<style> @import url("style/self_reference_move.css"); </style>
+	<defs>
+		<path id="err" d="M -3,-3 3,3 M3,-3 -3,3"/>
+		<path id="addr" d="M 0,0 h 40"/>
+		<rect id="mem" width="40" height="180"/>
+		<rect id="value" y="105" width="40" height="45"/>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M0,0 -4,2 -4,-2 Z"/>
+		</marker>
+	</defs>
+	<g transform="translate(40, 10)">
+		<path class="ref" d="M 40,142.5 h 20 a 5,5,0,0,0,5,-5 v -95 a 5,5,0,0,0,-5,-5 h -7"/>
+		<use href="#mem" class="fill"/>
+		<use href="#value" class="fill"/>
+		<use href="#addr" y="15"/>
+		<use href="#addr" y="30"/>
+		<use href="#addr" y="45"/>
+		<use href="#addr" y="60"/>
+		<use href="#addr" y="75"/>
+		<use href="#addr" y="90"/>
+		<use href="#addr" y="105"/>
+		<use href="#addr" y="120"/>
+		<use href="#addr" y="135"/>
+		<use href="#addr" y="150"/>
+		<use href="#addr" y="165"/>
+		<text class="code" x="-5" y="11" text-anchor="end">0000</text>
+		<text class="code" x="-5" y="26" text-anchor="end">0004</text>
+		<text class="code" x="-5" y="41" text-anchor="end">0008</text>
+		<text class="code" x="-5" y="56" text-anchor="end">000C</text>
+		<text class="code" x="-5" y="71" text-anchor="end">0010</text>
+		<text class="code" x="-5" y="86" text-anchor="end">0014</text>
+		<text class="code" x="-5" y="101" text-anchor="end">0018</text>
+		<text class="code" x="-5" y="116" text-anchor="end">001C</text>
+		<text class="code" x="-5" y="131" text-anchor="end">0020</text>
+		<text class="code" x="-5" y="146" text-anchor="end">0024</text>
+		<text class="code" x="-5" y="161" text-anchor="end">0028</text>
+		<text class="code" x="-5" y="176" text-anchor="end">002C</text>
+		<text class="data" x="20" y="116" text-anchor="middle">####</text>
+		<text class="data" x="20" y="131" text-anchor="middle">####</text>
+		<text class="data" x="20" y="146" text-anchor="middle">0008</text>
+		<use href="#mem" class="stroke"/>
+		<use href="#value" class="stroke"/>
+		<use href="#err" x="47" y="37.5"/>
+	</g>
+</svg>

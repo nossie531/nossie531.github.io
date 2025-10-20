@@ -1,0 +1,52 @@
+path#err {
+	fill: none;
+	stroke: red;
+	stroke-width: 2;
+}
+
+path.ref {
+	fill: none;
+	stroke: gray;
+	marker-end: url(#arrow);
+}
+
+path#addr {
+	stroke: silver;
+}
+
+marker#arrow > path {
+	fill: context-stroke;
+	stroke: context-stroke;
+	stroke-linejoin: round;
+}
+
+use[href="#mem"].fill {
+	fill: white;
+}
+
+use[href="#mem"].stroke {
+	fill: none;
+	stroke: black;
+}
+
+use[href="#value"].fill {
+	fill: #EEF;
+}
+
+use[href="#value"].stroke {
+	fill: none;
+	stroke: #00C;
+	stroke-width: 2;
+}
+
+text.code {
+	font-family: "Consolas", monospace;
+	font-size: 11px;
+	fill: gray;
+}
+
+text.data {
+	font-family: "Consolas", monospace;
+	font-size: 11px;
+	fill: rgba(0, 0, 0, 0.8);
+}

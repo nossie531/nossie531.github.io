@@ -36,8 +36,21 @@ Rust の自己参照型には独特の作法があり、周辺知識が必須と
 			</section> <section>
 				<h2>自己参照型の欠点</h2>
 				<p>
-値が移動されると自身への参照が壊れる。
+値の移動があると、内部の自己参照が壊れてしまう。
 				</p> <p>
+これは以下のようなメモリ配置を想像すると分かりやすい。
+				</p>
+				<div class="cmpFigure center">
+					<figure class="normal">
+						<iframe src="img/self_reference_move1.svg" style="width: 12rem; height: 20rem;"/>
+						<figcaption>移動前</figcaption>
+					</figure>
+					<figure class="normal">
+						<iframe src="img/self_reference_move2.svg" style="width: 12rem; height: 20rem;"/>
+						<figcaption>移動後</figcaption>
+					</figure>
+				</div>
+				<p>
 なお、値の移動は GC のない言語では日常である (GC があれば自由に参照を増やせるため、値の移動そのものが不要になる)。そのため、GC のない言語では自己参照型はあまり使われない。特に Rust では、参照が壊れるのを予防するために、アンセーフなしでは自己参照型を作れなくなっている。
 				</p>
 			</section>
@@ -47,22 +60,34 @@ Rust の自己参照型には独特の作法があり、周辺知識が必須と
 以下の型を使用する。
 			</p>
 			<dl class="normal">
-				<dt><a href="https://doc.rust-lang.org/std/pin/struct.Pin.html"><code>Pin</code></a></dt>
+				<dt>
+<a href="https://doc.rust-lang.org/std/marker/trait.Unpin.html"><code>Unpin</code></a>
+				</dt>
 				<dd>
 					<p>
-ラップ対象の移動を制限する型 (対象が <code>Unpin</code> を実装すれば移動可)。
+自動実装されるトレイト。
+					</p> <p>
+否自己参照型はこれを実装する。
 					</p>
 				</dd>
-				<dt><a href="https://doc.rust-lang.org/std/marker/trait.Unpin.html"><code>Unpin</code></a></dt>
+				<dt>
+<a href="https://doc.rust-lang.org/std/marker/struct.PhantomPinned.html"><code>PhantomPinned</code></a>
+				</dt>
 				<dd>
 					<p>
-ほとんどの型で自動実装されるトレイト。
+<code>Unpin</code> を解除するマーカー。
+					</p> <p>
+自己参照型はこのフィールドを所有する。
 					</p>
 				</dd>
-				<dt><a href="https://doc.rust-lang.org/std/marker/struct.PhantomPinned.html"><code>PhantomPinned</code></a></dt>
+				<dt>
+<a href="https://doc.rust-lang.org/std/pin/struct.Pin.html"><code>Pin</code></a>
+				</dt>
 				<dd>
 					<p>
-自動実装される <code>Unpin</code> を解除するマーカー型。
+ラップ対象の移動を制限するスマートポインタ。
+					</p> <p>
+対象が <code>Unpin</code> を持つ場合にのみ <code>DerefMut</code> が有効になる。
 					</p>
 				</dd>
 			</dl>
