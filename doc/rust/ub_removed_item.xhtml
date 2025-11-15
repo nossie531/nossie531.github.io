@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: UB - 削除済のアイテムの利用</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: attempting a write access using &lt;288&gt; at alloc124[0x0], but that tag does not exist in the borrow stack for this location</mark>
+</samp></pre>
+		<p>
+<a href="miri.xhtml">MIRI</a> においてスタックのアイテムが削除済だった場合のエラー。
+		</p>
+		<aside class="normal">
+			<p>MIRI のモデル</p>
+			<p>
+MIRI のエイリアシングモデルには <a href="miri.xhtml#sb">Stacked Borrows</a> と <a href="miri.xhtml#tb">Tree Borrows</a> があるが、ここでは 2025 年現在の既定である前者に基づいて解説する。
+			</p>
+		</aside>
+		<section>
+			<h1>検出方法</h1>
+			<section>
+				<h2>概要</h2>
+				<p>
+まず、ポインタ (参照や生ポインタ) の作成時にその参照先と参照元とを紐づける。そして、ポインタの利用時にはその紐づけが残っている事を確認する。ただし、各ポインタはその利用時に競合する紐づけがあると勝手にそれらを外してしまう。そのため、紐づけが外されたポインタを使うと UB となる。
+				</p>
+			</section> <section>
+				<h2>構造</h2>
+				<p>
+上記の実現のために、メモリや変数には以下のメタ情報が付加される。
+				</p> 
+				<ul>
+					<li>
+メモリの各アドレスに対して、参照元との紐づけ用のスタック
+					</li> <li>
+各ポインタに対して、タグと呼ばれる自身の識別子
+					</li>
+				</ul>
+				<p>
+ここで、スタックのアイテムには現在の参照元の情報が、タグを含め保管される仕組となる。なお、参照用のタグではそれぞれに固有のものを使うが、生ポインタ用のタグでは個々を区別しないため共通のタグ (記号⊥) を使う。
+				</p> <p>
+スタックのアイテムには以下の種類がある (t はタグ)。
+				</p>
+				<ul>
+					<li>
+<span style="font-family: 'MyMath', math;">Unique(t)</span>: 可変参照に由来
+					</li> <li>
+<span style="font-family: 'MyMath', math;">SharedRO(t)</span>: 共有参照に由来 
+					</li> <li>
+<span style="font-family: 'MyMath', math;">SharedRW(t)</span>: 生ポインタに由来 
+					</li>
+				</ul>
+			</section> <section>
+				<h2>動作</h2>
+				<p>
+上記の構造を利用して、以下のアルゴリズムが適用される。
+				</p>
+				<ul>
+					<li>
+ポインタを作る場合、アドレスのスタックにポインタに紐づくアイテムをプッシュ。
+					</li> <li>
+ポインタを利用する場合、スタックにポインタに紐づくアイテムがなければ UB。
+					</li> <li>
+ポインタを利用する場合、スタックから邪魔なアイテムをポップ。
+					</li>
+				</ul>
+			</section>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+変数 <code>var</code> を生ポインタ <code>var_mtp</code> と可変参照 <code>var_mut</code> から参照する。
+			</p> <p>
+この場合、メモリの各アドレスの値、そしてスタックは以下のようになる。
+			</p>
+			<figure class="normal">
+				<iframe src="img/ub_removed_item.svg" style="width: 40rem; height: 12rem;"/>
+			</figure>
+			<p>
+ここで、<code>var_mtp</code> を使うには <span style="font-family: 'MyMath', math;">SharedRW(⊥)</span> が必要になる。
+			</p> <p>
+しかし、その上には <span style="font-family: 'MyMath', math;">Unique(t1)</span> があり邪魔なのでポップする。
+			</p> <p>
+すると、それに紐づいていた <code>var_mut</code> は使えなくなってしまう。
+			</p> <p>
+以上をソースコードにすると以下のようになる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = 0;
+    let var_mtp = &amp;mut var as *mut _;
+    let var_mut = unsafe { &amp;mut *var_mtp };
+    unsafe { *var_mtp = 1 };
+    *var_mut = 2;
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: attempting a write access using &lt;288&gt; at alloc124[0x0], but that tag does not exist in the borrow stack for this location</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:6:5
+<mark class="info">  |</mark>
+<mark class="info">6 |</mark>     *var_mut = 2;
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^^^ this error occurs as part of an access at alloc124[0x0..0x4]</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it violated are still experimental
+<mark class="info">  =</mark> <mark class="title">help</mark>: see <a href="https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md">https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md</a> for further information
+<mark class="info">help</mark>: &lt;288&gt; was created by a Unique retag at offsets [0x0..0x4]
+<mark class="info"> --&gt;</mark> src\main.rs:4:28
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     let var_mut = unsafe { &amp;mut *var_mtp };
+<mark class="info">  |</mark>                            <mark class="info">^^^^^^^^^^^^^</mark>
+<mark class="info">help</mark>: &lt;288&gt; was later invalidated at offsets [0x0..0x4] by a write access
+<mark class="info"> --&gt;</mark> src\main.rs:5:14
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark>     unsafe { *var_mtp = 1 };
+<mark class="info">  |</mark>              <mark class="info">^^^^^^^^^^^^</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: BACKTRACE (of the first span):
+<mark class="info">  =</mark> <mark class="title">note</mark>: inside `main` at src\main.rs:6:5: 6:17
+</samp></pre>
+		</section>
+		<footer>
+			<section>
+				<h1>参考文献</h1>
+				<ul class="links">
+					<li>
+<a href="https://plv.mpi-sws.org/rustbelt/stacked-borrows/paper.pdf">Stacked Borrows: An Aliasing Model for Rust</a>
+					</li>
+				</ul>
+			</section>
+		</footer>
+	</body>
+</html>

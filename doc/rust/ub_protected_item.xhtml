@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: UB - 保護されたアイテムの削除</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: not granting access to tag &lt;286&gt; because that would remove [SharedReadOnly for &lt;294&gt;] which is strongly protected</mark>
+</samp></pre>
+		<p>
+<a href="miri.xhtml">MIRI</a> においてスタックから削除したアイテムが保護中だった場合のエラー。
+		</p>
+		<aside class="normal">
+			<p>MIRI のモデル</p>
+			<p>
+MIRI のエイリアシングモデルには <a href="miri.xhtml#sb">Stacked Borrows</a> と <a href="miri.xhtml#tb">Tree Borrows</a> があるが、ここでは 2025 年現在の既定である前者に基づいて解説する。
+			</p>
+		</aside>
+		<section>
+			<h1>検出方法</h1>
+			<p>
+このエラーは『<a href="ub_removed_item.xhtml">UB - 削除済のアイテムの利用</a>』と似ている。ただし、そのエラーではアイテムの削除時にはエラーにならず、実際にそれが利用されるまでは保留していた。一方、こちらのエラーは保護されたアイテムの削除時にすぐ発生する。
+			</p> <p>
+保護されるのは、呼出中の関数の引数に紐づくアイテムで、それらを他のアイテムを利用するために削除しようとすると UB になる。
+			</p>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>callback</code> の呼出中に <code>var_ref</code> に紐づくアイテムを保護している。しかし、同じアドレスを指す <code>var_mtp</code> の使用のためにそれを除去しようとしてエラーになる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut var = 0;
+    let var_mtp = &amp;mut var as *mut _;
+    let var_ref = unsafe { &amp;*var_mtp };
+    callback(var_ref, || unsafe { *var_mtp = 1; });
+}
+
+fn callback(x: &amp;i32, f: impl FnOnce()) {
+    f();
+    assert_eq!(*x, 1);
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: not granting access to tag &lt;286&gt; because that would remove [SharedReadOnly for &lt;294&gt;] which is strongly protected</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:5:35
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark>     callback(var_ref, || unsafe { *var_mtp = 1; });
+<mark class="info">  |</mark>                                   <mark class="error">^^^^^^^^^^^^ Undefined Behavior occurred here</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it violated are still experimental
+<mark class="info">  =</mark> <mark class="title">help</mark>: see <a href="https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md">https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md</a> for further information
+<mark class="info">help</mark>: &lt;286&gt; was created by a SharedReadWrite retag at offsets [0x0..0x4]
+<mark class="info"> --&gt;</mark> src\main.rs:3:19
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     let var_mtp = &amp;mut var as *mut _;
+<mark class="info">  |</mark>                   <mark class="info">^^^^^^^^</mark>
+<mark class="info">help</mark>: &lt;294&gt; is this argument
+<mark class="info"> --&gt;</mark> src\main.rs:8:17
+<mark class="info">  |</mark>
+<mark class="info">8 |</mark> pub fn callback(x: &amp;i32, f: impl FnOnce()) {
+<mark class="info">  |</mark>                 <mark class="info">^</mark>
+<mark class="info">  =</mark> note: BACKTRACE (of the first span):
+<mark class="info">  =</mark> note: inside closure at src\main.rs:5:35: 5:47
+<mark class="edit">note</mark>: inside `callback::&lt;{closure@src\main.rs:5:23: 5:25}&gt;`
+<mark class="info"> --&gt;</mark> src\main.rs:9:5
+<mark class="info">  |</mark>
+<mark class="info">9 |</mark>     f();
+<mark class="info">  |</mark>     <mark class="edit">^^^</mark>
+<mark class="edit">note</mark>: inside `main`
+<mark class="info"> --&gt;</mark> src\main.rs:5:5
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark>     callback(var_ref, || unsafe { *var_mtp = 1; });
+<mark class="info">  |</mark>     <mark class="edit">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+</samp></pre>
+		</section>
+		<footer>
+			<section>
+				<h1>参考文献</h1>
+				<ul class="links">
+					<li>
+<a href="https://plv.mpi-sws.org/rustbelt/stacked-borrows/paper.pdf">Stacked Borrows: An Aliasing Model for Rust</a>
+					</li>
+				</ul>
+			</section>
+		</footer>
+	</body>
+</html>

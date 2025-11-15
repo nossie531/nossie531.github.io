@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+	<style>
+@import url("../../../style/import/font_math.css");
+text { font-size: 10px; }
+text.math { font-family: "MyMath", math; }
+text.code { font-family: "Consolas", monospace; white-space-collapse: preserve-spaces; }
+
+g#memory {
+	rect.block { fill: white; stroke: black; }
+	path.addr { stroke-width: 1px; stroke: gray; }
+}
+
+g#stack {
+	path.block { fill: #FEE; stroke: black; }
+	path.item { stroke-width: 1px; stroke: black; }
+}
+
+path.ref {
+	fill: none;
+	stroke-wtidh: 1px;
+	stroke: black;
+	marker-end: url(#arrow);
+}
+	</style>
+	<defs>
+		<marker id="arrow" markerUnits="userSpaceOnUse" orient="auto-start-reverse"
+			markerWidth="20" markerHeight="20" viewBox="-10 -10 20 20">
+			<path d="M5,0 0,-3 0,3 Z"/>
+		</marker>
+	</defs>
+	<g transform="translate(10, 10)">
+		<g id="memory" transform="translate(45, 0)">
+			<rect class="block" width="80" height="100"/>
+			<path class="addr" d="M0,25 h 80"/>
+			<path class="addr" d="M0,50 h 80"/>
+			<path class="addr" d="M0,75 h 80"/>
+			<text class="code" x="-5" y="15" text-anchor="end">var    </text>
+			<text class="code" x="-5" y="40" text-anchor="end">var_mtp</text>
+			<text class="code" x="-5" y="65" text-anchor="end">var_mut</text>
+			<text class="math" x="5" y="15">0</text>
+			<text class="math" x="5" y="40">Pointer(a0, ⊥)</text>
+			<text class="math" x="5" y="65">Pointer(a0, t1)</text>
+		</g>
+		<g id="stack" transform="translate(130, 0)">
+			<path class="block" d="M0,0 v25 h 235 a5,5,0,0,0,5,-5 v-15 a5,5,0,0,0,-5,-5 z"/>
+			<path class="item" d="M80,0 v25 M160,0 v25"/>
+			<text class="math" x="40" y="15" text-anchor="middle">Unique(t0)</text>
+			<text class="math" x="120" y="15" text-anchor="middle">SharedRW(⊥)</text>
+			<text class="math" x="200" y="15" text-anchor="middle">Unique(t1)</text>
+		</g>
+		<path class="ref" d="M125,37.5 h120 a5,5,0,0,0,5,-5 v-2.5"/>
+		<path class="ref" d="M125,62.5 h200 a5,5,0,0,0,5,-5 v-27.5"/>
+	</g>
+</svg>
