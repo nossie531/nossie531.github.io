@@ -24,7 +24,7 @@ MIRI の名前はそれが Rust の中間表現である MIR (Rust's Mid-level I
 		<section>
 			<h1>現状と必要性</h1>
 			<p>
-2025 年現在、MIRI はまだ実験段階のためナイトリー版でのみ動作する。
+<time>2025 年現在</time>、MIRI はまだ実験段階のため、ナイトリー版でのみ動作する。
 			</p> <p>
 とはいえ、<code>unsafe</code> なコードを扱う場合、筆者はこのツールはほぼ必須だと考えている。
 			</p> <p>
@@ -52,19 +52,31 @@ MIRI の名前はそれが Rust の中間表現である MIR (Rust's Mid-level I
 </code></pre>
 			</section>
 		</section> <section>
-			<h1>検出精度</h1>
-			<p>
-実用的な範囲では十分な精度がある。
-			</p> <p>
-そのため、MIRI がエラーを検出した場合、そのコードはほぼ確実に不健全である。ただし、MIRI がエラーを検出しない場合でも、その API が確実に健全だとは言えない。なぜなら、UB になるパターンがテストされていないだけの可能性は常にある。
-			</p>
-		</section> <section>
-			<h1>モデル</h1>
-			<p>
-2025 年現在、Rust の <code>unsafe</code> まわりにはまだ曖昧さが残っている。
-			</p> <p>
-これに対して、MIRI は二つのモデル <dfn id="sb">Stacked Borrows</dfn> と <dfn id="tb">Tree Borrows</dfn> を用意している。どちらでもメモリ安全性は守られるが、後者は制限がより少ない。既定は前者で、後者を試用する場合、環境変数 <code>MIRIFLAGS</code> に <code>-Zmiri-tree-borrows</code> を指定するとよい。
-			</p>
+			<h1>注意点</h1>
+			<section>
+				<h2>偽陽性なし</h2>
+				<p>
+エラーがあればそれは何らかの不健全性がある事を示している。
+				</p> <p>
+ただし、<time>2025 年現在</time>の重要な点として、後述の<a href="#model">モデル</a>による差異がある。
+				</p>
+			</section> <section>
+				<h2>偽陰性あり</h2>
+				<p>
+ツールの性質上、偽陰性は避けられない。
+				</p> <p>
+なぜなら、UB になるパターンがテストされていないだけの可能性は常にある。
+				</p>
+			</section> <section>
+				<h2 id="model">モデル</h2>
+				<p>
+<time>2025 年現在</time>、Rust の <code>unsafe</code> まわりにはまだ曖昧さが残っている。
+				</p> <p>
+これに対して、MIRI は二つのモデル <dfn id="sb">Stacked Borrows</dfn> と <dfn id="tb">Tree Borrows</dfn> を用意している。どちらでもメモリ安全性は守られるが、後者は制限がより少ない。現在の既定は前者だが、将来的には後者が有力である。後者に切り替える場合、環境変数 <code>MIRIFLAGS</code> に <code>-Zmiri-tree-borrows</code> を指定するとよい。
+				</p> <p>
+ちなみに、将来的に Stacked Borrow より Tree Borrows が有力とする根拠は、前者が現状の多くのクレートの実情にそぐわないからである (参考: <a href="miri_sb_vs_arraydeque.xhtml"><code>arraydeque</code> での実例</a>)。
+				</p>
+			</section>
 		</section> <section>
 			<h1>事例集</h1>
 			<ul>

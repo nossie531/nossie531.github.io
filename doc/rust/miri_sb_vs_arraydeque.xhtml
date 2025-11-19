@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Stack Borrows モデル × arraydeque クレート</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<a href="miri.xhtml">MIRI</a> の <a href="miri.xhtml#sb">Stacked Borrows</a> モデルは相性が悪いクレートが多い。
+		</p> <p>
+有名なクレート <a href="https://crates.io/crates/arraydeque/0.5.1"><code>arraydeque</code></a> (配列による両端キューを提供) もその一つである。
+		</p>
+		<section>
+			<h1>サンプル</h1>
+			<p>
+以下は Stacked Borrows でのみ UB になる (Tree Borrows では問題ない)。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    use arraydeque::ArrayDeque;
+    drop(ArrayDeque::&lt;i32, 3&gt;::new().drain(..));
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: not granting access to tag &lt;313&gt; because that would remove [SharedReadOnly for &lt;337&gt;] which is strongly protected</mark>
+<mark class="info">    --&gt;</mark> C:\Users\nossi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\arraydeque-0.5.1\src\lib.rs:2391:37
+<mark class="info">     |</mark>
+<mark class="info">2391 |</mark>        let source_deque = unsafe { &amp;mut *self.deque };
+<mark class="info">     |</mark>                                    <mark class="error">^^^^^^^^^^^^^^^^ Undefined Behavior occurred here</mark>
+<mark class="info">     |</mark>
+<mark class="info">     =</mark> <mark class="title">help</mark>: this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it violated are still experimental
+<mark class="info">     =</mark> <mark class="title">help</mark>: see <a href="https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md">https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md</a> for further information
+<mark class="info">help</mark>: &lt;313&gt; was created by a SharedReadWrite retag at offsets [0x0..0x20]
+<mark class="info">    --&gt;</mark> src\main.rs:3:10
+<mark class="info">     |</mark>
+<mark class="info">   3 |</mark>     drop(ArrayDeque::&lt;i32, 3&gt;::new().drain(..));
+<mark class="info">     |</mark>          <mark class="info">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">help</mark>: &lt;337&gt; is this argument
+<mark class="info">    --&gt;</mark> src\main.rs:3:5
+<mark class="info">     |</mark>
+<mark class="info">   3 |</mark>     drop(ArrayDeque::&lt;i32, 3&gt;::new().drain(..));
+<mark class="info">     |</mark>     <mark class="info">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">     =</mark> <mark class="title">note</mark>: BACKTRACE (of the first span):
+<mark class="info">     =</mark> <mark class="title">note</mark>: inside `&lt;arraydeque::Drain&lt;'_, i32, 3, arraydeque::Saturating&gt; as std::ops::Drop&gt;::drop` at C:\Users\nossi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\arraydeque-0.5.1\src\lib.rs:2391:37: 2391:53  
+<mark class="info">     =</mark> <mark class="title">note</mark>: inside `std::ptr::drop_in_place::&lt;arraydeque::Drain&lt;'_, i32, 3, arraydeque::Saturating&gt;&gt; - shim(Some(arraydeque::Drain&lt;'_, i32, 3, arraydeque::Saturating&gt;))` at C:\Users\nossi\.rustup\toolchains\nightly-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\ptr\mod.rs:804:1: 804:62
+<mark class="info">     =</mark> <mark class="title">note</mark>: inside `std::mem::drop::&lt;arraydeque::Drain&lt;'_, i32, 3, arraydeque::Saturating&gt;&gt;` at C:\Users\nossi\.rustup\toolchains\nightly-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\mem\mod.rs:961:24: 961:25
+<mark class="edit">note</mark>: inside `main`
+<mark class="info">    --&gt;</mark> src\main.rs:3:5
+<mark class="info">     |</mark>
+<mark class="info">   3 |</mark>     drop(ArrayDeque::&lt;i32, 3&gt;::new().drain(..));
+<mark class="info">     |</mark>     <mark class="edit">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info"></mark>
+<mark class="edit">note</mark>: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace
+</samp></pre>
+		</section>
+	</body>
+</html>
