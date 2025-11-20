@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: MIRI エラー / メモリリーク</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: memory leaked: alloc217 (Rust heap, size: 40, align: 8), allocated here:</mark>
+</samp></pre>
+		<p>
+<a href="miri.xhtml">MIRI</a> がメモリリークを検出した場合のエラー。
+		</p>
+		<aside class="normal">
+			<p>メモリリークの扱い</p>
+			<p>
+MIRI は UB の検出ツールという位置づけらしい。そして、正確にはメモリリークは UB ではない。しかし、よくあるバグのため一緒に検出してくれる。なお、UB は <code>unsafe</code> なしでは発生しないが、メモリリークは <code>unsafe</code> なしでも発生する。そのため、MIRI が <code>unsafe</code> なしでエラーになる場合はだいたいこれである
+			</p>
+		</aside>
+		<section>
+			<h1>検出方法</h1>
+			<p>
+確保したメモリがプログラム完了時点で未解放、かつグローバルな <code>static</code> 領域からそれらへとポインタを辿って到達不可能な場合、メモリリークと判定される。
+			</p>
+		</section> <section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle"><code>unsafe</code> の誤用</div>
+				</hgroup>
+				<p>
+<code>unsafe</code> の誤用によりメモリ管理が破綻するパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>unsafe</code> な機能で <code>Rc</code> の参照カウンタを強引に操作している。
+					</p>
+<pre><code class="language-rust">
+use std::rc::Rc;
+
+fn main() {
+    let rc = Rc::new(42);
+    let ptr = Rc::into_raw(rc);
+    unsafe {
+        Rc::increment_strong_count(ptr);
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: memory leaked: alloc207 (Rust heap, size: 24, align: 8), allocated here:</mark>
+<mark class="info">   --&gt;</mark> C:\Users\nossi\.rustup\toolchains\nightly-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\alloc\src\rc.rs:412:27
+<mark class="info">    |</mark>
+<mark class="info">412 |</mark>                 Box::leak(Box::new(RcInner { strong: Cell::new(1), weak: Cell::new(1), value }))
+<mark class="info">    |</mark>                           <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">    |</mark>
+<mark class="info">    =</mark> <mark class="title">note</mark>: BACKTRACE:
+<mark class="info">    =</mark> <mark class="title">note</mark>: inside `std::rc::Rc::&lt;i32&gt;::new` at C:\Users\nossi\.rustup\toolchains\nightly-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\alloc\src\rc.rs:412:27: 412:96
+<mark class="edit">note</mark>: inside `main`
+<mark class="info">   --&gt;</mark> src\main.rs:4:14
+<mark class="info">    |</mark>
+<mark class="info">  4 |</mark>     let rc = Rc::new(42);
+<mark class="info">    |</mark>              <mark class="edit">^^^^^^^^^^^</mark>
+<mark class="info"></mark>
+<mark class="edit">note</mark><mark class="title">: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace</mark>
+<mark class="info"></mark>
+<mark class="edit">note</mark><mark class="title">: set `MIRIFLAGS=-Zmiri-ignore-leaks` to disable this check</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">循環参照</div>
+				</hgroup>
+				<p>
+参照カウンタ方式の型 (<a href="https://doc.rust-lang.org/std/rc/struct.Rc.html"><code>Rc</code></a> や <a href="https://doc.rust-lang.org/std/sync/struct.Arc.html"><code>Arc</code></a> など) が循環参照して解放されないパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、単方向リンクの末尾が先頭と接続され、<code>Rc</code> が循環参照している。
+					</p>
+<pre><code class="language-rust">
+use std::rc::Rc;
+use std::cell::RefCell;
+
+fn main() {
+    // Construct links.
+    let n1 = &amp;mut LinkNode::new(1);
+    let n2 = &amp;mut LinkNode::new(2);
+    n1.borrow_mut().set_next(n2);
+    n2.borrow_mut().set_next(n1);
+
+    // Assert links.
+    let n1_next = n1.borrow().next();
+    assert_eq!(n1_next.borrow().value, n2.borrow().value);
+}
+
+struct LinkNode {
+    value: i32,
+    next: Option&lt;Rc&lt;RefCell&lt;LinkNode&gt;&gt;&gt;,
+}
+
+impl LinkNode {
+    pub fn new(value: i32) -&gt; Rc&lt;RefCell&lt;LinkNode&gt;&gt; {
+        let next = None;
+        Rc::new(RefCell::new(Self { value, next }))
+    }
+
+    pub fn next(&amp;self) -&gt; Rc&lt;RefCell&lt;LinkNode&gt;&gt; {
+        self.next.as_ref().unwrap().clone()
+    }
+
+    pub fn set_next(&amp;mut self, node: &amp;Rc&lt;RefCell&lt;LinkNode&gt;&gt;) {
+        self.next = Some(node.clone());
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: memory leaked: alloc217 (Rust heap, size: 40, align: 8), allocated here:</mark>
+<mark class="info">   --&gt;</mark> C:\Users\nossi\.rustup\toolchains\nightly-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\alloc\src\rc.rs:412:27
+<mark class="info">    |</mark>
+<mark class="info">412 |</mark>                 Box::leak(Box::new(RcInner { strong: Cell::new(1), weak: Cell::new(1), value }))
+<mark class="info">    |</mark>                           <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">    |</mark>
+<mark class="info">    =</mark> <mark class="title">note</mark>: BACKTRACE:
+<mark class="info">    =</mark> <mark class="title">note</mark>: inside `std::rc::Rc::&lt;std::cell::RefCell&lt;LinkNode&gt;&gt;::new` at C:\Users\nossi\.rustup\toolchains\nightly-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\alloc\src\rc.rs:412:27: 412:96
+<mark class="edit">note</mark>: inside `LinkNode::new`
+<mark class="info">   --&gt;</mark> src\main.rs:24:9
+<mark class="info">    |</mark>
+<mark class="info"> 24 |</mark>         Rc::new(RefCell::new(Self { value, next }))
+<mark class="info">    |</mark>         <mark class="edit">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="edit">note</mark>: inside `main`
+<mark class="info">   --&gt;</mark> src\main.rs:6:19
+<mark class="info">    |</mark>
+<mark class="info">  6 |</mark>     let n1 = &amp;mut LinkNode::new(1);
+<mark class="info">    |</mark>                   <mark class="edit">^^^^^^^^^^^^^^^^</mark>
+<mark class="info"></mark>
+<mark class="error">error</mark><mark class="title">: memory leaked: alloc285 (Rust heap, size: 40, align: 8), allocated here:</mark>
+<mark class="info">   --&gt;</mark> C:\Users\nossi\.rustup\toolchains\nightly-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\alloc\src\rc.rs:412:27
+<mark class="info">    |</mark>
+<mark class="info">412 |</mark>                 Box::leak(Box::new(RcInner { strong: Cell::new(1), weak: Cell::new(1), value }))
+<mark class="info">    |</mark>                           <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">    |</mark>
+<mark class="info">    =</mark> <mark class="title">note</mark>: BACKTRACE:
+<mark class="info">    =</mark> <mark class="title">note</mark>: inside `std::rc::Rc::&lt;std::cell::RefCell&lt;LinkNode&gt;&gt;::new` at C:\Users\nossi\.rustup\toolchains\nightly-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\alloc\src\rc.rs:412:27: 412:96
+<mark class="info">note</mark>: inside `LinkNode::new`
+<mark class="info">   --&gt;</mark> src\main.rs:24:9
+<mark class="info">    |</mark>
+<mark class="info"> 24 |</mark>         Rc::new(RefCell::new(Self { value, next }))
+<mark class="info">    |</mark>         <mark class="edit">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">note</mark>: inside `main`
+<mark class="info">   --&gt;</mark> src\main.rs:7:19
+<mark class="info">    |</mark>
+<mark class="info">  7 |</mark>     let n2 = &amp;mut LinkNode::new(2);
+<mark class="info">    |</mark>                   <mark class="edit">^^^^^^^^^^^^^^^^</mark>
+<mark class="info"></mark>
+<mark class="edit">note</mark><mark class="title">: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace</mark>
+<mark class="info"></mark>
+<mark class="edit">note</mark><mark class="title">: set `MIRIFLAGS=-Zmiri-ignore-leaks` to disable this check</mark>
+</samp></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
