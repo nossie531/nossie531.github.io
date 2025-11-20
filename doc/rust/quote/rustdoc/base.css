@@ -2,11 +2,21 @@
 
 /* 以下は原文と近くなるよう調整。*/
 
-:where(:root, :host):lang(en),
-:not(:lang(en)) > :lang(en) { 
+:where(:host, :not(:lang(en))) > :lang(en) { 
 	line-height: 1.5;
 	font-family: "Georgia", serif;
 }
+
+:where(:host, :not(:lang(ja))) > :lang(ja) { 
+	line-height: 1.7;
+	font-family: "Biz UDMincho", serif;
+}
+
+p:lang(ja) {
+	text-align: justify;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: sans-serif; }
 
 ol, ul { padding-left: 1.5rem; }
 
