@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: MIRI エラー / メモリリーク</title>
+		<title>Rust メモ: Miri エラー / メモリリーク</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -15,12 +15,12 @@
 <mark class="error">error</mark><mark class="title">: memory leaked: alloc217 (Rust heap, size: 40, align: 8), allocated here:</mark>
 </samp></pre>
 		<p>
-<a href="miri.xhtml">MIRI</a> がメモリリークを検出した場合のエラー。
+<a href="miri.xhtml">Miri</a> がメモリリークを検出した場合のエラー。
 		</p>
 		<aside class="normal">
 			<p>メモリリークの扱い</p>
 			<p>
-MIRI は UB の検出ツールという位置づけらしい。そして、正確にはメモリリークは UB ではない。しかし、よくあるバグのため一緒に検出してくれる。なお、UB は <code>unsafe</code> なしでは発生しないが、メモリリークは <code>unsafe</code> なしでも発生する。そのため、MIRI が <code>unsafe</code> なしでエラーになる場合はだいたいこれである
+Miri は UB の検出ツールという位置づけらしい。そして、正確にはメモリリークは UB ではない。しかし、よくあるバグのため一緒に検出してくれる。なお、UB は <code>unsafe</code> なしでは発生しないが、メモリリークは <code>unsafe</code> なしでも発生する。そのため、Miri が <code>unsafe</code> なしでもエラーになる場合はだいたいこれである
 			</p>
 		</aside>
 		<section>

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: MIRI エラー / 保護されたアイテムの削除</title>
+		<title>Rust メモ: Miri エラー / 保護されたアイテムの削除</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -15,12 +15,12 @@
 <mark class="error">error</mark><mark class="title">: Undefined Behavior: not granting access to tag &lt;286&gt; because that would remove [SharedReadOnly for &lt;294&gt;] which is strongly protected</mark>
 </samp></pre>
 		<p>
-<a href="miri.xhtml">MIRI</a> においてスタックから削除したアイテムが保護中だった場合のエラー。
+<a href="miri.xhtml">Miri</a> においてスタックから削除したアイテムが保護中だった場合のエラー。
 		</p>
 		<aside class="normal">
-			<p>MIRI のモデル</p>
+			<p>Miri のモデル</p>
 			<p>
-MIRI のエイリアシングモデルには <a href="miri.xhtml#sb">Stacked Borrows</a> と <a href="miri.xhtml#tb">Tree Borrows</a> があるが、ここでは 2025 年現在の既定である前者に基づいて解説する。
+Miri のエイリアシングモデルには <a href="miri.xhtml#sb">Stacked Borrows</a> と <a href="miri.xhtml#tb">Tree Borrows</a> があるが、ここでは 2025 年現在の既定である前者に基づいて解説する。
 			</p>
 		</aside>
 		<section>

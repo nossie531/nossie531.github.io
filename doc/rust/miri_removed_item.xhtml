@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: MIRI エラー / 削除済のアイテムの利用</title>
+		<title>Rust メモ: Miri エラー / 削除済のアイテムの利用</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -15,12 +15,12 @@
 <mark class="error">error</mark><mark class="title">: Undefined Behavior: attempting a write access using &lt;288&gt; at alloc124[0x0], but that tag does not exist in the borrow stack for this location</mark>
 </samp></pre>
 		<p>
-<a href="miri.xhtml">MIRI</a> においてスタックのアイテムが削除済だった場合のエラー。
+<a href="miri.xhtml">Miri</a> においてスタックのアイテムが削除済だった場合のエラー。
 		</p>
 		<aside class="normal">
-			<p>MIRI のモデル</p>
+			<p>Miri のモデル</p>
 			<p>
-MIRI のエイリアシングモデルには <a href="miri.xhtml#sb">Stacked Borrows</a> と <a href="miri.xhtml#tb">Tree Borrows</a> があるが、ここでは 2025 年現在の既定である前者に基づいて解説する。
+Miri のエイリアシングモデルには <a href="miri.xhtml#sb">Stacked Borrows</a> と <a href="miri.xhtml#tb">Tree Borrows</a> があるが、ここでは 2025 年現在の既定である前者に基づいて解説する。
 			</p>
 		</aside>
 		<section>

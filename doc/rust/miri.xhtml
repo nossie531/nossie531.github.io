@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: MIRI の使用方法</title>
+		<title>Rust メモ: Miri の使用方法</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -12,23 +12,23 @@
 			<h1><doc-title/></h1>
 		</header>
 		<p>
-<a href="https://github.com/rust-lang/miri">MIRI</a> は UB (<a href="https://doc.rust-lang.org/reference/behavior-considered-undefined.html">Undefineded Behavior</a>) の検出ツールである。 <br/>
+<a href="https://github.com/rust-lang/miri">Miri</a> は UB (<a href="https://doc.rust-lang.org/reference/behavior-considered-undefined.html">Undefineded Behavior</a>) の検出ツールである。 <br/>
 <code>unsafe</code> を含む Rust コードの健全性の確認に使われる。
 		</p>
 		<aside class="normal">
 			<p>名前の由来</p> 
 			<p>
-MIRI の名前はそれが Rust の中間表現である MIR (Rust's Mid-level Inter&#xAD;mediate Repre&#xAD;sen&#xAD;tation) の解釈プログラム (Interpreter) として動作する事に由来している。
+Miri の名前はそれが Rust の中間表現 MIR (Rust's Mid-level Inter&#xAD;mediate Repre&#xAD;sen&#xAD;tation) の解釈プログラム (Interpreter) として動作する事に由来している。
 			</p> 
 		</aside>
 		<section>
 			<h1>現状と必要性</h1>
 			<p>
-<time>2025 年現在</time>、MIRI はまだ実験段階のため、ナイトリー版でのみ動作する。
+<time>2025 年現在</time>、Miri はまだ実験段階のため、ナイトリー版でのみ動作する。
 			</p> <p>
 とはいえ、<code>unsafe</code> なコードを扱う場合、筆者はこのツールはほぼ必須だと考えている。
 			</p> <p>
-なぜなら、健全性の問題は人間にとって盲点になるものが多い。また、不健全なコードはその時点では問題なく動作しても、将来的な Rust の更新の影響を受ける可能性がある。MIRI はそれらの予防にもなる。
+なぜなら、健全性の問題は人間にとって盲点になるものが多い。また、不健全なコードはその時点で問題なく動作しても、将来的に Rust の更新の影響を受ける可能性がある。Miri はそれらの予防にもなる。
 			</p>
 		</section> <section>
 			<h1>実行方法</h1>
@@ -72,20 +72,20 @@ MIRI の名前はそれが Rust の中間表現である MIR (Rust's Mid-level I
 				<p>
 <time>2025 年現在</time>、Rust の <code>unsafe</code> まわりにはまだ曖昧さが残っている。
 				</p> <p>
-これに対して、MIRI は二つのモデル <dfn id="sb">Stacked Borrows</dfn> と <dfn id="tb">Tree Borrows</dfn> を用意している。どちらでもメモリ安全性は守られるが、後者は制限がより少ない。現在の既定は前者だが、将来的には後者が有力である。後者に切り替える場合、環境変数 <code>MIRIFLAGS</code> に <code>-Zmiri-tree-borrows</code> を指定するとよい。
+これに対して、Miri は二つのモデル <dfn id="sb">Stacked Borrows</dfn> と <dfn id="tb">Tree Borrows</dfn> を用意している。どちらでもメモリ安全性は守られるが、後者は制限がより少ない。現在の既定は前者だが、将来的には後者が有力である。後者に切り替える場合、環境変数 <code>MIRIFLAGS</code> に <code>-Zmiri-tree-borrows</code> を指定するとよい。
 				</p> <p>
-ちなみに、将来的に Stacked Borrow より Tree Borrows が有力とする根拠は、前者が現状の多くのクレートの実情にそぐわないからである (参考: <a href="miri_sb_vs_arraydeque.xhtml"><code>arraydeque</code> での実例</a>)。
+ちなみに、将来的に Stacked Borrows より Tree Borrows が有力とする根拠は、前者が現状の多くのクレートの実情にそぐわないからである (参考: <a href="miri_sb_vs_arraydeque.xhtml"><code>arraydeque</code> での実例</a>)。
 				</p>
 			</section>
 		</section> <section>
 			<h1>事例集</h1>
 			<ul>
 				<li>
-<a href="miri_memory_leak.xhtml">MIRI エラー / メモリリーク</a>
+<a href="miri_memory_leak.xhtml">Miri エラー / メモリリーク</a>
 				</li> <li>
-<a href="miri_removed_item.xhtml">MIRI エラー / 削除済のアイテムの利用</a>
+<a href="miri_removed_item.xhtml">Miri エラー / 削除済のアイテムの利用</a>
 				</li> <li>
-<a href="miri_protected_item.xhtml">MIRI エラー / 保護されたアイテムの削除</a>
+<a href="miri_protected_item.xhtml">Miri エラー / 保護されたアイテムの削除</a>
 				</li>
 			</ul>
 		</section>
