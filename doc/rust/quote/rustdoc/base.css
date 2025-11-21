@@ -9,7 +9,7 @@
 
 :where(:host, :not(:lang(ja))) > :lang(ja) { 
 	line-height: 1.7;
-	font-family: "Biz UDMincho", serif;
+	font-family: "Times New Roman", "Biz UDMincho", serif;
 }
 
 p:lang(ja) {
