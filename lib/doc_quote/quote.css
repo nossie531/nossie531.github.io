@@ -48,8 +48,8 @@ div.info {
 
 blockquote {
 	margin: 0 calc(var(--gap) * -1);
-	padding: 0 calc(var(--gap) * 1);
-	border: thin dashed var(--key1-color);
+	padding: 0 calc(var(--gap) * 1 - 1px);
+	border: 1px dashed var(--key1-color);
 	background: var(--nest-color);
 
 	&::before, &::after {
