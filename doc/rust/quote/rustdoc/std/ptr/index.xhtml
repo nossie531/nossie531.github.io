@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../base.css"/>
+		<link rel="stylesheet" href="../../../../../../style/import/prism.css"/>
+		<script src="../../../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-11-07" cite="https://doc.rust-lang.org/std/ptr/index.html#provenance">
+			<h2>起源</h2>
+			<p>
+ポインタは<em>単なる</em>「整数」や「アドレス」ではない。例えば､「幸運」があり Use After Free にて解放されたメモリがあなたの読み書きよりも前に再割り当てされたとしても、明らかに Undefineded Behavior なのは議論の余地がない (実際にはこれは最悪の場合のシナリオで、これがなければ UAF の懸念はだいぶ減るだろう！)。別の例として、<a href="../primitive.pointer.html#method.wrapping_offset"><code>wrapping_offset</code></a> はオリジナルポインタが指し示すメモリの割り当てを「思い出す」と文書化されていて、これはたとえその割り当てに占有されるメモリ範囲のはるか外側にオフセットされてもなおそうである事を考えてみよう。このような主張が合理性を持つには、ポインタは単なるアドレス以上の存在である必要がある: つまりそれらには<strong>起源</strong>がなければならない。
+			</p> <p>
+Rust におけるポインタの値は意味論的に以下の情報を含む:
+			</p>
+			<ul>
+				<li>
+それが指し示す<strong>アドレス</strong>、これは <code>usize</code> により表現できる。
+				</li> <li>
+それが持つ<strong>起源</strong>、これはアクセス許可のあるメモリを定義する。起源は不在になりうり、その場合はポインタはどのメモリへのアクセス許可も持たない。
+				</li>
+			</ul>
+			<p>
+起源の正確な構造はまだ仕様化されていないが、ポインタの起源により定義される許可は<em>空間</em>の成分、<em>時間</em>の成分、そして<em>可変性</em>の成分を持つ:
+			</p>
+			<ul>
+				<li>
+空間: そのポインタがアクセスを許可されるメモリアドレスの集合。
+				</li> <li>
+時間: そのポインタがそれらのメモリアドレスへのアクセスを許される期間。
+				</li> <li>
+可変性: そのポインタがメモリの読込アクセスのみできるのか、それとも書込アクセスもできるのか。これは他の成分にも影響するので注意されたい。例えば、あるポインタはアドレス集合の部分集合のみ、もしくはその最大期間の部分集合のみの変更を許可しているかもしれない。
+				</li>
+			</ul>
+			<p>
+<a href="#allocation">割り当て</a>が作成されると、それは固有のオリジナルポインタとなる。alloc API ではこれは文字通りその呼出が戻すポインタであり、ローカル変数や静的変数ではこれは変数/静的変数の名前である (これは用語「ポインタ」の簡潔な説明のためゆるい重複定義になる)。
+			</p> <p>
+割り当てに使われたオリジナルポインタには起源があり、それは割り当てたメモリ範囲へのこのポインタの<em>空間</em>の許可、そして割り当てのライフタイムへの<em>時間</em>の許可を制約する。起源はオリジナルポインタから <a href="../primitive.pointer.html#method.offset"><code>offset</code></a>、借用、ポインタキャストのような操作を通して推移的に派生する全てのポインタに暗黙的に継承される。幾つかの操作はアクセスできるメモリの量や有効期間を制限する事で、派生した起源の許可を<em>縮小</em>する (すなわち、サブフィールドやサブスライスの借用は起源の空間の成分を縮小するかもしれず、全ての借用は起源の時間の成分を縮小するかもしれない)。ただし、派生した起源の許可を<em>拡大</em>する操作はない: たとえより大きな割り当てがそこにあるとあなたが「把握」していても、より大きな起源でのポインタの派生はできない。同じように、二つの連続する起源を一つに戻す「再結合」もできない (例: <code>fn merge(&amp;[T], &amp;[T]) -&gt; &amp;[T]</code> のような操作)。
+			</p> <p>
+場所への参照は、常に最低でもその場所が占めるメモリを覆う起源を持つ。スライスへの参照は、常に最低でもそのスライスが表現する範囲を覆う起源を持つ。参照の起源が「縮小」されそれが指し示すメモリに<em>ぴったりと</em>収まるかどうか、またそれが正確にいつ行われるかはまだ決まっていない。
+			</p> <p>
+<em>共有</em>参照はいつもメモリからの読込を許可する起源のみを持ち、決して書込を許さないが、<a href="../cell/struct.UnsafeCell.html"><code>UnsafeCell</code></a> の内側は例外である。
+			</p> <p>
+起源はプログラムが未定義動作を持つかに影響しうる:
+			</p>
+			<ul>
+				<li>
+そのメモリを覆う起源を持たないポインタを通しメモリにアクセスするのは未定義動作である。その起源の「終端」にあるポインタは実際にはその起源の外側にあるのではなく、ただロード/ストア可能な 0 バイトを持つだけだと注意されたい。ゼロサイズのアクセスではメモリの空の範囲にアクセスするためどの起源も必要ない。
+				</li> <li>
+派生元の割り当てに含まれないメモリの範囲を横断してポインタを <a href="../primitive.pointer.html#method.offset"><code>offset</code></a> したり、同じ割り当てから派生しない二つのポインタから <a href="../primitive.pointer.html#method.offset_from"><code>offset_from</code></a> をとるのは未定義動作である。起源は「派生元」が具体的に何を意味するのかを述べるために使われる: ポインタの血統はそれが派生してきたオリジナルポインタへとさかのぼり、関連する割り当てを識別する。特に、現在は割り当てが解除された何らかのものから派生したポインタをオフセットするのは、そのオフセットが 0 である場合を除いて UB である。
+				</li>
+			</ul>
+			<p>
+しかし、以下は依然として健全である:
+			</p>
+			<ul>
+				<li>
+ただのアドレスから起源なしでポインタを生成する (参考: <a href="fn.without_provenance.html"><code>without_provenance</code></a>)。そのようなポインタはメモリアクセスには使えない (ゼロサイズのアクセスは例外)。残る用途には null のような番兵の値<em>または</em>逆参照不可能なタグ付きのポインタのための表現がある。一般に、整数にポインタのふりを「趣味で」させるのは、それに妥当性が要求されるそれ上の操作 (非ゼロサイズのオフセット、読込、書込など) を使わない限りにおいては常に安全である。
+				</li> <li>
+非 null の正常にアライメントしたアドレスでサイズゼロの割り当てを偽造する。つまり、いつもの「ZST は偽物なので、何でもあり」のルールが適用される。
+				</li> <li>
+ポインタをその起源の外側に <a href="../primitive.pointer.html#method.wrapping_offset"><code>wrapping_offset</code></a> する。これには起源「なし」のポインタも含まれる。特に、これはポインタにタグ付けをするトリックを健全にする。
+				</li> <li>
+任意のポインタをアドレスにより比較する。ポインタの比較は起源を無視してアドレスをただの整数にするので、たとえそのポインタ達がダングリング状態や別の起源由来でも、一貫した答えが得られる。ただしもし「幸運」があって、ある割り当ての終了にあるポインタと別の割り当ての開始が「同じ」アドレスだと気がついたとしても、その事実を利用した何かはおそらく意味不明になるだろう。その意味不明なもののスコープは二つのポインタが依然として他方の割り当て (バイト列) にアクセスを許されないという事実によって規制されている。なぜなら、それらはまだ別起源である。
+				</li>
+			</ul>
+			<p>
+Rust における起源の完全な定義はまだ決まっていない事に注意されたいが、これはまだ未決定な<a href="../../nomicon/aliasing.html">エイリアシング</a>のルールとの相互作用を伴うためである。
+			</p>
+			<h3>ポインタ vs 整数</h3>
+			<p>
+この議論により、<code>usize</code> が正確にはポインタを表現できない事、そしてポインタから <code>usize</code> への変換は一般にはアドレスを取り出すだけの操作である事が明白となった。このアドレスをポインタへ戻すには疑問: 結果のポインタはどの起源を持つべきなのか？に答える何かが必要になる。
+			</p> <p>
+Rust はこの状況を扱う二つの方法を提供する: <em>厳密な起源</em>と<em>公開された起源</em>。
+			</p> <p>
+ポインタは <code>usize</code> を表現<em>できる</em> (<a href="fn.without_provenance.html"><code>without_provenance</code></a> を介して)、そのため値が「ある時はポインタである時は生の <code>usize</code>」の状況で使うべき適切な型は、ポインタ型である事に注意されたい。
+			</p>
+			<h3 id="strict-provenance">厳密な起源</h3>
+			<p>
+「厳密な起源」はより明示的に起源とともに作業するための API の集まりである。それらはポインタから整数またはその逆のキャストの代替として意図されている。
+			</p> <p>
+ポインタへの整数のキャストを完全にやめる事で、その操作の潜在的な曖昧さを首尾よく回避できる。これはコンパイラ最適化に有益であり、ポインタの誤用の検出診断を目的とした <a href="https://github.com/rust-lang/miri">Miri</a> のようなツールや <a href="https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/">CHERI</a> のようなアーキテクチャの使用要件ともうまく適合する。
+			</p> <p>
+ポインタへの整数のキャストを<em>全く</em>なしにプログラミングを行えるようにする鍵となる洞察は <a href="../primitive.pointer.html#method.with_addr"><code>with_addr</code></a> メソッドにある:
+			</p>
+<pre><code class="text">    /// Creates a new pointer with the given address.
+    ///
+    /// This performs the same operation as an `addr as ptr` cast, but copies
+    /// the *provenance* of `self` to the new pointer.
+    /// This allows us to dynamically preserve and propagate this important
+    /// information in a way that is otherwise impossible with a unary cast.
+    ///
+    /// This is equivalent to using `wrapping_offset` to offset `self` to the
+    /// given address, and therefore has all the same capabilities and restrictions.
+    pub fn with_addr(self, addr: usize) -&gt; Self;
+</code></pre>
+			<p>
+そう、まだアドレス表現への落とし込みは可能で、欲するどんな巧妙なビットトリックでも実行でき、それには起源の「再構成」を可能にするために関心のある割り当てへのポインタを手元に置いておけばよい。通常これは非常に簡単である。なぜならポインタを取得し、アドレスでごちゃごやし、すぐにポインタへと戻すだけでよい。私達はこの用法がより人間工学的になるよう、<a href="../primitive.pointer.html#method.map_addr"><code>map_addr</code></a> メソッドを提供している。
+			</p> <p>
+コードが厳密な起源の意味論に「従っている」のを明確にするために、私達は <a href="../primitive.pointer.html#method.addr"><code>addr</code></a> メソッドを提供していて、これは戻されるアドレスがポインタ-整数-ポインタの往復の一部でない事を約束する。将来的には、コードが厳密な起源を順守しているかを監査できるよう、私達はポインタ &#x2194; 整数のキャストのためのリントを提供するかもしれない。
+			</p>
+			<h4 id="using-strict-provenance">厳密な起源の使用</h4>
+			<p>
+ほとんどのコードは厳格な起源を順守するのに変更する必要がないが、これは真に懸念のある操作が <code>usize</code> からポインタへのキャストのみだからである。<code>usize</code> をポインタへとキャストするコードでは、変更範囲は具体的に何をしているかによる。
+			</p> <p>
+一般には、ただ <code>usize</code> のアドレスをポインタへと変換してそのポインタをメモリの読込/書込に使いたいかを確認し、その読込/書込自身を実施するのに十分な起源を持つポインタを手元に置いておけばよい。こうするとアドレスからポインタへの全てのキャストは本質的にただのオフセットの適用やインデックス付けになる。
+			</p> <p>
+タグ付きポインタのようにシンプルな場合、<em>タグ付きポインタを <code>usize</code> ではなく実際のポインタで表現する限り</em>、これは大概は平凡に実現できる。
+			</p>
+<pre><code class="language-rust">unsafe {
+    // A flag we want to pack into our pointer
+    static HAS_DATA: usize = 0x1;
+    static FLAG_MASK: usize = !HAS_DATA;
+
+    // Our value, which must have enough alignment to have spare least-significant-bits.
+    let my_precious_data: u32 = 17;
+    assert!(align_of::&lt;u32&gt;() &gt; 1);
+
+    // Create a tagged pointer
+    let ptr = &amp;my_precious_data as *const u32;
+    let tagged = ptr.map_addr(|addr| addr | HAS_DATA);
+
+    // Check the flag:
+    if tagged.addr() &amp; HAS_DATA != 0 {
+        // Untag and read the pointer
+        let data = *tagged.map_addr(|addr| addr &amp; FLAG_MASK);
+        assert_eq!(data, 17);
+    } else {
+        unreachable!()
+    }
+}
+</code></pre>
+			<p>
+(そう、並行データ構造の中でポインタのために <a href="../sync/atomic/struct.AtomicUsize.html"><code>AtomicUsize</code></a> を使っているなら、代わりに <a href="../sync/atomic/struct.AtomicPtr.html"><code>AtomicPtr</code></a> を使うべきである。もしこれがあなたがポインタを原子操作する方法を台無しにするのなら、私達にその理由と修正方法を知らせてほしい。)
+			</p> <p>
+妥当なポインタをただのアドレスから作成<em>しなければならない</em>状況、ベアメタルコードが固定アドレスにあるメモリマップインタフェースにアクセスするような場合、現在のところ厳密な起源の API では扱えないため<a href="#exposed-provenance">公開された起源</a>を使うべきである。
+			</p>
+			<h3 id="exposed-provenance">公開された起源</h3>
+			<p>
+上で議論したように、ポインタへの整数のキャストは厳密な起源の API では不可能である。これは意図的である: 厳密な起源の目標は、私達がそれに自信をもって、曖昧さなく形式化ができ正確な形式的推論の対象にできる、明確な仕様を提供する事である。整数へのポインタのキャストは (現在のところ) そうした明確な仕様を持たない。
+			</p> <p>
+しかしながら、ポインタへの整数のキャストが避けられないか、またはそれを避けるためには巨大なリファクタリングが求められるであろう状況は存在する。レガシーなプラットフォームの API もだいたいは <code>usize</code> がポインタを形成する全情報を捕捉できると想定している。ベアメタルのプラットフォームもまた正しい起源を獲得する場所がなく ｢どこからともなく｣ ポインタを合成する必要があったりする。
+			</p> <p>
+Rust でポインタへの整数のキャストを扱うモデルは<em>公開された起源</em>と呼ばれる。とはいえ、公開された起源の意味論は厳格な起源よりもはるかに軟弱な基盤上にあり、この時点において公開された起源に満足のいく曖昧さのない意味論を定義できるかはまだ明らかでない。もしこれが悪く聞こえるなら、ポインタへの整数のキャストを提供する他の人気のある言語もあまり良くやれてない事を再確認しよう。さらに言えば、公開された起源は <a href="https://github.com/rust-lang/miri">Miri</a> や <a href="https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/">CHERI</a> のようなツールでは (十分に) 機能しない。
+			</p> <p>
+公開された起源は <a href="../primitive.pointer.html#method.expose_provenance"><code>expose_provenance</code></a> と <a href="fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> メソッドによって提供され、それらはポインタと整数の間の <code>as</code> キャストに等しい。
+			</p>
+			<ul>
+				<li>
+<a href="../primitive.pointer.html#method.expose_provenance"><code>expose_provenance</code></a> は <a href="../primitive.pointer.html#method.addr"><code>addr</code></a> とよく似ているが、さらにポインタの起源を ‘公開された’ 起源のグローバルなリストへと追加する。(このリストは純粋に概念的なものであり、Rust を規定するために存在するが実際の実行内では、Miri のようなツール内を除いて実体化されない｡）Rust の抽象機械の制御の外側にあるメモリ (例えば MMIO レジスタ) はこのメモリがスタック、ヒープ、静的変数のような抽象機械により使用されうるメモリから分離されている限り、公開されていると常に考えられる。
+				</li> <li>
+<a href="fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> は以前に ‘公開された’ そうした起源の一つとともにポインタを構築するのに使える。<a href="fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> は引数として <code>addr: usize</code> のみをとるため、<a href="../primitive.pointer.html#method.with_addr"><code>with_addr</code></a> の場合と異なり戻されるポインタにとっての正しい起源が何かを示すものがない – そしてそれこそがポインタへの整数のキャストを厳密に規定するのをとてもやりにくくしている！　コンパイラは正しい起源を採取するよう最善を尽くすが、現在のところ結果のポインタがどの起源を持つかはいかなる保証も提供できない。一つだけ明確な事がある: もし戻されるポインタが使用されるのを正当化する手段が以前に ‘公開された’ 起源になければ、プログラムは未定義動作となる。
+				</li>
+			</ul>
+			<p>
+可能な限り、<a href="#strict-provenance">厳密な起源</a>の API へと移植して、公開された起源が必要となるのを避けるよう推奨する。そうしたコードの量の最大化は使用の複雑さを回避し、(アンセーフな) Rust コードの信頼性の向上に大きく貢献する <a href="https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/">CHERI</a> や <a href="https://github.com/rust-lang/miri">Miri</a> のようなツールの導入を促進する大きな利点となる。ただ、私達はこれが常に可能だとは限らないのも認識していて、厳密な起源のよく定義された意味論を明示的に「オプトアウト」して、不明瞭なポインタへの整数のキャストの意味論を「オプトイン」する手段として、公開された起源を提供している。
+			</p>
+		</blockquote>
+	</body>
+</html>
+
