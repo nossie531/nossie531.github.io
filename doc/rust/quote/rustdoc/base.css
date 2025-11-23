@@ -1,25 +1,89 @@
 @charset "utf-8";
 
-/* 以下は原文と近くなるよう調整。*/
+/* # rustdoc のスタイルを模倣した独自スタイル。
+ *
+ * 完全に模倣しない理由は以下の通り。
+ *
+ * - 原文の要素は Markdown 由来のため単純
+ * - 引用先の要素はやや幅が狭いため若干の調整が必要
+ * - 元のスタイルは Web フォントなどを含むため重量級
+ * - 元のスタイルは将来変更されうるため厳密な模倣は不毛
+ * */
 
-:where(:host, :not(:lang(en))) > :lang(en) { 
-	line-height: 1.5;
-	font-family: "Georgia", serif;
+@layer lang {
+	/* # 原文での引用
+	 * - 行高を欧文に適した高さに設定
+	 * - 原文の Web フォントは Georgia と似た雰囲気 */
+	:where(:host, :not(:lang(en))) > :lang(en) { 
+		line-height: 1.5;
+		font-family: "Georgia", serif;
+	}
+
+	/* # 訳文での引用
+	 * - 行高を和文に適した高さに設定
+	 * - 原文はサンセリフ体のため訳文は同系統の明朝
+	 * - Times New Roman と Biz UDMincho は好相性 */
+	:where(:host, :not(:lang(ja))) > :lang(ja) { 
+		line-height: 1.7;
+		font-family: "Times New Roman", "Biz UDMincho", serif;
+	}
+
+	:where(p, li):lang(ja) {
+		text-align: justify;
+	}
 }
 
-:where(:host, :not(:lang(ja))) > :lang(ja) { 
-	line-height: 1.7;
-	font-family: "Times New Roman", "Biz UDMincho", serif;
+blockquote {
+	h1, h2, h3, h4, h5, h6 { font-family: sans-serif; }
+
+	ol, ul { padding-left: 1.5rem; }
+
+	details.method {
+		margin: 1em 0;
+
+		.rightside {
+			float: right;
+			margin-left: 2em;
+		}
+
+		summary {
+			display: block;
+			list-style-position: outside;
+			margin-left: 1rem;
+			pointer-events: none;
+		}
+
+		summary::before {
+			margin-left: -1rem;
+			font-family: system-ui;
+			pointer-events: auto;
+			font-size: xx-small;
+		}
+
+		&[open] summary::before {
+			content: "\25BC";
+		}
+
+		&:not([open]) summary::before {
+			content: "\25B6";
+		}
+
+		summary a {
+			pointer-events: auto;
+		}
+
+		summary > code {
+			background-color: transparent;
+		}
+
+		summary + div {
+			margin-left: 1rem;
+		}
+	}
+
+	/* コードのカラーリング */
+	a.trait { color: #6e4fc9; }
+	a.fn, .fn { color: #ad7c37; }
+	a.primitive, .primitive { color: #ad378a; }
 }
-
-p:lang(ja) {
-	text-align: justify;
-}
-
-h1, h2, h3, h4, h5, h6 { font-family: sans-serif; }
-
-ol, ul { padding-left: 1.5rem; }
-
-/* 以下は原文からの変更部分。*/ 
-a.doc-anchor { display: none; }
 

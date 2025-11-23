@@ -125,11 +125,12 @@ blockquote {
 
 		&::before {
 			content: "⋯";
+			font-family: "Meiryo", monospace;
 		}
 	}
 
 	& > hr.omit + * {
-		margin-top: 0;
+		margin-top: 0 !important;
 	}
 
 	& > * + hr.omit {
