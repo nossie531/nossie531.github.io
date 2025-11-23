@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../base.css"/>
+	</head>
+	<body>
+		<blockquote data-time="2025-11-07" cite="https://doc.rust-lang.org/1.91.1/std/primitive.pointer.html">
+			<h1>プリミティブ型 <span class="primitive">ポインタ</span></h1>
+			<hr class="omit"/>
+			<details class="method" open="open">
+				<summary>
+					<span class="rightside">
+1.84.0 · <a href="../src/core/ptr/const_ptr.rs.html#153">Source</a>
+					</span>
+					<code id="method.addr">
+pub fn <a class="fn" href="#method.addr">addr</a>(self) -&gt; <a class="primitive" href="primitive.usize.html">usize</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+ポインタの「アドレス」部分を取得する。
+					</p> <p>
+これは <code>self as usize</code> と似ているが、ポインタの<a href="ptr/index.html#provenance">起源</a>が破棄され<a href="ptr/index.html#exposed-provenance">公開</a>されない点において異なる。これが意味するのは、戻されたアドレスをキャストして再びポインタにすると<a href="ptr/fn.without_provenance.html">起源のないポインタ</a>が生成され、その逆参照は未定義動作になるという事実だ。失われた情報を復元して逆参照可能なポインタを適切に得るには、<a href="primitive.pointer.html#method.with_addr"><code>with_addr</code></a> か <a href="primitive.pointer.html#method.map_addr"><code>map_addr</code></a> を使え。
+					</p> <p>
+もしこれらの API の使用が不可能、つまり必須となる起源つきのポインタを維持する手段がない場合、厳密な起源は適さないかもしれない。代わりにポインタ整数間のキャストまたは <a href="primitive.pointer.html#method.expose_provenance"><code>expose_provenance</code></a> と <a href="ptr/fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> を使え。ただし、これらはコードに移植性の低下と Rust メモリモデルの順守をチェックするツールとの親和性の低下をもたらしてしまう。
+					</p> <p>
+殆どのプラットフォームではバイト列全体でアドレスを表現するため、これは元のポインタと同じバイト列の値を生成するだろう。ポインタ内に追加情報を保存する必要のあるプラットフォームはポインタのアドレス部分のみを含む値を生成するために表現の変更を行うかもしれない。それが何を意味するかはプラットフォームでの定義による。
+					</p> <p>
+これは<a href="ptr/index.html#strict-provenance">厳密な起源の API</a> である。
+					</p>
+				</div>
+			</details>
+			<hr class="omit"/>
+			<details class="method" open="open">
+				<summary>
+					<span class="rightside">
+1.84.0 · <a href="../src/core/ptr/const_ptr.rs.html#153">Source</a>
+					</span>
+					<code id="method.with_addr">
+pub fn <a class="fn" href="#method.with_addr">with_addr</a>(self, addr: <a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+与えられたアドレスと <code>self</code> の<a href="ptr/index.html#provenance">起源</a>で新しいポインタを作成する。
+					</p> <p>
+これは <code>addr as *const T</code> キャストと似ているが、<code>self</code> の<em>起源</em>を新しいポインタにコピーする。これは単項の本質的なキャストの曖昧さを排除する。
+					</p> <p>
+これは <a href="primitive.pointer.html#method.wrapping_offset"><code>wrapping_offset</code></a> を使い <code>self</code> を与えられたアドレスへとオフセットするのと等価であり、そのため機能も制限も同じである。
+					</p> <p>
+これは<a href="ptr/index.html#strict-provenance">厳密な起源の API</a> である。
+					</p>
+				</div>
+			</details>
+			<details class="method" open="open">
+				<summary>
+					<span class="rightside">
+1.84.0 · <a href="../src/core/ptr/const_ptr.rs.html#153">Source</a>
+					</span>
+					<code id="method.map_addr">
+pub fn <a class="fn" href="#method.map_addr">map_addr</a>(self, f: impl <a class="trait" href="ops/trait.FnOnce.html" title="trait std::ops::FnOnce">FnOnce</a>(<a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+<code>self</code> の<a href="ptr/index.html#provenance">起源</a>を維持しながら、<code>self</code> のアドレスから新しい値へとマップ操作をする事により新しいポインタを作成する。
+					</p> <p>
+これは <a href="primitive.pointer.html#method.with_addr"><code>with_addr</code></a> の簡易版であり、詳しくはそちらのメソッドを参照されたい。
+					</p> <p>
+これは<a href="ptr/index.html#strict-provenance">厳密な起源の API</a> である。
+					</p>
+				</div>
+			</details>
+			<hr class="omit"/>
+		</blockquote>
+	</body>
+</html>
+

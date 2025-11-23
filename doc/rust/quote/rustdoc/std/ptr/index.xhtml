@@ -9,7 +9,7 @@
 		<script src="../../../../../../lib/prism_shadow.js"></script>
 	</head>
 	<body>
-		<blockquote data-time="2025-11-07" cite="https://doc.rust-lang.org/std/ptr/index.html#provenance">
+		<blockquote data-time="2025-11-07" cite="https://doc.rust-lang.org/1.91.1/std/ptr/index.html#provenance">
 			<h2>起源</h2>
 			<p>
 ポインタは<em>単なる</em>「整数」や「アドレス」ではない。例えば､「幸運」があり Use After Free にて解放されたメモリがあなたの読み書きよりも前に再割り当てされたとしても、明らかに Undefineded Behavior なのは議論の余地がない (実際にはこれは最悪の場合のシナリオで、これがなければ UAF の懸念はだいぶ減るだろう！)。別の例として、<a href="../primitive.pointer.html#method.wrapping_offset"><code>wrapping_offset</code></a> はオリジナルポインタが指し示すメモリの割り当てを「思い出す」と文書化されていて、これはたとえその割り当てに占有されるメモリ範囲のはるか外側にオフセットされてもなおそうである事を考えてみよう。このような主張が合理性を持つには、ポインタは単なるアドレス以上の存在である必要がある: つまりそれらには<strong>起源</strong>がなければならない。
@@ -150,7 +150,7 @@ Rust でポインタへの整数のキャストを扱うモデルは<em>公開�
 			</p>
 			<ul>
 				<li>
-<a href="../primitive.pointer.html#method.expose_provenance"><code>expose_provenance</code></a> は <a href="../primitive.pointer.html#method.addr"><code>addr</code></a> とよく似ているが、さらにポインタの起源を ‘公開された’ 起源のグローバルなリストへと追加する。(このリストは純粋に概念的なものであり、Rust を規定するために存在するが実際の実行内では、Miri のようなツール内を除いて実体化されない｡）Rust の抽象機械の制御の外側にあるメモリ (例えば MMIO レジスタ) はこのメモリがスタック、ヒープ、静的変数のような抽象機械により使用されうるメモリから分離されている限り、公開されていると常に考えられる。
+<a href="../primitive.pointer.html#method.expose_provenance"><code>expose_provenance</code></a> は <a href="../primitive.pointer.html#method.addr"><code>addr</code></a> とよく似ているが、さらにポインタの起源を ‘公開された’ 起源のグローバルなリストへと追加する。(このリストは純粋に概念的なものであり、Rust を規定するために存在するが実際の実行中には、Miri のようなツール内を除いて実体化されない｡）Rust の抽象機械の制御の外にあるメモリ (例えば MMIO レジスタ) は、そのメモリがスタック、ヒープ、静的変数のような抽象機械により使用されうるメモリから分離されている限り、公開されていると常に考えられる。
 				</li> <li>
 <a href="fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> は以前に ‘公開された’ そうした起源の一つとともにポインタを構築するのに使える。<a href="fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> は引数として <code>addr: usize</code> のみをとるため、<a href="../primitive.pointer.html#method.with_addr"><code>with_addr</code></a> の場合と異なり戻されるポインタにとっての正しい起源が何かを示すものがない – そしてそれこそがポインタへの整数のキャストを厳密に規定するのをとてもやりにくくしている！　コンパイラは正しい起源を採取するよう最善を尽くすが、現在のところ結果のポインタがどの起源を持つかはいかなる保証も提供できない。一つだけ明確な事がある: もし戻されるポインタが使用されるのを正当化する手段が以前に ‘公開された’ 起源になければ、プログラムは未定義動作となる。
 				</li>

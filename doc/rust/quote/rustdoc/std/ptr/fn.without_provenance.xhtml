@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../base.css"/>
+		<link rel="stylesheet" href="../../../../../../style/import/prism.css"/>
+		<script src="../../../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-11-07" cite="https://doc.rust-lang.org/1.91.1/std/ptr/fn.without_provenance.html">
+			<h1>関数 <span class="fn">without_provenance </span></h1>
+			<span>
+				Since 1.84.0 (const: 1.84.0) · 
+				<a href="../../src/core/ptr/mod.rs.html#879">Source</a>
+			</span>
+			<pre><code>pub const fn without_provenance&lt;T&gt;(addr: <a class="primitive" href="../primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="../primitive.pointer.html">*const T</a></code></pre>
+			<div>
+				<p>
+与えられたアドレスから<a href="index.html#provenance">起源</a>なしでポインタを作成する。
+				</p> <p>
+これは <code>ptr::null().with_addr(addr)</code> と等価である。
+				</p> <p>
+起源がないため、このポインタは実際の割り当てと関連付けられていない。そのような起源のないポインタは (適切にアラインされていれば) ゼロサイズのメモリアクセスに使えるが、起源のないポインタでの非ゼロサイズのメモリアクセスは UB である。起源のないポインタは <code>usize</code> アドレスの変装にすぎない。
+				</p> <p>
+これは <code>addr as *const T</code> と異なる。後者は以前に公開した起源を拾ってポインタを作成する。その操作のさらなる詳細は  <a href="fn.with_exposed_provenance.html" title="fn std::ptr::with_exposed_provenance"><code>with_exposed_provenance</code></a> を見よ。
+				</p> <p>
+これは<a href="index.html#strict-provenance">厳密な起源の API</a> である。
+				</p>
+			</div>
+		</blockquote>
+	</body>
+</html>
+
