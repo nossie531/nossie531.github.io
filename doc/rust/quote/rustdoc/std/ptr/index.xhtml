@@ -150,7 +150,7 @@ Rust でポインタへの整数のキャストを扱うモデルは<em>公開�
 			</p>
 			<ul>
 				<li>
-<a href="../primitive.pointer.html#method.expose_provenance"><code>expose_provenance</code></a> は <a href="../primitive.pointer.html#method.addr"><code>addr</code></a> とよく似ているが、さらにポインタの起源を ‘公開された’ 起源のグローバルなリストへと追加する。(このリストは純粋に概念的なものであり、Rust を規定するために存在するが実際の実行中には、Miri のようなツール内を除いて実体化されない｡）Rust の抽象機械の制御の外にあるメモリ (例えば MMIO レジスタ) は、そのメモリがスタック、ヒープ、静的変数のような抽象機械により使用されうるメモリから分離されている限り、公開されていると常に考えられる。
+<a href="../primitive.pointer.html#method.expose_provenance"><code>expose_provenance</code></a> は <a href="../primitive.pointer.html#method.addr"><code>addr</code></a> とよく似ているが、さらにポインタの起源を ‘公開された’ 起源のグローバルなリストへと追加する。(このリストは純粋に概念的なものであり、Rust を規定するために存在するが実際の実行中には、Miri のようなツール内を除いて実体化されない｡）Rust の抽象機械の制御外にあるメモリ (例えば MMIO レジスタ) は、そのメモリがスタック、ヒープ、静的変数のような抽象機械により使用されうるメモリから分離されている限り、公開されていると常に考える。
 				</li> <li>
 <a href="fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> は以前に ‘公開された’ そうした起源の一つとともにポインタを構築するのに使える。<a href="fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> は引数として <code>addr: usize</code> のみをとるため、<a href="../primitive.pointer.html#method.with_addr"><code>with_addr</code></a> の場合と異なり戻されるポインタにとっての正しい起源が何かを示すものがない – そしてそれこそがポインタへの整数のキャストを厳密に規定するのをとてもやりにくくしている！　コンパイラは正しい起源を採取するよう最善を尽くすが、現在のところ結果のポインタがどの起源を持つかはいかなる保証も提供できない。一つだけ明確な事がある: もし戻されるポインタが使用されるのを正当化する手段が以前に ‘公開された’ 起源になければ、プログラムは未定義動作となる。
 				</li>

@@ -16,24 +16,116 @@
 		</p> 
 		<section>
 			<h1>概要</h1>
-			<p class="todo">
-TODO: Now Writing...
+			<p>
+「起源」の概念はポインタまわりの整数演算についての UB を検出可能にする。起源を利用した API を使用しておけば、<a href="miri.xhtml">Miri</a> などの検証ツールとうまく連携できるようになる。なお、エラー検出以外の殆どの状況では、起源は無視されパフォーマンスに影響しない。
 			</p>
-		</section> <section>
-			<h1>API</h1>
-			<p class="todo">
-TODO: Now Writing... (公開された起源の API を追加予定)
-			</p>
-			<div style="margin: 1em 0;">
-<doc-quote src="quote/rustdoc/std/primitive.pointer.xhtml"/>
-			</div>
-			<div style="margin: 1em 0;">
-<doc-quote src="quote/rustdoc/std/ptr/fn.without_provenance.xhtml"/>
-			</div>
+			<section>
+				<h2>問題領域</h2>
+				<p>
+起源を使わない場合、ポインタは物理的にはアドレスを表現するただの整数である。同様に、ポインタを演算対象とする演算も物理的にはただの整数演算である。しかし、これだけが制限だとすると、どんな意味のない演算でも可能であり、その結果として生成されるポインタが UB を起こしうるかどうかも自動検出できない。
+				</p>
+			</section> <section>
+				<h2>基本方針</h2>
+				<p>
+起源が有効な環境では、ポインタは参照先のアドレスに加えて起源を持つ。この起源は一緒に確保されて一緒に利用されるべきメモリの範囲である。この範囲を越えてポインタのアドレスを編集すると、Miri などの検出ツールは UB と判定する。
+				</p> <p>
+最初の起源は変数やヒープの確保によって生じる。そして、それらの変数やヒープを指すポインタや参照から新たなポインタや参照が派生されると、それらに元の起源の全部または一部を引き継いだ起源が紐づけられる。
+				</p> 
+			</section> <section>
+				<h2>代替手段</h2>
+				<p>
+上記の仕組は「厳密な起源」と呼ばれる。一方､「公開された起源」と呼ばれるものもある。
+				</p> <p>
+推奨されるのは前者で、後者は仕様もあまり定まっていない。具体的には、起源をグローバルなリストで管理しており、以前に作られた起源からそれっぽい対象を選ぶらしい。Rust の外部やレガシーシステムとの通信手段ではこれが必要になる状況が想定されている。
+				</p>
+			</section> <section>
+				<h2>主要 API</h2>
+				<p>
+よく使うもののみ抜粋 (他は『<a href="#api">API</a>』セクションを参照)。
+				</p>
+				<section>
+					<h3>アドレス演算用</h3>
+				<dl class="normal lowProfile">
+					<dt style="width: 25ch;">
+<code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.wrapping_offset">wrapping_offset</a></code>
+					</dt>
+					<dd>
+ポインタのアドレスを加減算
+					</dd>
+					<dt>
+<code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.wrapping_add">wrapping_add</a></code>
+					</dt>
+					<dd>
+ポインタのアドレスを加算
+					</dd>
+					<dt>
+<code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.wrapping_sub">wrapping_sub</a></code>
+					</dt>
+					<dd>
+ポインタのアドレスを減算
+					</dd>
+				</dl>
+				</section> <section>
+					<h3>厳密な起源用</h3>
+				<dl class="normal lowProfile">
+					<dt style="width: 25ch;">
+<code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.addr">addr</a></code>
+					</dt>
+					<dd>
+ポインタ → アドレス + 起源 (破棄)
+					</dd>
+					<dt>
+<code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.with_addr">with_addr</a></code>
+					</dt>
+					<dd>
+ポインタ ← アドレス + 自身の起源
+					</dd>
+					<dt>
+<code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.map_addr">map_addr</a></code>
+					</dt>
+					<dd>
+<code>with_addr</code> とアドレス計算の複合版
+					</dd>
+				</dl>
+				</section> <section>
+					<h3>公開された起源用</h3>
+				<dl class="normal lowProfile">
+					<dt>
+<code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.expose_provenance">expose_provenance</a></code>
+					</dt>
+					<dd>
+ポインタ → アドレス + グローバルな起源
+					</dd>
+					<dt>
+<a href="https://doc.rust-lang.org/std/ptr/fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a>
+					</dt>
+					<dd>
+ポインタ ← アドレス + グローバルな起源 
+					</dd>
+				</dl>
+				</section>
+			</section>
 		</section> <section>
 			<h1>仕様</h1>
 			<div>
 <doc-quote src="quote/rustdoc/std/ptr/index.xhtml"/>
+			</div>
+		</section> <section>
+			<h1 id="api">API</h1>
+			<div style="margin: 1em 0;">
+<doc-quote src="quote/rustdoc/std/primitive.pointer.xhtml"/>
+			</div>
+			<div style="margin: 1em 0;">
+<doc-quote src="quote/rustdoc/std/ptr/fn.with_exposed_provenance.xhtml"/>
+			</div>
+			<div style="margin: 1em 0;">
+<doc-quote src="quote/rustdoc/std/ptr/fn.with_exposed_provenance_mut.xhtml"/>
+			</div>
+			<div style="margin: 1em 0;">
+<doc-quote src="quote/rustdoc/std/ptr/fn.without_provenance.xhtml"/>
+			</div>
+			<div style="margin: 1em 0;">
+<doc-quote src="quote/rustdoc/std/ptr/fn.without_provenance_mut.xhtml"/>
 			</div>
 		</section>
 	</body>

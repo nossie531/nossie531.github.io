@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../base.css"/>
+		<link rel="stylesheet" href="../../../../../../style/import/prism.css"/>
+		<script src="../../../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-11-07" cite="https://doc.rust-lang.org/1.91.1/std/ptr/fn.with_exposed_provenance.html">
+			<h1>関数 <span class="fn">with_exposed_provenance</span></h1>
+			<span>
+				Since 1.84.0 (const: 1.91.0) · 
+				<a href="../../src/core/ptr/mod.rs.html#981">Source</a>
+			</span>
+			<pre><code>pub const fn with_exposed_provenance&lt;T&gt;(addr: <a class="primitive" href="../primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="../primitive.pointer.html">*const T</a></code></pre>
+			<details class="desc">
+				<summary>説明を展開</summary>
+				<div>
+					<p>
+アドレスを変換しポインタへと、以前に ‘公開’ されたいずれかの<a href="index.html#provenance">起源</a>を拾って戻す。
+					</p> <p>
+これは <code>addr as *const T</code> と完全に等価である。戻されるポインタの起源は以前にそれを <a href="../primitive.pointer.html#method.expose_provenance"><code>expose_provenance</code></a> へ渡すか、<code>ptr as usize</code> キャストで公開した<em>いずれかの</em>ポインタのものである。加えて、Rust の抽象機械の制御外にあるメモリ (例えば MMIO レジスタ) は、そのメモリがスタック、ヒープ、静的変数のような抽象機械により使用されうるメモリから分離されている限り、公開されていると常に考える。
+					</p> <p>
+どの起源が拾われるかついては仕様化されていない。コンパイラは (それが何かはともかく)「正しい」起源を拾おうと最善をつくすが、現在のところ私達は結果のポインタがどの起源を持つかについていかなる保証も提供できない – そしてそれゆえに戻されるポインタがどのメモリにアクセスするかの確定した仕様は存在しない。
+					</p> <p>
+もし戻されるポインタが使用されるのを正当化する手段が以前に ‘公開’ された起源になければ、プログラムは未定義動作となる。特に、エイリアシング規則はまだ有効である: エイリアシングへのアクセスにより無効化されたポインタと参照はたとえそれらが公開されていても、もはや使用できない！
+					</p> <p>
+その本質的な曖昧さのため、この操作は Rust のメモリモデルに継続的に準拠するのを補助するツールによりサポートされないかもしれない。可能な限りは <a href="../primitive.pointer.html#method.with_addr"><code>with_addr</code></a> のような <a href="https://doc.rust-lang.org/1.91.1/std/ptr/index.html#strict-provenance">厳密な起源</a>の API を使用するのが推奨される。
+					</p> <p>
+殆どのプラットフォームでこれはアドレスと同じバイト列で値を生成する。ポインタに追加情報の保存が必要なプラットフォームでは、戻されるポインタがどの起源を拾うべきかを実際に計算するのが一般に不可能なため、この操作をサポートしないかもしれない。
+					</p> <p>
+これは<a href="index.html#exposed-provenance">公開された起源の API</a> である。
+					</p>
+				</div>
+			</details>
+		</blockquote>
+	</body>
+</html>
+

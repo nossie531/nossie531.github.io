@@ -11,21 +11,16 @@
  * */
 
 @layer lang {
-	/* # 原文での引用
-	 * - 行高を欧文に適した高さに設定
-	 * - 原文の Web フォントは Georgia と似た雰囲気 */
 	:where(:host, :not(:lang(en))) > :lang(en) { 
-		line-height: 1.5;
-		font-family: "Georgia", serif;
+		--quote-serif: "Georgia", serif;
+		--quote-sans: "Arial", sans-serif;
+		font-family: var(--quote-serif);
 	}
 
-	/* # 訳文での引用
-	 * - 行高を和文に適した高さに設定
-	 * - 原文はサンセリフ体のため訳文は同系統の明朝
-	 * - Times New Roman と Biz UDMincho は好相性 */
 	:where(:host, :not(:lang(ja))) > :lang(ja) { 
-		line-height: 1.7;
-		font-family: "Times New Roman", "Biz UDMincho", serif;
+		--quote-serif: "Times New Roman", "Biz UDMincho", serif;
+		--quote-sans: "Arial", "Biz UDGothic", sans-serif;
+		font-family: var(--quote-serif);
 	}
 
 	:where(p, li):lang(ja) {
@@ -34,30 +29,39 @@
 }
 
 blockquote {
-	h1, h2, h3, h4, h5, h6 { font-family: sans-serif; }
+	h1, h2, h3, h4, h5, h6 {
+		font-family: var(--quote-sans);
+	}
 
 	ol, ul { padding-left: 1.5rem; }
 
-	details.method {
-		margin: 1em 0;
+	/* コードのカラーリング */
+	a.trait { color: #6e4fc9; }
+	a.fn, .fn { color: #ad7c37; }
+	a.primitive, .primitive { color: #ad378a; }
 
-		.rightside {
-			float: right;
-			margin-left: 2em;
-		}
+	/* Markdown の見出しの一段目 */
+	h5 { 
+		font-size: 1rem;
+		margin: 1rem 0 0.5rem;
+	}
 
-		summary {
+	/* 要約詳細のマーカ設定 */
+	details {
+		> summary {
 			display: block;
-			list-style-position: outside;
 			margin-left: 1rem;
-			pointer-events: none;
-		}
 
-		summary::before {
-			margin-left: -1rem;
-			font-family: system-ui;
-			pointer-events: auto;
-			font-size: xx-small;
+			&::before {
+				display: inline-block;
+				width: 1rem;
+				margin-left: -1rem;
+				vertical-align: text-top;
+				font-size: xx-small;
+				font-family: system-ui;
+				cursor: pointer;
+				color: #999;
+			}
 		}
 
 		&[open] summary::before {
@@ -67,23 +71,58 @@ blockquote {
 		&:not([open]) summary::before {
 			content: "\25B6";
 		}
+	}
 
-		summary a {
-			pointer-events: auto;
+	/* 説明アイテム。*/
+	details.desc {
+		summary {
+			cursor: pointer;
+			color: #999;
+
+			& + div {
+				margin-left: 1rem;
+			}
 		}
 
-		summary > code {
-			background-color: transparent;
+		&[open] summary {
+			width: 0;
+			visibility: hidden;
+			float: left;
 		}
 
-		summary + div {
-			margin-left: 1rem;
+		&[open] summary::before {
+			visibility: visible;
 		}
 	}
 
-	/* コードのカラーリング */
-	a.trait { color: #6e4fc9; }
-	a.fn, .fn { color: #ad7c37; }
-	a.primitive, .primitive { color: #ad378a; }
+	/* メソッドアイテム。*/
+	details.method {
+		margin: 1em 0;
+
+		.rightside {
+			float: right;
+			margin-left: 2em;
+		}
+
+		summary {
+			pointer-events: none;
+
+			&::before {
+				pointer-events: auto;
+			}
+
+			a {
+				pointer-events: auto;
+			}
+
+			& > code {
+				background-color: transparent;
+			}
+
+			& + div {
+				margin-left: 1rem;
+			}
+		}
+	}
 }
 

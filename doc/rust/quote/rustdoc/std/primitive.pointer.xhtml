@@ -5,12 +5,14 @@
 		<title>blockquote</title>
 		<meta name="robots" content="noindex"/>
 		<link rel="stylesheet" href="../base.css"/>
+		<link rel="stylesheet" href="../../../../../style/import/prism.css"/>
+		<script src="../../../../../lib/prism_shadow.js"></script>
 	</head>
 	<body>
 		<blockquote data-time="2025-11-07" cite="https://doc.rust-lang.org/1.91.1/std/primitive.pointer.html">
-			<h1>プリミティブ型 <span class="primitive">ポインタ</span></h1>
+			<h1>基本型 <span class="primitive">ポインタ</span></h1>
 			<hr class="omit"/>
-			<details class="method" open="open">
+			<details class="method">
 				<summary>
 					<span class="rightside">
 1.84.0 · <a href="../src/core/ptr/const_ptr.rs.html#153">Source</a>
@@ -33,11 +35,34 @@ pub fn <a class="fn" href="#method.addr">addr</a>(self) -&gt; <a class="primitiv
 					</p>
 				</div>
 			</details>
-			<hr class="omit"/>
-			<details class="method" open="open">
+			<details class="method">
 				<summary>
 					<span class="rightside">
-1.84.0 · <a href="../src/core/ptr/const_ptr.rs.html#153">Source</a>
+1.84.0 · <a class="src" href="../src/core/ptr/const_ptr.rs.html#186">Source</a>
+					</span>
+					<code id="method.expose_provenance">
+pub fn <a href="#method.expose_provenance" class="fn">expose_provenance</a>(self) -&gt; <a class="primitive" href="primitive.usize.html">usize</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+ポインタの「<a href="ptr/index.html#provenance">起源</a>」の部分を後で <a href="ptr/fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> で使えるように公開しつつその「アドレス」の部分を戻す。
+					</p> <p>
+これは <code>self as usize</code> と等価であり、それは意味論的に起源の情報を破棄する。さらに、これは (<code>as</code> キャストのように) 起源を ‘公開’ とマークする暗黙の副作用を持ち、そのためそれをサポートするプラットフォームにおいて後で <a href="ptr/fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> を呼ぶと起源を含んだ元のポインタを再構成できる。
+					</p> <p>
+その本質的な曖昧さのために、<a href="ptr/fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> は Rust のメモリモデルに継続的に準拠するのを補助するツールによりサポートされないかもしれない。可能な限りは <a href="primitive.pointer.html#method.with_addr"><code>with_addr</code></a> のような <a href="ptr/index.html#strict-provenance">厳密な起源</a>の API を使用するのが推奨され、その場合は <a href="primitive.pointer.html#method.addr"><code>addr</code></a> が <code>expose_provenance</code> の代わりに使われるべきである。
+					</p> <p>
+殆どのプラットフォームでは、元のポインタのバイト列全体をアドレス表現に利用しているので、これはそれと同じバイト列を生成する。ポインタに追加情報の保存が必要なプラットフォームでは、<a href="ptr/fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a> の作業に要求される ‘公開’ の副作用が利用できない事が多いため、この操作をサポートしないかもしれない。
+					</p> <p>
+これは<a href="index.html#exposed-provenance">公開された起源</a>の API である。
+					</p>
+				</div>
+			</details>
+			<hr class="omit"/>
+			<details class="method">
+				<summary>
+					<span class="rightside">
+1.84.0 · <a href="../src/core/ptr/const_ptr.rs.html#204">Source</a>
 					</span>
 					<code id="method.with_addr">
 pub fn <a class="fn" href="#method.with_addr">with_addr</a>(self, addr: <a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
@@ -47,7 +72,7 @@ pub fn <a class="fn" href="#method.with_addr">with_addr</a>(self, addr: <a class
 					<p>
 与えられたアドレスと <code>self</code> の<a href="ptr/index.html#provenance">起源</a>で新しいポインタを作成する。
 					</p> <p>
-これは <code>addr as *const T</code> キャストと似ているが、<code>self</code> の<em>起源</em>を新しいポインタにコピーする。これは単項の本質的なキャストの曖昧さを排除する。
+これは <code>addr as *const T</code> キャストと似ているが、<code>self</code> の<em>起源</em>を新しいポインタにコピーする。これは単項のキャストの本質的な曖昧さを排除する。
 					</p> <p>
 これは <a href="primitive.pointer.html#method.wrapping_offset"><code>wrapping_offset</code></a> を使い <code>self</code> を与えられたアドレスへとオフセットするのと等価であり、そのため機能も制限も同じである。
 					</p> <p>
@@ -55,10 +80,10 @@ pub fn <a class="fn" href="#method.with_addr">with_addr</a>(self, addr: <a class
 					</p>
 				</div>
 			</details>
-			<details class="method" open="open">
+			<details class="method">
 				<summary>
 					<span class="rightside">
-1.84.0 · <a href="../src/core/ptr/const_ptr.rs.html#153">Source</a>
+1.84.0 · <a href="../src/core/ptr/const_ptr.rs.html#223">Source</a>
 					</span>
 					<code id="method.map_addr">
 pub fn <a class="fn" href="#method.map_addr">map_addr</a>(self, f: impl <a class="trait" href="ops/trait.FnOnce.html" title="trait std::ops::FnOnce">FnOnce</a>(<a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
@@ -75,6 +100,202 @@ pub fn <a class="fn" href="#method.map_addr">map_addr</a>(self, f: impl <a class
 				</div>
 			</details>
 			<hr class="omit"/>
+			<details class="method">
+				<summary>
+					<span class="rightside">
+1.16.0 (const: 1.61.0) · <a href="../src/core/ptr/const_ptr.rs.html#463-465">Source</a>
+					</span>
+					<code id="method.wrapping_offset">
+pub const fn <a href="#method.wrapping_offset" class="fn">wrapping_offset</a>(self, count: <a class="primitive" href="primitive.isize.html">isize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+ラッピング計算方式でポインタに符号つきオフセットを加える。
+					</p> <p>
+<code>count</code> は T を単位とする; つまり、<code>count</code> が 3 なら <code>3 * size_of::&lt;T&gt;()</code> バイトのポインタのオフセットを表す。
+					</p>
+					<h5>安全性</h5>
+					<p>
+この操作自身は安全だが、結果のポインタの使用はそうでない。
+					</p> <p>
+結果のポインタは <code>self</code> が指し示す<a href="ptr/index.html#allocation">割り当て</a>を「思い出す」(これは「<a href="ptr/index.html#provenance">起源</a>」と呼ばれる)。そのポインタは他の割り当てを読み書きするのに使ってはならない。
+					</p> <p>
+言い換えると、<code>let z = x.wrapping_offset((y as isize) - (x as isize))</code> はたとえ <code>T</code> のサイズが <code>1</code> で且つオーバーフローがなくても <code>z</code> を <code>y</code> と同じにしない: <code>z</code> は依然として <code>x</code> が帰属するオブジェクトに帰属し、<code>x</code> と <code>y</code> が同じ割り当ての中を指し示していない限りその逆参照は未定義動作となる。
+					</p> <p>
+<a href="#method.offset"><code>offset</code></a> と比べると、このメソッドは基本的に同じ割り当ての中にいる必要性を遅延させる: <a href="#method.offset"><code>offset</code></a> はオブジェクトの境界を横断すると直ちに未定義動作となる; <code>wrapping_offset</code> は単にまだ未定義動作を起こしうるポインタを生成し、関連付けられたオブジェクトの領域外でポインタが逆参照された時に問題とする。<a href="#method.offset"><code>offset</code></a> はより最適化しやすいためパフォーマンスに敏感なコードでは好まれる。
+					</p> <p>
+遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、、<code>x.wrapping_offset<wbr/>(o)<wbr/>.wrapping_offset<wbr/>(o.<wbr/>wrapping_neg<wbr/>())</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
+					</p>
+					<h5>例</h5>
+<pre><code class="language-rust">// Iterate using a raw pointer in increments of two elements
+let data = [1u8, 2, 3, 4, 5];
+let mut ptr: *const u8 = data.as_ptr();
+let step = 2;
+let end_rounded_up = ptr.wrapping_offset(6);
+
+let mut out = String::new();
+while ptr != end_rounded_up {
+    unsafe {
+        write!(&amp;mut out, "{}, ", *ptr)?;
+    }
+    ptr = ptr.wrapping_offset(step);
+}
+assert_eq!(out.as_str(), "1, 3, 5, ");</code></pre>
+				</div>
+			</details>
+			<details class="method">
+				<summary>
+					<span class="rightside">
+1.75.0 (const: 1.75.0) · <a href="../src/core/ptr/const_ptr.rs.html#485">Source</a>
+					</span>
+					<code id="method.wrapping_byte_offset">
+pub const fn <a href="#method.wrapping_byte_offset" class="fn">wrapping_byte_offset</a>(self, count: <a class="primitive" href="primitive.isize.html">isize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+ラッピング計算方式でポインタに符号つきオフセットをバイト単位で加える。
+					</p> <p>
+<code>count</code> はバイト単位である。
+					</p> <p>
+これは <code>u8</code> ポインタにキャストしてそれの <a href="primitive.pointer.html#method.wrapping_offset"><code>wrapping_offset</code></a> を使うのに純粋に便利である。ドキュメントはそちらを参照されたい。
+					</p> <p>
+<code>Sized</code> でないポイント対象ではこの操作はデータポインタのみを変更し、メタデータには手をつけない。
+					</p>
+				</div>
+			</details>
+			<hr class="omit"/>
+			<details class="method">
+				<summary>
+					<span class="rightside">
+1.26.0 (const: 1.61.0) · <a href="../src/core/ptr/const_ptr.rs.html#1053-1055">Source</a>
+					</span>
+					<code id="method.wrapping_add">
+pub const fn <a href="#method.wrapping_add" class="fn">wrapping_add</a>(self, count: <a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+ラッピング計算方式でポインタに符号なしオフセットを加える。
+					</p> <p>
+<code>count</code> は T を単位とする; つまり、<code>count</code> が 3 なら <code>3 * size_of::&lt;T&gt;()</code> バイトのポインタのオフセットを表す。
+					</p>
+					<h5>安全性</h5>
+					<p>
+この操作自身は安全だが、結果のポインタの使用はそうでない。
+					</p> <p>
+結果のポインタは <code>self</code> が指し示す<a href="ptr/index.html#allocation">割り当て</a>を ｢思い出す｣; そのポインタは他の割り当てを読み書きするのに使ってはならない。
+					</p> <p>
+言い換えると、<code>let z = x.wrapping_add((y as usize) - (x as usize))</code> はたとえ <code>T</code> のサイズが <code>1</code> で且つオーバーフローがなくても <code>z</code> を <code>y</code> と同じにしない: <code>z</code> は依然として <code>x</code> が帰属するオブジェクトに帰属し、<code>x</code> と <code>y</code> が同じ割り当ての中を指し示していない限りその逆参照は未定義動作となる。
+					</p> <p>
+<a href="#method.add"><code>add</code></a> と比べると、このメソッドは基本的に同じ割り当ての中にいる必要性を遅延させる: <a href="#method.add"><code>add</code></a> はオブジェクトの境界を横断すると直ちに未定義動作となる; <code>wrapping_add</code> は単にまだ未定義動作を起こしうるポインタを生成し、関連付けられたオブジェクトの領域外でポインタが逆参照された時に問題とする。<a href="#method.add"><code>add</code></a> はより最適化しやすいためパフォーマンスに敏感なコードでは好まれる。
+					</p> <p>
+遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、、<code>x.wrapping_add<wbr/>(o)<wbr/>.wrapping_sub<wbr/>(o)</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
+					</p>
+					<h5>例</h5>
+<pre><code class="language-rust">// Iterate using a raw pointer in increments of two elements
+let data = [1u8, 2, 3, 4, 5];
+let mut ptr: *const u8 = data.as_ptr();
+let step = 2;
+let end_rounded_up = ptr.wrapping_offset(6);
+
+let mut out = String::new();
+while ptr != end_rounded_up {
+    unsafe {
+        write!(&amp;mut out, "{}, ", *ptr)?;
+    }
+    ptr = ptr.wrapping_offset(step);
+}
+assert_eq!(out.as_str(), "1, 3, 5, ");</code></pre>
+				</div>
+			</details>
+			<details class="method">
+				<summary>
+					<span class="rightside">
+1.75.0 (const: 1.75.0) · <a href="../src/core/ptr/const_ptr.rs.html#1073">Source</a>
+					</span>
+					<code id="method.wrapping_byte_add">
+pub const fn <a href="#method.wrapping_byte_add" class="fn">wrapping_byte_add</a>(self, count: <a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+ラッピング計算方式でポインタに符号なしオフセットをバイト単位で加える。
+					</p> <p>
+<code>count</code> はバイト単位である。
+					</p> <p>
+これは <code>u8</code> ポインタにキャストしてそれの <a href="primitive.pointer.html#method.wrapping_add"><code>wrapping_add</code></a> を使うのに純粋に便利である。ドキュメントはそちらを参照されたい。
+					</p> <p>
+<code>Sized</code> でないポイント対象ではこの操作はデータポインタのみを変更し、メタデータには手をつけない。
+					</p>
+				</div>
+			</details>
+			<details class="method">
+				<summary>
+					<span class="rightside">
+1.26.0 (const: 1.61.0) · <a href="../src/core/ptr/const_ptr.rs.html#1132-1134">Source</a>
+					</span>
+					<code id="method.wrapping_sub">
+pub const fn <a href="#method.wrapping_sub" class="fn">wrapping_sub</a>(self, count: <a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+ラッピング計算方式でポインタに符号なしオフセットを加える。
+					</p> <p>
+<code>count</code> は T を単位とする; つまり、<code>count</code> が 3 なら <code>3 * size_of::&lt;T&gt;()</code> バイトのポインタのオフセットを表す。
+					</p>
+					<h5>安全性</h5>
+					<p>
+この操作自身は安全だが、結果のポインタの使用はそうでない。
+					</p> <p>
+結果のポインタは <code>self</code> が指し示す<a href="ptr/index.html#allocation">割り当て</a>を ｢思い出す｣; そのポインタは他の割り当てを読み書きするのに使ってはならない。
+					</p> <p>
+言い換えると、<code>let z = x.wrapping_sub((x as usize) - (y as usize))</code> はたとえ <code>T</code> のサイズが <code>1</code> で且つオーバーフローがなくても <code>z</code> を <code>y</code> と同じにしない: <code>z</code> は依然として <code>x</code> が帰属するオブジェクトに帰属し、<code>x</code> と <code>y</code> が同じ割り当ての中を指し示していない限りその逆参照は未定義動作となる。
+					</p> <p>
+<a href="#method.sub"><code>sub</code></a> と比べると、このメソッドは基本的に同じ割り当ての中にいる必要性を遅延させる: <a href="#method.sub"><code>sub</code></a> はオブジェクトの境界を横断すると直ちに未定義動作となる; <code>wrapping_sub</code> は単にまだ未定義動作を起こしうるポインタを生成し、関連付けられたオブジェクトの領域外でポインタが逆参照された時に問題とする。<a href="#method.sub"><code>sub</code></a> はより最適化しやすいためパフォーマンスに敏感なコードでは好まれる。
+					</p> <p>
+遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、、<code>x.wrapping_add<wbr/>(o)<wbr/>.wrapping_sub<wbr/>(o)</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
+					</p>
+					<h5>例</h5>
+<pre><code class="language-rust">// Iterate using a raw pointer in increments of two elements (backwards)
+let data = [1u8, 2, 3, 4, 5];
+let mut ptr: *const u8 = data.as_ptr();
+let start_rounded_down = ptr.wrapping_sub(2);
+ptr = ptr.wrapping_add(4);
+let step = 2;
+let mut out = String::new();
+while ptr != start_rounded_down {
+    unsafe {
+        write!(&amp;mut out, "{}, ", *ptr)?;
+    }
+    ptr = ptr.wrapping_sub(step);
+}
+assert_eq!(out, "5, 3, 1, ");</code></pre>
+				</div>
+			</details>
+			<details class="method">
+				<summary>
+					<span class="rightside">
+1.75.0 (const: 1.75.0) · <a href="../src/core/ptr/const_ptr.rs.html#1152">Source</a>
+					</span>
+					<code id="method.wrapping_byte_sub">
+pub const fn <a href="#method.wrapping_byte_sub" class="fn">wrapping_byte_sub</a>(self, count: <a class="primitive" href="primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="primitive.pointer.html">*const T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+ラッピング計算方式でポインタに符号なしオフセットをバイト単位で加える。
+					</p> <p>
+<code>count</code> はバイト単位である。
+					</p> <p>
+これは <code>u8</code> ポインタにキャストしてそれの <a href="primitive.pointer.html#method.wrapping_sub"><code>wrapping_sub</code></a> を使うのに純粋に便利である。ドキュメントはそちらを参照されたい。
+					</p> <p>
+<code>Sized</code> でないポイント対象ではこの操作はデータポインタのみを変更し、メタデータには手をつけない。
+					</p>
+				</div>
+			</details>
 		</blockquote>
 	</body>
 </html>
