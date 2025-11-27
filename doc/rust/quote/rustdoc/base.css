@@ -4,25 +4,28 @@
  *
  * 完全に模倣しない理由は以下の通り。
  *
+ * - 引用先の要素はやや幅が狭く調整が必要
  * - 原文の要素は Markdown 由来のため単純
- * - 引用先の要素はやや幅が狭いため若干の調整が必要
- * - 元のスタイルは Web フォントなどを含むため重量級
- * - 元のスタイルは将来変更されうるため厳密な模倣は不毛
+ * - 原文のスタイルは Web フォントを含み重量級
+ * - 原文のスタイルは将来変更されうる
  * */
 
 @layer lang {
+	/* 原文のためのフォント設定 */
 	:where(:host, :not(:lang(en))) > :lang(en) { 
 		--quote-serif: "Georgia", serif;
 		--quote-sans: "Arial", sans-serif;
 		font-family: var(--quote-serif);
 	}
 
+	/* 訳文のためのフォント設定 */
 	:where(:host, :not(:lang(ja))) > :lang(ja) { 
 		--quote-serif: "Times New Roman", "Biz UDMincho", serif;
 		--quote-sans: "Arial", "Biz UDGothic", sans-serif;
 		font-family: var(--quote-serif);
 	}
 
+	/* 訳文は両端ぞろえ。*/
 	:where(p, li):lang(ja) {
 		text-align: justify;
 	}
@@ -33,7 +36,9 @@ blockquote {
 		font-family: var(--quote-sans);
 	}
 
-	ol, ul { padding-left: 1.5rem; }
+	ol, ul { padding-left: 1.5em; }
+
+	li { margin: 0.5em 0; }
 
 	/* コードのカラーリング */
 	a.trait { color: #6e4fc9; }
@@ -46,7 +51,7 @@ blockquote {
 		margin: 1rem 0 0.5rem;
 	}
 
-	/* 要約詳細のマーカ設定 */
+	/* 要約と詳細のマーカ設定 */
 	details {
 		> summary {
 			display: block;
