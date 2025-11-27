@@ -34,75 +34,75 @@
 			</section> <section>
 				<h2>代替手段</h2>
 				<p>
-上記の仕組は「厳密な起源」と呼ばれる。一方､「公開された起源」と呼ばれるものもある。
+上記は「厳密な起源」と呼ばれる仕組である。一方､「公開された起源」と呼ばれる仕組も存在する。なお、整数とポインタ間のキャストは公開された起源の別表現であり、実質それらは同じである。推奨されるのは厳密な起源で、公開された起源は仕様も不確かである。
 				</p> <p>
-推奨されるのは前者で、後者は仕様もあまり定まっていない。具体的には、起源をグローバルなリストで管理しており、以前に作られた起源からそれっぽい対象を選ぶらしい。Rust の外部やレガシーシステムとの通信手段ではこれが必要になる状況が想定されている。
+公開された起源では、起源をグローバルなリストで管理しており、起源が必要になると以前に作られた起源からそれっぽい対象を選ぶ。Rust の外部やレガシーシステムとのやりとりではこれが必要になる状況が想定されている。
 				</p>
 			</section> <section>
 				<h2>主要 API</h2>
 				<p>
-よく使うもののみ抜粋 (他は『<a href="#api">API</a>』セクションを参照)。
+よく使うものを抜粋 (他は『<a href="#api">API</a>』セクションを参照)。
 				</p>
 				<section>
-					<h3>アドレス演算用</h3>
-				<dl class="normal lowProfile">
-					<dt style="width: 25ch;">
+					<h3>アドレス演算</h3>
+					<dl class="normal lowProfile">
+						<dt style="width: 25ch;">
 <code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.wrapping_offset">wrapping_offset</a></code>
-					</dt>
-					<dd>
+						</dt>
+						<dd>
 ポインタのアドレスを加減算
-					</dd>
-					<dt>
+						</dd>
+						<dt>
 <code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.wrapping_add">wrapping_add</a></code>
-					</dt>
-					<dd>
+						</dt>
+						<dd>
 ポインタのアドレスを加算
-					</dd>
-					<dt>
+						</dd>
+						<dt>
 <code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.wrapping_sub">wrapping_sub</a></code>
-					</dt>
-					<dd>
+						</dt>
+						<dd>
 ポインタのアドレスを減算
-					</dd>
-				</dl>
+						</dd>
+					</dl>
 				</section> <section>
-					<h3>厳密な起源用</h3>
-				<dl class="normal lowProfile">
-					<dt style="width: 25ch;">
+					<h3>厳密な起源</h3>
+					<dl class="normal lowProfile">
+						<dt style="width: 25ch;">
 <code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.addr">addr</a></code>
-					</dt>
-					<dd>
+						</dt>
+						<dd>
 ポインタ → アドレス + 起源 (破棄)
-					</dd>
-					<dt>
+						</dd>
+						<dt>
 <code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.with_addr">with_addr</a></code>
-					</dt>
-					<dd>
+						</dt>
+						<dd>
 ポインタ ← アドレス + 自身の起源
-					</dd>
-					<dt>
+						</dd>
+						<dt>
 <code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.map_addr">map_addr</a></code>
-					</dt>
-					<dd>
+						</dt>
+						<dd>
 <code>with_addr</code> とアドレス計算の複合版
-					</dd>
-				</dl>
+						</dd>
+					</dl>
 				</section> <section>
-					<h3>公開された起源用</h3>
-				<dl class="normal lowProfile">
-					<dt>
+					<h3>公開された起源</h3>
+					<dl class="normal lowProfile">
+						<dt>
 <code><em>pointer</em>::<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.expose_provenance">expose_provenance</a></code>
-					</dt>
-					<dd>
+						</dt>
+						<dd>
 ポインタ → アドレス + グローバルな起源
-					</dd>
-					<dt>
+						</dd>
+						<dt>
 <a href="https://doc.rust-lang.org/std/ptr/fn.with_exposed_provenance.html"><code>with_exposed_provenance</code></a>
-					</dt>
-					<dd>
+						</dt>
+						<dd>
 ポインタ ← アドレス + グローバルな起源 
-					</dd>
-				</dl>
+						</dd>
+					</dl>
 				</section>
 			</section>
 		</section> <section>
