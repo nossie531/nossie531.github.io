@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Miri エラー / ダングリングポインタ</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: memory access failed: alloc237 has been freed, so this pointer is dangling</mark>
+</samp></pre>
+		<p>
+<a href="miri.xhtml">Miri</a> がダングリングポインタへのアクセスを検出した。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">ヒープ領域</div>
+				</hgroup>
+				<p>
+ヒープ領域を指すダングリングポインタにアクセスしたパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>dangling_ptr</code> から解放済のヒープ領域へのポインタが戻される。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let ptr = dangling_ptr();
+    let val = unsafe { *ptr };
+    assert_eq!(val, 0);
+}
+
+fn dangling_ptr() -&gt; *const i32 {
+    let var = vec![0; 256];
+    &amp;var[255] as *const _
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: memory access failed: alloc237 has been freed, so this pointer is dangling</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:3:24
+<mark class="info">   |</mark>
+<mark class="info"> 3 |</mark>     let val = unsafe { *ptr };
+<mark class="info">   |</mark>                        <mark class="error">^^^^ Undefined Behavior occurred here</mark>
+<mark class="info">   |</mark>
+<mark class="info">   =</mark> <mark class="title">help</mark>: this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior
+<mark class="info">   =</mark> <mark class="title">help</mark>: see <a href="https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html">https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html</a> for further information
+<mark class="info">help</mark>: alloc237 was allocated here:
+<mark class="info">  --&gt;</mark> src\main.rs:8:15
+<mark class="info">   |</mark>
+<mark class="info"> 8 |</mark>     let var = vec![0; 256];
+<mark class="info">   |</mark>               <mark class="info">^^^^^^^^^^^^</mark>
+<mark class="info">help</mark>: alloc237 was deallocated here:
+<mark class="info">  --&gt;</mark> src\main.rs:10:1
+<mark class="info">   |</mark>
+<mark class="info">10 |</mark> }
+<mark class="info">   |</mark> <mark class="info">^</mark>
+<mark class="info">   =</mark> <mark class="title">note</mark>: BACKTRACE (of the first span):
+<mark class="info">   =</mark> <mark class="title">note</mark>: inside `main` at src\main.rs:3:24: 3:28
+<mark class="info">   =</mark> <mark class="title">note</mark>: this error originates in the macro `vec` (in Nightly builds, run with -Z macro-backtrace for more info)
+<mark class="info"></mark>
+<mark class="edit">note</mark><mark class="title">: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">スタック領域</div>
+				</hgroup>
+				<p>
+スタック領域を指すダングリングポインタにアクセスしたパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>dangling_ptr</code> から解放済のスタック領域へのポインタが戻される。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let ptr = dangling_ptr();
+    let val = unsafe { *ptr };
+    assert_eq!(val, 0);
+}
+
+fn dangling_ptr() -&gt; *const i32 {
+    let var = 0;
+    &amp;var as *const _
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="warn">warning</mark><mark class="title">: a dangling pointer will be produced because the local variable `var` will be dropped</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:9:5
+<mark class="info">  |</mark>
+<mark class="info">7 |</mark> fn dangling_ptr() -&gt; *const i32 {
+<mark class="info">  |</mark>                      <mark class="info">---------- return type of the function is `*const i32`</mark>
+<mark class="info">8 |</mark>     let var = 0;
+<mark class="info">  |</mark>         <mark class="info">--- `var` is part the function and will be dropped at the end of the function</mark>
+<mark class="info">9 |</mark>     &amp;var as *const _
+<mark class="info">  |</mark>     <mark class="info">----</mark><mark class="warn">^^^^^^^^^^^^</mark>
+<mark class="info">  |</mark>     <mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="info">dangling pointer created here</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: pointers do not have a lifetime; after returning, the `i32` will be deallocated at the end of the function because nothing is referencing it as far as the type system is concerned
+<mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dangling_pointers_from_locals)]` on by default
+<mark class="info"></mark>
+<mark class="info">error</mark>: Undefined Behavior: memory access failed: alloc126 has been freed, so this pointer is dangling
+<mark class="info">  --&gt;</mark> src\main.rs:3:24
+<mark class="info">   |</mark>
+<mark class="info"> 3 |</mark>     let val = unsafe { *ptr };
+<mark class="info">   |</mark>                        <mark class="error">^^^^ Undefined Behavior occurred here</mark>
+<mark class="info">   |</mark>
+<mark class="info">   =</mark> <mark class="title">help</mark>: this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior
+<mark class="info">   =</mark> <mark class="title">help</mark>: see <a href="https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html">https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html</a> for further information
+<mark class="info">help</mark>: alloc126 was allocated here:
+<mark class="info">  --&gt;</mark> src\main.rs:8:9
+<mark class="info">   |</mark>
+<mark class="info"> 8 |</mark>     let var = 0;
+<mark class="info">   |</mark>         <mark class="info">^^^</mark>
+<mark class="info">help</mark>: alloc126 was deallocated here:
+<mark class="info">  --&gt;</mark> src\main.rs:10:1
+<mark class="info">   |</mark>
+<mark class="info">10 |</mark> }
+<mark class="info">   |</mark> <mark class="info">^</mark>
+<mark class="info">   =</mark> <mark class="info">note</mark>: BACKTRACE (of the first span):
+<mark class="info">   =</mark> <mark class="info">note</mark>: inside `main` at src\main.rs:3:24: 3:28
+<mark class="info"></mark>
+<mark class="edit">note</mark><mark class="title">: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace</mark>
+</samp></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
