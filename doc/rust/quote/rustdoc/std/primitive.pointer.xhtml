@@ -125,7 +125,7 @@ pub const fn <a href="#method.wrapping_offset" class="fn">wrapping_offset</a>(se
 					</p> <p>
 <a href="#method.offset"><code>offset</code></a> と比べると、このメソッドは基本的に同じ割り当ての中にいる必要性を遅延させる: <a href="#method.offset"><code>offset</code></a> はオブジェクトの境界を横断すると直ちに未定義動作となる; <code>wrapping_offset</code> は単にまだ未定義動作を起こしうるポインタを生成し、関連付けられたオブジェクトの領域外でポインタが逆参照された時に問題とする。<a href="#method.offset"><code>offset</code></a> はより最適化しやすいためパフォーマンスに敏感なコードでは好まれる。
 					</p> <p>
-遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、、<code>x.wrapping_offset<wbr/>(o)<wbr/>.wrapping_offset<wbr/>(o.<wbr/>wrapping_neg<wbr/>())</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
+遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、<code>x.wrapping_offset<wbr/>(o)<wbr/>.wrapping_offset<wbr/>(o.<wbr/>wrapping_neg<wbr/>())</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
 					</p>
 					<h5>例</h5>
 <pre><code class="language-rust">// Iterate using a raw pointer in increments of two elements
@@ -191,7 +191,7 @@ pub const fn <a href="#method.wrapping_add" class="fn">wrapping_add</a>(self, co
 					</p> <p>
 <a href="#method.add"><code>add</code></a> と比べると、このメソッドは基本的に同じ割り当ての中にいる必要性を遅延させる: <a href="#method.add"><code>add</code></a> はオブジェクトの境界を横断すると直ちに未定義動作となる; <code>wrapping_add</code> は単にまだ未定義動作を起こしうるポインタを生成し、関連付けられたオブジェクトの領域外でポインタが逆参照された時に問題とする。<a href="#method.add"><code>add</code></a> はより最適化しやすいためパフォーマンスに敏感なコードでは好まれる。
 					</p> <p>
-遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、、<code>x.wrapping_add<wbr/>(o)<wbr/>.wrapping_sub<wbr/>(o)</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
+遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、<code>x.wrapping_add<wbr/>(o)<wbr/>.wrapping_sub<wbr/>(o)</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
 					</p>
 					<h5>例</h5>
 <pre><code class="language-rust">// Iterate using a raw pointer in increments of two elements
@@ -256,7 +256,7 @@ pub const fn <a href="#method.wrapping_sub" class="fn">wrapping_sub</a>(self, co
 					</p> <p>
 <a href="#method.sub"><code>sub</code></a> と比べると、このメソッドは基本的に同じ割り当ての中にいる必要性を遅延させる: <a href="#method.sub"><code>sub</code></a> はオブジェクトの境界を横断すると直ちに未定義動作となる; <code>wrapping_sub</code> は単にまだ未定義動作を起こしうるポインタを生成し、関連付けられたオブジェクトの領域外でポインタが逆参照された時に問題とする。<a href="#method.sub"><code>sub</code></a> はより最適化しやすいためパフォーマンスに敏感なコードでは好まれる。
 					</p> <p>
-遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、、<code>x.wrapping_add<wbr/>(o)<wbr/>.wrapping_sub<wbr/>(o)</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
+遅延チェックはポインタの逆参照されたポインタの値のみを考慮し、最終結果の計算中に使われる中間値は気にしない。例えば、<code>x.wrapping_add<wbr/>(o)<wbr/>.wrapping_sub<wbr/>(o)</code> は常に <code>x</code> と同じになる。言い換えると、割り当てから離れて後で再び入るのは許可されている。
 					</p>
 					<h5>例</h5>
 <pre><code class="language-rust">// Iterate using a raw pointer in increments of two elements (backwards)
