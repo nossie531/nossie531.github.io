@@ -14,6 +14,9 @@
 <pre><samp class="console-rustc">
 <mark class="error">error</mark><mark class="title">: Undefined Behavior: memory access failed: alloc237 has been freed, so this pointer is dangling</mark>
 </samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: memory access failed: attempting to access 4 bytes, but got 0x20a24[noalloc] which is a dangling pointer (it has no provenance)</mark>
+</samp></pre>
 		<p>
 <a href="miri.xhtml">Miri</a> がダングリングポインタへのアクセスを検出した。
 		</p>
@@ -132,6 +135,60 @@ fn dangling_ptr() -&gt; *const i32 {
 <mark class="info">   |</mark> <mark class="info">^</mark>
 <mark class="info">   =</mark> <mark class="info">note</mark>: BACKTRACE (of the first span):
 <mark class="info">   =</mark> <mark class="info">note</mark>: inside `main` at src\main.rs:3:24: 3:28
+<mark class="info"></mark>
+<mark class="edit">note</mark><mark class="title">: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン C</h1>
+					<div class="subTitle">不明な起源</div>
+				</hgroup>
+				<p>
+有効な『<a href="pointer_provenance.xhtml">ポインタの起源</a>』が存在しないパターン。
+				</p> <p>
+これは実際に起源が存在しない場合の他にも、誤って厳密な起源を用いる <code>addr</code> メソッドと公開された起源を用いるポインタから整数へのキャスト (<code>with_exposed_provenance</code> と等価) を併用した場合にもよく発生する。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>addr</code> メソッドとポインタから整数へのキャストを併用している。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let var = 0;
+    let ptr = &amp;var as *const i32;
+    let addr = ptr.addr();
+    let ptr = addr as *const i32;
+    let val = unsafe { *ptr };
+    assert_eq!(val, var);
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="warn">warning</mark><mark class="title">: integer-to-pointer cast</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:5:15
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark>     let ptr = addr as *const i32;
+<mark class="info">  |</mark>               <mark class="warn">^^^^^^^^^^^^^^^^^^ integer-to-pointer cast</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: this program is using integer-to-pointer casts or (equivalently) `ptr::with_exposed_provenance`, which means that Miri might miss pointer bugs in this program
+<mark class="info">  =</mark> <mark class="title">help</mark>: see <a href="https://doc.rust-lang.org/nightly/std/ptr/fn.with_exposed_provenance.html">https://doc.rust-lang.org/nightly/std/ptr/fn.with_exposed_provenance.html</a> for more details on that operation
+<mark class="info">  =</mark> <mark class="title">help</mark>: to ensure that Miri does not miss bugs in your program, use Strict Provenance APIs (https://doc.rust-lang.org/nightly/std/ptr/index.html#strict-provenance, https://crates.io/crates/sptr) instead
+<mark class="info">  =</mark> <mark class="title">help</mark>: you can then set `MIRIFLAGS=-Zmiri-strict-provenance` to ensure you are not relying on `with_exposed_provenance` semantics
+<mark class="info">  =</mark> <mark class="title">help</mark>: alternatively, `MIRIFLAGS=-Zmiri-permissive-provenance` disables this warning
+<mark class="info">  =</mark> <mark class="title">note</mark>: BACKTRACE:
+<mark class="info">  =</mark> <mark class="title">note</mark>: inside `main` at src\main.rs:5:15: 5:33
+<mark class="info"></mark>
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: memory access failed: attempting to access 4 bytes, but got 0x20a24[noalloc] which is a dangling pointer (it has no provenance)</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:6:24
+<mark class="info">  |</mark>
+<mark class="info">6 |</mark>     let val = unsafe { *ptr };
+<mark class="info">  |</mark>                        <mark class="error">^^^^ Undefined Behavior occurred here</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">help</mark>: this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior
+<mark class="info">  =</mark> <mark class="title">help</mark>: see <a href="https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html">https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html</a> for further information
+<mark class="info">  =</mark> <mark class="title">note</mark>: BACKTRACE:
+<mark class="info">  =</mark> <mark class="title">note</mark>: inside `main` at src\main.rs:6:24: 6:28
 <mark class="info"></mark>
 <mark class="edit">note</mark><mark class="title">: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace</mark>
 </samp></pre>
