@@ -56,9 +56,6 @@ Rust の自己参照型には独特の作法があり、周辺知識が必須と
 			</section>
 		</section> <section>
 			<h1>関連アイテム</h1>
-			<p>
-自己参照型の作成には以下のアイテムの知識が必要になる。
-			</p>
 			<dl class="normal">
 				<dt>
 <a href="https://doc.rust-lang.org/std/marker/trait.Unpin.html"><code>Unpin</code></a>
@@ -77,7 +74,7 @@ Rust の自己参照型には独特の作法があり、周辺知識が必須と
 					<p>
 <code>Unpin</code> を解除するマーカー。
 					</p> <p>
-自己参照型はこのフィールドを所有する。
+自己参照型はこの型のフィールドを持つ必要がある。
 					</p>
 				</dd>
 				<dt>
