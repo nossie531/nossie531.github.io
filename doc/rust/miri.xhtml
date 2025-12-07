@@ -12,8 +12,8 @@
 			<h1><doc-title/></h1>
 		</header>
 		<p>
-<a href="https://github.com/rust-lang/miri">Miri</a> は UB (<a href="https://doc.rust-lang.org/reference/behavior-considered-undefined.html">Undefineded Behavior</a>) の検出ツールである。 <br/>
-<code>unsafe</code> を含む Rust コードの健全性の確認に使われる。
+<a href="https://github.com/rust-lang/miri">Miri</a> は<a href="undefined_behavior.xhtml#ub">未定義動作</a> (UB: Undefined Behavior) の検出ツールである。 <br/>
+<code>unsafe</code> を含むコードの検証やその<a href="undefined_behavior.xhtml#soundness">健全性</a>の確認に使われる。
 		</p>
 		<aside class="normal">
 			<p>名前の由来</p> 
@@ -28,7 +28,7 @@ Miri の名前はそれが Rust の中間表現 MIR (Rust's Mid-level Inter&#xAD
 			</p> <p>
 とはいえ、<code>unsafe</code> なコードを扱う場合、筆者はこのツールはほぼ必須だと考えている。
 			</p> <p>
-なぜなら、健全性の問題は人間にとって盲点になるものが多い。また、不健全なコードはその時点で問題なく動作しても、将来的に Rust の更新の影響を受ける可能性がある。Miri はそれらの予防にもなる。
+なぜなら、未定義動作は通常の実行では偶然などから問題なく動作する事も多い。また、その時点では問題なく動作しても、将来的に Rust の更新の影響を受ける可能性がある。Miri はそれらの予防にもなる。
 			</p>
 		</section> <section>
 			<h1>実行方法</h1>
@@ -56,7 +56,7 @@ Miri の名前はそれが Rust の中間表現 MIR (Rust's Mid-level Inter&#xAD
 			<section>
 				<h2>偽陽性なし</h2>
 				<p>
-エラーがあればそれは何らかの不健全性がある事を示している。
+エラーがあればそれは何らかの未定義動作がある事を示している。
 				</p> <p>
 ただし、<time>2025 年現在</time>の重要な点として、後述の<a href="#model">モデル</a>による差異がある。
 				</p>
