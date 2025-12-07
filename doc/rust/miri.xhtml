@@ -18,7 +18,7 @@
 		<aside class="normal">
 			<p>名前の由来</p> 
 			<p>
-Miri の名前はそれが Rust の中間表現 MIR (Rust's Mid-level Inter&#xAD;mediate Repre&#xAD;sen&#xAD;tation) の解釈プログラム (Interpreter) として動作する事に由来している。
+Miri は Rust の中間表現 (MIR: Mid-level Inter&#xAD;mediate Repre&#xAD;sen&#xAD;tation) の解釈プログラム (Inter&#xAD;preter) として動作する。この事は名前の由来にもなっている。
 			</p> 
 		</aside>
 		<section>
@@ -28,7 +28,7 @@ Miri の名前はそれが Rust の中間表現 MIR (Rust's Mid-level Inter&#xAD
 			</p> <p>
 とはいえ、<code>unsafe</code> なコードを扱う場合、筆者はこのツールはほぼ必須だと考えている。
 			</p> <p>
-なぜなら、未定義動作は通常の実行では偶然などから問題なく動作する事も多い。また、その時点では問題なく動作しても、将来的に Rust の更新の影響を受ける可能性がある。Miri はそれらの予防にもなる。
+なぜなら、未定義動作にはエラーの発生有無が偶然に左右される物があり、見逃されやすい。また、Rust のバージョンアップなどで最適化方法が変更されると、その影響を受ける可能性もある。Miri はこれらの問題の対策となる。
 			</p>
 		</section> <section>
 			<h1>実行方法</h1>
@@ -70,7 +70,7 @@ Miri の名前はそれが Rust の中間表現 MIR (Rust's Mid-level Inter&#xAD
 			</section> <section>
 				<h2 id="model">モデル</h2>
 				<p>
-<time>2025 年現在</time>、Rust の <code>unsafe</code> まわりにはまだ曖昧さが残っている。
+<time>2025 年現在</time>、Rust のエイリアシングルールは <code>unsafe</code> まわりにまだ曖昧さがある。
 				</p> <p>
 これに対して、Miri は二つのモデル <dfn id="sb">Stacked Borrows</dfn> と <dfn id="tb">Tree Borrows</dfn> を用意している。どちらでもメモリ安全性は守られるが、後者は制限がより少ない。現在の既定は前者だが、将来的には後者が有力である。後者に切り替える場合、環境変数 <code>MIRIFLAGS</code> に <code>-Zmiri-tree-borrows</code> を指定するとよい。
 				</p> <p>
