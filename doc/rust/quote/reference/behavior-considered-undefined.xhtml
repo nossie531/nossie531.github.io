@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="style/md.css"/>
+		<link rel="stylesheet" href="../../../../style/import/prism.css"/>
+		<script src="../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-06-14" cite="https://doc.rust-lang.org/reference/behavior-considered-undefined.html">
+			<h1 id="behavior-considered-undefined">
+<a href="#behavior-considered-undefined">未定義とみなされる動作</a>
+			</h1>
+			<p>
+Rust コードは以下のリスト内のいずれかの動作を発現すると不正となる。これはアンセーフブロックとアンセーフ関数内にあるコードに含まれる。アンセーフは未定義動作を回避するのがプログラマである事を意味するだけだ; Rust プログラムが未定義動作を決して発生させてはならないという事実を何ら変えるものではない。
+			</p> <p>
+<code>unsafe</code> コードの記述時に、任意のセーフコードがその <code>unsafe</code> コードと相互作用してこれらの動作を誘発できないようにするのはプログラマの責任である。任意のセーフなクライアントに対してこの特性を満たす <code>unsafe</code> コードは<em>健全</em>であると呼ばれる; もしも <code>unsafe</code> コードがセーフコードにより誤用されうるなら、それは<em>不健全</em>である。
+			</p>
+			<div class="alert alert-warning">
+				<p class="alert-title">⚠︎ 警告</p>
+				<p>
+以下のリストは網羅的ではない; 増減がありうる。何が許され何が許されないかについての Rust の意味論の正式なモデルはないため、未定義とみなされる動作はもっとあるかもしれない。また私達はそのリストのいくつかを将来的に定義済とする権利も留保する。言い換えると、このリストは全ての将来の Rust のバージョンで何かが<em>確実に</em>常に未定義だとは言っていない (ただし将来的にリストのいくつかの項目について、そのような約束をする可能性はある)
+				</p> <p>
+アンセーフコードを書く前に <a href="../nomicon/index.html">Rustonomicon</a> を読んでほしい。
+				</p>
+			</div>
+			<ul>
+				<li>
+					<p>
+データ競合
+					</p>
+				</li> <li>
+					<p>
+<a href="#dangling-pointers">ダングリング</a>になっているか<a href="#places-based-on-misaligned-pointers">ミスアライメントされたポインタ基準</a>の場所への (ロードやストア) アクセス。
+					</p>
+				</li> <li>
+					<p>
+<a href="../std/primitive.pointer.html#method.offset">境界内でのポインタ計算</a>の要件に違反する場所についての射影の実行。ここで射影とは<a href="expressions/field-expr.html">フィールド式</a>、<a href="expressions/tuple-expr.html#tuple-indexing-expressions">タプル添字式</a>、または<a href="expressions/array-expr.html#array-and-slice-indexing-expressions">配列/スライス添字式</a>である。
+					</p>
+				</li> <li>
+					<p>
+ポインタのエイリアシングルールの破壊。正確なエイリアシングルールはまだ決まっていないが、ここは一般原則の外形をあげる: <code>&amp;T</code> はそれが生存している限りは、変更されないメモリをポイントしなければならない (<a href="../core/cell/struct.UnsafeCell.html"><code>UnsafeCell&lt;U&gt;</code></a> の内側のデータは例外)。そして <code>&amp;mut T</code> はそれが生存している限りは、その参照から派生されていない任意のポインタにより読書されず他の参照がポイントしないメモリをポイントしなければならない。<code>Box&lt;T&gt;</code> はこれらの規則においては <code>&amp;'static mut T</code> と似たように扱われる。正確な生存期間は指定されないが、幾つかの境界は存在する:
+					</p>
+					<ul>
+						<li>
+参照では、生存期間は借用チェッカーによりあてがわれた構文上のライフタイムにより上限が決まる; そのライフタイム<em>以上</em>には生きられない。
+						</li> <li>
+参照やボックスは逆参照または再借用されるたび、生存中と見なされる。
+						</li> <li>
+参照やボックスは関数へと渡されるか関数から戻されるたび、生存中と見なされる。
+						</li> <li>
+参照 (<code>Box</code> は異なる！) が関数に渡される時、それは最低でもその関数の呼出中は生存中となる。繰り返しだが <code>&amp;T</code> が <a href="../core/cell/struct.UnsafeCell.html"><code>UnsafeCell&lt;U&gt;</code></a> を含むと例外になる。
+						</li>
+					</ul>
+					<p>
+これらは全てこれらの型の値が複合型の (入れ子の) フィールドに渡された時にも適用されるが、ポインタによる間接処理の元ではそうでない。
+					</p>
+				</li> <li>
+					<p>
+不変なバイト列の改変。<a href="destructors.html#constant-promotion">不変昇格</a>された式を経由して到達できる全てのバイト列は不変である。また、<code>'static</code> へ<a href="destructors.html#temporary-lifetime-extension">ライフタイム拡張</a>された <code>static</code> と <code>const</code> 初期化子内の借用を経由して到達できるバイト列も同様である。不変束縛や不変 <code>static</code> によって所有されるバイト列は、それらが <a href="../core/cell/struct.UnsafeCell.html"><code>UnsafeCell&lt;U&gt;</code></a> の一部でない限り、不変である。
+					</p> <p>
+さらに言えば、共有参照により<a href="#pointed-to-bytes">ポイント</a>されるバイト列は、他の参照 (共有と可変の両方) や <code>Box</code> を推移的に経由するものも含めて、不変である; ここで推移性には複合型のフィールドに保存された参照も含める。
+					</p> <p>
+改変とは関連するバイト列のどこかと重複する 0 バイトよりも大きい任意の書込である (たとえその書込がメモリの内容を変更しなくても)。
+					</p>
+				</li> <li>
+					<p>
+コンパイラの内在機能による未定義動作の起動。
+					</p>
+				</li> <li>
+					<p>
+現在のプラットフォームがサポートしないプラットフォームの機能と共にコンパイルされたコードの実行 (<a href="attributes/codegen.html#the-target_feature-attribute"><code class="hljs">target_feature</code></a> を参照)、ただしプラットフォームがこれを明示的に文書化している場合を除く。
+					</p>
+				</li> <li>
+					<p>
+間違った<a href="items/external-blocks.html#abi">呼出 ABI</a> での関数の呼出、または巻き戻しが許可されないスタックフレームを超えての巻き戻し (例えば、"C" の関数や関数ポインタとしてインポートもしくは変換された "C-unwind" つき関数の呼出によって)。
+					</p>
+				</li> <li>
+					<p>
+<a href="#invalid-values">不正な値</a>の生成。値の “生成” は値が場所へと代入されるか場所から読取されるか、関数/プリミティブ操作へと渡されるか関数/プリミティブ操作から戻されると、常に発生する。
+					</p>
+				</li> <li>
+					<p>
+インラインアセンブリの不正な使用。より詳しくは、インラインアセンブリを使用するコード記述時の<a href="inline-assembly.html#rules-for-inline-assembly">ルール</a>を参照せよ。
+					</p>
+				</li> <li>
+					<p>
+<strong><a href="const_eval.html#const-context">定数文脈</a>において</strong>: ポインタ (参照、生ポインタ、または関数ポインタ) を非ポインタ型 (整数など) である何らかの割り当てへと変換または別の方法で再解釈。‘再解釈’ はキャストなしでポインタの値を整数でロードする事を指し、例えば生ポインタのキャストや共用体を使って行える。
+					</p>
+				</li> <li>
+					<p>
+Rust ランタイムの仮定への違反。殆どの Rust ランタイムの仮定は現在は明示的に文書化されていない。
+					</p>
+					<ul>
+						<li>
+特に巻き戻しに関する仮定については、<a href="panic.html#unwinding-across-ffi-boundaries">パニックについての文書</a>を見よ。
+						</li> <li>
+ランタイムは Rust のスタックフレームはそのスタックフレームにより所有されるローカル変数のデストラクタの実行なしには割り当てを解除されないと仮定している。この仮定は <code>longjmp</code> のような C の関数により侵害できる。
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<div class="alert alert-note">
+				<p class="alert-title">ⓘ 参考</p>
+				<p>
+未定義動作はプログラム全体に影響する。例えば、C での未定義動作を発現する C の関数の呼出はあなたのプログラム全体が未定義動作を含む事を意味し、それは Rust コードにも影響しうる。そして逆も同様、Rust での未定義動作は他へのあらゆる FFI 呼出により実行されるコードの悪影響の原因になりうる。
+				</p>
+			</div>
+			<h2 id="pointed-to-bytes">
+<a href="#pointed-to-bytes">ポイントされるバイト列</a>
+			</h2>
+			<p>
+ポインタや参照が “ポイントする” バイト列の区間はポインタの値とポイントされる型のサイズにより決定される (<code>size_of_val</code> の使用)。
+			</p>
+			<h2 id="places-based-on-misaligned-pointers">
+<a href="#places-based-on-misaligned-pointers">ミスアライメントされたポインタ基準の場所</a>
+			</h2>
+			<p>
+場所はもし場所計算中の最後の <code>*</code> 射影がその型にアライメントされていないポインタ上で実行されると、“ミスアライメントされたポインタ基準” であると言われる。(もし場所式の中に <code>*</code> 射影がなければ、これはローカルか静的なフィールドへのアクセスで rustc は正しいアライメントを生成する。もし複数の <code>*</code> 射影があれば、それらはそれぞれメモリからそれ自身を逆参照するためのポインタのロードを招き、これらのそれぞれのロードがアライメント制約の対象となる。表面的な Rust の構文では自動逆参照があるため特定の <code>*</code> 射影は省略できる点に注意せよ; 私達はここでは完全に展開された場所式について考えている。)
+			</p> <p>
+実例として、もし <code>ptr</code> が <code>*const S</code> の型を持ち <code>S</code> のアライメントが 8 なら、<code>ptr</code> はアライメント 8 でなければならず、そうでなければ <code>(*ptr).f</code> は “ミスアライメントされたポインタ基準” になる。これはたとえフィールド <code>f</code> の型が <code>u8</code> (つまりアライメント 1 の型) でも真実である。言い換えると、アライメントの要件はポインタが逆参照された型から導出され、アクセスされるフィールドの型からではない。
+			</p> <p>
+ミスアライメントされたポインタ基準の場所はそれがロードまたはストアされた時にのみ未定義動作につながる点に注意せよ。
+			</p> <p>
+<code>&amp;raw const</code> / <code>&amp;raw mut</code> はそのような場所でも使える。
+			</p> <p>
+<code>&amp;</code> / <code>&amp;mut</code> における場所はフィールド型のアライメントが要求され (そうでなければプログラムは “不正な値の生成” になるだろう)、これはアライメントされたポインタに基づく場合よりは一般に小さい制限の要求である。
+			</p> <p>
+フィールドの型がそれを含む型よりも大きなアライメントを持つかもしれない場合 (つまり、<code>repr(packed)</code>)、参照をとる事はコンパイルエラーにつながる。これはつまりアライメントされたポインタを基準にすると常に十分に新しい参照のアライメントを保証できるが、必ずしもそれが必要ではない事を意味している。
+			</p>
+			<h2 id="dangling-pointers">
+<a href="#dangling-pointers">ダングリングポインタ</a>
+			</h2>
+			<p>
+参照/ポインタはもしそれが<a href="#pointed-to-bytes">ポイントする</a>バイト列の全てが同一の生きた割り当ての一部でないと “ダングリング” になる (つまり具体的にはそれらは全て<em>特定の</em>割り当ての一部でなければならない)。
+			</p> <p>
+もしサイズが 0 なら、そのポインタは自明だが “ダングリング” は決してしない (たとえそれがヌルポインタでも)。
+			</p> <p>
+動的サイズ型 (スライスや文字列のような) はそれらの範囲全体をポイントするため、長さのメタデータが極端に大きくないのも重要である。
+			</p> <p>
+具体的には、Rust の値の動的サイズ (<code>size_of_val</code> により決定される) は一回の割り当てが <code>isize::MAX</code> より大きくなるのが不可能なため、決して <code>isize::MAX</code> を超えてはならない。
+			</p>
+			<h2 id="invalid-values">
+<a href="#invalid-values">不正な値</a>
+			</h2>
+			<p>
+Rust のコンパイラはプログラムの実行中に生成される全ての値が “妥当” であり、そして不正な値はそのためすぐに UB になると仮定する。
+			</p> <p>
+値が妥当かは型に依存する:
+			</p>
+			<ul>
+				<li>
+					<p>
+<a href="types/boolean.html"><code>bool</code></a> の値は <code>false</code> (<code>0</code>) か <code>true</code> (<code>1</code>) でなければならない。
+					</p>
+				</li> <li>
+					<p>
+<code>fn</code> ポインタの値は非ヌルでなければならない。
+					</p>
+				</li> <li>
+					<p>
+<code>char</code> の値はサロゲートであってはならず (つまり、範囲 <code>0xD800..=0xDFFF</code> にあってはならない)、<code>char::MAX</code> 以下でなければならない。
+					</p>
+				</li> <li>
+					<p>
+<code>!</code> の値は決して存在してはならない。
+					</p>
+				</li> <li>
+					<p>
+整数 (<code>i*</code> / <code>u*</code>)、浮動小数点数値 (<code>f*</code>)、または生ポインタは初期化されていなければならない、つまり未初期化のメモリから獲得してはいけない。
+					</p>
+				</li> <li>
+					<p>
+<code>str</code> 値は <code>[u8]</code> のように扱う、つまり初期化されていなければならない。
+					</p>
+				</li> <li>
+					<p>
+<code>enum</code> は妥当な識別子を持たなければならず、その識別子によって示される変異形の全てのフィールドがそれらそれぞれの型で妥当でなければならない。
+					</p>
+				</li> <li>
+					<p>
+<code>struct</code>、タプル、そして配列は全てのフィールド/要素がそれらのそれぞれの型で妥当であるよう要求する。
+					</p>
+				</li> <li>
+					<p>
+<code>union</code> では、正確な妥当性の要求はまだ決定されていない。当然、セーフコードで作成される全ての値は妥当である。もし共用体がゼロサイズのフィールドを持つなら、全ての可能な値は妥当である。さらなる詳細は<a href="https://github.com/rust-lang/unsafe-code-guidelines/issues/438">まだ議論中</a>である。
+					</p>
+				</li> <li>
+					<p>
+参照や <a href="../alloc/boxed/struct.Box.html"><code>Box&lt;T&gt;</code></a> はアライメントされた非ヌルで、<a href="#dangling-pointers">ダングリング</a>してはならず、かつ妥当な値をポイントしなければならない (動的サイズ型では、メタデータにより決まるポイントされる実際の動的型が使われる)。最後の点 (妥当な値のポイントについて) は幾つか議論になる話題が残っている事に注意せよ。
+					</p>
+				</li> <li>
+					<p>
+ファット参照、<a href="../alloc/boxed/struct.Box.html"><code>Box&lt;T&gt;</code></a>、または生ポインタのメタデータはサイズ指定されない末尾の型に適合しなければならない:
+					</p>
+					<ul>
+						<li>
+<code>dyn Trait</code> のメタデータはコンパイラが生成した <code>Trait</code> のための vtable でなければならない (生ポインタではこの要件は幾つか議論になる話題が残っている)。
+						</li> <li>
+スライス (<code>[T]</code>) のメタデータは妥当な <code>usize</code> でなければならない。さらに言うと、ファット参照と <a href="../alloc/boxed/struct.Box.html"><code>Box&lt;T&gt;</code></a>、スライスのメタデータは、もしそれがポイントされる値の合計サイズを <code>isize::MAX</code> より大きくするようなら不正となる。
+						</li>
+					</ul>
+				</li> <li>
+					<p>
+もし型が妥当な値について独自の範囲を持つなら、妥当な値はその範囲内になければならない。標準ライブラリの中では、これは  <a href="../core/ptr/non_null/struct.NonNull.html"><code class="hljs">NonNull&lt;T&gt;</code></a> and <a href="../core/num/nonzero/struct.NonZero.html"><code class="hljs">NonZero&lt;T&gt;</code></a> に影響する。
+					</p>
+					<div class="alert alert-note">
+						<p class="alert-title">ⓘ 参考</p>
+						<p>
+<code>rustc</code> はこれを不安定な <code>rustc_layout_scalar_valid_range_*</code> 属性で達成する。
+						</p>
+					</div>
+				</li>
+			</ul>
+			<p>
+<strong>参考:</strong> 未初期化のメモリは制限された有効な値の集合を持つ任意の型において暗黙的に不正である。言い換えると、未初期化メモリの読取が許されるのは <code>union</code> の内側と “パディング” (型のフィールド間にある隙間) の中のみである。
+			</p>
+		</blockquote>
+	</body>
+</html>
+

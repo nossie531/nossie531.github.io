@@ -1,30 +1,76 @@
 blockquote {
-	.table-wrapper {
-		overflow-x: auto;
+    --alert-warning-color: #9a6700;
+    --alert-note-color: #0969da;
+
+	:is(h1, h2, h3, h4, h5):not(:first-child) {
+		margin-top: 2em;
+	}
+
+	:is(h1, h2, h3, h4, h5) > a:link:only-child {
+		color: var(--fg-color);
+		text-decoration: none;
+	}
+
+	a:link:hover {
+		text-decoration: underline;
+	}
+
+	ul, ol {
+		padding-left: 1.5em;
 	}
 
 	table {
 		margin: 0 auto;
 		border-collapse: collapse;
+
+		thead {
+			background: var(--edge-color);
+		}
+
+		thead tr {
+			border: thin var(--base0-color) solid;
+		}
+
+		thead td {
+			font-weight: bold;
+			border: none;
+		}
+
+		thead th {
+			padding: 3px 20px;
+		}
+
+		tbody tr:nth-child(2n) {
+			background: var(--neutral1-color);
+		}
+
+		td {
+			padding: 3px 20px;
+			border: thin var(--base0-color) solid;
+		}
 	}
-	table td {
-		padding: 3px 20px;
-		border: thin var(--base0-color) solid;
+
+	div.alert-warning {
+		border-left: medium solid var(--alert-warning-color);
+		padding-left: 1rem;
+
+		.alert-title {
+			font-weight: bold;
+			color: var(--alert-warning-color);
+		}
 	}
-	table thead {
-		background: var(--edge-color);
+
+	div.alert-note {
+		border-left: medium solid var(--alert-note-color);
+		padding-left: 1rem;
+
+		.alert-title {
+			font-weight: bold;
+			color: var(--alert-note-color);
+		}
 	}
-	table thead tr {
-		border: thin var(--base0-color) solid;
-	}
-	table thead td {
-		font-weight: bold;
-		border: none;
-	}
-	table thead th {
-		padding: 3px 20px;
-	}
-	table tbody tr:nth-child(2n) {
-		background: var(--neutral1-color);
+
+	.table-wrapper {
+		overflow-x: auto;
 	}
 }
