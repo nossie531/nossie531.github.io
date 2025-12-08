@@ -115,7 +115,7 @@ fn dangling_ptr() -&gt; *const i32 {
 <mark class="info">  =</mark> <mark class="title">note</mark>: pointers do not have a lifetime; after returning, the `i32` will be deallocated at the end of the function because nothing is referencing it as far as the type system is concerned
 <mark class="info">  =</mark> <mark class="title">note</mark>: `#[warn(dangling_pointers_from_locals)]` on by default
 <mark class="info"></mark>
-<mark class="info">error</mark>: Undefined Behavior: memory access failed: alloc126 has been freed, so this pointer is dangling
+<mark class="error">error</mark><mark class="title">: Undefined Behavior: memory access failed: alloc126 has been freed, so this pointer is dangling</mark>
 <mark class="info">  --&gt;</mark> src\main.rs:3:24
 <mark class="info">   |</mark>
 <mark class="info"> 3 |</mark>     let val = unsafe { *ptr };
