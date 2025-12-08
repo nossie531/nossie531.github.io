@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: ライフタイム拡張</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+ライフタイム拡張について。
+		</p> 
+		<aside class="normal">
+			<p>メモした理由</p>
+			<p>
+筆者の場合、この機能は Rust の学習を進めるごとに発見があった。まずは「え！こんな記法ありなんだ…」となり、少しすると「やっぱりこの部分だけ独特だよな…」となり、最終的に「なるほど！専用のルールがあったのか！」となった。
+			</p>
+		</aside>
+		<section>
+			<h1>概要</h1>
+			<p>
+ライフタイム拡張は <code>let x = &amp;<em>some_expression</em>;</code> のような <code>let</code> 構文で有効になる。
+			</p> <p>
+そして、末尾の一時式のライフタイムを、変数のスコープ範囲にまで拡張する。
+			</p> <p>
+仮にもし、この文をライフタイム拡張の知識なしで真面目に考えると、末尾の一時式の結果はすぐに解放されるため、<code>x</code> は最初からダングリング状態となる。もしそうなら、これは確実にコンパイルエラーにすべき状況である。しかし、実際はエラーにならない。
+			</p>
+		</section> <section>
+			<h1>仕様</h1>
+			<div>
+<doc-quote src="quote/reference/destructors.xhtml"/>
+			</div>
+		</section>
+	</body>
+</html>

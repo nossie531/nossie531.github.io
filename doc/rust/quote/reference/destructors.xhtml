@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="style/md.css"/>
+		<link rel="stylesheet" href="../../../../style/import/prism.css"/>
+		<script src="../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2025-10-07" cite="https://doc.rust-lang.org/reference/destructors.html#temporary-lifetime-extension">
+			<h3 id="temporary-lifetime-extension">
+<a href="#temporary-lifetime-extension">一時値のライフタイム拡張</a>
+			</h3>
+			<div class="alert alert-note">
+				<p class="alert-title">ⓘ 参考</p>
+				<p>
+一時値のライフタイム拡張のための正確なルールは変更の対象になるかもしれない。ここでは現在の動作のみを説明している。
+				</p>
+			</div>
+			<p>
+<code>let</code> 文内の式のための一時的なスコープは時おり <code>let</code> 文を包含するブロックのスコープまで拡張される。これは通常の一時的なスコープが小さすぎる時に行われ、特定の構文ルールに基づく。例えば:
+			</p>
+<pre><code class="language-rust">let x = &amp;mut 0;
+// Usually a temporary would be dropped by now, but the temporary for `0` lives
+// to the end of the block.
+println!("{}", x);</code></pre>
+			<p>
+ライフタイム拡張は <code>static</code> と <code>const</code> のアイテムにも適用され、そこでは一時値がプログラムの終了まで生きるようになる。例えば:
+			</p>
+<pre><code class="language-rust">const C: &amp;Vec&lt;i32&gt; = &amp;Vec::new();
+// Usually this would be a dangling reference as the `Vec` would only
+// exist inside the initializer expression of `C`, but instead the
+// borrow gets lifetime-extended so it effectively has `'static` lifetime.
+println!("{:?}", C);</code></pre>
+			<p>
+もし<a href="expressions/operator-expr.html#borrow-operators">借用</a>、<a href="expressions/operator-expr.html#the-dereference-operator">逆参照</a>、<a href="expressions/field-expr.html">フィールド</a>、または<a href="expressions/tuple-expr.html#tuple-indexing-expressions">タプル添字</a>の式が拡張された一時的なスコープを持つなら、その演算対象もそうなる。もし<a href="expressions/array-expr.html#array-and-slice-indexing-expressions">添字式</a>が拡張された一時的なスコープを持つなら、添字の適用対象の式もまた拡張された一時的なスコープを持つ。
+			</p>
+			<h4 id="extending-based-on-patterns">
+<a href="#extending-based-on-patterns">パターンに基づく拡張</a>
+			</h4>
+			<p>
+<em>拡張パターン</em>は以下のどれかである:
+			</p>
+			<ul>
+				<li>
+					<p>
+参照や可変参照により束縛される<a href="patterns.html#identifier-patterns">識別子パターン</a>。
+					</p>
+<pre><code class="language-rust">let ref x = temp(); // Binds by reference.
+let ref mut x = temp(); // Binds by mutable reference.</code></pre>
+				</li> <li>
+					<p>
+<a href="patterns.html#struct-patterns">構造体</a>、<a href="patterns.html#tuple-patterns">タプル</a>、<a href="patterns.html#tuple-struct-patterns">タプル構造体</a>、<a href="patterns.html#slice-patterns">スライス</a>、または直下のサブパターンの最低でもどれか一つが拡張パターンとなる<a href="patterns.html#or-patterns">選択パターン</a>。
+					</p>
+<pre><code class="language-rust">struct W&lt;T&gt;(T);
+let W { 0: ref x } = W(()); // Struct pattern.
+let W(ref x) = W(()); // Tuple struct pattern.
+let (W(ref x),) = (W(()),); // Tuple pattern.
+let [W(ref x), ..] = [W(())]; // Slice pattern.
+let (Ok(W(ref x)) | Err(&amp;ref x)) = Ok(W(())); // Or pattern.
+//
+// All of the temporaries above are still live here.</code></pre>
+				</li>
+			</ul>
+			<p>
+つまり <code>ref x</code>、<code>V(ref x)</code> そして <code>[ref x, y]</code> は全て拡張パターンだが、<code>x</code>、<code>&amp; ref x</code> そして <code>&amp;(ref x,)</code> はそうではない。
+			</p> <p>
+もしも <code>let</code> 文内のパターンが拡張パターンなら、初期化子の式の一時的なスコープは拡張される。
+			</p>
+<pre><code class="language-rust">// This is an extending pattern, so the temporary scope is extended.
+let ref x = *&amp;temp(); // OK</code></pre>
+<pre><code class="language-rust">// This is neither an extending pattern nor an extending expression,
+// so the temporary is dropped at the semicolon.
+let &amp;ref x = *&amp;&amp;temp(); // ERROR</code></pre>
+<pre><code class="language-rust">// This is not an extending pattern but it is an extending expression,
+// so the temporary lives beyond the `let` statement.
+let &amp;ref x = &amp;*&amp;temp(); // OK</code></pre>
+			<h4 id="extending-based-on-expressions">
+<a href="#extending-based-on-expressions">式に基づく拡張</a>
+			</h4>
+			<p>
+初期化子を伴う let 文では、<em>拡張式</em>は以下のうちのどれか一つの式である:
+			</p>
+			<ul>
+				<li>
+初期化式。
+				</li> <li>
+拡張される<a href="expressions/operator-expr.html#borrow-operators">借用式</a>の演算対象。
+				</li> <li>
+拡張される<a href="expressions/array-expr.html#array-expressions">配列</a>、<a href="expressions/operator-expr.html#type-cast-expressions">キャスト</a>、<a href="expressions/struct-expr.html">中括弧つき構造体</a>、または<a href="expressions/tuple-expr.html#tuple-expressions">タプル</a>式。
+				</li> <li>
+拡張される<a href="types/struct.html#r-type.struct.tuple">タプル構造体</a>または<a href="types/enum.html#r-type.enum.declaration">タプル変異形</a>のコンストラクタ式への引数。
+				</li> <li>
+拡張される<a href="expressions/block-expr.html">ブロック式</a>の最後の式、ただし<a href="expressions/block-expr.html#r-expr.block.async">非同期ブロック式</a>は除く。
+				</li> <li>
+拡張される <a href="expressions/if-expr.html#if-expressions"><code>if</code></a> 式のブロック (先頭、<code>else if</code>、そして <code>else</code>) の最後の式。
+				</li> <li>
+拡張される <a href="expressions/match-expr.html"><code>match</code></a> 式のアーム式。
+				</li>
+			</ul>
+			<p>
+つまり <code>&amp;mut 0</code>、<code>(&amp;1, &amp;mut 2)</code>、そして <code>Some(&amp;mut 3)</code> 内の借用式は全て拡張式だが、<code>&amp;0 + &amp;1</code> と <code>f(&amp;mut 0)</code> 内の借用はそうではない。
+			</p> <p>
+任意の拡張される借用式の演算対象はその拡張された一時的なスコープを持つ。
+			</p>
+			<div class="alert alert-note">
+				<p class="alert-title">ⓘ 参考</p>
+				<p>
+<code>rustc</code> は拡張される<a href="types/array.html">配列</a>の<a href="expressions/array-expr.html#r-expr.array.repeat-operand">反復対象</a>を拡張式として扱わない。そうすべきかどうかは未解決の問題である。
+				</p> <p>
+詳しくは、<a href="https://github.com/rust-lang/rust/issues/146092">Rust issue #146092</a> を参照。
+				</p>
+			</div>
+			<h4 id="example">
+<a href="#example">例</a>
+			</h4>
+			<p>
+ここでは式が一時的なスコープを持つ例をいくつか示す:
+			</p>
+<pre><code class="language-rust">let x = &amp;temp(); // Operand of borrow.
+let x = &amp;raw const *&amp;temp(); // Operand of raw borrow.
+let x = &amp;temp() as &amp;dyn Send; // Operand of cast.
+let x = (&amp;*&amp;temp(),); // Operand of tuple constructor.
+let x = { [Some(&amp;temp())] }; // Final expr of block.
+let x = const { &amp;temp() }; // Final expr of `const` block.
+let x = unsafe { &amp;temp() }; // Final expr of `unsafe` block.
+let x = if true { &amp;temp() } else { &amp;temp() };
+//              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//           Final exprs of `if`/`else` blocks.
+let x = match () { _ =&gt; &amp;temp() }; // `match` arm expression.
+//
+// All of the temporaries above are still live here.</code></pre>
+			<p>
+ここでは式が一時的なスコープを持たない例をいくつか示す:
+			</p>
+<pre><code class="language-rust">// Arguments to function calls are not extending expressions. The
+// temporary is dropped at the semicolon.
+let x = core::convert::identity(&amp;temp()); // ERROR</code></pre>
+<pre><code class="language-rust">// Receivers of method calls are not extending expressions.
+let x = (&amp;temp()).use_temp(); // ERROR</code></pre>
+<pre><code class="language-rust">// Scrutinees of match expressions are not extending expressions.
+let x = match &amp;temp() { x =&gt; x }; // ERROR</code></pre>
+<pre><code class="language-rust">// Final expressions of `async` blocks are not extending expressions.
+let x = async { &amp;temp() }; // ERROR</code></pre>
+<pre><code class="language-rust">// Final expressions of closures are not extending expressions.
+let x = || &amp;temp(); // ERROR</code></pre>
+<pre><code class="language-rust">// Operands of loop breaks are not extending expressions.
+let x = loop { break &amp;temp() }; // ERROR</code></pre>
+<pre><code class="language-rust">// Operands of breaks to labels are not extending expressions.
+let x = 'a: { break 'a &amp;temp() }; // ERROR</code></pre>
+		</blockquote>
+	</body>
+</html>
+

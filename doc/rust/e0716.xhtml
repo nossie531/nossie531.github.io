@@ -89,15 +89,15 @@ Rust 以外の多くの言語では、ローカル変数に計算過程の中間
 			</section> <section>
 				<hgroup>
 					<h1>パターン B</h1>
-					<div class="subTitle">参照式</div>
+					<div class="subTitle">ライフタイム拡張</div>
 				</hgroup>
 				<p>
-参照式 (<code>&amp;<var>x</var></code>) は必要に応じて現在のスコープに演算対象 (<code><var>x</var></code>) を保存する。そのため、一時的な値に由来する参照でも、この場合は<a href="#basic">基本形</a>のパターンとは異なり、その参照がすぐに使えなくなる事はない。ただし、スコープを超えた利用ではやはりエラーになる。
+一時的な値が<a href="lifetime_extension.xhtml">ライフタイム拡張</a>される場合、<a href="#basic">基本形</a>のパターンのようにその参照がすぐに使えなくなる事はない。しかし、スコープを超えた利用はやはりエラーになる。
 				</p>
 				<section>
 					<h2>サンプル</h2>
 					<p>
-以下では、参照式により一時的な値に由来する <code>Foo::new().val</code> がスコープに保存される。そのため、それを参照する <code>ref_to_temp</code> の使用は妥当である。しかし、関数 <code>use_ref</code> の引数のライフタイムは <code>'static</code> であるため、その保存期間を超えてしまっている。
+以下では、ライフタイム拡張により <code>Foo::new().val</code> は <code>ref_to_temp</code> と同じライフタイムを持つようになる。しかし、関数 <code>use_ref</code> は引数のライフタイムに <code>'static</code> を要求しているため、そのライフタイムでは短すぎる。
 					</p>
 <pre><code class="language-rust">
 fn main() {
