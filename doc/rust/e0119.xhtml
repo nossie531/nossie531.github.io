@@ -282,13 +282,13 @@ struct MyType {}
 				<hgroup>
 					<h1>パターン D2</h1>
 					<div class="subTitle">
-外部クレート <span class="nw">(下流クレートとの衝突予防)</span>
+外部クレート <span class="nw">(下流クレートの考慮)</span>
 					</div>
 				</hgroup>
 				<p>
-作成中のクレートと下流クレートのトレイト実装の衝突予防のためのパターン。
+作成中のクレートの下流クレートでありうる実装を考慮したパターン。
 				</p> <p>
-これは作成中のクレートが提供するトレイトと型の組合せで、下流クレートがトレイト実装をする可能性を考慮している (『<a href="orphan_rule.xhtml">孤児ルール</a>』の『<a href="orphan_rule.xhtml#additionalRule">基本ルール</a>』のみを考えるとこれは不可能に思えるが､『<a href="orphan_rule.xhtml#additionalRule">追加ルール</a>』により型パラメタつきのトレイトで可能となる)。
+これは下流クレートがトレイト実装を、作成中のクレートを含む上流クレートが提供するトレイトと型で行う可能性を考慮している (『<a href="orphan_rule.xhtml">孤児ルール</a>』の『<a href="orphan_rule.xhtml#additionalRule">基本ルール</a>』のみを考えるとこれは不可能に思えるが､『<a href="orphan_rule.xhtml#additionalRule">追加ルール</a>』により型パラメタつきのトレイトで可能となる)。
 				</p>
 				<hr class="split"/>
 				<p>
