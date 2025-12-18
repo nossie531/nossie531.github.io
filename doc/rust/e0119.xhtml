@@ -288,28 +288,28 @@ struct MyType {}
 				<p>
 作成中のクレートと下流クレートのトレイト実装の衝突予防のためのパターン。
 				</p> <p>
-型とトレイトの両方が作成中のクレート由来の場合、かつそれらが『<a href="orphan_rule.xhtml">孤児ルール</a>』の抜け道となる『<a href="orphan_rule.xhtml#specialRule">特別ルール</a>』の適用パターンの場合に発生する。なお、殆どの衝突予防は孤児ルールの『<a href="orphan_rule.xhtml#basicRule">基本ルール</a>』の守備範囲のため、そちらで対策されている。
+これは作成中のクレートが提供するトレイトと型の組合せで、下流クレートがトレイト実装をする可能性を考慮している (『<a href="orphan_rule.xhtml">孤児ルール</a>』の『<a href="orphan_rule.xhtml#additionalRule">基本ルール</a>』のみを考えるとこれは不可能に思えるが､『<a href="orphan_rule.xhtml#additionalRule">追加ルール</a>』により型パラメタつきのトレイトで可能となる)。
 				</p>
 				<hr class="split"/>
 				<p>
 以下では、下流クレートが <code>OurTrait</code> を <code>OurType</code> に実装するかもしれない。
 				</p>
 <pre><code class="language-rust">
-trait MyTrait&lt;T&gt; {}
+trait MyTrait {}
 trait OurTrait&lt;T&gt; {}
 struct OurType {}
 
-impl&lt;P&gt; MyTrait&lt;P&gt; for OurType {}
-<mark class="error">impl&lt;P, T&gt; MyTrait&lt;P&gt; for T where T: OurTrait&lt;P&gt;</mark> {}
+impl MyTrait for OurType {}
+<mark class="error">impl&lt;T, U&gt; MyTrait for T where T: OurTrait&lt;U&gt;</mark> {}
 </code></pre>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0119]</mark><mark class="title">: conflicting implementations of trait `MyTrait&lt;_&gt;` for type `OurType`</mark>
-<mark class="info"> --&gt;</mark> src\lib.rs:6:1
+<mark class="error">error[E0119]</mark><mark class="title">: conflicting implementations of trait `MyTrait` for type `OurType`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:6:1
 <mark class="info">  |</mark>
-<mark class="info">5 |</mark> impl&lt;P&gt; MyTrait&lt;P&gt; for OurType {}
-<mark class="info">  |</mark> <mark class="info">------------------------------ first implementation here</mark>
-<mark class="info">6 |</mark> impl&lt;P, T&gt; MyTrait&lt;P&gt; for T where T: OurTrait&lt;P&gt; {}
-<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `OurType`</mark>
+<mark class="info">5 |</mark> impl MyTrait for OurType {}
+<mark class="info">  |</mark> <mark class="info">------------------------ first implementation here</mark>
+<mark class="info">6 |</mark> impl&lt;T, U&gt; MyTrait for T where T: OurTrait&lt;U&gt; {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `OurType`</mark>
 <mark class="info">  |</mark>
 <mark class="info">  =</mark> <mark class="title">note</mark>: downstream crates may implement trait `OurTrait&lt;_&gt;` for type `OurType`
 </samp></pre>
