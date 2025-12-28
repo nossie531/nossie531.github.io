@@ -23,7 +23,7 @@
 		<section>
 			<h1>サンプル</h1>
 			<p>
-以下では単層化により <code>Target&lt;i32&gt;</code> と <code>Target&lt;()&gt;</code> が生成されている。そして、それらはそれぞれ <code>match</code> の分岐の片側しか通らない。これにより網羅率が 100% にならない。
+以下では、単層化により <code>Target&lt;i32&gt;</code> と <code>Target&lt;()&gt;</code> が生成されている。そして、それらはそれぞれ <code>match</code> の分岐の片側しか通らない。これにより網羅率が 100% にならない。
 			</p>
 <pre><code class="language-rust">
 pub enum Target&lt;R&gt; {
