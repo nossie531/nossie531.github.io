@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: カバレッジ計測とジェネリクス</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+カバレッジ計測ツール (ここでは <a href="https://crates.io/crates/cargo-llvm-cov">llvm-cov</a> を使用) でジェネリクスを使用したコードを測定すると、単層化の影響で網羅率が上がらない事がある。
+		</p>
+		<aside class="normal moan">
+			<p>UI の問題も…。</p>
+			<p>
+2025 年現在、<code>cargo llvm-cov --open</code> で表示される HTML ページはやや表示が分かりにくい。筆者の場合、全行が通過とマークされているのに、網羅率が 100% にならない事態に割と混乱した。もちろん<a href="#answer">対策</a>はあるのだけど、やや初心者泣かせな気がする。
+			</p>
+		</aside>
+		<section>
+			<h1>サンプル</h1>
+			<p>
+以下では単層化により <code>Target&lt;i32&gt;</code> と <code>Target&lt;()&gt;</code> が生成されている。そして、それらはそれぞれ <code>match</code> の分岐の片側しか通らない。これにより網羅率が 100% にならない。
+			</p>
+<pre><code class="language-rust">
+pub enum Target&lt;R&gt; {
+    A(R),
+    B(),
+}
+
+impl&lt;R&gt; Target&lt;R&gt; {
+    pub fn method(self) {
+        match self {
+            Self::A(_) =&gt; {},
+            Self::B() =&gt; {},
+        }
+    }
+}
+
+#[test]
+fn test() {
+    Target::A(1).method();
+    Target::&lt;()&gt;::B().method();
+}
+</code></pre>
+		</section> <section>
+			<h1 id="answer">対策</h1>
+			<p>
+以下のように引数を与えると、単層化された個々の実体による表示が必要な箇所をきちんと表示するようになる (デフォルトでこのオプションが有効でないのは結果の情報量が増えて少し見にくくなるためかもしれない)。
+			</p>
+<pre><code class="console">
+<mark class="prompt">&gt;</mark> cargo llvm-cov --show-instantiations --open
+</code></pre>
+		</section>
+	</body>
+</html>
