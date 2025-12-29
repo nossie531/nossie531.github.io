@@ -173,9 +173,9 @@
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.xor"><code>xor</code></a> </dt>
 					<dd> 片方のみあればそれを取得、他は <code>None</code> を取得。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.and_then"><code>and_then</code></a> </dt>
-					<dd> <code>and</code> の y が生成関数で渡され、x があればそれを使用。</dd>
+					<dd> x があれば生成関数 y に送信、その結果を取得。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.or_else"><code>or_else</code></a> </dt>
-					<dd> <code>or</code> の y が生成関数で渡され、x がないとそれを使用。</dd>
+					<dd> x がないと生成関数 y を実行、その結果を取得。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.zip"><code>zip</code></a> </dt>
 					<dd> 二つの <code>Option</code> からペアタプルの <code>Option</code> を合成。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unzip"><code>unzip</code></a> </dt>
