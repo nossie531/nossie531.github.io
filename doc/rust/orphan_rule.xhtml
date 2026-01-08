@@ -36,7 +36,7 @@
 			</section> <section>
 				<h2 id="additionalRule">解説 (追加ルール)</h2>
 				<p>
-トレイト本体が外部クレート由来でも、ローカル由来の型引数が含まれる場合、ローカル扱いとする。ただし、それより前の型引数に型パラメタが指定される場合、他のクレートがその型引数に自身のローカル型を指定する場合を優先したいので、その場合は例外とする。
+外部クレート由来のトレイトでも、ローカル由来の型引数を含む場合、ローカル扱いできる。ただし、それよりも前の型引数または実装対象の型が型パラメタで表現されている場合、他のクレートがそこに自身のローカル型を指定する場合を優先したいので、その場合については例外となる。
 				</p>
 			</section> <section>
 				<h2>実例</h2>
@@ -45,9 +45,11 @@
 				</p>
 				<ul>
 					<li>
-<code>impl YourTrait for YourType</code>
+<code>impl ForeginTrait for ForeginType</code>
 					</li> <li>
-<code>impl&lt;T&gt; YourTrait&lt;T, MyType&gt; for YourType</code>
+<code>impl&lt;T&gt; ForeginTrait&lt;MyType&gt; for T</code>
+					</li> <li>
+<code>impl&lt;T&gt; ForeginTrait&lt;T, MyType&gt; for ForeginType</code>
 					</li>
 				</ul>
 				<p>
@@ -55,17 +57,17 @@
 				</p>
 				<ul>
 					<li>
-<code>impl MyTrait for YourType</code>
+<code>impl MyTrait for ForeginType</code>
 					</li> <li>
-<code>impl YourTrait for MyType</code>
+<code>impl ForeginTrait for MyType</code>
 					</li> <li>
-<code>impl&lt;T&gt; YourTrait&lt;MyType&gt; for YourType</code>
+<code>impl&lt;T&gt; ForeginTrait&lt;MyType&gt; for ForeginType</code>
 					</li> <li>
-<code>impl&lt;T&gt; YourTrait&lt;MyType, T&gt; for YourType</code>
+<code>impl&lt;T&gt; ForeginTrait&lt;MyType, T&gt; for ForeginType</code>
 					</li> <li>
-<code>impl&lt;T&gt; YourTrait&lt;YourType2, MyType&gt; for YourType</code>
+<code>impl&lt;T&gt; ForeginTrait&lt;ForeginType2, MyType&gt; for ForeginType</code>
 					</li> <li>
-<code>impl&lt;T&gt; YourTrait&lt;Cover&lt;T&gt;, MyType&gt; for YourType</code>
+<code>impl&lt;T&gt; ForeginTrait&lt;Cover&lt;T&gt;, MyType&gt; for ForeginType</code>
 					</li>
 				</ul>
 			</section>
