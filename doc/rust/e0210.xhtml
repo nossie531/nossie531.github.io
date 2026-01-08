@@ -15,22 +15,33 @@
 <mark class="error">error[E0210]</mark><mark class="title">: type parameter `T` must be used as the type parameter for some local type (e.g., `MyStruct&lt;T&gt;`)</mark>
 </samp></pre>
 		<p>
-『<a href="orphan_rule.xhtml">孤児ルール</a>』と型パラメタが絡んだエラー。
+孤児ルールと型パラメタが絡んだエラー。
 		</p>
 		<section>
 			<h1>原因</h1>
 			<p>
-孤児ルールは、クレート外部の型やトレイトに厳しい。
+『<a href="orphan_rule.xhtml">孤児ルール</a>』はクレート外部の型やトレイトに厳しい。
 			</p> <p>
 一方、型パラメタの対象にはクレート外部の型もなりうる。
 			</p> <p>
 そのため、型パラメタが孤児ルールのきっかけになる事がある。
 			</p>
 		</section> <section>
-			<h1>サンプル</h1>
-			<p>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+型パラメタに外部のトレイトを実装しようとしているパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、外部の型になりうる <code>T</code> に、外部のトレイト <a href="https://doc.rust-lang.org/std/fmt/trait.Display.html"><code>Display</code></a> を実装している。
-			</p>
+					</p>
 <pre><code class="language-rust">
 use std::fmt::{self, Display, Formatter};
 
@@ -50,6 +61,80 @@ impl&lt;<mark class="error">T</mark>&gt; Display for T {
 <mark class="info">  =</mark> <mark class="title">note</mark>: implementing a foreign trait is only possible if at least one of the types for which it is implemented is local
 <mark class="info">  =</mark> <mark class="title">note</mark>: only traits defined in the current crate can be implemented for a type parameter
 </samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">ローカル型引数つき外部トレイト</div>
+				</hgroup>
+				<p>
+『<a href="orphan_rule.xhtml">孤児ルール</a> / <a href="orphan_rule.xhtml#additionalRule">追加ルール</a>』にある通り、外部トレイトでもローカル由来の型引数を含んでいるとローカル扱いできる場合があり、そのパターンでは孤児ルールが問題にならなくなる。ただし、これには条件があり、問題の型引数より前の型引数または実装対象の型が型パラメタであってはならない。これに違反するとやはりエラーとなる。
+				</p>
+				<section>
+					<h2>サンプル 1</h2>
+					<p>
+以下では、<code>ForeginTrait&lt;MyType&gt;</code> は型引数にローカル型を含むため、孤児ルールが問題にならなそうだが、実装対象の型が型パラメタのため、結局はエラーになる。
+					</p>
+					<figure class="file">
+						<figcaption>/src/lib.rs</figcaption>
+<pre><code class="language-rust">
+use foreign::ForeignTrait;
+
+struct MyType();
+
+impl&lt;<mark class="error">T</mark>&gt; ForeignTrait&lt;MyType&gt; for T {}
+</code></pre>
+					</figure>
+					<figure class="file">
+						<figcaption>/foregin/src/lib.rs</figcaption>
+<pre><code class="language-rust">
+pub trait ForeignTrait&lt;T&gt; {}
+</code></pre>
+					</figure>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0210]</mark><mark class="title">: type parameter `T` must be covered by another type when it appears before the first local type (`MyType`)</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:5:6
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> impl&lt;T&gt; ForeignTrait&lt;MyType&gt; for T {}
+<mark class="info">  |</mark>      <mark class="error">^ type parameter `T` must be covered by another type when it appears before the first local type (`MyType`)</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: implementing a foreign trait is only possible if at least one of the types for which it is implemented is local, and no uncovered type parameters appear before that first local type
+<mark class="info">  =</mark> <mark class="title">note</mark>: in this case, 'before' refers to the following order: `impl&lt;..&gt; ForeignTrait&lt;T1, ..., Tn&gt; for T0`, where `T0` is the first and `Tn` is the last
+</samp></pre>
+				</section> <section>
+					<h2>サンプル 2</h2>
+					<p>
+以下では、<code>ForeginTrait&lt;T, MyType&gt;</code> は型引数にローカル型を含むため、孤児ルールが問題にならなそうだが、その型引数よりも前方に型パラメタがあるため、結局はエラーになる。
+					</p>
+					<figure class="file">
+						<figcaption>/src/lib.rs</figcaption>
+<pre><code class="language-rust">
+use foreign::{ForeginType, ForeignTrait};
+
+struct MyType();
+
+impl&lt;<mark class="error">T</mark>&gt; ForeignTrait&lt;T, MyType&gt; for ForeginType {}
+</code></pre>
+					</figure>
+					<figure class="file">
+						<figcaption>/foregin/src/lib.rs</figcaption>
+<pre><code class="language-rust">
+pub struct ForeginType();
+pub trait ForeignTrait&lt;T, U&gt; {}
+</code></pre>
+					</figure>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0210]</mark><mark class="title">: type parameter `T` must be covered by another type when it appears before the first local type (`MyType`)</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:5:6
+<mark class="info">  |</mark>
+<mark class="info">5 |</mark> impl&lt;T&gt; ForeignTrait&lt;T, MyType&gt; for ForeginType {}
+<mark class="info">  |</mark>      <mark class="error">^ type parameter `T` must be covered by another type when it appears before the first local type (`MyType`)</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: implementing a foreign trait is only possible if at least one of the types for which it is implemented is local, and no uncovered type parameters appear before that first local type
+<mark class="info">  =</mark> <mark class="title">note</mark>: in this case, 'before' refers to the following order: `impl&lt;..&gt; ForeignTrait&lt;T1, ..., Tn&gt; for T0`, where `T0` is the first and `Tn` is the last
+</samp></pre>
+				</section>
+			</section>
 		</section>
 	</body>
 </html>
