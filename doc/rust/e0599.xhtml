@@ -57,7 +57,53 @@ struct MyValue();
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1>パターン B1</h1>
+					<h1>パターン B</h1>
+					<div class="subTitle">関連関数との取り違え</div>
+				</hgroup>
+				<p>
+呼び出そうとしたメソッドがなく、代わりに同名の関連関数があるパターン。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let ret = MyType(42).<mark class="error">add</mark>(1);
+    assert_eq!(ret, MyType(43))
+}
+
+#[derive(PartialEq)]
+struct MyType(i32);
+
+impl MyType {
+    pub fn add(x: Self, value: i32) -&gt; Self {
+        Self(x.0 + value)
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: no method named `add` found for struct `MyType` in the current scope</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:2:26
+<mark class="info">   |</mark>
+<mark class="info"> 2 |</mark>     let ret = MyType(42).add(1);
+<mark class="info">   |</mark>               <mark class="info">-----------</mark><mark class="error">^^^</mark><mark class="info">---</mark>
+<mark class="info">   |</mark>               <mark class="info">|          </mark><mark class="error">|</mark>
+<mark class="info">   |</mark>               <mark class="info">|          </mark><mark class="error">this is an associated function, not a method</mark>
+<mark class="info">   |</mark>               <mark class="info">help: use associated function syntax instead: `MyType::add(MyType(42), 1)`</mark>
+<mark class="info">...</mark>
+<mark class="info"> 7 |</mark> struct MyType(i32);
+<mark class="info">   |</mark> <mark class="info">------------- method `add` not found for this struct</mark>
+<mark class="info">   |</mark>
+<mark class="info">   =</mark> <mark class="title">note</mark>: found the following associated functions; to be used as methods, functions must have a `self` parameter
+<mark class="edit">note</mark>: the candidate is defined in an impl for the type `MyType`
+<mark class="info">  --&gt;</mark> src\main.rs:10:5
+<mark class="info">   |</mark>
+<mark class="info">10 |</mark>     pub fn add(x: Self, value: i32) -&gt; Self {
+<mark class="info">   |</mark>     <mark class="edit">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">   =</mark> <mark class="title">help</mark>: items from traits can only be used if the trait is implemented and in scope
+<mark class="info">   =</mark> <mark class="title">note</mark>: the following trait defines an item `add`, perhaps you need to implement it:
+<mark class="info">    </mark>       candidate #1: `Add`
+</samp></pre>
+			</section> <section>
+				<hgroup>
+					<h1>パターン C1</h1>
 					<div class="subTitle">境界への不適合 (通常版)</div>
 				</hgroup>
 				<p>
@@ -104,7 +150,7 @@ impl&lt;T: UpperHex&gt; MyValue&lt;T&gt; {
 				</section>
 			</section> <section>
 				<hgroup id="deriveAttribute">
-					<h1>パターン B2</h1>
+					<h1>パターン C2</h1>
 					<div class="subTitle">境界への不適合 (<code>derive</code> 属性版)</div>
 				</hgroup>
 				<p>
@@ -158,7 +204,7 @@ struct MyVec&lt;T&gt;(Vec&lt;T&gt;);
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="hrtbTypeInference">パターン C</h1>
+					<h1 id="hrtbTypeInference">パターン D</h1>
 					<div class="subTitle">HRTB を期待する型推論</div>
 				</hgroup>
 				<p>
