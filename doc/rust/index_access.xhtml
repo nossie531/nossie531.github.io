@@ -103,7 +103,7 @@ where
 				<p>
 配列 <a href="https://doc.rust-lang.org/std/primitive.array.html"><code>[T; N]</code></a> は <code><a href="https://doc.rust-lang.org/std/ops/trait.Index.html">Index</a>&lt;I&gt;</code> と <code><a href="https://doc.rust-lang.org/std/ops/trait.IndexMut.html">IndexMut</a>&lt;I&gt;</code> を実装している。
 				</p> <p>
-これらの実装はスライス <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> の実装が基になっている。
+この実装はスライス側 <a href="https://doc.rust-lang.org/std/primitive.slice.html"><code>[T]</code></a> を実装すると自動的に行われる。
 				</p>
 <pre><code class="language-rust">
 impl&lt;T, I, const N: usize&gt; Index&lt;I&gt; for [T; N]
@@ -133,8 +133,8 @@ where
 				<p>
 <a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> の実装について。
 				</p> <p>
-<time>2024 年現在</time>、<a href="https://doc.rust-lang.org/std/slice/trait.SliceIndex.html"><code>SliceIndex</code></a> のメソッドはどれもナイトリーのため、自前での実装はできない (スライス本体を引数に各要素へのアクセスを行う類いのものが多い)。
-				</p> 
+<time>2025 年現在</time>、<code>SliceIndex</code> のメソッドは全てナイトリーで今後もそのままだと予想される (この機能は元々コンパイラ用<a href="https://doc.rust-lang.org/beta/unstable-book/library-features/slice-index-methods.html">らしい</a>)。そのため、添字アクセスの実装には、<code>SliceIndex</code> で添字の対象を追加するのではなく、<code>Index</code> で添字アクセスを追加する事になる。
+				</p>
 			</aside>
 			<section>
 				<h1>
