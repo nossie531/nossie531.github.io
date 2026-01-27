@@ -39,9 +39,13 @@
 					<div class="subTitle">自明なパターン</div>
 				</hgroup>
 				<p>
-全く同じトレイトと型を指定している。
+同じ型と同じトレイトですでに実装があるパターン。
 				</p>
-				<hr class="split"/>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、全く同じトレイトと型ですでに実装がある。
+					</p>
 <pre><code class="language-rust">
 trait MyTrait {}
 struct MyType {}
@@ -58,6 +62,7 @@ impl MyTrait for MyType {}
 <mark class="info">5 |</mark> impl MyTrait for MyType {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `MyType`</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン B1</h1>
@@ -65,12 +70,13 @@ impl MyTrait for MyType {}
 				</hgroup>
 				<p>
 同じトレイトについて、個別の型への実装と、ブランケット実装がある。<br/>
-しかし、個別の型がブランケット実装の範囲に含まれてしまっている。
+そして、個別の型がブランケット実装の範囲に含まれてしまっている。
 				</p>
-				<hr class="split"/>
-				<p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、<code>MyType</code> は <code>T</code> に含まれている。
-				</p>
+					</p>
 <pre><code class="language-rust">
 trait MyTrait {}
 struct MyType {}
@@ -87,6 +93,7 @@ impl MyTrait for MyType {}
 <mark class="info">5 |</mark> impl&lt;T&gt; MyTrait for T {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `MyType`</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン B2</h1>
@@ -94,12 +101,13 @@ impl MyTrait for MyType {}
 				</hgroup>
 				<p>
 同じトレイトについて、ブランケット実装が複数ある。<br/>
-しかし、両者の範囲が重複してしまっている。
+そして、両者の範囲が重複してしまっている。
 				</p>
-				<hr class="split"/>
-				<p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、<code>TraitX</code> と <code>TraitY</code> の両方を実装する型への考慮がない。
-				</p>
+					</p>
 <pre><code class="language-rust">
 trait MyTrait {}
 trait TraitX {}
@@ -117,6 +125,7 @@ impl&lt;T&gt; MyTrait for T where T: TraitX {}
 <mark class="info">6 |</mark> impl&lt;T&gt; MyTrait for T where T: TraitY {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン B3</h1>
@@ -127,10 +136,11 @@ impl&lt;T&gt; MyTrait for T where T: TraitX {}
 				<p>
 ジェネリクス型どうしが同じになりうるパターン。
 				</p>
-				<hr class="split"/>
-				<p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、<code>MyType&lt;i32&gt;</code> と <code>MyType&lt;T&gt;</code> は同じになりうる。
-				</p>
+					</p>
 <pre><code class="language-rust">
 trait MyTrait {}
 struct MyType&lt;T&gt;(T);
@@ -147,6 +157,7 @@ impl MyTrait for MyType&lt;i32&gt; {}
 <mark class="info">5 |</mark> impl&lt;T&gt; MyTrait for MyType&lt;T&gt; {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `MyType&lt;i32&gt;`</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン B4</h1>
@@ -157,10 +168,11 @@ impl MyTrait for MyType&lt;i32&gt; {}
 				<p>
 ジェネリクストレイトどうしが同じになりうるパターン。
 				</p>
-				<hr class="split"/>
-				<p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、<code>MyTrait&lt;i32&gt;</code> と <code>MyTrait&lt;T&gt;</code> は同じになりうる。
-				</p>
+					</p>
 <pre><code class="language-rust">
 trait MyTrait&lt;T&gt; {}
 struct MyType {}
@@ -177,6 +189,7 @@ impl MyTrait&lt;i32&gt; for MyType {}
 <mark class="info">5 |</mark> impl&lt;T&gt; MyTrait&lt;T&gt; for MyType {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `MyType`</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン B5</h1>
@@ -187,10 +200,11 @@ impl MyTrait&lt;i32&gt; for MyType {}
 				<p>
 トレイトと型に同じ型パラメタが含まれるパターン。
 				</p>
-				<hr class="split"/>
-				<p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、<code>MyTrait&lt;i32&gt;</code> と <code>i32</code> の組は、<code>MyTrait&lt;T&gt;</code> と <code>T</code> の組と同じになりうる。
-				</p>
+					</p>
 <pre><code class="language-rust">
 trait MyTrait&lt;T&gt; {}
 
@@ -206,11 +220,12 @@ impl MyTrait&lt;i32&gt; for i32 {}
 <mark class="info">4 |</mark> impl&lt;T&gt; MyTrait&lt;T&gt; for T {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `i32`</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン C</h1>
 					<div class="subTitle">
-関連型の影響 <span class="nw">(Rust の欠陥)</span>
+関連型 <span class="nw">(Rust の欠陥)</span>
 					</div>
 				</hgroup>
 				<p>
@@ -223,10 +238,11 @@ impl MyTrait&lt;i32&gt; for i32 {}
 <time>2025 年現在</time>、修正は延期中。<a href="https://github.com/rust-lang/rust/issues/20400">Github の投稿</a>によると、トレイトシステム全体の刷新が控えているらしく、また修正が及ぼす波及効果の検討も必要らしい。
 					</p>
 				</aside>
-				<hr class="split"/>
-				<p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、<code>HasType&lt;Type = i32&gt;</code> と <code>HasType&lt;Type = i64&gt;</code> 区別されず衝突にいたる。
-				</p>
+					</p>
 <pre><code class="language-rust">
 trait MyTrait {}
 trait HasType { type Type; }
@@ -243,6 +259,7 @@ impl&lt;T: HasType&lt;Type = i32&gt;&gt; MyTrait for T {}
 <mark class="info">5 |</mark> impl&lt;T: HasType&lt;Type = i64&gt;&gt; MyTrait for T {}
 <mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation</mark>
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン D1</h1>
@@ -255,10 +272,11 @@ impl&lt;T: HasType&lt;Type = i32&gt;&gt; MyTrait for T {}
 				</p> <p>
 これは身に覚えがないぶん、いざ発生すると混乱しやすい。
 				</p>
-				<hr class="split"/>
-				<p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、<a href="https://doc.rust-lang.org/core/index.html"><code>core</code></a> にある <a href="https://doc.rust-lang.org/core/convert/trait.From.html"><code>From</code></a> の<a href="https://doc.rust-lang.org/core/convert/trait.From.html#impl-From%3CT%3E-for-T">ブランケット実装</a> (自身への恒等変換) と重複がおきる。
-				</p>
+					</p>
 <pre><code class="language-rust">
 struct MyType {}
 
@@ -278,11 +296,48 @@ struct MyType {}
 <mark class="info">  =</mark> <mark class="title">note</mark>: conflicting implementation in crate `core`:
 <mark class="info"></mark>          - impl&lt;T&gt; From&lt;T&gt; for T;
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
 					<h1>パターン D2</h1>
 					<div class="subTitle">
-外部クレート <span class="nw">(下流クレートの考慮)</span>
+外部クレート <span class="nw">(上流クレートとの衝突予防)</span>
+					</div>
+				</hgroup>
+				<p>
+型へのトレイト実装とブランケット実装との将来的な衝突を予防するパターン。
+				</p> <p>
+これは型が上流クレート由来で、衝突の有無がその上流クレート次第だと発生する。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>std</code> が将来的に <a href="https://doc.rust-lang.org/std/primitive.f32.html"><code>f32</code></a> に <a href="https://doc.rust-lang.org/std/cmp/trait.Eq.html"><code>Eq</code></a> を実装すると、前のブランケット実装と衝突する (そのような変更は今後とも絶対にないだろうが、あり得そうかどうかでなく、上流クレート次第の状況になるとエラーが発生する)。
+					</p>
+<pre><code class="language-rust">
+trait MyTrait {}
+struct MyType&lt;T&gt;(T);
+
+impl&lt;T: Eq&gt; MyTrait for MyType&lt;T&gt; {}
+<mark class="error">impl&lt;T&gt; MyTrait for MyType&lt;f32&gt;</mark> {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0119]</mark><mark class="title">: conflicting implementations of trait `MyTrait` for type `MyType&lt;f32&gt;`</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:5:1
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark> impl&lt;T: Eq&gt; MyTrait for MyType&lt;T&gt; {}
+<mark class="info">  |</mark> <mark class="info">--------------------------------- first implementation here</mark>
+<mark class="info">5 |</mark> impl&lt;T&gt; MyTrait for MyType&lt;f32&gt; {}
+<mark class="info">  |</mark> <mark class="error">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `MyType&lt;f32&gt;`</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: upstream crates may add a new impl of trait `std::cmp::Eq` for type `f32` in future versions
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン D3</h1>
+					<div class="subTitle">
+外部クレート <span class="nw">(下流クレートへの配慮)</span>
 					</div>
 				</hgroup>
 				<p>
@@ -290,10 +345,11 @@ struct MyType {}
 				</p> <p>
 これは下流クレートがトレイト実装を、作成中のクレートを含む上流クレートが提供するトレイトと型で行う可能性を考慮している (『<a href="orphan_rule.xhtml">孤児ルール</a>』の『<a href="orphan_rule.xhtml#additionalRule">基本ルール</a>』のみを考えるとこれは不可能に思えるが､『<a href="orphan_rule.xhtml#additionalRule">追加ルール</a>』により型パラメタつきのトレイトで可能となる)。
 				</p>
-				<hr class="split"/>
-				<p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
 以下では、下流クレートが <code>OurTrait</code> を <code>OurType</code> に実装するかもしれない。
-				</p>
+					</p>
 <pre><code class="language-rust">
 trait MyTrait {}
 trait OurTrait&lt;T&gt; {}
@@ -313,6 +369,7 @@ impl MyTrait for OurType {}
 <mark class="info">  |</mark>
 <mark class="info">  =</mark> <mark class="title">note</mark>: downstream crates may implement trait `OurTrait&lt;_&gt;` for type `OurType`
 </samp></pre>
+				</section>
 			</section>
 		</section>
 	</body>
