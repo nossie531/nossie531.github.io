@@ -29,7 +29,7 @@
 					<div class="subTitle">基本形</div>
 				</hgroup>
 				<p>
-呼び出そうとしたメソッドが型にそもそもないパターン。
+対象のメソッドが型にそもそもないパターン。
 				</p>
 				<section>
 					<h2>サンプル</h2>
@@ -58,11 +58,62 @@ struct MyValue();
 			</section> <section>
 				<hgroup>
 					<h1>パターン B</h1>
+					<div class="subTitle">変数の隠蔽</div>
+				</hgroup>
+				<p>
+対象のメソッドを持つ変数が同名の変数で隠蔽されているパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+    let x = MyTypeX();
+    let x = x.conv();
+    x.method_of_x();
+}
+
+struct MyTypeX();
+struct MyTypeY();
+
+impl MyTypeX {
+    pub fn conv(self) -&gt; MyTypeY {
+        MyTypeY()
+    }
+
+    pub fn method_of_x(&amp;self) {
+        // nop.
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: no method named `method_of_x` found for struct `MyTypeY` in the current scope</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:7
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     x.method_of_x();
+<mark class="info">  |</mark>       <mark class="error">^^^^^^^^^^^ method not found in `MyTypeY`</mark>
+<mark class="info">...</mark>
+<mark class="info">8 |</mark> struct MyTypeY();
+<mark class="info">  |</mark> <mark class="info">-------------- method `method_of_x` not found for this struct</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: there's an earlier shadowed binding `x` of type `MyTypeX` that has method `method_of_x` available
+<mark class="info"> --&gt;</mark> src\main.rs:2:9
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let x = MyTypeX();
+<mark class="info">  |</mark>         <mark class="edit">^ `x` of type `MyTypeX` that has method `method_of_x` defined earlier here</mark>
+<mark class="info">3 |</mark>     let x = x.conv();
+<mark class="info">  |</mark>         <mark class="info">- earlier `x` shadowed here with type `MyTypeY`</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン C</h1>
 					<div class="subTitle">関連関数との取り違え</div>
 				</hgroup>
 				<p>
-呼び出そうとしたメソッドがなく、代わりに同名の関連関数があるパターン。
+対象のメソッドが型になく、代わりに同名の関連関数があるパターン。
 				</p>
+				<section>
+					<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
     let ret = MyType(42).<mark class="error">add</mark>(1);
@@ -101,13 +152,14 @@ impl MyType {
 <mark class="info">   =</mark> <mark class="title">note</mark>: the following trait defines an item `add`, perhaps you need to implement it:
 <mark class="info">    </mark>       candidate #1: `Add`
 </samp></pre>
+				</section>
 			</section> <section>
 				<hgroup>
-					<h1>パターン C1</h1>
+					<h1>パターン D1</h1>
 					<div class="subTitle">境界への不適合 (通常版)</div>
 				</hgroup>
 				<p>
-呼び出そうとしたメソッドは型にあるが、境界に適合しないパターン。
+対象のメソッドは型にあるが、境界に適合しないパターン。
 				</p>
 				<section>
 					<h2>サンプル</h2>
@@ -150,11 +202,11 @@ impl&lt;T: UpperHex&gt; MyValue&lt;T&gt; {
 				</section>
 			</section> <section>
 				<hgroup id="deriveAttribute">
-					<h1>パターン C2</h1>
+					<h1>パターン D2</h1>
 					<div class="subTitle">境界への不適合 (<code>derive</code> 属性版)</div>
 				</hgroup>
 				<p>
-呼び出そうとしたメソッドは型にあるが、そのメソッドが <code>derive</code> 属性により導入されたトレイトのメソッドで、その境界に適合しないパターン。
+対象のメソッドは型にあるが、そのメソッドが <code>derive</code> 属性で実装されたトレイトのメソッドであり、その境界に適合しないパターン。
 				</p> <p>
 『<a href="derive_attribute.xhtml">derive 属性</a> - <a href="derive_attribute.xhtml#typeParam">型パラメタの影響</a>』で紹介する通り、<code>derive</code> 属性は型パラメタについての境界を導入する場合が多い。この境界に違反するとエラーになる。なお、下記のサンプルではエラーメッセージがその境界 <code>T: Default</code> について指摘しているが、ソース中に該当箇所が存在しない。そのため、混乱しやすい。
 				</p>
@@ -204,7 +256,7 @@ struct MyVec&lt;T&gt;(Vec&lt;T&gt;);
 				</section>
 			</section> <section>
 				<hgroup>
-					<h1 id="hrtbTypeInference">パターン D</h1>
+					<h1 id="hrtbTypeInference">パターン E</h1>
 					<div class="subTitle">HRTB を期待する型推論</div>
 				</hgroup>
 				<p>
