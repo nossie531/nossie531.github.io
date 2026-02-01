@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: メソッド名の衝突と解決</title>
+		<title>Rust メモ: メソッド名の衝突と破壊的変更</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -12,10 +12,18 @@
 			<h1><doc-title/></h1>
 		</header>
 		<p>
-トレイトにより型に同名のメソッドが複数ある場合について。
+トレイトどうし又はトレイトと型に同名のメソッドがあると、それらの衝突がありうる。
+		</p> <p>
+ここでは衝突時におこる問題とその対処法について解説している。
 		</p>
+		<aside class="normal moan">
+			<p>下流クレートの破壊問題</p>
+			<p>
+上流クレート側にメソッドを追加すると、下流クレート側のメソッド呼出箇所で衝突がおきるようになり、下流クレートが破壊される可能性がある。この問題は後述の『<a href="#caveat1">型 vs トレイト / 注意点</a>』と『<a href="#caveat2">トレイト vs トレイト / 注意点</a>』で触れているが、危険かつ対策が地味に面倒なため厄介である。
+			</p>
+		</aside>
 		<section>
-			<h1>メソッドの呼出記法</h1>
+			<h1>基礎知識</h1>
 			<p>
 メソッドの呼出記法には二通りある。
 			</p>
@@ -31,19 +39,74 @@
 				<dt id="FullyQualifiedSyntax">完全修飾記法</dt>
 				<dd>
 					<p>
-例: <code>Trait::method(&amp;target, arg1, arg2, ...)</code>
+例: <code>SomeTrait::method(&amp;target, arg1, arg2, ...)</code>
 					</p> <p>
 長く煩雑だが、どのトレイトのメソッドか明確になる記法。
 					</p>
 				</dd>
 			</dl>
 		</section> <section>
-			<h1>トレイトどうしでの衝突</h1>
+			<h1>型 vs トレイト</h1>
 			<p>
-候補がどれもトレイト由来の場合、通常記法ではエラーになる。
+同名のメソッドに型由来のものがあれば、通常記法ではそれが優先される。
 			</p>
 			<section>
-				<h2>サンプル</h2>
+				<h1>サンプル</h1>
+				<p>
+以下では、型 <code>MyType</code> がトレイト <code>MyTrait</code> を実装しており、そのどちらもがメソッド <code>method</code> を持つ。この場合、通常記法による呼出では前者のメソッドが優先される。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let target = MyType();
+    assert_eq!(target.method(), "MyType");
+    assert_eq!(MyType::method(&amp;target), "MyType");
+    assert_eq!(MyTrait::method(&amp;target), "MyTrait");
+}
+
+trait MyTrait {
+    fn method(&amp;self) -&gt; &amp;str;
+}
+
+struct MyType();
+
+impl MyTrait for MyType {
+    fn method(&amp;self) -&gt; &amp;str {
+        "MyTrait"
+    }
+}
+
+impl MyType {
+    pub fn method(&amp;self) -&gt; &amp;str {
+        "MyType"
+    }
+}
+</code></pre>
+			</section> <section>
+				<h1 id="caveat1">注意点</h1>
+				<p>
+上流クレートで追加したメソッドが下流クレートの呼出箇所で衝突する危険性について。
+				</p> <p>
+引数型などが一致しない場合、コンパイルエラーになる！
+				</p> <p>
+引数型などが一致した場合、静かに呼出先が変更される！！
+				</p>
+			</section> <section>
+				<h1>対策</h1>
+				<p>
+残念ながらあまり強力な方法はない…。
+				</p> <p>
+上流側: 困難 (強いて言うなら下流側の努力を祈るくらい…)
+				</p> <p>
+下流側: 完全修飾構文の使用 (地味にコードが長く読みにくくなる…)
+				</p>
+			</section>
+		</section> <section>
+			<h1>トレイト vs トレイト</h1>
+			<p>
+同名のメソッドがどちらもトレイト由来の場合、通常記法ではエラーになる。
+			</p>
+			<section>
+				<h1>サンプル</h1>
 				<p>
 以下では、型 <code>MyType</code> は二つのトレイト <code>TraitX</code> と <code>TraitY</code> を実装しており、そのどちらもがメソッド <code>method</code> を持つ。この場合、通常記法による呼出ではエラーになる。
 				</p>
@@ -97,71 +160,41 @@ trait TraitY {
 <mark class="info">3  |</mark>     assert_eq!(TraitY::method(&amp;target), "XXX");
 <mark class="info">   |</mark>                <mark class="edit">~~~~~~~~~~~~~~~~~~~~~~~</mark>
 </samp></pre>
-			</section>
-		</section> <section>
-			<h1>型とトレイトでの衝突</h1>
-			<p>
-候補に型由来のものがあれば、通常記法ではそれが優先される。
-			</p>
-			<aside class="normal moan">
+			</section> <section>
+				<h1 id="caveat2">注意点</h1>
 				<p>
-仕様の不備？
+上流クレートで追加したメソッドが下流クレートの呼出箇所で衝突する危険性について。
 				</p> <p>
-この仕様は後述の『<a href="#bigProblem">破滅的な問題</a>』の原因になる。筆者としては、トレイトどうしでの場合と同様、こちらもエラーにすれば良かったのに…と感じる。型由来を優先するのは分かりやすいかもしれないが、どうにもハイリスクローリターンに思える。
+型がまざる場合とは異なり、トレイトどうしの場合は一律でコンパイルエラーになる。
 				</p>
-			</aside>
-			<section>
-				<h2>サンプル</h2>
+			</section> <section>
+				<h1>対策</h1>
 				<p>
-以下では、型 <code>MyType</code> がトレイト <code>MyTrait</code> を実装しており、そのどちらもがメソッド <code>method</code> を持つ。この場合、通常記法による呼出では前者のメソッドが優先される。
-				</p>
-<pre><code class="language-rust">
-fn main() {
-    let target = MyType();
-    assert_eq!(target.method(), "MyType");
-    assert_eq!(MyType::method(&amp;target), "MyType");
-    assert_eq!(MyTrait::method(&amp;target), "MyTrait");
-}
-
-trait MyTrait {
-    fn method(&amp;self) -&gt; &amp;str;
-}
-
-struct MyType();
-
-impl MyTrait for MyType {
-    fn method(&amp;self) -&gt; &amp;str {
-        "MyTrait"
-    }
-}
-
-impl MyType {
-    pub fn method(&amp;self) -&gt; &amp;str {
-        "MyType"
-    }
-}
-</code></pre>
-			</section>
-			<section>
-				<h1 id="bigProblem">破滅的な問題</h1>
-				<p>
-この仕様はクレートのアップデートで型にメソッドが追加され、運悪く既存のものと引数などが同じだった場合、こっそりと呼出先が変更される大問題になりうる。
+型がまざる場合よりやや状況はよい。
+				</p> <p>
+上流側: 型にトレイトのメソッドをコピー (よく使う型ではかなり有効)
+				</p> <p>
+下流側: 完全修飾構文の使用 (こちらは型が混ざる場合と同様) 
 				</p>
 				<section>
-					<h2>対症療法</h2>
+					<h2>補足</h2>
 					<p>
-クレートの利用側で完全修飾構文を使えば、この問題を防げる。
+型にトレイトのメソッドをコピーする手法について。
 					</p> <p>
-しかし、クレートの定義側での対策はできない。また、必要な全ての箇所 (型を経由したトレイトメソッドの呼出箇所) でこれを行うと、地味に面倒でコードも長くなってしまう。
+これは『型 vs トレイト』で紹介した型優先のルールの応用である。
+					</p> <p>
+例: <a href="https://doc.rust-lang.org/std/ops/struct.Range.html"><code>Range</code></a> 型には <a href="https://doc.rust-lang.org/std/ops/trait.RangeBounds.html"><code>RangeBounds</code></a> トレイト由来の <a href="https://doc.rust-lang.org/std/ops/trait.RangeBounds.html#method.contains"><code>contains</code></a> メソッド、そして型それ自身の <a href="https://doc.rust-lang.org/std/ops/struct.Range.html#method.contains"><code>contains</code></a> メソッドの両方がある。後者は前者への中継のみを行うメソッドであり、一見するとこれは無意味だが、これによりどんなトレイト実装が適用されているかを気にせず <code>Range</code> の <code>contains</code> を通常記法で一意に呼び出せるようになる。
 					</p>
-				</section> <section>
-					<h2>公式の見解</h2>
-					<p>
-Cargo における SemVer 互換性の解説を見ると、これは意図された設計らしい。
-					</p>
-					<doc-quote src="quote/cargo/reference/semver.xhtml"/>
 				</section>
 			</section>
+		</section> <section>
+			<h1>関連仕様</h1>
+			<p>
+Cargo における SemVer 互換性の解説より。
+			</p> <p>
+ここで紹介したメソッド追加の変更は「許容されうる破壊的変更」扱いらしい。
+			</p>
+			<doc-quote src="quote/cargo/reference/semver.xhtml"/>
 		</section>
 	</body>
 </html>

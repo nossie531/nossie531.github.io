@@ -8,9 +8,76 @@
 		<script src="../../../../../lib/prism_shadow.js"></script>
 	</head>
 	<body>
-		<blockquote data-time="2025-04-03" cite="https://doc.rust-lang.org/cargo/reference/semver.html#impl-item-new">
+		<blockquote data-time="2026-01-23" cite="https://doc.rust-lang.org/cargo/reference/semver.html#change-categories">
+			<h2 id="change-categories">
+<a class="header" href="#change-categories">変更の分類</a>
+			</h2>
+			<p>
+以下にリストした全ての方針は変更のレベルで分類される:
+			</p>
+			<ul>
+				<li>
+<strong>メジャーな変更</strong>: メジャー SemVer の変更が必要
+				</li> <li>
+<strong>マイナーな変更</strong>: マイナー SemVer のみの変更が必要
+				</li> <li>
+<strong>許容されうる破壊的変更</strong>: 特定のプロジェクトではメジャーだと考えて他ではマイナーだと考えるかもしれない変更
+				</li>
+			</ul>
+			<p>
+「許容されうる破壊的変更」の分類は更新時に互換性の破壊の<em>潜在性</em>がある変更をカバーするが、必ずしも破綻するとは限らない。これらの変更の影響は慎重に検討されるべきである。具体的な実体はその変更とプロジェクトの管理者の方針に依存する。
+			</p>
+			<hr class="omit"/>
+			<h3 id="trait-new-default-item">
+<a class="header" href="#trait-new-default-item">許容されうる破壊的変更: デフォルトつきトレイトアイテムの追加</a>
+			</h3>
+			<p>
+通常はデフォルトつきトレイトアイテムの追加は安全である。しかしながら、これはたまにコンパイルエラーを起こす。例えば、もし別のトレイトに同じ名前のメソッドが存在すればこれは曖昧さを生じさせる。
+			</p>
+<pre><code class="language-rust">// Breaking change example
+
+///////////////////////////////////////////////////////////
+// Before
+pub trait Trait {}
+
+///////////////////////////////////////////////////////////
+// After
+pub trait Trait {
+    fn foo(&amp;self) {}
+}
+
+///////////////////////////////////////////////////////////
+// Example usage that will break.
+use updated_crate::Trait;
+struct Foo;
+
+trait LocalTrait {
+    fn foo(&amp;self) {}
+}
+
+impl Trait for Foo {}
+impl LocalTrait for Foo {}
+
+fn main() {
+    let x = Foo;
+    x.foo(); // Error: multiple applicable items in scope
+}
+</code></pre>
+			<p>
+名前の衝突におけるこの曖昧さは<a href="../../reference/items/implementations.html#inherent-implementations">固有の実装</a>では、それらがトレイトアイテムより優先されるため、存在し<em>ない</em>点に注意せよ。
+			</p> <p>
+トレイトアイテム追加時の特殊な場合には<a href="#trait-object-safety">トレイトのオブジェクトセーフ</a>を参照されたい。
+			</p> <p>
+マイグレーション戦略:
+			</p>
+			<ul>
+				<li>
+プロジェクトによってはこれを容認可能な破壊として捉えるだろう、特に新しいアイテムの名前が既存コードと衝突しなさそうなら。こうした衝突を避けるために名前は慎重に選べ。さらに、依存性の更新時に正しい関数を選択するために利用者側に<a href="../../reference/expressions/call-expr.html#disambiguating-function-calls">曖昧でない構文</a>の追加を要請するのも容認可能かもしれない。
+				</li>
+			</ul>
+			<hr class="omit"/>
 			<h3 id="impl-item-new">
-<a class="header" href="#impl-item-new">許容される破壊的変更: 任意の固有アイテムの追加</a>
+<a class="header" href="#impl-item-new">許容されうる破壊的変更: 任意の固有アイテムの追加</a>
 			</h3>
 			<p>
 通常は実装に固有のアイテムを追加するのは安全である。なぜなら固有のアイテムはトレイトのアイテムより優先される。ただし、もし実装されたトレイトのアイテムと同じ名前で異なるシグネチャなら、特定の場合では衝突して問題の原因になるかもしれない。
