@@ -49,29 +49,29 @@
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap"><code>unwrap</code></a> </dt>
 					<dd> 値があれば取得、ないとパニック。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or"><code>unwrap_or</code></a> </dt>
-					<dd> 値があれば取得、ないと指定値で代替。</dd>
+					<dd> 値があれば取得、ないと指定値を使用。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_default"><code>unwrap_or_default</code></a> </dt>
-					<dd> 値があれば取得、ないと既定値で代替。</dd>
+					<dd> 値があれば取得、ないと既定値を使用。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_or_else"><code>unwrap_or_else</code></a> </dt>
-					<dd> 値があれば取得、ないと生成関数で代替。</dd>
+					<dd> 値があれば取得、ないと生成関数を使用。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap_unchecked"><code>unwrap_unchecked</code></a> </dt>
 					<dd> 値があれば取得、ないと未定義動作。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map"><code>map</code></a> </dt>
-					<dd> 値があれば写像関数を使用、ないと <code>None</code> で代替。</dd>
+					<dd> 値があれば写像関数を使用、ないと <code>None</code> を使用。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map_or"><code>map_or</code></a> </dt>
-					<dd> 値があれば写像関数を使用、ないと指定値で代替。</dd>
+					<dd> 値があれば写像関数を使用、ないと指定値を使用。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map_or_else"><code>map_or_else</code></a> </dt>
-					<dd> 値があれば写像関数を使用、ないと生成関数で代替。</dd>
+					<dd> 値があれば写像関数を使用、ないと生成関数を使用。</dd>
 					<dt> <code>Option&lt;&amp;T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.cloned">cloned</a></code> </dt>
-					<dd> 値があればクローンを使用、ないと <code>None</code> で代替。</dd>
+					<dd> 値があればクローンを使用、ないと <code>None</code> を使用。</dd>
 					<dt> <code>Option&lt;&amp;T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.copied">copied</a></code> </dt>
-					<dd> 値があればコピーを使用、ないと <code>None</code> で代替。</dd>
+					<dd> 値があればコピーを使用、ないと <code>None</code> を使用。</dd>
 					<dt> <code>Option&lt;&amp;mut T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.cloned-1">cloned</a></code> </dt>
-					<dd> 値があればクローンを使用、ないと <code>None</code> で代替。</dd>
+					<dd> 値があればクローンを使用、ないと <code>None</code> を使用。</dd>
 					<dt> <code>Option&lt;&amp;mut T&gt;::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.copied-1">copied</a></code> </dt>
-					<dd> 値があればコピーを使用、ないと <code>None</code> で代替。</dd>
+					<dd> 値があればコピーを使用、ないと <code>None</code> を使用。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.filter"><code>filter</code></a> </dt>
-					<dd> 値があれば条件つきで取得、ないと <code>None</code> で代替。</dd>
+					<dd> 値があれば条件つきで取得、ないと <code>None</code> を使用。</dd>
 				</dl>
 			</section> <section>
 				<h1>参照</h1>
@@ -203,9 +203,9 @@
 				</p>
 				<dl class="normal lowProfile">
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.ok_or"><code>ok_or</code></a> </dt>
-					<dd> 値があれば <code>Ok</code> でラップ、なければ指定値で代替。</dd>
+					<dd> 値があれば <code>Ok</code> でラップ、ないと指定値を <code>Err</code> でラップ。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.ok_or_else"><code>ok_or_else</code></a> </dt>
-					<dd> 値があれば <code>Ok</code> でラップ、なければ生成関数で代替。</dd>
+					<dd> 値があれば <code>Ok</code> でラップ、ないと生成関数の結果を <code>Err</code> でラップ。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.transpose"><code>transpose</code></a> </dt>
 					<dd> <code>Option&lt;Result&lt;T, E&gt;&gt;</code> から <code>Result&lt;Option&lt;T&gt;, E&gt;</code> を生成。</dd>
 				</dl>
