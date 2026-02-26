@@ -1,0 +1,41 @@
+@charset "utf-8";
+
+table.api {
+	tr > th {
+		text-align: left;
+		white-space: nowrap;
+	}
+
+	tr > td {
+		text-align: left;
+		overflow: hidden;
+	}
+
+	td > div.textEllipsis {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	td > div.sWide {
+		width: 24rem;
+	}
+
+	td > div.bWide {
+		width: 30rem;
+	}
+
+	tr > * code {
+		background-color: transparent;
+	}
+}
+
+table.selfs {
+	tr > * code {
+		background-color: transparent;
+	}
+	tr > * > code.wscp {
+		white-space-collapse: preserve;
+		margin: 0 0.5ch;
+	}
+}

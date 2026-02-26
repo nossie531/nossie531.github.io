@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: as_ref 系メソッド</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<link rel="stylesheet" href="style/as_ref.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<code>Option::as_ref</code> などのメソッドについて。
+		</p> 
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+<code>as_ref</code> 系のメソッドは単純だが、その存在は型の設計全体にまで影響する場合がある。そのため、既存の型の分析、自作の型の設計、どちらの観点からも重要度が高い。
+			</p>
+		</aside>
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+構造はそのままに中の値のみを参照化する。
+			</p> <p>
+例えば、<code>Option&lt;T&gt;</code> の <code>as_ref</code> は <code>Option&lt;&amp;T&gt;</code> を戻す。
+			</p>
+			<section>
+				<h1>メソッド一覧</h1>
+				<p>
+代表的なものをまとめておく。
+				</p>
+				<dl class="normal">
+					<dt><code>as_ref</code> … 参照化</dt>
+					<dd>
+						<table class="normal api">
+							<tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;T&gt;</code>
+								</th>
+								<td>
+									<div class="textEllipsis sWide">
+<code>fn <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_ref">as_ref</a>(&amp;self) -&gt; Option&lt;&amp;T&gt;</code>
+									</div>
+								</td>
+							</tr> <tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T&gt;</code> 
+								</th>
+								<td>
+									<div class="textEllipsis sWide">
+<code>fn <a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.as_ref">as_ref</a>(&amp;self) -&gt; Result&lt;&amp;T&gt;</code> 
+									</div>
+								</td>
+							</tr> <tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/ops/enum.Bound.html">Bound</a>&lt;T&gt;</code> 
+								</th>
+								<td>
+									<div class="textEllipsis sWide">
+<code>fn <a href="https://doc.rust-lang.org/std/ops/enum.Bound.html#method.as_ref">as_ref</a>(&amp;self) -&gt; Bound&lt;&amp;T&gt;</code>
+									</div>
+								</td>
+							</tr>
+						</table>
+						<p style="margin: -0.5em 0 1em;">
+※ <code>AsRef&lt;T&gt;::as_ref</code> は用途が異なる (<code>&amp;T</code> 型を返却)。
+						</p>
+					</dd>
+					<dt><code>as_mut</code> … 可変参照化 </dt>
+					<dd>
+						<table class="normal api">
+							<tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;T&gt;</code>
+								</th>
+								<td>
+									<div class="textEllipsis sWide">
+<code>fn <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_mut">as_mut</a>(&amp;mut self) -&gt; Option&lt;&amp;mut T&gt;</code>
+									</div>
+								</td>
+							</tr> <tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T&gt;</code>
+								</th>
+								<td>
+									<div class="textEllipsis sWide">
+<code>fn <a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.as_mut">as_mut</a>(&amp;mut self) -&gt; Result&lt;&amp;mut T&gt;</code>
+									</div>
+								</td>
+							</tr> <tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/ops/enum.Bound.html">Bound</a>&lt;T&gt;</code>
+								</th>
+								<td>
+									<div class="textEllipsis sWide">
+<code>fn <a href="https://doc.rust-lang.org/std/ops/enum.Bound.html#method.as_mut">as_mut</a>(&amp;mut self) -&gt; Bound&lt;&amp;mut T&gt;</code>
+									</div>
+								</td>
+							</tr>
+						</table>
+						<p style="margin: -0.5em 0 1em;">
+※ <code>Bound&lt;T&gt;::as_mut</code> は <time>2026/01</time> 時点でナイトリー。<br/>
+※ <code>AsMut&lt;T&gt;::as_mut</code> は用途が異なる (<code>&amp;mut T</code> 型を返却)。
+						</p>
+					</dd>
+					<dt><code>as_deref</code> … <code>Deref</code> による参照化</dt>
+					<dd>
+						<table class="normal api">
+							<tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;T&gt;</code>
+								</th>
+								<td>
+									<div class="textEllipsis bWide">
+<code>fn <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_deref">as_deref</a>(&amp;self) -&gt; Option&lt;&amp;&lt;T as Deref&gt;::Target&gt;</code>
+									</div>
+								</td>
+							</tr> <tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T&gt;</code>
+								</th>
+								<td>
+									<div class="textEllipsis bWide">
+<code>fn <a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.as_deref">as_deref</a>(&amp;self) -&gt; Result&lt;&amp;&lt;T as Deref&gt;::Target&gt;</code>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</dd>
+					<dt><code>as_deref_mut</code> … <code>DerefMut</code> による可変参照化</dt>
+					<dd>
+						<table class="normal api">
+							<tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;T&gt;</code>
+								</th>
+								<td>
+									<div class="textEllipsis bWide">
+<code>fn <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.as_deref_mut">as_deref_mut</a>(&amp;mut self) -&gt; Option&lt;&amp;mut &lt;T as Deref&gt;::Target&gt;</code>
+									</div>
+								</td>
+							</tr> <tr>
+								<th>
+<code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T&gt;</code>
+								</th>
+								<td>
+									<div class="textEllipsis bWide">
+<code>fn <a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.as_deref_mut">as_deref_mut</a>(&amp;mut self) -&gt; Result&lt;&amp;mut &lt;T as Deref&gt;::Target&gt;</code>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</dd>
+				</dl>
+			</section> <section>
+				<h1>補足</h1>
+				<p>
+<code>as_deref</code> と <code>as_deref_mut</code> はそれぞれ <code>as_ref</code> と <code>as_mut</code> の参照からスマートポインタへの一般化である。中でも特によく見るパターンは <code>as_deref</code> による <code>Option<wbr/>&lt;String&gt;</code> から <code>Option<wbr/>&lt;&amp;str&gt;</code> への変換である。
+				</p>
+			</section>
+		</section> <section>
+			<h1>型全体への影響</h1>
+			<p>
+<code>as_ref</code> がある型のメソッドは <code>self</code> を <code>&amp;self</code> よりもよく使う傾向にある。
+			</p> <p>
+例えば、<a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> 型の <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap"><code>unwrap</code></a> や <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.map"><code>map</code></a> などのメソッドも <code>self</code> を使っている。
+			</p> <p>
+そして、<code>opt.as_ref().unwrap()</code> のようなコードがよく見られるようになる。
+			</p>
+			<section>
+				<h2>理由</h2>
+				<p>
+<code>as_ref</code> を経由すると <code>self</code> と <code>&amp;self</code> のサイズ差が問題にならなくなる。
+				</p> <p>
+例えば、型 <code>Option&lt;T&gt;</code> とそれに <code>as_ref</code> を適用した型 <code>Option&lt;&amp;T&gt;</code> を考える。
+				</p> <p>
+ここで、二つの型の <code>self</code> と <code>&amp;self</code> の実際の型はそれぞれ以下の通りとなる。
+				</p>
+				<table class="normal selfs">
+					<thead>
+						<tr>
+							<th></th>
+							<th><code class="wscp"> Option&lt;T&gt;</code></th>
+							<th><code class="wscp"> Option&lt;&amp;T&gt;</code></th>
+						</tr>
+					</thead>
+					<tr>
+						<th><code class="wscp"> self</code></th>
+						<td><code class="wscp"> Option&lt;T&gt;</code></td>
+						<td><code class="wscp"> Option&lt;&amp;T&gt;</code></td>
+					</tr> <tr>
+						<th><code class="wscp">&amp;self</code></th>
+						<td><code class="wscp">&amp;Option&lt;T&gt;</code></td>
+						<td><code class="wscp">&amp;Option&lt;&amp;T&gt;</code></td>
+					</tr>
+				</table>
+				<p>
+ここで <code>T</code> のサイズが大きいと、<code>Option&lt;T&gt;</code> の列では <code>self</code> が <code>&amp;self</code> より大きくなる。一方、<code>Option&lt;&amp;T&gt;</code> の列では両者の差は殆どない。そのため、<code>as_ref</code> がないと <code>self</code> はサイズ的に不利になるが、<code>as_ref</code> があると <code>self</code> だけで問題なく運用できるようになる。
+				</p>
+			</section>
+		</section>
+	</body>
+</html>

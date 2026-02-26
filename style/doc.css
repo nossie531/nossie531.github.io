@@ -315,6 +315,14 @@
 			font-weight: normal;
 			background-color: var(--fill-color);
 		}
+
+		& > caption::before {
+			content: "[";
+		}
+
+		& > caption::after {
+			content: "]";
+		}
 	}
 
 	figure.normal {
