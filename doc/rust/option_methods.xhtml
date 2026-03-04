@@ -207,7 +207,7 @@
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.ok_or_else"><code>ok_or_else</code></a> </dt>
 					<dd> 値があれば <code>Ok</code> でラップ、ないと生成関数の結果を <code>Err</code> でラップ。</dd>
 					<dt> <a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.transpose"><code>transpose</code></a> </dt>
-					<dd> <code>Option&lt;Result&lt;T, E&gt;&gt;</code> から <code>Result&lt;Option&lt;T&gt;, E&gt;</code> を生成。</dd>
+					<dd> <code>Option&lt;Result&lt;T, E&gt;&gt;</code> から <code>Result&lt;Option&lt;T&gt;, E&gt;</code> を生成<sup class="tail"><a href="#link-3">[3]</a></sup>。</dd>
 				</dl>
 			</section> <section>
 				<h1>反復子を出力 <span class="navNone">(<code>Iterator</code> ← <code>Option</code>)</span></h1>
@@ -258,7 +258,11 @@
 					</dd>
 					<dt id="link-2">[2]</dt>
 					<dd>
-<a href="option_as_iterator.xhtml">Option や Result と Iterator</a>
+<a href="option_as_iterator.xhtml">Option や Result の Iterator への変換</a>
+					</dd>
+					<dt id="link-3">[3]</dt>
+					<dd>
+<a href="transpose.xhtml">Option や Result の transpose</a>
 					</dd>
 				</dl>
 			</section>

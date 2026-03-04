@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Option と Result の transpose</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<link rel="stylesheet" href="style/as_ref.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;<a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T&gt;&gt;</code> と <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;<a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;T&gt;&gt;</code> を相互変換する <code>transpose</code> について。
+		</p> 
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+マイナーで活用方法が少し分かりにくいため。
+			</p>
+		</aside>
+		<section>
+			<h1>メソッド一覧</h1>
+			<p>
+<a href="https://doc.rust-lang.org/std/option/enum.Option.html"><code>Option</code></a> と <a href="https://doc.rust-lang.org/std/result/enum.Result.html"><code>Result</code></a> に同じ名前のメソッドがある。
+			</p>
+			<section>
+				<h1>
+<code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>::<a href="https://doc.rust-lang.org/std/option/enum.Option.html#method.transpose">transpose</a></code>
+				</h1>
+<pre><code class="language-rust">
+impl&lt;T, E&gt; Option&lt;Result&lt;T, E&gt;&gt; {
+    pub const fn transpose(self) -&gt; Result&lt;Option&lt;T&gt;, E&gt; {
+		// ... //
+    }
+}
+</code></pre>
+			</section> <section>
+				<h1>
+<code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>::<a href="https://doc.rust-lang.org/std/result/enum.Result.html#method.transpose">transpose</a></code>
+				</h1>
+<pre><code class="language-rust">
+impl&lt;T, E&gt; Result&lt;Option&lt;T&gt;, E&gt; {
+    pub const fn transpose(self) -&gt; Option&lt;Result&lt;T, E&gt;&gt; {
+		// ... //
+    }
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>活用方法</h1>
+			<p>
+使用頻度が多いのは <code><a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;<a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;T&gt;&gt;</code> から <code><a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result</a>&lt;<a href="https://doc.rust-lang.org/std/option/enum.Option.html">Option</a>&lt;T&gt;&gt;</code> への変換である。これにはより重要な意味を持つ <code>Result</code> を外側にする事で型を扱いやすくする効果がある (逆方向の変換の存在は対称性があって嬉しいが滅多に使われない)。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、空かもしれない数字を解析している。
+				</p>
+<pre><code class="language-rust">
+use std::num::ParseIntError;
+
+fn main() {
+    assert_eq!(parse(""), Ok(None));
+    assert_eq!(parse("3"), Ok(Some(3)));
+    assert!(parse("three").is_err());
+}
+
+fn parse(input: &amp;str) -&gt; Result&lt;Option&lt;i32&gt;, ParseIntError&gt; {
+    let has_input = !input.is_empty();
+    let opt_result = has_input.then(|| input.parse());
+    opt_result.transpose()
+}
+</code></pre>
+			</section>
+		</section>
+	</body>
+</html>
