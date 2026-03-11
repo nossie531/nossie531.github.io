@@ -68,12 +68,12 @@ fn main() {
 		</section> <section>
 			<h1 id="prosCons">利点と欠点</h1>
 			<p>
-この方法には利点と欠点があるが、筆者としてはやや後者が勝るように思える。利点は見通しの良さ、欠点は公開レベルが本体ルールとサブルールとで同じになる点にある。利点は主にマクロの作者にとってだが、欠点は主にマクロの利用者にとってのものになる。これでは後者を優先したくなるのは仕方なく思える。
+この方法には利点と欠点があるが、筆者はやや後者が勝るように思う。利点は見通しの良さ、欠点は rustdoc にてサブルールが本体ルールと同じ階層で掲載される点にある。利点は主にマクロの作者にとってだが、欠点は主にマクロの利用者にとってのものになる。これでは後者を優先したくなるのは仕方なく思える。
 			</p>
 		</section> <section>
 			<h1>代替案</h1>
 			<p>
-複数の <code>macro_rules</code> を用意しても似た効果が得られる。これならサブルールの公開レベルも調整できる (記述位置が本体ルールと別になるため、サブルール的なニュアンスは少し薄れるかもしれないが…)。
+複数の <code>macro_rules</code> を用意しても似た効果が得られる (記述位置が本体ルールと別になるため、サブルール的なニュアンスは少し薄れるかもしれないが…)。
 			</p>
 			<section>
 				<h2>サンプル</h2>
@@ -83,21 +83,18 @@ use std::collections::BTreeMap;
 macro_rules! text_map {
     {$($key:literal $(: $val: literal)?),*} =&gt; {
         BTreeMap::&lt;&amp;str, &amp;str&gt;::from_iter([
-            $(private::text_map_entry!($key $(: $val)?)),*
+            $(text_map_entry!($key $(: $val)?)),*
         ])
     }
 }
 
-mod private {
-    macro_rules! text_map_entry {
-        ($key:literal) =&gt; {
-            ($key, "")
-        };
-        ($key:literal: $val:literal) =&gt; {
-            ($key, $val)
-        };
-    }
-    pub(crate) use text_map_entry;
+macro_rules! text_map_entry {
+	($key:literal) =&gt; {
+		($key, "")
+	};
+	($key:literal: $val:literal) =&gt; {
+		($key, $val)
+	};
 }
 
 fn main() {
