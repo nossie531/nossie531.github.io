@@ -62,27 +62,46 @@ pub fn f() {}
 			<p>
 文書化コメントと <code>README.md</code>、それぞれの Markdown には若干の違いがある。
 			</p> <p>
-そのため、内容を流用する予定がある場合、書式に注意が必要になってしまう。
-			</p> <p>
-とは言え、共通部分も多いので流用は十分可能。なぜなら、Markdown には幾つかの方言があるが、どちらも <a href="https://spec.commonmark.org/current/">CommonMark</a> を採用している。また、そこからの互いの独自拡張にも同じものが多い。
+とは言え、共通部分が多いため流用は十分可能。なぜなら、Markdown には幾つかの方言があるが、どちらも <a href="https://spec.commonmark.org/current/">CommonMark</a> を採用している。また、そこからの互いの独自拡張も多くが共通している。
 			</p>
 			<section>
-				<h2>独自拡張の詳細</h2>
-				<dl class="normal lowProfile">
-					<dt>文書化コメント</dt>
+				<h2>独自拡張の差異</h2>
+				<dl class="normal">
+					<dt>
+						<span>文書化コメント</span> …
+						<a href="https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html#markdown">rustdoc Markdown</a>
+					</dt>
 					<dd>
-<a href="https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html#markdown">rustdoc Markdown</a>
+						<ul>
+							<li>
+API への自動リンクに対応
+							</li> <li>
+URL のリンク化は手動 ('<code>&lt;</code>' と '<code>&gt;</code>' で囲む)
+							</li> <li>
+<code>class="warning"</code> に対応
+							</li>
+						</ul>
 					</dd>
-					<dt><code>README.md</code></dt>
+					<dt>
+						<code>README.md</code> …
+						<a href="https://github.github.com/gfm/"><abbr>GFM</abbr> (Github Flavored Markdown)</a>
+					</dt>
 					<dd>
-<a href="https://github.github.com/gfm/"><abbr>GFM</abbr> (Github Flavored Markdown)</a>
+						<ul>
+							<li>
+HTML の一部の要素や属性が使用不可
+							</li> <li>
+URL のリンク化は自動 (書式に反応)
+							</li> <li>
+<a href="https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#mentioning-people-and-teams">絵文字コード</a>に対応
+							</li> <li>
+<a href="https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#alerts">アラート構文</a>に対応
+							</li> <li>
+<a href="https://mermaid.js.org/">Mermaid</a> や <a href="https://www.mathjax.org/">MathJax</a> にデフォルトで対応
+							</li>
+						</ul>
 					</dd>
 				</dl>
-			</section> <section>
-				<h2>基本方針</h2>
-				<p>
-文書化コメント側を基準にしておくと上手くいく場合が多い。なぜなら、<code>README.md</code> で使われる GFM のほうが機能が多いため、そちらの書式を基準にしてしまうと、いざ流用した時にそれが機能していないという事態が多くなってしまう。
-				</p>
 			</section>
 		</section> <section>
 			<h1>クレート紹介</h1>
