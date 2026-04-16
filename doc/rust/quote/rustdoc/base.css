@@ -11,45 +11,57 @@
  * */
 
 @layer lang {
-	/* 原文のためのフォント設定 */
+	/* 原文フォント */
 	:where(:host, :not(:lang(en))) > :lang(en) { 
 		--quote-serif: "Georgia", serif;
 		--quote-sans: "Arial", sans-serif;
 		font-family: var(--quote-serif);
 	}
 
-	/* 訳文のためのフォント設定 */
+	/* 訳文フォント */
 	:where(:host, :not(:lang(ja))) > :lang(ja) { 
 		--quote-serif: "Times New Roman", "Biz UDMincho", serif;
 		--quote-sans: "Arial", "Biz UDGothic", sans-serif;
 		font-family: var(--quote-serif);
 	}
 
-	/* 訳文は両端ぞろえ。*/
+	/* 訳文は両端揃え */
 	:where(p, li):lang(ja) {
 		text-align: justify;
 	}
 }
 
 blockquote {
+	/* 見出しの基本設定 */
 	h1, h2, h3, h4, h5, h6 {
 		font-family: var(--quote-sans);
+		border-color: var(--base0-color); 
+		border-width: thin; 
 	}
 
-	ol, ul { padding-left: 1.5em; }
+	/* 中レベル見出しには下線を付加 */
+	h2, h3, h4 {
+		border-bottom-style: solid;
+	}
 
+	/* 見出しのサイズ設定 */
+	h1 { font-size: 1.5rem; }
+	h2 { font-size: 1.375rem; margin: 1.5rem 0 1rem; padding: 0 0 1rem; }
+	h3 { font-size: 1.25rem; margin: 1rem 0 0.33rem; padding: 0 0 0.33rem; }
+	h4 { font-size: 1.125rem; margin: 1rem 0 0.33rem; padding: 0 0 0.33rem; }
+	h5 { font-size: 1rem; margin: 1rem 0 0.33rem; }
+	h5 { font-size: 1rem; margin: 1rem 0 0.33rem; }
+
+	/* 箇条書のインデント */
+	ol, ul { padding-left: 1.5em; }
 	li { margin: 0.5em 0; }
 
-	/* コードのカラーリング */
-	a.trait { color: #6e4fc9; }
-	a.fn, .fn { color: #ad7c37; }
-	a.primitive, .primitive { color: #ad378a; }
-
-	/* Markdown の見出しの一段目 */
-	h5 { 
-		font-size: 1rem;
-		margin: 1rem 0 0.5rem;
-	}
+	/* コードの色設定 */
+	a.trait, span.trait { color: #6e4fc9; }
+	a.fn, span.fn { color: #ad7c37; }
+	a.trait, span.trait { color: #ad378a; }
+	a.primitive, span.primitive { color: #ad378a; }
+	a.primitive *, span.primitive * { color: inherit !important; }
 
 	/* 要約と詳細のマーカ設定 */
 	details {
@@ -78,7 +90,7 @@ blockquote {
 		}
 	}
 
-	/* 説明アイテム。*/
+	/* 説明アイテム */
 	details.desc {
 		summary {
 			cursor: pointer;
@@ -100,7 +112,7 @@ blockquote {
 		}
 	}
 
-	/* メソッドアイテム。*/
+	/* メソッドアイテム */
 	details.method {
 		margin: 1em 0;
 

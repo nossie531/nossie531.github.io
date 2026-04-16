@@ -24,7 +24,7 @@
 		& .token.namespace,
 		& .token.class-name,
 		& .token.function {
-			color: inherit;
+			color: hsla(0, 0%, 0%, 0.8);
 		}
 
 		& .token.macro {
@@ -67,7 +67,7 @@
 		& .token.namespace,
 		& .token.class-name,
 		& .token.function {
-			color: inherit;
+			color: hsla(0, 0%, 75%, 0.8);
 		}
 
 		& .token.macro {
