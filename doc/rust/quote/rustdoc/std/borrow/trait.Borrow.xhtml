@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../base.css"/>
+		<link rel="stylesheet" href="../../../../../../style/import/prism.css"/>
+		<script src="../../../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2026-03-25" cite="https://doc.rust-lang.org/std/borrow/trait.Borrow.html">
+			<h1>
+トレイト <span class="trait">Borrow</span>
+			</h1>
+			<span>
+Since 1.0.0
+(const: <a href="https://github.com/rust-lang/rust/issues/143773">unstable</a>) ·
+<a href="../../src/core/borrow.rs.html#158">Source</a>
+			</span>
+<pre><code class="language-rust">pub trait Borrow&lt;Borrowed&gt;
+where
+    Borrowed: ?<a class="trait" href="../marker/trait.Sized.html">Sized</a>,
+{
+    // Required method
+    fn <a class="fn" href="#tymethod.borrow">borrow</a>(&amp;self) -&gt; <a class="primitive" href="../primitive.reference.html">&amp;Borrowed;</a>
+}
+</code></pre>
+			<details class="desc" open="open">
+				<summary>説明を展開</summary>
+				<div>
+					<p>
+データを借用するためのトレイト。
+					</p> <p>
+Rust では、異なる用途には異なる型の表現を与えるのが一般的である。例えば、特定の用途に適するよう値の保存場所や管理方法を <a href="../../std/boxed/struct.Box.html"><code>Box&lt;T&gt;</code></a> や <a href="../../std/rc/struct.Rc.html"><code>Rc&lt;T&gt;</code></a> のような型によって明確に選択できる。任意の型に使用できるこうした汎用的なラッパーに加え、いくつかの型は潜在的にコストのある別の切り口を提供している。そうした型の例に <a href="../../std/string/struct.String.html"><code>String</code></a> があり、それは通常の <a href="../primitive.str.html"><code>str</code></a> に文字列を拡張する能力を付加している。これには単純な不変文字列には不要な追加情報を保持する必要がある。
+					</p> <p>
+これらの型は背後にあるデータへのアクセスをそのデータの型への参照を通して提供する。これはその型「として借用される」と表現される。例えば、<a href="../../std/boxed/struct.Box.html"><code>Box&lt;T&gt;</code></a> は <code>T</code> として借用され <a href="../../std/string/struct.String.html"><code>String</code></a> は <code>str</code> として借用される。
+					</p> <p>
+型は <code>Borrow&lt;T&gt;</code> を実装し、そのトレイトの <a href="trait.Borrow.html#tymethod.borrow"><code>borrow</code></a> メソッド内で <code>T</code> への参照を提供する事により、特定の型 <code>T</code> として借用できる事を表現する。一つの型を幾つかの異なる型として借用するのも自由である。もしその型として可変借用したい、つまり背後のデータの変更を許可したいなら、追加で <a href="trait.BorrowMut.html"><code>BorrowMut&lt;T&gt;</code></a> も実装できる。
+					</p> <p>
+さらに、追加のトレイトの実装を提供している場合、それはそれらが背後にある型の代理としての動作の結果、背後にある型と同様の振舞いをすべきかどうかを考慮する必要がある。ジェネリックコードはこれらの追加のトレイト実装で同様の挙動が採用される際、通常は <code>Borrow&lt;T&gt;</code> を使用する。こうしたトレイトは追加のトレイト境界としてよく現れる。
+					</p> <p>
+特に、<code>Eq</code>, <code>Ord</code> そして <code>Hash</code> は借用と所有の値が等価でなければならない: <code>x.borrow() == y.borrow()</code> は <code>x == y</code> と同じ結果を与えるべきである。
+					</p> <p>
+もしジェネリックコードが単純に関係する型 <code>T</code> への参照を提供できる全ての型において機能する必要があるのなら、より多くの型を安全に実装できるため <a href="../convert/trait.AsRef.html"><code>AsRef&lt;T&gt;</code></a> を使用したほうが良い場合が多い。
+					</p>
+					<h2>例</h2>
+					<p>
+データのコレクションとして、<a href="../../std/collections/struct.HashMap.html"><code>HashMap&lt;K, V&gt;</code></a> はキーと値の両方を所有する。もしキーの実際のデータがある種の管理用の型にラップされていたとして、それでもまだキーデータへの参照を使った値の検索が可能であるべきである。例として、もしキーが文字列なら、ハッシュマップには  <a href="../../std/string/struct.String.html"><code>String</code></a> として保存される事が多いだろうが、それは <a href="../primitive.str.html" title="primitive str"><code>&amp;str</code></a> を使って検索できる。そのため、<code>insert</code> は <code>String</code> での操作が必要になるが <code>get</code> は <code>&amp;str</code> も使える必要がある。
+					</p> <p>
+少し簡略化するが、<code>HashMap&lt;K, V&gt;</code> の関連箇所は以下のように見える:
+					</p>
+<pre><code class="language-rust">use std::borrow::Borrow;
+use std::hash::Hash;
+
+pub struct HashMap&lt;K, V&gt; {
+    // fields omitted
+}
+
+impl&lt;K, V&gt; HashMap&lt;K, V&gt; {
+    pub fn insert(&amp;self, key: K, value: V) -&gt; Option&lt;V&gt;
+    where K: Hash + Eq
+    {
+        // ...
+    }
+
+    pub fn get&lt;Q&gt;(&amp;self, k: &amp;Q) -&gt; Option&lt;&amp;V&gt;
+    where
+        K: Borrow&lt;Q&gt;,
+        Q: Hash + Eq + ?Sized
+    {
+        // ...
+    }
+}</code></pre>
+					<p>
+ハッシュマップ全体はキーの型 <code>K</code> についてジェネリックである。これらのキーはハッシュマップに保存されるため、この型はキーのデータを所有する必要がある。キーと値のペアの挿入時、マップにはそうした <code>K</code> が与えられ、正しいハッシュバケットを見つけ、そのキーがすでに存在するかを <code>K</code> に基づいて検査する。そのため <code>K: Hash + Eq</code> が要求される。
+					</p> <p>
+とはいえ、マップ内で値を検索する際、検索のためのキーとして <code>K</code> への参照を提供しなければならないとすると、そのような所有された値の作成が常に要求される。文字列キーでは、これは <code>str</code> のみ利用可能な箇所で、検索のためだけに <code>String</code> 値の作成が必要となる事を意味する。
+					</p> <p>
+代わりに、<code>get</code> メソッドはキーデータの背後の型、上記メソッドシグネチャでは <code>Q</code> と呼称、についてジェネリックである。それは <code>K</code> が <code>Q</code> として借用される事を <code>K: Borrow&lt;Q&gt;</code> を要求する事により宣言する。さらに <code>Q: Hash + Eq</code> を要求する事により、<code>K</code> と <code>Q</code> が <code>Hash</code> と <code>Eq</code> トレイトの実装で同じ結果を生成する要件を示唆している。
+					</p> <p>
+<code>get</code> の実装は具体的な <code>Hash</code> の実装が一致する事をあてにしていて、それはキーのハッシュバケットを <code>Q</code> の <code>Hash::hash</code> を呼び出す事により決定するのだが、そのキーは <code>K</code> の値から計算されたハッシュ値に基づいて挿入されている。
+					</p> <p>
+結果として、もし <code>Q</code> の値をラップした <code>K</code> が <code>Q</code> と異なるハッシュを生成するとハッシュマップは壊れてしまう。例として、文字列をラップするが比較では ASCII 文字の大文字小文字を無視する型があるとする:
+					</p>
+<pre><code class="language-rust">pub struct CaseInsensitiveString(String);
+
+impl PartialEq for CaseInsensitiveString {
+    fn eq(&amp;self, other: &amp;Self) -&gt; bool {
+        self.0.eq_ignore_ascii_case(&amp;other.0)
+    }
+}
+
+impl Eq for CaseInsensitiveString { }
+</code></pre>
+					<p>
+二つの同じ値は同じハッシュ値を生成する必要があるため、<code>Hash</code> の実装も ASCII の大文字小文字を無視する必要がある:
+					</p>
+<pre><code class="language-rust">impl Hash for CaseInsensitiveString {
+    fn hash&lt;H: Hasher&gt;(&amp;self, state: &amp;mut H) {
+        for c in self.0.as_bytes() {
+            c.to_ascii_lowercase().hash(state)
+        }
+    }
+}
+</code></pre>
+					<p>
+<code>CaseInsensitiveString</code> は <code>Borrow&lt;str&gt;</code> を実装できるだろうか？　文字列スライスへの参照を提供する事はそれに含まれる所有された文字列を通して確かにできる。しかしその <code>Hash</code> の実装が異なるため、それは <code>str</code> と異なる挙動をする、ゆえに実際には <code>Borrow&lt;str&gt;</code> を実装してはならない。もし、基盤となる <code>str</code> へのアクセスを他者に許可したいのなら、追加の要件を伴わない <code>AsRef&lt;str&gt;</code> を通してそれを行う事はできる。
+					</p>
+				</div>
+			</details>
+			<h2>要求されるメソッド</h2>
+			<details class="method" open="open">
+				<summary>
+					<span class="rightside">
+1.0.0 · <a class="src" href="../../src/core/borrow.rs.html#179">Source</a>
+					</span>
+					<code id="tymethod.borrow">
+fn <a class="fn" href="#tymethod.borrow">borrow</a>(&amp;self) -&gt; <a class="primitive" href="../primitive.reference.html">&amp;Borrowed</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+所有された値から不変借用をする。
+					</p>
+					<h5>例</h5>
+<pre><code class="language-rust">use std::borrow::Borrow;
+
+fn check&lt;T: Borrow&lt;str&gt;&gt;(s: T) {
+    assert_eq!("Hello", s.borrow());
+}
+
+let s = "Hello".to_string();
+
+check(s);
+
+let s = "Hello";
+
+check(s);
+</code></pre>
+				</div>
+			</details>
+		</blockquote>
+	</body>
+</html>
+

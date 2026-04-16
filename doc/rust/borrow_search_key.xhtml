@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: セットやマップからの検索と Borrow トレイト</title>
+		<title>Rust メモ: Borrow / コレクションの検索キー</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -12,22 +12,26 @@
 			<h1><doc-title/></h1>
 		</header>
 		<p>
-<a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> クレートのセットやマップ (<a href="https://doc.rust-lang.org/std/collections/struct.BTreeSet.html"><code>BTreeSet</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.HashSet.html"><code>HashSet</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html"><code>BTreeMap</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html"><code>HashMap</code></a>) における検索系のメソッドについて。検索引数の型、検索対象の型、それから <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> トレイト、それぞれの関係を紹介する。
+『<a href="borrow.xhtml">Borrow</a>』のコレクションの検索キーとしての活用方法について。
 		</p> 
 		<section>
-			<h1>基本と応用</h1>
+			<h1>概要</h1>
 			<p>
-検索メソッドの用法には基本と応用がある。
+セットやマップ (<a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a> の <a href="https://doc.rust-lang.org/std/collections/struct.BTreeSet.html"><code>BTreeSet</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.HashSet.html"><code>HashSet</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.BTreeMap.html"><code>BTreeMap</code></a>, <a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html"><code>HashMap</code></a> など) の検索メソッドの引数には検索対象の参照型を渡すのが基本ではあるが、<a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> トレイトの性質を使った応用もできるようになっている。
 			</p>
 			<section>
-				<h2>基本編</h2>
+				<h2>基本</h2>
 				<p>
-検索引数として、検索対象への参照型を渡す。
+検索引数として、検索対象への参照型をそのまま渡す。
+				</p> <p>
+(<code>&amp;T</code> は <code>Borrow&lt;T&gt;</code> を実装しているため同じ関数で対応可能。)
 				</p>
 			</section> <section>
-				<h2>応用編</h2>
+				<h2>応用</h2>
 				<p>
-上記以外の検索引数も渡せるよう、検索メソッドの仕様はより汎用的になっている。具体的には、検索引数として渡せる型は、検索対象から借用でき、かつ検索対象と似た動作ができる型への参照型であればよい。
+検索引数として、検索対象から <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> で借用できる型への参照を渡す。
+				</p> <p>
+(ここで検索対象と借用される型は似た動きができなければならない。)
 				</p>
 			</section>
 		</section> <section>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Borrow / 所有と借用の両対応</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+『<a href="borrow.xhtml">Borrow</a>』を利用した引数の汎用化手法について。
+		</p> 
+		<section>
+			<h1>概要</h1>
+			<p>
+<a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow</code></a> トレイトをうまく使うと、所有と借用を一つの引数でまとめる事ができる。
+			</p> <p>
+これが可能なのは <code>Borrow</code> が以下のブランケット実装を持つためである。
+			</p>
+			<ul>
+				<li>
+<code>impl&lt;T&gt; Borrow&lt;T&gt; for T where T: ?Sized</code>
+				</li> <li>
+<code>impl&lt;T&gt; Borrow&lt;T&gt; for &amp;T where T: ?Sized</code>
+				</li> <li>
+<code>impl&lt;T&gt; Borrow&lt;T&gt; for &amp;mut T where T: ?Sized</code>
+				</li>
+			</ul>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、<code>func</code> の引数を所有と借用の両方で渡せるようになっている。
+			</p>
+<pre><code class="language-rust">
+use std::{borrow::Borrow, fmt::Display};
+
+fn main() {
+    assert_eq!(func::&lt;i32&gt;(1), "1");
+    assert_eq!(func::&lt;i32&gt;(&amp;1), "1");
+}
+
+fn func&lt;T: Display&gt;(arg: impl Borrow&lt;T&gt;) -&gt; String {
+    format!("{}", arg.borrow()).to_string()
+}
+</code></pre>
+		</section>
+	</body>
+</html>

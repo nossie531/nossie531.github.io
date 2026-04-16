@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Borrow</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow&lt;T&gt;</code></a> について。
+		</p> 
+		<section>
+			<h1>概要</h1>
+			<p>
+<a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html"><code>Borrow&lt;T&gt;</code></a> トレイトは型の背後にある本体の型への参照 <code>&amp;T</code> を提供できる事を示す。
+			</p> <p>
+実装が必要なメソッドは <a href="https://doc.rust-lang.org/std/borrow/trait.Borrow.html#tymethod.borrow"><code>borrow</code></a> のみでこれが本体の型 <code>&amp;T</code> への参照を戻す。
+			</p>
+		</section> <section>
+			<h1>用途</h1>
+			<p>
+よく使う用法に以下のようなものがある。
+			</p>
+			<ul>
+				<li>
+<a href="borrow_search_key.xhtml">コレクションの検索キー</a>
+				</li> <li>
+<a href="borrow_two_way.xhtml">所有と借用の両対応</a>
+				</li>
+			</ul>
+		</section> <section>
+			<h1>仕様</h1>
+			<doc-quote src="quote/rustdoc/std/borrow/trait.Borrow.xhtml"/>
+		</section>
+	</body>
+</html>
