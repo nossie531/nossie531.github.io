@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../base.css"/>
+		<link rel="stylesheet" href="../../../../../../style/import/prism.css"/>
+		<script src="../../../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2026-04-14" cite="https://doc.rust-lang.org/std/convert/trait.AsRef.html">
+			<h1>
+トレイト <span class="trait">AsRef</span>
+			</h1>
+			<span>
+Since 1.0.0
+(const: <a href="https://github.com/rust-lang/rust/issues/143773">unstable</a>) ·
+<a href="../../src/core/convert/mod.rs.html#220">Source</a>
+			</span>
+<pre><code class="language-rust">
+pub trait AsRef&lt;T&gt;where
+	T: ?<a class="trait" href="../marker/trait.Sized.html">Sized</a>,
+{
+    // Required method
+    fn <a class="fn" href="#tymethod.as_ref">as_ref</a>(&amp;self) -&gt; <a class="primitive" href="../primitive.reference.html">&amp;T</a>;
+}
+</code></pre>
+			<details class="desc" open="open">
+				<summary>説明を展開</summary>
+				<div>
+					<p>
+参照から参照への安価な変換に使用される。
+					</p> <p>
+このトレイトは可変参照との変換に使われる <a href="trait.AsMut.html"><code>AsMut</code></a> と似ている。もしも高コストな変換を行う必要があるのなら <code>&amp;T</code> に <a href="trait.From.html"><code>From</code></a> を実装するか自作の関数を書こう。
+					</p>
+					<h2><code>Borrow</code> との関係</h2>
+					<p>
+<code>AsRef</code> は <a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> と同じシグネチャを持つが、<a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> とは幾つかの点で異なる。
+					</p>
+					<ul>
+						<li>
+<code>AsRef</code> とは違い、<a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> は任意の <code>T</code> に対するブランケット実装を持つため、参照と値の双方を受けいれるのに使える (下記の <code>AsRef</code> の反射性の但し書きを見よ)。
+						</li> <li>
+<a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> はまた借用される値の <a href="../hash/trait.Hash.html" title="trait std::hash::Hash"><code>Hash</code></a>, <a href="../cmp/trait.Eq.html" title="trait std::cmp::Eq"><code>Eq</code></a> そして <a href="../cmp/trait.Ord.html" title="trait std::cmp::Ord"><code>Ord</code></a> が所有される値のそれと同じになる事を要求する。この理由のため、構造体の単一のフィールドのみを借用したいのなら、<code>AsRef</code> での実装はできるが <a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> ではできない。
+						</li>
+					</ul>
+					<p>
+<strong>Note: このトレイトは失敗してはならない。</strong>もし変換が失敗しうるなら、 <a href="../option/enum.Option.html"><code>Option&lt;T&gt;</code></a> や <a href="../result/enum.Result.html"><code>Result&lt;T, E&gt;</code></a> を戻す専用のメソッドを使え。
+					</p>
+					<h2>一般的な実装</h2>
+					<p>
+<code>AsRef</code> はもし内部の型が参照や可変参照なら自動逆参照する (例: <code>foo.as_ref()</code> は <code>foo</code> が <code>&amp;mut Foo</code> や <code>&amp;&amp;mut Foo</code> なら同じ働きをする)。
+					</p> <p>
+なお歴史的経緯のため現在、上記は全ての<a href="../ops/trait.Deref.html">逆参照可能型</a>で一般化されているわけではなく、例えば <code>foo.as_ref()</code> は <code>Box::new(foo).as_ref()</code> と同じ働きとは<em>ならない</em>。代わりに、多くのスマートポインタは単純に<a href="../ops/trait.Deref.html#associatedtype.Target">ポイントされた値</a>への参照を戻すだけの <code>as_ref</code> の実装を提供する (逆にその値には参照から参照への低コストな変換は実施されない)。とは言え、<a href="trait.AsRef.html#tymethod.as_ref" title="method std::convert::AsRef::as_ref"><code>AsRef::as_ref</code></a> を逆参照だけの目的で使うべきではない; 代わりに  <a href="../ops/trait.Deref.html#deref-coercion" title="trait std::ops::Deref">‘<code>Deref</code> 強制’</a> が使用できる:
+					</p>
+<pre><code class="language-rust">let x = Box::new(5i32);
+// これは避けて:
+// let y: &amp;i32 = x.as_ref();
+// こう書くだけで良い:
+let y: &amp;i32 = &amp;x;</code></pre>
+					<p>
+<a href="../ops/trait.Deref.html"><code>Deref</code></a> を実装する型は <code>AsRef&lt;T&gt;</code> を以下のように実装するよう考慮すべきである:
+					</p>
+<pre><code class="language-rust">impl&lt;T&gt; AsRef&lt;T&gt; for SomeType
+where
+    T: ?Sized,
+    &lt;SomeType as Deref&gt;::Target: AsRef&lt;T&gt;,
+{
+    fn as_ref(&amp;self) -&gt; &amp;T {
+        self.deref().as_ref()
+    }
+}</code></pre>
+				</div>
+			</details>
+			<h2>反射性</h2>
+			<p>
+理想的には、<code>AsRef</code> は反射的であるべきで、つまり <code>impl&lt;T: ?Sized&gt; AsRef&lt;T&gt; for T</code> は <a href="trait.AsRef.html#tymethod.as_ref" title="method std::convert::AsRef::as_ref"><code>as_ref</code></a> で単純にその引数を変更せずに戻すべきである。だが Rust の型システムの技術的制約のためそのようなブランケット実装は現在は提供されて<em>いない</em> (それが既存のブランケット実装の <code>&amp;T where T: AsRef&lt;U&gt;</code> と重複するためで、これは上記の『一般的な実装』の通り、<code>AsRef</code> に自動逆参照を可能にしている)。
+			</p> <p>
+特定の型 <code>T</code> のための <code>AsRef&lt;T&gt; for T</code> の素朴な実装が必要または期待されるなら明示的な追加が必要になる。しかしながら、<code>std</code> 由来の全ての型にそうした実装が含まれているわけではなく、またそれらは孤児ルールにより外部コードから追加できない事に注意せよ。
+			</p>
+			<h2>例</h2>
+			<p>
+トレイト境界を使用する事で異なる型の引数をそれらが特定の型 <code>T</code> に変換できる限り受け入れられる。
+			</p> <p>
+例えば: <code>AsRef&lt;str&gt;</code> をとるジェネリック関数を作成する事で、<a href="../primitive.str.html"><code>&amp;str</code></a> に変換できる全ての参照を受け入れたい事を表現できる。<a href="../../std/string/struct.String.html"><code>String</code></a> と <a href="../primitive.str.html"><code>&amp;str</code></a> は共に <code>AsRef&lt;str&gt;</code> を実装しているので共に入力引数として受け入れできる。
+			</p>
+<pre><code class="language-rust">fn is_hello&lt;T: AsRef&lt;str&gt;&gt;(s: T) {
+   assert_eq!("hello", s.as_ref());
+}
+
+let s = "hello";
+is_hello(s);
+
+let s = "hello".to_string();
+is_hello(s);</code></pre>
+			<h2>要求されるメソッド</h2>
+			<details class="method" open="open">
+				<summary>
+					<span class="rightside">
+1.0.0 · <a class="src" href="../../src/core/convert/mod.rs.html#223">Source</a>
+					</span>
+					<code id="tymethod.borrow">
+fn <a  class="fn" href="#tymethod.as_ref">as_ref</a>(&amp;self) -&gt; <a class="primitive" href="../primitive.reference.html">&amp;T</a>
+					</code>
+				</summary>
+				<div>
+					<p>
+この型を入力型 (通常は推論される) の共有参照へと変換する。
+					</p>
+				</div>
+			</details>
+		</blockquote>
+	</body>
+</html>
+
