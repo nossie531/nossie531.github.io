@@ -42,7 +42,7 @@ pub trait AsRef&lt;T&gt;where
 						<li>
 <code>AsRef</code> とは違い、<a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> は任意の <code>T</code> に対するブランケット実装を持つため、参照と値の双方を受けいれるのに使える (下記の <code>AsRef</code> の反射性の但し書きを見よ)。
 						</li> <li>
-<a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> はまた借用される値の <a href="../hash/trait.Hash.html" title="trait std::hash::Hash"><code>Hash</code></a>, <a href="../cmp/trait.Eq.html" title="trait std::cmp::Eq"><code>Eq</code></a> そして <a href="../cmp/trait.Ord.html" title="trait std::cmp::Ord"><code>Ord</code></a> が所有される値のそれと同じになる事を要求する。この理由のため、構造体の単一のフィールドのみを借用したいのなら、<code>AsRef</code> での実装はできるが <a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> ではできない。
+また <a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> は借用される値の <a href="../hash/trait.Hash.html" title="trait std::hash::Hash"><code>Hash</code></a>, <a href="../cmp/trait.Eq.html" title="trait std::cmp::Eq"><code>Eq</code></a> そして <a href="../cmp/trait.Ord.html" title="trait std::cmp::Ord"><code>Ord</code></a> が所有される値のそれと同じになる事を要求する。この理由のため、構造体の単一のフィールドのみを借用したいのなら、<code>AsRef</code> での実装はできるが <a href="../borrow/trait.Borrow.html"><code>Borrow</code></a> ではできない。
 						</li>
 					</ul>
 					<p>
