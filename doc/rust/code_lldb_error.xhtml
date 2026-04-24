@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: CodeLLDB でのエラー</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+Oops! The debug adapter has terminated abnormally.
+</samp></pre>
+		<p>
+VSCode でデバッグ中に CodeLLDB が落ちると上記のエラーメッセージが出る。このエラーメッセージ自体には様々な原因が考えられるが、ここでは <time>2026 年現在</time>の Windows 環境で最も多いであろう原因についてメモしておく。
+		</p>
+		<aside class="normal moan">
+			<p>
+背景にある相性問題
+			</p> <p>
+Windows 環境では定番の Rust ツールチェーンの MSVC は CodeLLDB と相性があまりよくないらしい。そもそも、LLDB は MSVC に非対応だが、CodeLLDB はそれを独自にバンドルして動かしているのだとか。
+			</p> <p>
+こうした背景のため、ごく簡単な操作でもエラーになる事があるようだ。とは言え、この解決のためだけに MinGW を導入して GNU ツールチェーンを使ったり、WSL 等の Linux 環境を用意するのは少し面倒だろう。
+			</p>
+		</aside>
+		<section>
+			<h1>再現手順</h1>
+			<p>
+未初期化の変数にマウスホバーするだけで落ちてしまう。そのため例えば、以下のコードでは最初の <code>let</code> 文の実行前にデバッガで停止し、<code>result</code> にマウスホバーするだけで落ちる。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let result = func();
+    println!("{result}");
+}
+
+fn func() -&gt; usize {
+    42
+}
+</code></pre>
+		</section> <section>
+			<h1>解決策</h1>
+			<p>
+VS Code の設定ファイル <code>setting.json</code> に以下の行を記述をするといい。これでホバー時のポップアップを無効化できる。使いづらくはなるが、デバッガが落ちるよりはましだろう。
+			</p>
+<pre><code class="language-json">
+"lldb.evaluateForHovers": false,
+</code></pre>
+		</section>
+	</body>
+</html>
