@@ -4,6 +4,7 @@
 	<head>
 		<title>blockquote</title>
 		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="style/md.css"/>
 		<link rel="stylesheet" href="../../../../style/import/prism.css"/>
 		<script src="../../../../lib/prism_shadow.js"></script>
 	</head>
@@ -34,8 +35,8 @@
 					</p>
 				</li>
 			</ul>
-			<div style="border-left: medium solid #06D; padding-left: 1em;">
-				<p style="color: #06D;">ⓘ Note</p>
+			<div class="alert alert-note">
+				<p class="alert-title">ⓘ 参考</p>
 				<p>
 単項演算子 <code>-</code> の背後にあるリテラル式の例外は <code>-128_i8</code> や <code>let j:i8 = -(128)</code> のような書式は決してパニックせず期待通りの値 -128 となる事を意味する。
 				</p> <p>
