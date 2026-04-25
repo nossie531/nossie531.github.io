@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>blockquote</title>
+		<meta name="robots" content="noindex"/>
+		<link rel="stylesheet" href="../../../../style/import/prism.css"/>
+		<script src="../../../../lib/prism_shadow.js"></script>
+	</head>
+	<body>
+		<blockquote data-time="2026-03-18" cite="https://doc.rust-lang.org/reference/expressions/operator-expr.html#overflow">
+			<h2 id="overflow">
+<a class="header" href="#overflow">オーバーフロー</a>
+			</h2>
+			<p>
+デバッグモードでコンパイルされていれば整数演算子はオーバーフロー時にパニックする。<code>-C debug-assertions</code> と <code>-C overflow-checks</code> コンパイラフラグはこれをより直接的に制御するのに使用できる。以下の事象はオーバーフローとみなされる:
+			</p>
+			<ul>
+				<li>
+					<p>
+<code>+</code>, <code>*</code> または二項の <code>-</code> で保存先の最大値より大きいか最小値より小さい値を生成。
+					</p>
+				</li> <li>
+					<p>
+単項の <code>-</code> の符号付整数型の最負値への適用、ただし演算対象は<a href="literal-expr.html#integer-literal-expressions">リテラル式</a> (または一つ以上の<a href="grouped-expr.html">グループ式</a>中に単独で存在するリテラル式) でないとする。
+					</p>
+				</li> <li>
+					<p>
+<code>/</code> または <code>%</code> を、左辺項を符号付整数型の最小整数かつ右辺項を <code>-1</code> で使用。これらの検査は歴史的理由から <code>-C overflow-checks</code> が無効でも行われる。
+					</p>
+				</li> <li>
+					<p>
+<code>&lt;&lt;</code> または <code>&gt;&gt;</code> を、右辺項が左辺項の型のビット数以上か負で使用。
+					</p>
+				</li>
+			</ul>
+			<div style="border-left: medium solid #06D; padding-left: 1em;">
+				<p style="color: #06D;">ⓘ Note</p>
+				<p>
+単項演算子 <code>-</code> の背後にあるリテラル式の例外は <code>-128_i8</code> や <code>let j:i8 = -(128)</code> のような書式は決してパニックせず期待通りの値 -128 となる事を意味する。
+				</p> <p>
+これらの場合、リテラル式はすでにその型の最負値をすでに持っている (例えば、<code>128_i8</code> は -128 を持つ) なぜなら整数リテラルは<a href="literal-expr.html#integer-literal-expressions">整数リテラル式</a>の説明の通りそれらの型へと切り詰められる。
+				</p> <p>
+２の補数方式のオーバーフロー規則のためこれらの最負値を否定しても値は変化のないままである。
+				</p> <p>
+<code>rustc</code> では、これらの最負値の式は <code>overflowing_literals</code> リントにより無視される。
+				</p>
+			</div>
+		</blockquote>
+	</body>
+</html>
+

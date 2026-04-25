@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: オーバーフロー</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+オーバーフローの取扱について。
+		</p> 
+		<section>
+			<h1>全体設定</h1>
+			<p>
+基本的にはオーバーフローすると開発ビルドではパニック、リリースビルドでは無視される。つまり、前者はエラー検出、後者は実行速度を優先している。この設定は <code>Cargo.toml</code> から以下のように変更できる (詳細は後述の<a href="#spec">仕様</a>を参照)。
+			</p>
+<pre><code class="language-toml">
+[profile.dev]
+overflow-checks = false
+</code></pre>
+		</section> <section>
+			<h1>API</h1>
+			<section>
+				<h1><code>checked_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.checked_add"><code>i32::checked_add</code></a>
+				</p> <p>
+オーバーフローすると <code>None</code> が戻され、それ以外では <code>Some</code> で計算結果が戻される。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(i32::checked_add(2, 3), Some(5));
+    assert_eq!(i32::checked_add(i32::MAX, 1), None);
+}
+</code></pre>
+			</section> <section>
+				<h1><code>overflowing_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.overflowing_add"><code>i32::overflowing_add</code></a>
+				</p> <p>
+オーバーフローした上位ビットは無視され、共にオーバーフローの有無が戻される。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(i32::overflowing_add(2, 3), (5, false));
+    assert_eq!(i32::overflowing_add(i32::MAX, 3), (i32::MIN + 2, true));
+}
+</code></pre>
+			</section> <section>
+				<h1><code>saturating_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.saturating_add"><code>i32::saturating_add</code></a>
+				</p> <p>
+計算結果が最小値と最大値に抑制される。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(i32::saturating_add(2, 3), 5);
+    assert_eq!(i32::saturating_add(i32::MAX, 3), i32::MAX);
+}
+</code></pre>
+			</section> <section>
+				<h1><code>strict_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.strict_add"><code>i32::strict_add</code></a>
+				</p> <p>
+オーバーフローするとパニックする。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(i32::strict_add(2, 3), 5);
+    let _val = i32::strict_add(i32::MAX, 1); // ⚠️ Panic!
+    unreachable!();
+}
+</code></pre>
+			</section> <section>
+				<h1><code>unbounded_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.unbounded_shl"><code>i32::unbounded_shl</code></a>
+				</p> <p>
+ビットシフト用。第二引数に整数型のビット数以上の値を指定可能にする。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(i32::unbounded_shl(1, 3), 8);
+    assert_eq!(i32::unbounded_shl(1, 32), 0);
+}
+</code></pre>
+			</section> <section>
+				<h1><code>unchecked_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.unchecked_add"><code>i32::unchecked_add</code></a>
+				</p> <p>
+				<code>unsafe</code> 関数。オーバーフローは <a href="undefined_behavior.xhtml#ub">UB (Undefineded Behavior)</a> として処理する。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    unsafe {
+        assert_eq!(i32::unchecked_add(2, 3), 5);
+        let _val = i32::unchecked_add(i32::MAX, 1); // ⚠️ UB!
+    }
+}
+</code></pre>
+			</section> <section>
+				<h1><code>wrapping_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.wrapping_add"><code>i32::wrapping_add</code></a>
+				</p> <p>
+オーバーフローした上位ビットは無視される。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    assert_eq!(i32::wrapping_add(2, 3), 5);
+    assert_eq!(i32::wrapping_add(i32::MAX, 3), i32::MIN + 2);
+}
+</code></pre>
+			</section> <section>
+				<h1><a href="https://doc.rust-lang.org/std/num/struct.Saturating.html"><code>Saturating</code></a></h1>
+				<p>
+<code>saturating_xxx</code> のラッパー版。
+				</p>
+<pre><code class="language-rust">
+use std::num::Saturating;
+
+fn main() {
+    assert_eq!(Saturating(2) + Saturating(3), Saturating(5));
+    assert_eq!(Saturating(i32::MAX) + Saturating(3), Saturating(i32::MAX));
+}
+</code></pre>
+			</section> <section>
+				<h1><a href="https://doc.rust-lang.org/std/num/struct.Wrapping.html"><code>Wrapping</code></a></h1>
+				<p>
+<code>wrapping_xxx</code> のラッパー版。
+				</p>
+<pre><code class="language-rust">
+use std::num::Wrapping;
+
+fn main() {
+    assert_eq!(Wrapping(2) + Wrapping(3), Wrapping(5));
+    assert_eq!(Wrapping(i32::MAX) + Wrapping(3), Wrapping(i32::MIN + 2));
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1>API (ナイトリー)</h1>
+			<p>
+<time>2026 年現在</time>、以下の API はまだナイトリーだが、参考としてメモしておく。
+			</p>
+			<section>
+				<h1><code>borrowing_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.borrowing_sub"><code>i32::borrowing_sub</code></a>
+				</p> <p>
+多倍長整数の演算に利用できる。前の減算のオーバーフローを今回の減算に加味しつつ、減算結果とオーバーフローの発生有無を取得する。
+				</p>
+<pre><code class="language-rust">
+#![feature(signed_bigint_helpers)]
+
+fn main() {
+    assert_eq!(i32::borrowing_sub(7, 3, false), (4, false));
+    assert_eq!(i32::borrowing_sub(7, 3, true), (3, false));
+    assert_eq!(i32::borrowing_sub(i32::MIN, 3, false), (i32::MAX - 2, true));
+    assert_eq!(i32::borrowing_sub(i32::MIN, 3, true), (i32::MAX - 3, true));
+}
+</code></pre>
+			</section> <section>
+				<h1><code>carrying_xxx</code></h1>
+				<p>
+例: <a href="https://doc.rust-lang.org/std/primitive.i32.html#method.carrying_add"><code>i32::carrying_add</code></a>
+				</p> <p>
+多倍長整数の演算に利用できる。前の計算のオーバーフローを今回の計算に加味しつつ、計算結果とオーバーフローの発生有無 (乗算の場合は上位ビット群) を取得する。
+				</p>
+<pre><code class="language-rust">
+#![feature(signed_bigint_helpers)]
+
+fn main() {
+    assert_eq!(i32::carrying_add(2, 3, false), (5, false));
+    assert_eq!(i32::carrying_add(2, 3, true), (6, false));
+    assert_eq!(i32::carrying_add(i32::MAX, 3, false), (i32::MIN + 2, true));
+    assert_eq!(i32::carrying_add(i32::MAX, 3, true), (i32::MIN + 3, true));
+}
+</code></pre>
+			</section> <section>
+				<h1><a href="https://doc.rust-lang.org/std/primitive.i32.html#method.widening_mul"><code>widening_mul</code></a></h1>
+				<p>
+乗算結果とオーバーフローによる上位ビット群を取得する。
+				</p>
+<pre><code class="language-rust">
+#![feature(widening_mul)]
+
+fn main() {
+    assert_eq!(u8::widening_mul(2, 3), (6, 0));
+    assert_eq!(u8::widening_mul(0b1000_0000, 3), (0b1000_0000, 1));
+}
+</code></pre>
+			</section>
+		</section> <section>
+			<h1 id="spec">仕様</h1>
+			<div>
+<doc-quote src="quote/cargo/reference/profiles.xhtml"/>
+			</div>
+			<br/>
+			<div>
+<doc-quote src="quote/reference/operator-expr.xhtml"/>
+			</div>
+		</section>
+	</body>
+</html>
+
