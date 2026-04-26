@@ -1,4 +1,5 @@
 :host {
+	--jumpAnim: jumpHighlight 1.5s linear;
 	display: block;
 	position: relative;
 }
@@ -61,6 +62,10 @@ blockquote {
 	a:link, a:visited {
 		text-decoration: none;
 		color: var(--link-color);
+	}
+
+	a:hover {
+		text-decoration: underline;
 	}
 
 	h1 {
@@ -191,6 +196,10 @@ blockquote {
 			display: block;
 		}
 	}
+}
+
+@keyframes jumpHighlight {
+	0% { background-color: #F84; }
 }
 
 @media screen and (width < calc(0.93 * (42em + 0.5em * 2 + 0.25em))) {

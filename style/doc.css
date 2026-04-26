@@ -682,7 +682,7 @@
 
 @layer ui {
 	:root {
-		--firstHighlightAnim: firstHighlight 1.5s linear;
+		--jumpAnim: jumpHighlight 1.5s linear;
 
 		scroll-behavior: smooth;
 
@@ -694,10 +694,10 @@
 	}
 
 	*:target {
-		animation: var(--firstHighlightAnim);
+		animation: var(--jumpAnim);
 	}
 
-	@keyframes firstHighlight {
+	@keyframes jumpHighlight {
 		0% { background-color: #F84; }
 	}
 }
