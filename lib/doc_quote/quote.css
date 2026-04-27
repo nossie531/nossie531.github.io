@@ -5,6 +5,7 @@
 }
 
 div.info {
+	font-family: inherit;
 	font-size: smaller;
 	color: var(--disable-color);
 
