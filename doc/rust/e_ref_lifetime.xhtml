@@ -201,11 +201,13 @@ fn set_ref_cell_value(immutable_ref: &amp;RefCell&lt;i32&gt;, value: i32) {
 </samp></pre>
 				</section>
 			</section> <section>
-				<h1>特殊な入れ子の参照</h1>
+				<h1>入れ子の参照</h1>
 				<p>
-<code>&amp;'a A&lt;'a&gt;</code> のような指定について。つまり、値への参照と値からの参照、両者が同じライフタイムを持つとした場合について。
+<code>&amp;'a A&lt;'a&gt;</code> や <code>Ref&lt;'a, A&lt;'a&gt;&gt;</code> のような参照について。
 				</p> <p>
-このような借用を行うと、その借用はその値が破棄されるまで返却されなくなる。なぜなら、[値への参照のライフタイム] ⊆ [値の存在期間] ⊆ [値からの参照のライフタイム] の包含関係において、両側が同じになるため、全体での等号が成立する。
+つまり、参照元と参照先、両者が同じライフタイムを持つとした場合について。
+				</p> <p>
+これらの型で借用すると、対象の値が破棄されるまで借用されっぱなしになる。なぜなら､ [参照元のライフタイム] ⊆ [値の存在期間] ⊆ [参照先のライフタイム] の包含関係において、両側が同じになるため、全体での等号が成立する。
 				</p>
 				<section>
 					<h2>アンチパターン？</h2>
@@ -220,9 +222,9 @@ fn set_ref_cell_value(immutable_ref: &amp;RefCell&lt;i32&gt;, value: i32) {
 					</p>
 					</aside>
 				</section> <section>
-					<h2><code>self</code> と <code>Self</code> の影響</h2>
+					<h2><code>self</code> や <code>Self</code> の影響</h2>
 					<p>
-<code>&amp;'a SomeType&lt;'a&gt;</code> なら一目でこのパターンだと分かるが、<code>self</code> と <code>Self</code> が含まれる場合、少しだけコードの追跡が必要になる。例えば、<code>SomeType&lt;'a&gt;</code> 型における <code>&amp;'a self</code> はつまり <code>&amp;'a SomeType&lt;'a&gt;</code> と同じであり、これはこのパターンに該当する。
+<code>&amp;'a SomeType&lt;'a&gt;</code> なら一目でこのパターンだと分かるが、<code>self</code> や <code>Self</code> が含まれる場合、少しだけコードの追跡が必要になる。例えば、<code>SomeType&lt;'a&gt;</code> 型における <code>&amp;'a self</code> はつまり <code>&amp;'a SomeType&lt;'a&gt;</code> と同じであり、これはこのパターンに該当する。
 					</p>
 				</section> <section>
 					<h2>コンパイルエラーになる例</h2>
