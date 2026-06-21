@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0284 - 型推論の失敗 - 2</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0284]</mark><mark class="title">: type annotations needed</mark>
+</samp></pre>
+		<p>
+戻り値の<a href="type_inference.xhtml">型推論</a>が失敗した場合について。
+		</p>
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+型推論が使えそうで使えない状況がある。
+			</p>
+		</aside>
+		<section>
+			<h1>他エラーとの関係</h1>
+			<p>
+このエラーは『<a href="e0284.xhtml">E0282 - 型推論の失敗 - 1</a>』と原理や対策が共通している。
+			</p>
+		</section> <section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1 id="basic">パターン A</h1>
+					<div class="subTitle">基本形</div>
+				</hgroup>
+				<p>
+型推論のための情報が不足しているパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+<pre><code class="language-rust">
+fn main() {
+	let result = "42".parse();
+    assert!(result.is_ok());
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0284]</mark><mark class="title">: type annotations needed for `Result&lt;_, _&gt;`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:6
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let result = "42".parse();
+<mark class="info">  |</mark>         <mark class="error">^^^^^^</mark>        <mark class="info">----- type must be known at this point</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> <mark class="title">note</mark>: cannot satisfy `&lt;_ as FromStr&gt;::Err == _`
+<mark class="info">help</mark>: consider giving `result` an explicit type, where the type for type parameter `F` is specified
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let result<mark class="edit">: Result&lt;F, _&gt;</mark> = "42".parse();
+<mark class="info">  |</mark>               <mark class="edit">++++++++++++++</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策 1</h2>
+					<p>
+エラーメッセージにもあるが、変数宣言で型を明示すればよい。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+	let result: Result&lt;i32, _&gt; = "42".parse();
+    assert!(result.is_ok());
+}
+</code></pre>
+				</section> <section>
+					<h2>解決策 2</h2>
+					<p>
+値の生成時に型を明示する方法もある。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+	let result = "42".parse::&lt;i32&gt;();
+    assert!(result.is_ok());
+}
+</code></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="withDrop">パターン B</h1>
+					<div class="subTitle">トレイトの選択</div>
+				</hgroup>
+				<p>
+推論中の型を引数に、適用可能なトレイトを複数の候補から探る事はできない。
+				</p> <p>
+なぜなら、これをするとトレイトの候補や組合せが膨大な数になる場合がある。
+				</p> <p>
+そして、これは以下のサンプルであげるような少し意外な結果をもたらす。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>42</code> との比較で <code>x</code> が <code>i32</code> 型だと分かりそうだが、これはエラーになる。なぜなら、<code>==</code> 演算子のためには <a href="https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html"><code>Eq</code></a> トレイトが必要になる。しかし、<code>Eq</code> トレイトには <code>i32</code> のための<a href="https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html#impl-Eq-for-i32">実装</a>だけでなく、他の型のための<a href="https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html#impl-Eq-for-u32">実装</a>も存在する。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+	let <mark class="error">x</mark> = "42".parse().unwrap();
+    assert!(x == 42);
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0284]</mark><mark class="title">: type annotations needed</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:9
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let x = "42".parse().unwrap();
+<mark class="info">  |</mark>         <mark class="error">^</mark>        <mark class="info">----- type must be known at this point</mark>
+<mark class="info">  |</mark>
+<mark class="info">  =</mark> note: cannot satisfy `&lt;_ as FromStr&gt;::Err == _`
+<mark class="info">help</mark>: consider giving `x` an explicit type
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let x<mark class="edit">: /* Type */</mark> = "42".parse().unwrap();
+<mark class="info">  |</mark>          <mark class="edit">++++++++++++</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策</h2>
+					<p>
+<a href="#basic">基本形</a>と同じ解決策が使える。
+					</p> <p>
+他にも、トレイトのメソッド呼出を完全修飾記法に変更してもよい。
+					</p>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>

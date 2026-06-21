@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: E0282 - 型推論の失敗</title>
+		<title>Rust メモ: E0282 - 型推論の失敗 -1</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -12,13 +12,10 @@
 			<h1><doc-title/></h1>
 		</header>
 <pre><samp class="console-rustc">
-<mark class="error">error[E0282]</mark><mark class="title">: type annotations needed</mark>
-</samp></pre>
-<pre><samp class="console-rustc">
 <mark class="error">error[E0282]</mark><mark class="title">: type annotations needed for `Xxx`</mark>
 </samp></pre>
 		<p>
-型推論が失敗した場合について。
+<a href="type_inference.xhtml">型推論</a>が失敗した場合について。
 		</p>
 		<aside class="normal">
 			<p>
@@ -28,38 +25,10 @@
 			</p>
 		</aside>
 		<section>
-			<h1>基礎知識</h1>
-			<section>
-				<h2>型推論</h2>
-				<p>
-型推論とは、型を明示せず周辺コードから推論する機能である。
-				</p> <p>
-例えば、以下の二行は同じ意味になる。
-				</p>
-<pre><code class="language-rust">
-let a: bool = true;
-let a = true;
-</code></pre>
-				<p>
-これにより、冗長な型の記述がなくなる。代わりに、周辺コードが複雑だと型が一目では判別できなくなる。しかし、傾向としては長所が短所を上回る。また、最近は IDE が省略された型をすぐに調べてくれる。
-				</p>
-			</section> <section>
-				<h2>型推論の守備範囲</h2>
-				<p>
-推論時にコードのどの範囲まで調べるかは言語により差がある。
-				</p> <p>
-2026 年現在の多くの言語 (C#, Java, TypeScript など) では文を追わない。そのため、変数型の型推論では右辺のみから型が決まる。この方法は非常に分かりやすいが、推論できる箇所が少ない。
-				</p> <p>
-一方、Rust では文を追いながら型情報が補完されていく。例えば以下では、変数 <code>vec</code> の型は宣言から <code>Vec&lt;_&gt;</code> と推論され、<code>push</code> の呼出から <code>Vec&lt;i32&gt;</code> と推論される。
-				</p>
-<pre><code class="language-rust">
-fn main() {
-    let mut vec = Vec::new();
-    vec.push(42);
-    assert_eq!(vec.pop(), Some(42));
-}
-</code></pre>
-			</section>
+			<h1>他エラーとの関係</h1>
+			<p>
+このエラーは『<a href="e0284.xhtml">E0284 - 型推論の失敗 - 2</a>』と原理や対策が共通している。
+			</p>
 		</section> <section>
 			<h1>パターン</h1>
 			<doc-nav-sub/>
@@ -133,31 +102,7 @@ struct MyType&lt;T&gt;(Option&lt;T&gt;);
 そして、これは以下のサンプルであげるような少し意外な結果をもたらす。
 				</p>
 				<section>
-					<h2>サンプル 1</h2>
-					<p>
-以下では、<code>42</code> との比較で <code>x</code> が <code>i32</code> 型だと分かりそうだが、これはエラーになる。なぜなら、<code>==</code> 演算子のためには <a href="https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html"><code>Eq</code></a> トレイトが必要になる。しかし、<code>Eq</code> トレイトには <code>i32</code> のための<a href="https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html#impl-Eq-for-i32">実装</a>だけでなく、他の型のための<a href="https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html#impl-Eq-for-u32">実装</a>も存在する。
-					</p>
-<pre><code class="language-rust">
-fn main() {
-	let <mark class="error">x</mark> = "42".parse().unwrap();
-    assert!(x == 42);
-}
-</code></pre>
-<pre><samp class="console-rustc">
-<mark class="error">error[E0284]</mark><mark class="title">: type annotations needed</mark>
-<mark class="info"> --&gt;</mark> src\main.rs:2:9
-<mark class="info">  |</mark>
-<mark class="info">2 |</mark>     let x = "42".parse().unwrap();
-<mark class="info">  |</mark>         <mark class="error">^</mark>        <mark class="info">----- type must be known at this point</mark>
-<mark class="info">  |</mark>
-<mark class="info">  =</mark> note: cannot satisfy `&lt;_ as FromStr&gt;::Err == _`
-<mark class="info">help</mark>: consider giving `x` an explicit type
-<mark class="info">  |</mark>
-<mark class="info">2 |</mark>     let x<mark class="edit">: /* Type */</mark> = "42".parse().unwrap();
-<mark class="info">  |</mark>          <mark class="edit">++++++++++++</mark>
-</samp></pre>
-				</section> <section>
-					<h2>サンプル 2</h2>
+					<h2>サンプル</h2>
 					<p>
 以下では、<code>extend</code> の呼出により <code>vec_dst</code> と <code>vec_src</code> が同じ型だと分かりそうだが、これはエラーになる。なぜなら、<a href="https://doc.rust-lang.org/nightly/std/vec/struct.Vec.html"><code>Vec</code></a> の <a href="https://doc.rust-lang.org/nightly/std/iter/trait.Extend.html"><code>Extend</code></a> の実装には、<a href="https://doc.rust-lang.org/nightly/std/vec/struct.Vec.html#impl-Extend%3CT%3E-for-Vec%3CT,+A%3E"><code>impl&lt;T, A&gt; Extend&lt;T&gt; for Vec&lt;T, A&gt;</code></a> と <a href="https://doc.rust-lang.org/nightly/std/vec/struct.Vec.html#impl-Extend%3C%26T%3E-for-Vec%3CT,+A%3E"><code>impl&lt;'a, T, A&gt; Extend&lt;&amp;'a T&gt; for Vec&lt;T, A&gt;</code></a> の二種類がある。
 					</p>
@@ -183,7 +128,7 @@ fn main() {
 				</section> <section>
 					<h2>解決策</h2>
 					<p>
-<a href="basic">基本形</a>と同じ解決策がどちらのサンプルにも使える。
+<a href="#basic">基本形</a>と同じ解決策が使える。
 					</p> <p>
 他にも、トレイトのメソッド呼出を完全修飾記法に変更してもよい。
 					</p>

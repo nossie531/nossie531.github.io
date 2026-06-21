@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: '_' の未対応箇所</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+'<code>_</code>' (型ホルダー) の未対応箇所について。
+		</p>
+		<section>
+			<h1>関連エラー</h1>
+			<p>
+以下のエラーはこの仕様に関連している。
+			</p>
+			<ul>
+				<li>
+<a href="e_global_type_holder.xhtml">[error] '_' の const や static での使用</a>
+				</li> <li>
+<a href="e0121.xhtml">[E0121] '_' の未対応箇所での使用</a>
+				</li>
+			</ul>
+		</section> <section>
+			<h1>基本ルール</h1>
+			<p>
+アイテム (パスを持つ構成要素) の型の記述では '_' を使った<a href="type_inference.xhtml">型推論</a>ができない。これは <time>2026 年現在</time>の多くの言語と同じだが、一部に例外の言語 (Haskell や ML) もあるため出身者は注意されたい。
+			</p> <p>
+特に以下はうっかりしやすい。
+			</p>
+			<ul>
+				<li>関数の返値型</li>
+				<li>const と static</li>
+			</ul>
+			<aside class="normal moan">
+				<p>
+個人的な感想。
+				</p> <p>
+妥当な仕様ではあるのだけど、<a href="e0121.xhtml#arrayLen">配列の要素数を手動で指定する必要がある点</a>だけは、何とかしてほしい。一応、<code>const</code> や <code>static</code> でも '<code>_</code>' による型推論を可能にしようという RFC は<a href="https://github.com/rust-lang/rfcs/pull/3546">提案</a>されているが、いますぐ採用されるような流れではない。
+				</p>
+			</aside>
+		</section> <section>
+			<h1>仕様</h1>
+			<section>
+				<h2> <code>const</code> の仕様</h2>
+<doc-quote src="quote/reference/item/constant-items.xhtml"/>
+			</section> <section>
+				<h2> <code>static</code> の仕様</h2>
+<doc-quote src="quote/reference/item/static-items.xhtml"/>
+			</section>
+		</section>
+	</body>
+</html>
+

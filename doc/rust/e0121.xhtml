@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: E0121 - 型推論の未対応箇所での '_' の使用</title>
+		<title>Rust メモ: E0121 - '_' の未対応箇所での使用</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -21,14 +21,12 @@
 <mark class="error">error[E0121]</mark><mark class="title">: the placeholder `_` is not allowed within types on item signatures for static variables</mark>
 </samp></pre>
 		<p>
-型推論の未対応箇所で '<code>_</code>' を使おうとした。
+未対応箇所で '<code>_</code>' を使おうとした。
 		</p>
 		<section>
 			<h1>原因</h1>
 			<p>
-『<a href="no_type_inference.xhtml">型推論の未対応箇所</a>』では型推論の未対応箇所を紹介している。
-			</p> <p>
-それらの箇所で '<code>_</code>' を使ってしまうとエラーになる。
+『<a href="type_holder_unsupported.xhtml">'_' の未対応箇所</a>』では紹介した箇所で '<code>_</code>' を使うとエラーになる。
 			</p>
 		</section> <section>
 			<h1>パターン</h1>

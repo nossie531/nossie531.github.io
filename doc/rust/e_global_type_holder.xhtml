@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: error - const や static における型推論</title>
+		<title>Rust メモ: error - '_' の const や static での使用</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -18,14 +18,12 @@
 <mark class="error">error</mark><mark class="title">: missing type for `static` item</mark>
 </samp></pre>
 		<p>
-<code>const</code> または <code>static</code> のアイテムで型推論を使おうとした。
+'<code>_</code>' を <code>const</code> または <code>static</code> のアイテムで使おうとした。
 		</p>
 		<section>
 			<h1>原因</h1>
 			<p>
-『<a href="no_type_inference.xhtml">型推論の未対応箇所</a>』によると、<code>const</code> や <code>static</code> のアイテムでは型推論が使えない。
-			</p> <p>
-そのため、型を指定しないとエラーになる。
+『<a href="type_holder_unsupported.xhtml">'_' の未対応箇所</a>』によると、'<code>_</code>' は<code>const</code> や <code>static</code> のアイテムでは使えない。
 			</p>
 		</section> <section>
 			<h1>サンプル</h1>

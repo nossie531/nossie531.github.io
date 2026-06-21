@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 型推論</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+型推論について。
+		</p>
+		<section>
+			<h1>基礎知識</h1>
+			<p>
+型推論とは、型を明示せず周辺コードから推論する機能である。
+			</p> <p>
+例えば、以下の二行は同じ意味になる。
+			</p>
+<pre><code class="language-rust">
+let a: bool = true;
+let a = true;
+</code></pre>
+			<p>
+これにより、冗長な型の記述がなくなる。代わりに、周辺コードが複雑だと型が一目では判別できなくなる。しかし、傾向としては長所が短所を上回る。また、最近は IDE が省略された型をすぐに調べてくれる。
+			</p>
+		</section> <section>
+			<h2>守備範囲</h2>
+			<p>
+推論時にコードのどの範囲まで調べるかは言語により差がある。
+			</p> <p>
+2026 年現在の多くの言語 (C#, Java, TypeScript など) では文を追わない。そのため、変数型の型推論では右辺のみから型が決まる。この方法は非常に分かりやすいが、推論できる箇所が少ない。
+			</p> <p>
+一方、Rust では文を追いながら型情報が補完されていく。例えば以下では、変数 <code>vec</code> の型は宣言から <code>Vec&lt;_&gt;</code> と推論され、<code>push</code> の呼出から <code>Vec&lt;i32&gt;</code> と推論される。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut vec = Vec::new();
+    vec.push(42);
+    assert_eq!(vec.pop(), Some(42));
+}
+</code></pre>
+		</section> <section>
+			<h1>関連エラー</h1>
+			<ul>
+				<li>
+					<a href="e0282.xhtml">[E0282] 型推論の失敗 - 1</a>
+				</li> <li>
+					<a href="e0284.xhtml">[E0284] 型推論の失敗 - 2</a>
+				</li> <li>
+					<a href="no_type_inference.xhtml">型推論 / 未対応箇所</a>
+				</li>
+			</ul>
+		</section>
+	</body>
+</html>

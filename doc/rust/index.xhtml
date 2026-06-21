@@ -22,7 +22,7 @@ Rust について気付いた事をメモ。
 				</li> <li>
 <a href="w_unused_must_use.xhtml">[unused_must_use] 必須使用値の無視</a>
 				</li> <li>
-<a href="e_global_type_inference.xhtml">[error] const や static における型推論</a>
+<a href="e_global_type_holder.xhtml">[error] '_' の const や static での使用</a>
 				</li> <li>
 <a href="e_fnmut_capt_escape.xhtml">[error] キャプチャ変数の流出</a>
 				</li> <li>
@@ -46,7 +46,7 @@ Rust について気付いた事をメモ。
 				</li> <li>
 <a href="e0119.xhtml">[E0119] トレイト実装の衝突</a>
 				</li> <li>
-<a href="e0121.xhtml">[E0121] 型推論の未対応箇所での '_' の使用</a>
+<a href="e0121.xhtml">[E0121] '_' の未対応箇所での使用</a>
 				</li> <li>
 <a href="e0207.xhtml">[E0207] 実装を構成しないジェネリクスパラメタ</a>
 				</li> <li>
@@ -58,7 +58,9 @@ Rust について気付いた事をメモ。
 				</li> <li>
 <a href="e0277.xhtml">[E0277] トレイト境界への不適合</a>
 				</li> <li>
-<a href="e0282.xhtml">[E0282] 型推論の失敗</a>
+<a href="e0282.xhtml">[E0282] 型推論の失敗 - 1</a>
+				</li> <li>
+<a href="e0284.xhtml">[E0284] 型推論の失敗 - 2</a>
 				</li> <li>
 <a href="e0307.xhtml">[E0307] self に使えない型</a>
 				</li> <li>
@@ -186,6 +188,8 @@ Rust について気付いた事をメモ。
 				</li> <li>
 <a href="qmark_error_conv.xhtml">? 演算子とエラー型変換</a>
 				</li> <li>
+<a href="type_holder_unsupported.xhtml">'_' の未対応箇所</a>
+				</li> <li>
 <a href="deref_coercion.xhtml">Deref 型強制</a>
 				</li> <li>
 <a href="hrtb.xhtml">HRTB (Higher-Rank Trait Bounds)</a>
@@ -220,15 +224,15 @@ Rust について気付いた事をメモ。
 				</li> <li>
 <a href="implied_lifetime_bound.xhtml">暗黙のライフタイム境界</a>
 				</li> <li>
-<a href="no_type_inference.xhtml">型推論の未対応箇所</a>
+<a href="type_inference.xhtml">型推論</a>
 				</li> <li>
 <a href="unit.xhtml">空のタプル (ユニット)</a>
 				</li> <li>
 <a href="associated_type.xhtml">関連型</a>
 				</li> <li>
-<a href="self_type.xhtml">組込型の特権/self への型指定</a>
+<a href="self_type.xhtml">組込型の特権 / self への型指定</a>
 				</li> <li>
-<a href="unsize.xhtml">組込型の特権/アンサイズ</a>
+<a href="unsize.xhtml">組込型の特権 / アンサイズ</a>
 				</li> <li>
 <a href="orphan_rule.xhtml">孤児ルール</a>
 				</li> <li>
