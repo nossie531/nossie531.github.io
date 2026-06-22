@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0573 - 型とその他の取り違え</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0573]</mark><mark class="title">: expected type, found constant 'XXX'</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0573]</mark><mark class="title">: expected type, found variant 'Xxx'</mark>
+</samp></pre>
+		<p>
+型が要求される箇所に別のものを使用した。
+		</p>
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+定数まわりの仕様とエラーメッセージが少し不親切になっている。
+			</p>
+		</aside>
+		<section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<p>
+エラー番号は違うが <a href="e0782.xhtml">E0782</a> も同じ類いのエラーである。
+			</p>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">通常型</div>
+				</hgroup>
+				<p>
+通常型に他の何かを指定したパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、型に列挙型 <code>Option</code> の変異形 <code>Some</code> を指定している。
+					</p>
+<pre><code class="language-rust">
+use std::fmt::Display;
+
+fn main() {
+    show_default::&lt;<mark class="error">Some</mark>&gt;();
+}
+
+fn show_default&lt;T&gt;()
+where 
+    T: Default + Display
+{
+    println!("{}", T::default())
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0573]</mark><mark class="title">: expected type, found variant `Some`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:20
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     show_default::&lt;Some&gt;();
+<mark class="info">  |</mark>                    <mark class="error">^^^^ not a type</mark>
+<mark class="info">  |</mark>
+<mark class="info">help</mark>: try using the variant's enum
+<mark class="info">  |</mark>
+<mark class="info">4</mark> <mark class="error">-</mark>     show_default::&lt;<mark class="error">Some</mark>&gt;();
+<mark class="info"></mark>4 <mark class="edit">+</mark>     show_default::&lt;<mark class="edit">core::option::Option</mark>&gt;();
+<mark class="info">  </mark>|
+<mark class="info"></mark>4 <mark class="error">-</mark>     show_default::&lt;<mark class="error">Some</mark>&gt;();
+<mark class="info"></mark>4 <mark class="edit">+</mark>     show_default::&lt;<mark class="edit">std::option::Option</mark>&gt;();
+<mark class="info">  </mark>|
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">定数型</div>
+				</hgroup>
+				<p>
+定数型に定数値を指定したパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、<code>ts::LEN</code> が定数値として読まれている。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let arr = MyArray::&lt;i32, <mark class="error">ts::LEN</mark>&gt;::default();
+    assert_eq!(arr.0.len(), 32);
+}
+
+struct MyArray&lt;T, const N: usize&gt;([T; N]);
+impl&lt;T: Default, const N: usize&gt; Default for MyArray&lt;T, N&gt; {
+    fn default() -&gt; Self {
+        Self(std::array::from_fn(|_| Default::default()))
+    }
+}
+
+mod ts {
+    pub const LEN: usize = 32;
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0573]</mark><mark class="title">: expected type, found constant `ts::LEN`</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:30
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let arr = MyArray::&lt;i32, ts::LEN&gt;::default();
+<mark class="info">  |</mark>                              <mark class="error">^^^^^^^ not a type</mark>
+</samp></pre>
+				</section> <section>
+					<h2>解決策 1</h2>
+					<p>
+値として解釈される原因はパス式にある。そのため、<code>use</code> で回避できる。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    use ts::LEN;
+    let arr = MyArray::&lt;i32, LEN&gt;::default();
+    assert_eq!(arr.0.len(), 32);
+}
+
+struct MyArray&lt;T, const N: usize&gt;([T; N]);
+impl&lt;T: Default, const N: usize&gt; Default for MyArray&lt;T, N&gt; {
+    fn default() -&gt; Self {
+        Self(std::array::from_fn(|_| Default::default()))
+    }
+}
+
+mod ts {
+    pub const LEN: usize = 32;
+}
+</code></pre>
+				</section> <section>
+					<h2>解決策 2</h2>
+					<p>
+中括弧で囲むと定数値を定数型として表現できる。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let arr = MyArray::&lt;i32, { ts::LEN }&gt;::default();
+    assert_eq!(arr.0.len(), 32);
+}
+
+struct MyArray&lt;T, const N: usize&gt;([T; N]);
+impl&lt;T: Default, const N: usize&gt; Default for MyArray&lt;T, N&gt; {
+    fn default() -&gt; Self {
+        Self(std::array::from_fn(|_| Default::default()))
+    }
+}
+
+mod ts {
+    pub const LEN: usize = 32;
+}
+</code></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
+

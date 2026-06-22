@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0782 - 型とトレイトの取り違え</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0782]</mark><mark class="title">: expected type, found trait 'Xxx'</mark>
+</samp></pre>
+		<p>
+型が要求される箇所にトレイトを使用した。
+		</p>
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+この辺りは Rust Edition 2021 から書き方が変更されている。
+			</p>
+		</aside>
+		<section>
+			<h1>背景</h1>
+			<section>
+				<h2>基礎知識</h2>
+				<p>
+トレイトは型を分類し抽象化する。
+				</p> <p>
+抽象化には二種類あり、コンパイル時の抽象化を担うのが静的ディスパッチ、実行時の抽象化を担うのが動的ディスパッチである。前者は具体的な型の指定を不要にし、後者は実行時に同種のトレイトへの参照どうしを交換可能にする。
+				</p>
+			</section> <section>
+				<h2><code>impl</code> と <code>dyn</code> </h2>
+				<p>
+現在の仕様では、静的ディスパッチ型か動的ディスパッチ型かは、トレイト名に先行する <code>impl</code> と <code>dyn</code> により、明示的な区別が必須である。
+				</p> <p>
+一方、Rust 2021 Edition 以前では、両者は暗黙的に区別されるだけで、どちらもトレイト名を書くだけだった。両者は似ているが重要な箇所で異なっており、これは混乱の原因だった。このような経緯があるため、一部のこのエラー番号のエラーは以前は合法だった。
+				</p>
+			</section> <section>
+				<h2>よくある誤解</h2>
+				<p>
+過去の筆者も含め、トレイトを型の一種だと考えている Rust の初心者は多い。しかし、トレイトは型を抽象化するだけで、それ自身は型ではない。そのため、型が要求される箇所にトレイトを直接は指定できない。一方、<code>dyn</code> と <code>impl</code> を指定した動的ディスパッチ型や静的ディスパッチ型は正式に型として扱われる。
+				</p> <p>
+ちなみに、この誤解の切っ掛けは他の言語によくある機能、インターフェースだろう。と言うのも、インターフェースはトレイトと同じく型の抽象化が目的で、またそれ自身が型である。そのため、型を要求している箇所にはインターフェースもだいたい指定できる。
+				</p>
+			</section>
+		</section>
+		<section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">Rust 2021 Edition 未満でもエラー</div>
+				</hgroup>
+				<p>
+このパターンはそもそも間違っているため根本的な見直しが必要である。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、関数 <code>show_default</code> の型引数にトレイト <code>MyTrait</code> を指定してしまっている。
+					</p>
+<pre><code class="language-rust">
+use std::fmt::Display;
+
+fn main() {
+    show_default::&lt;<mark class="error">MyTrait</mark>&gt;();
+}
+
+fn show_default&lt;T: Default + Display&gt;() {
+    println!("{}", T::default())
+}
+
+trait MyTrait: Default + Display {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0782]</mark><mark class="title">: expected a type, found a trait</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:4:20
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     show_default::&lt;MyTrait&gt;();
+<mark class="info">  |</mark>                    <mark class="error">^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">help</mark>: you can add the `dyn` keyword if you want a trait object
+<mark class="info">  |</mark>
+<mark class="info">4 |</mark>     show_default::&lt;dyn MyTrait&gt;();
+<mark class="info">  |</mark>                    <mark class="edit">+++</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B</h1>
+					<div class="subTitle">Rust 2021 Edition 以降でエラー</div>
+				</hgroup>
+				<p>
+このパターンは <code>impl</code> や <code>dyn</code> を指定すると治る。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、変数 <code>x</code> の型の内部で <code>dyn</code> なしのトレイトを指定している。
+					</p>
+<pre><code class="language-rust">
+fn main() {
+    let x: &amp;<mark class="error">ShowValue</mark> = &amp;42;
+    x.show_value();
+}
+
+trait ShowValue {
+    fn show_value(&amp;self);
+}
+
+impl ShowValue for i32 {
+    fn show_value(&amp;self) {
+        println!("The value is {self}");        
+    }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="info">error[E0782]</mark><mark class="title">: expected a type, found a trait</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:13
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let x: &amp;ShowValue = &amp;42;
+<mark class="info">  |</mark>             <mark class="error">^^^^^^^^^</mark>
+<mark class="info">  |</mark>
+<mark class="info">help</mark>: you can add the `dyn` keyword if you want a trait object
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let x: &amp;dyn ShowValue = &amp;42;
+<mark class="info">  |</mark>             <mark class="edit">+++</mark>
+</samp></pre>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
+
