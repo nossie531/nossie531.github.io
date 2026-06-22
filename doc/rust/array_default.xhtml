@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 配列と Default トレイト</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<a href="https://doc.rust-lang.org/std/primitive.array.html">配列</a>における <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> トレイトの奇妙な制限について。
+		</p> 
+		<section>
+			<h1>背景</h1>
+			<section>
+				<h2>Const Generics</h2>
+				<p>
+<a href="https://doc.rust-lang.org/reference/items/generics.html#const-generics">Const Generics</a> は定数をジェネリクス型として扱えるようにする機能である。この機能は <a href="https://blog.rust-lang.org/2020/10/08/Rust-1.47/">Rust 1.47.0</a> で配列について先行採用、<a href="https://blog.rust-lang.org/2021/03/25/Rust-1.51.0.html">Rust 1.51.0</a> で全体に採用された。
+				</p>
+			</section> <section>
+				<h2>配列への適用</h2>
+				<p>
+Const Generics により、配列のトレイト実装も任意の要素数を扱えるようになった。
+				</p> <p>
+例えば、現在の <code>Debug</code> トレイトは以下のように定義されている。
+				</p> <p>
+<code>impl&lt;T, const N: usize&gt; Debug for [T; N] where T: Debug</code>
+				</p> <p>
+一方、以前のそれは以下のような実装が複数あり、要素数 32 が上限だった。
+				</p> <p>
+<code>impl&lt;T&gt; Debug for [T; 32] where T: Debug</code>
+				</p>
+			</section>
+		</section> <section>
+			<h1>奇妙な制限</h1>
+			<p>
+以上のように、各トレイトは任意の要素数の配列に対応できるようになった。
+			</p> <p>
+しかし、<time>2026 年現在</time>、<a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> トレイトだけはまだそうなっていない。 
+			</p> 
+			<section>
+				<h2>原因</h2>
+				<p>
+<code>Default</code> トレイトの場合、要素数が <code>0</code> だと境界 <code>T: Default</code> が必要ない。
+				</p> <p>
+つまり、以下の実装がある。
+				</p> <p>
+<code>impl&lt;T&gt; Default for [T; 0]</code>
+				</p> <p>
+そして、これは以下の実装と衝突してしまう。
+				</p> <p>
+<code>impl&lt;T, const N: usize&gt; Default for [T; N] where T: Default</code>
+				</p>
+			</section> <section>
+				<h2>サンプル</h2>
+				<p>
+以下では、未対応の要素数の配列 <code>[i32; 64]</code> で <code>default</code> メソッドを使っている。
+				</p>
+<pre><code class="language-rust">
+fn main() {
+    let arr1 = &lt;[i32; 64]&gt;::<mark class="error">default</mark>();
+    let arr2 = std::iter::repeat_n(i32::default(), 64);
+    assert!(arr1.into_iter().eq(arr2))
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0599]</mark><mark class="title">: no function or associated item named `default` found for array `[i32; 64]` in the current scope</mark>
+<mark class="info"> --&gt;</mark> src\main.rs:2:29
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     let arr1 = &lt;[i32; 64]&gt;::default();
+<mark class="info">  |</mark>                             <mark class="error">^^^^^^^ function or associated item not found in `[i32; 64]`</mark>
+</samp></pre>
+			</section> <section>
+				<h2>解決策</h2>
+				<p>
+単純なメソッド呼出なら『<a href="array_initialization.xhtml">配列の初期化</a>』で紹介する各種方法で代替できるだろう。
+				</p>
+			</section> <section>
+				<h2>将来の展望</h2>
+				<p>
+この問題は Rust に特殊化が導入されれば解決するだろう (<code>N</code> が 0 の場合の実装を特殊化して例外にできる)。しかし、現状では <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/specialization.html"><code>specialization</code></a> や <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/min-specialization.html"><code>min_specialization</code></a> など、まだ RFC への提案段階にある。
+				</p>
+			</section>
+		</section>
+	</body>
+</html>

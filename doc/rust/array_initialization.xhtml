@@ -50,6 +50,13 @@ fn main() {
 これは <code><a href="https://doc.rust-lang.org/std/default/trait.Default.html">Default</a>::<a href="https://doc.rust-lang.org/std/default/trait.Default.html#tymethod.default">default</a></code> が <code>const</code> 関数でないため。
 				</p>
 			</section> <section>
+				<h2>要素数の制限</h2>
+				<p>
+2026 年現在、この方法が使える配列の要素数は 32 までである。
+				</p> <p>
+この理由については『<a href="array_default.xhtml">配列と Default トレイト</a>』を参照。
+				</p>
+			</section> <section>
 				<h2>サンプル</h2>
 <pre><code class="language-rust">
 fn main() {
@@ -57,15 +64,6 @@ fn main() {
     assert_eq!(arr, [0, 0, 0]);
 }
 </code></pre>
-			</section> <section>
-				<h2 class="noTitle"></h2>
-				<aside class="normal moan">
-					<p>
-要素数の制限について。
-					</p> <p>
-要素数が 32 を超えるとこの方法は使えない。なぜなら、<code>Default</code> は <code class="nw">[T; 0]</code> から <code class="nw">[T; 32]</code> までしか<a href="https://doc.rust-lang.org/std/primitive.array.html#impl-Default-for-%5BT;+32%5D">実装</a>されていない。これは <a href="https://blog.rust-lang.org/2021/03/25/Rust-1.51.0.html">Rust 1.51.0</a> による <a href="https://doc.rust-lang.org/reference/items/generics.html#const-generics">Const Generics</a> の導入前、要素数をジェネリクスで一般化できなかった時代の名残りのように思えるが、<time>2024 年現在</time>も、まだ改善されていない。
-					</p>
-				</aside>
 			</section>
 		</section> <section>
 			<hgroup>
