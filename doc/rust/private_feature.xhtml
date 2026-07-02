@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: 非公開のフィーチャー</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+'_' で始まるフィーチャーは慣習的にそのクレート専用である。
+		</p>
+		<aside class="normal">
+			<p>
+RFC の提案。
+			</p> <p>
+<time>2026 年現在</time>、GitHub を見ると RFC による正式な仕様化はまだ<a href="https://github.com/rust-lang/cargo/issues/10882">らしい</a>。
+			</p>
+		</aside>
+		<section>
+			<h1>よくある用法</h1>
+			<p>
+よくあるのは結合テストやベンチマークでの使用である。
+			</p>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、単体テストと結合テストの両方から呼べるメソッドを作成している。具体的には、非公開のフィーチャー <code>_test</code> を用意して、属性 <code>#[cfg(feature = "_test")]</code> をメソッド <code>Item::margin</code> に指定している (既存の <code>#[cfg(test)]</code> だと単体テスト専用になる)。
+				</p>
+				<figure class="file">
+					<figcaption>cargo.toml</figcaption>
+<pre><code class="language-toml">
+[package]
+name = "my_app"
+version = "0.1.0"
+edition = "2024"
+
+[dev-dependencies]
+my_app = { path = ".", features = ["_test"] }
+
+[features]
+_test = []
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>lib.rs</figcaption>
+<pre><code class="language-rust">
+pub struct Item {
+    pub price: u32,
+    cost: u32,
+}
+
+impl Item {
+    pub fn new(price: u32, cost: u32) -&gt; Self {
+        Self { price, cost }
+    }
+
+    #[cfg(feature = "_test")]
+    pub fn margin(&amp;self) -&gt; f32 {
+        self.price as f32 / self.cost as f32
+    }
+}
+</code></pre>
+				</figure>
+				<figure class="file">
+					<figcaption>tests/test.rs</figcaption>
+<pre><code class="language-rust">
+use my_app::Item;
+
+#[test]
+fn test() {
+    let item = Item::new(200, 10);
+    assert_eq!(item.margin(), 20.0)
+}
+</code></pre>
+				</figure>
+			</section>
+		</section>
+	</body>
+</html>
+
