@@ -60,8 +60,8 @@ impl Item {
     }
 
     #[cfg(feature = "_test")]
-    pub fn margin(&amp;self) -&gt; f32 {
-        self.price as f32 / self.cost as f32
+    pub fn margin(&amp;self) -&gt; u32 {
+        self.price - self.cost
     }
 }
 </code></pre>
@@ -73,8 +73,8 @@ use my_app::Item;
 
 #[test]
 fn test() {
-    let item = Item::new(200, 10);
-    assert_eq!(item.margin(), 20.0)
+    let item = Item::new(100, 10);
+    assert_eq!(item.margin(), 90);
 }
 </code></pre>
 				</figure>
