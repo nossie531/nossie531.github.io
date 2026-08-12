@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: コレクションと動的借用</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+コレクションを動的借用する場合の定石について。
+		</p>
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+筆者はここで紹介する方法をなかなか思いつけず、七転八倒した。
+			</p>
+		</aside>
+		<section>
+			<h1>概要</h1>
+			<section>
+				<h2>コレクションの小技</h2>
+				<p>
+コレクションをより汎用的に扱うため、コレクションそのままではなく、コレクションのイテレータを <code>impl Iterator&lt;Item = &amp;T&gt;</code> のようにして抽象化する扱う事はよくある。
+				</p>
+			</section> <section>
+				<h2>動的借用時の問題点</h2>
+				<p>
+上記の技法はそのままでは動的借用されたコレクションでは使えない。なぜなら、イテレータは一般的にコレクションから借用されるのでなく生成される。そのため、コレクション経由のイテレータの借用は不可能である。つまり、動的借用されるコレクションからイテレータを動的借用する事もできない。
+				</p>
+			</section> <section>
+				<h2>解決策</h2>
+				<p>
+コレクションに <code>AsIterator</code> トレイトを導入し、そこからイテレータを生成するとよい。
+				</p>
+			</section>
+		</section> <section>
+			<h1>サンプル</h1>
+			<p>
+以下では、動的借用の例として <a href="https://doc.rust-lang.org/std/cell/struct.RefCell.html"><code>RefCell&lt;T&gt;</code></a> を使用している。<br/>
+(<a href="https://doc.rust-lang.org/std/sync/struct.RwLock.html"><code>RwLock&lt;T&gt;</code></a> や <a href="https://doc.rust-lang.org/std/sync/struct.Mutex.html"><code>Mutex&lt;T&gt;</code></a> でも同様の解決方法が適用可能。)
+			</p>
+<pre><code class="language-rust">
+use std::cell::{Ref, RefCell};
+
+fn main() {
+    let var = SomeType::new("test".to_string(), vec![1, 2, 3]);
+    assert_eq!(var.id(), "test");
+    assert!(var.values().iter().eq(vec![1, 2, 3].iter()));
+}
+
+struct SomeType(RefCell&lt;SomeInfo&gt;);
+
+impl SomeType {
+    fn new(id: String, values: Vec&lt;i32&gt;) -&gt; Self {
+        Self(RefCell::new(SomeInfo { id, values }))
+    }
+
+    fn id(&amp;self) -&gt; String {
+        self.0.borrow().id.to_string()
+    }
+
+    fn values(&amp;self) -&gt; Ref&lt;'_, impl AsIterator&lt;Item = i32&gt;&gt; {
+        Ref::map(self.0.borrow(), |x| &amp;x.values)
+    }
+}
+
+struct SomeInfo {
+    id: String,
+    values: Vec&lt;i32&gt;,
+}
+
+trait AsIterator {
+    type Item;
+    fn iter(&amp;self) -&gt; impl Iterator&lt;Item = &amp;Self::Item&gt;;
+}
+
+impl&lt;T&gt; AsIterator for Vec&lt;T&gt; {
+    type Item = T;
+    fn iter(&amp;self) -&gt; impl Iterator&lt;Item = &amp;Self::Item&gt; {
+        &lt;[T]&gt;::iter(&amp;self)
+    }
+}
+</code></pre>
+		</section>
+	</body>
+</html>
