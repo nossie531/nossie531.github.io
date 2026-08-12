@@ -26,7 +26,7 @@
 			<section>
 				<h2>コレクションの小技</h2>
 				<p>
-コレクションをより汎用的に扱うため、コレクションそのままではなく、コレクションのイテレータを <code>impl Iterator&lt;Item = &amp;T&gt;</code> のようにして抽象化する扱う事はよくある。
+コレクションからイテレータを取得して <code>impl Iterator&lt;Item = &amp;T&gt;</code> のように抽象化すると、コレクションそのものを扱うよりも汎用性が高くなる。
 				</p>
 			</section> <section>
 				<h2>動的借用時の問題点</h2>
