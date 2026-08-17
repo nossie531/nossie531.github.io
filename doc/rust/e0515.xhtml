@@ -12,29 +12,38 @@
 			<h1><doc-title/></h1>
 		</header>
 <pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to local variable `var`</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
 <mark class="error">error[E0515]</mark><mark class="title">: cannot return value referencing local variable `var`</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
 <mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to function parameter `arg`</mark>
 </samp></pre>
 <pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return value referencing function parameter `arg`</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
 <mark class="error">error[E0515]</mark><mark class="title">: cannot return reference to temporary value</mark>
+</samp></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return value referencing temporary value</mark>
 </samp></pre>
 		<p>
 関数が参照型を戻す場合、参照先は関数からの復帰後も有効でなければならない。
 		</p> <p>
-そのため、ローカル変数、関数の引数、一時的な値、これらは戻り値にできない。
+そのため、ローカル変数、関数の引数、一時値、これらは戻り値に包含できない。
 		</p>
 		<section>
 			<h1>パターン</h1>
 			<doc-nav-sub/>
 			<section>
 				<hgroup>
-					<h1>パターン A</h1>
-					<div class="subTitle">ローカル変数</div>
+					<h1>パターン A1</h1>
+					<div class="subTitle">戻り値がローカル変数への参照</div>
 				</hgroup>
 				<p>
-以下では、戻り値にローカル変数への参照が含まれている。
+以下では、戻り値がローカル変数への参照である。
 				</p>
 <pre><code class="language-rust">
 fn test() -&gt; &amp;'static i32 {
@@ -51,11 +60,35 @@ fn test() -&gt; &amp;'static i32 {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン B</h1>
-					<div class="subTitle">関数の引数</div>
+					<h1>パターン A2</h1>
+					<div class="subTitle">戻り値がローカル変数への参照を包含</div>
 				</hgroup>
 				<p>
-以下では、戻り値に引数への参照が含まれている。
+以下では、戻り値がローカル変数への参照を包含している。
+				</p>
+<pre><code class="language-rust">
+fn test() -&gt; Box&lt;&amp;'static i32&gt; {
+    let var = 0;
+    Box::new(&amp;var)
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return value referencing local variable `var`</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:3:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     Box::new(&amp;var)
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^</mark><mark class="info">----</mark><mark class="error">^</mark>
+<mark class="info">  |</mark>     <mark class="error">|        </mark><mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="error">|        </mark><mark class="info">`var` is borrowed here</mark>
+<mark class="info">  |</mark>     <mark class="error">returns a value referencing data owned by the current function</mark>
+</samp></pre>
+			</section> <section>
+				<hgroup>
+					<h1>パターン B1</h1>
+					<div class="subTitle">戻り値が引数への参照</div>
+				</hgroup>
+				<p>
+以下では、戻り値が引数への参照である。
 				</p>
 <pre><code class="language-rust">
 fn test(arg: i32) -&gt; &amp;'static i32 {
@@ -71,11 +104,34 @@ fn test(arg: i32) -&gt; &amp;'static i32 {
 </samp></pre>
 			</section> <section>
 				<hgroup>
-					<h1>パターン C</h1>
-					<div class="subTitle">一時的な値</div>
+					<h1>パターン B2</h1>
+					<div class="subTitle">戻り値が引数への参照を包含</div>
 				</hgroup>
 				<p>
-以下では、戻り値に一時的な値への参照が含まれている。
+以下では、戻り値が引数への参照を包含している。
+				</p>
+<pre><code class="language-rust">
+fn test(arg: i32) -&gt; Box&lt;&amp;'static i32&gt; {
+    Box::new(&amp;arg)
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return value referencing function parameter `arg`</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     Box::new(&amp;arg)
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^</mark><mark class="info">----</mark><mark class="error">^</mark>
+<mark class="info">  |</mark>     <mark class="error">|        </mark><mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="error">|        </mark><mark class="info">`arg` is borrowed here</mark>
+<mark class="info">  |</mark>     <mark class="error">returns a value referencing data owned by the current function</mark>
+</samp></pre>
+			</section> <section>
+				<hgroup>
+					<h1>パターン C1</h1>
+					<div class="subTitle">戻り値が一時値への参照</div>
+				</hgroup>
+				<p>
+以下では、戻り値に一時値への参照である。
 				</p>
 <pre><code class="language-rust">
 fn test(arg: i32) -&gt; &amp;'static i32 {
@@ -91,6 +147,29 @@ fn test(arg: i32) -&gt; &amp;'static i32 {
 <mark class="info">  |</mark>     <mark class="error">|</mark><mark class="info">|</mark>
 <mark class="info">  |</mark>     <mark class="error">|</mark><mark class="info">temporary value created here</mark>
 <mark class="info">  |</mark>     <mark class="error">returns a reference to data owned by the current function</mark>
+</samp></pre>
+			</section> <section>
+				<hgroup>
+					<h1>パターン C2</h1>
+					<div class="subTitle">戻り値が一時値への参照を包含</div>
+				</hgroup>
+				<p>
+以下では、戻り値が一時値への参照を包含している。
+				</p>
+<pre><code class="language-rust">
+fn test(arg: i32) -&gt; Box&lt;&amp;'static i32&gt; {
+    Box::new(&amp;(arg + 1))
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0515]</mark><mark class="title">: cannot return value referencing temporary value</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:2:5
+<mark class="info">  |</mark>
+<mark class="info">2 |</mark>     Box::new(&amp;(arg + 1))
+<mark class="info">  |</mark>     <mark class="error">^^^^^^^^^^</mark><mark class="info">---------</mark><mark class="error">^</mark>
+<mark class="info">  |</mark>     <mark class="error">|         </mark><mark class="info">|</mark>
+<mark class="info">  |</mark>     <mark class="error">|         </mark><mark class="info">temporary value created here</mark>
+<mark class="info">  |</mark>     <mark class="error">returns a value referencing data owned by the current function</mark>
 </samp></pre>
 			</section>
 		</section>
