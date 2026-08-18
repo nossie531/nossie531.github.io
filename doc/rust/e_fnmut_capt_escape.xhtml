@@ -20,14 +20,12 @@
 		<section>
 			<h1>詳細</h1>
 			<p>
-<code>FnMut</code> クロージャが可変でキャプチャしている変数の参照 (不変参照か可変参照かは不問) が、クロージャの外に公開されてしまうと発生する。
-			</p> <p>
-これが危険な理由は、初回の呼出で流出したキャプチャ変数の参照の存在中に、クロージャの呼出がまた行われ、キャプチャ変数の更新が行われる可能性があるためである。
+<code>FnMut</code> 形式のクロージャで可変変数をキャプチャした場合、その変数の参照はクロージャの外部に流出させられない。これにより、過去のクロージャの呼出で流出した参照の借用中に、再びクロージャが実行され、借用と更新が競合するのを予防している。
 			</p>
 		</section> <section>
 			<h1>サンプル</h1>
 			<p>
-以下で、<code>use_fn_mut</code> を <code>use_fn_once</code> で代替すると、エラーはなくなる。
+以下では、変数 <code>counter</code> への参照がクロージャから流出している。
 			</p>
 <pre><code class="language-rust">
 fn main() {
@@ -38,16 +36,9 @@ fn main() {
     });
 }
 
-#[allow(dead_code)]
 fn use_fn_mut&lt;'a, F&gt;(_: F)
 where
     F: FnMut() -&gt; &amp;'a i32 + 'a
-{}
-
-#[allow(dead_code)]
-fn use_fn_once&lt;'a, F&gt;(_: F)
-where
-    F: FnOnce() -&gt; &amp;'a i32 + 'a
 {}
 </code></pre>
 <pre><samp class="console-rustc">
@@ -66,6 +57,25 @@ where
 <mark class="info">  =</mark> <mark class="title">note</mark>: `FnMut` closures only have access to their captured variables while they are executing...
 <mark class="info">  =</mark> <mark class="title">note</mark>: ...therefore, they cannot allow references to captured variables to escape
 </samp></pre>
+		</section> <section>
+			<h1>解決策</h1>
+			<p>
+<code>FnMut</code> の代わりに <code>FnOnce</code> を使えば、一度きりの実行が保証されエラーにならない。
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let mut counter = 1;
+    use_fn_once(|| {
+        counter += 1;
+        &amp;counter
+    });
+}
+
+fn use_fn_once&lt;'a, F&gt;(_: F)
+where
+    F: FnOnce() -&gt; &amp;'a i32 + 'a
+{}
+</code></pre>
 		</section>
 	</body>
 </html>
