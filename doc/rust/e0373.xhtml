@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: E0373 - キャプチャ変数のライフタイム不足</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0373]</mark><mark class="title">: closure may outlive the current function, but it borrows `val`, which is owned by the current function</mark>
+</samp></pre>
+		<p>
+クロージャのキャプチャ変数のライフタイムが、クロージャの境界を順守できないほど短い。
+		</p>
+		<section>
+			<h1>パターン</h1>
+			<doc-nav-sub/>
+			<section>
+				<hgroup>
+					<h1>パターン A</h1>
+					<div class="subTitle">クロージャが戻り値</div>
+				</hgroup>
+				<p>
+問題のクロージャが関数の戻り値になっているパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、関数 <code>get_lambda</code> の戻り値がクロージャであり、それが変数 <code>val</code> をキャプチャしている。しかし、<code>val</code> はローカル変数のため、関数の呼出後は有効でなくなっている。
+					</p>
+<pre><code class="language-rust">
+fn get_lambda() -&gt; impl Fn() {
+    let val = 42;
+    <mark class="error">||</mark> { dbg!(val); }
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0373]</mark><mark class="title">: closure may outlive the current function, but it borrows `val`, which is owned by the current function</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:3:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     || { dbg!(val); }
+<mark class="info">  |</mark>     <mark class="error">^^</mark>        <mark class="info">--- `val` is borrowed here</mark>
+<mark class="info">  |</mark>     <mark class="error">|</mark>
+<mark class="info">  |</mark>     <mark class="error">may outlive borrowed value `val`</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: closure is returned here
+<mark class="info"> --&gt;</mark> src\lib.rs:3:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     || { dbg!(val); }
+<mark class="info">  |</mark>     <mark class="edit">^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">help</mark>: to force the closure to take ownership of `val` (and any other referenced variables), use the `move` keyword
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     <mark class="edit">move</mark> || { dbg!(val); }
+<mark class="info">  |</mark>     <mark class="edit">++++</mark>
+</samp></pre>
+				</section>
+			</section> <section>
+				<hgroup>
+					<h1 id="forLoop">パターン B</h1>
+					<div class="subTitle">クロージャが引数</div>
+				</hgroup>
+				<p>
+問題のクロージャが関数の引数になっているパターン。
+				</p>
+				<section>
+					<h2>サンプル</h2>
+					<p>
+以下では、関数 <code>call_lambda</code> の引数がクロージャであり、それが変数 <code>val</code> をキャプチャしている。しかし、<code>val</code> はローカル変数のため、<code>'static</code> つきの引数型からは参照できない。
+					</p>
+<pre><code class="language-rust">
+fn test() {
+    let val = 42;
+    call_lambda(<mark class="error">||</mark> { dbg!(val); });
+}
+
+fn call_lambda(_f: impl Fn() + 'static) {}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0373]</mark><mark class="title">: closure may outlive the current function, but it borrows `val`, which is owned by the current function</mark>
+<mark class="info"> --&gt;</mark> src\lib.rs:3:17
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     call_lambda(|| { dbg!(val); });
+<mark class="info">  |</mark>                 <mark class="error">^^</mark>        <mark class="info">--- `val` is borrowed here</mark>
+<mark class="info">  |</mark>                 <mark class="error">|</mark>
+<mark class="info">  |</mark>                 <mark class="error">may outlive borrowed value `val`</mark>
+<mark class="info">  |</mark>
+<mark class="edit">note</mark>: function requires argument type to outlive `'static`
+<mark class="info"> --&gt;</mark> src\lib.rs:3:5
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     call_lambda(|| { dbg!(val); });
+<mark class="info">  |</mark>     <mark class="edit">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</mark>
+<mark class="info">help</mark>: to force the closure to take ownership of `val` (and any other referenced variables), use the `move` keyword
+<mark class="info">  |</mark>
+<mark class="info">3 |</mark>     call_lambda(<mark class="edit">move</mark> || { dbg!(val); });
+<mark class="info">  |</mark>                 <mark class="edit">++++</mark>
+</samp></pre>
+				</section>
+			</section>
+		</section> <section>
+			<h1>解決策</h1>
+			<p>
+エラーメッセージの <q>help</q> にある通り、クロージャに <code>move</code> を指定する。
+			</p> <p>
+すると、クロージャはキャプチャ変数を参照する代わりに、クロージャ自身にキャプチャ変数を移動してその内容を使うようになる。これにより、クロージャとキャプチャ変数のライフタイムは必ず一致するようになる。
+			</p>
+		</section>
+	</body>
+</html>
