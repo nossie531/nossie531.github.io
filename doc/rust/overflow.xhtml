@@ -33,12 +33,12 @@ overflow-checks = false
 			<section>
 				<h2>ナイトリー限定の方法</h2>
 				<p>
-<time>2026 年現在</time>、<a href="nightly_unstable.xhtml">不安定な機能</a>である <a href="https://dev-doc.rust-lang.org/nightly/unstable-book/language-features/cfg-overflow-checks.html"><code>cfg-overflow-checks</code></a> を使うと、<a href="conditional_compile.xhtml">条件付きコンパイル</a> の構成オプションに <code>overflow_checks</code> が利用できるようになる。
+<time>2026 年現在</time>、<a href="nightly_unstable.xhtml">不安定な機能</a>だが <a href="https://dev-doc.rust-lang.org/nightly/unstable-book/language-features/cfg-overflow-checks.html"><code>cfg-overflow-checks</code></a> を使うと、<a href="conditional_compile.xhtml">条件付きコンパイル</a> の構成オプションに <code>overflow_checks</code> が利用できるようになる。
 				</p>
 			</section> <section>
 				<h2>トリッキーな方法</h2>
 				<p>
-実際にオーバーフローを発生させてパニックの有無を確認する。ただし、この方法は一時的だがパニックの制御情報を乗っ取る荒技を伴う。そのため、自動テストでの利用などには有効だが、プログラム本体の実行に使うのは問題があるかもしれない。
+実際にオーバーフローを発生させてパニックの有無を確認する。ただし、この方法は一時的にだがパニックの制御情報を乗っ取る荒技を伴う。そのため、自動テストでの利用などには有効だが、プログラム本体の実行に使うのは問題があるかもしれない。
 				</p>
 <pre><code class="language-rust">
 use std::panic::{self, PanicHookInfo};
