@@ -17,12 +17,51 @@
 		<section>
 			<h1>全体設定</h1>
 			<p>
-基本的にはオーバーフローすると開発ビルドではパニック、リリースビルドでは無視される。つまり、前者はエラー検出、後者は実行速度を優先している。この設定は <code>Cargo.toml</code> から以下のように変更できる (詳細は後述の<a href="#spec">仕様</a>を参照)。
+オーバーフロー時の規定の挙動は、開発ビルドではパニック、リリースビルドではあふれたビットの無視である。つまり、前者はエラー検出、後者は実行速度を優先している。
+			</p> <p>
+なお、この設定は <code>Cargo.toml</code> から以下のように変更できる (詳細は後述の<a href="#spec">仕様</a>を参照)。
 			</p>
 <pre><code class="language-toml">
 [profile.dev]
 overflow-checks = false
 </code></pre>
+		</section> <section>
+			<h1>全体設定の読込</h1>
+			<p>
+オーバーフロー時の設定はプログラム側からも読める。これが必須となるのは、自動テストがオーバーフロー時のパニックの有無に依存する場合などである。
+			</p>
+			<section>
+				<h2>ナイトリー限定の方法</h2>
+				<p>
+<time>2026 年現在</time>、<a href="nightly_unstable.xhtml">不安定な機能</a>である <a href="https://dev-doc.rust-lang.org/nightly/unstable-book/language-features/cfg-overflow-checks.html"><code>cfg-overflow-checks</code></a> を使うと、<a href="conditional_compile.xhtml">条件付きコンパイル</a> の構成オプションに <code>overflow_checks</code> が利用できるようになる。
+				</p>
+			</section> <section>
+				<h2>トリッキーな方法</h2>
+				<p>
+実際にオーバーフローを発生させてパニックの有無を確認する。ただし、この方法は一時的だがパニックの制御情報を乗っ取る荒技を伴う。そのため、自動テストでの利用などには有効だが、プログラム本体の実行に使うのは問題があるかもしれない。
+				</p>
+<pre><code class="language-rust">
+use std::panic::{self, PanicHookInfo};
+use std::sync::LazyLock;
+
+fn overflow_checks() -&gt; bool {
+    static RET: LazyLock&lt;bool&gt; = LazyLock::new(|| {
+        #[allow(arithmetic_overflow)]
+        let calc_overflow = || u8::MAX + 1;
+        let default_panic_hook = panic::take_hook();
+        let empty_panic_hook = Box::new(|_: &amp;PanicHookInfo| {});
+
+        panic::set_hook(empty_panic_hook);
+        let overflow_result = panic::catch_unwind(calc_overflow);
+        panic::set_hook(default_panic_hook);
+
+        overflow_result.is_err()
+    });
+
+    *LazyLock::force(&amp;RET)
+} 
+</code></pre>
+			</section>
 		</section> <section>
 			<h1>API</h1>
 			<section>
