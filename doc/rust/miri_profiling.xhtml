@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Miri でのプロファイリング</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+Miri でのプロファイリング方法について。
+		</p>
+		<section>
+			<h1>背景</h1>
+			<p>
+Miri での実行は非常に遅い。通常実行の 1 万倍以上かかる場合もある (1 秒が 2 時間以上)。原因は UB の有無の確認、インタプリタ形式での実行、両者の掛け算にあると思われる。
+			</p> <p>
+これを少しでも速くしたい場合、まずはどこが遅いかの分析にプロファイラが必要だろう。
+			</p> <p>
+しかし、前述の通り Miri での実行はインタプリタ形式である。そのため、ネイティブ実行のためのプロファイラ (例: samply) ではインタプリタ側の実行情報しかとれない。
+			</p> <p>
+対策として、Miri での実行では自己プロファイリングを行えるようになっている。
+			</p>
+		</section> <section>
+			<h1>実行方法</h1>
+			<p>
+以下の手順でプロファイリングできる。
+			</p>
+			<ol>
+				<li>
+					<p>
+環境変数 <code>MIRIFLAGS</code> に <code>-Zmiri-measureme=<var>dir_name</var></code> を設定。
+					</p> <p>
+ここで <code><var>dir_name</var></code> は結果ファイルの出力先ディレクトリ名である。
+					</p>
+				</li> <li>
+					<p>
+Miri で対象のプログラムを実行。
+					</p> <p>
+なお、結果ファイルは実行文脈ごとに複数が生成される場合がある (例: 単体テストと結合テストを含むテストの実行時)。とはいえ、どれが目的のファイルかはその名称からいくらか予想できるようになっている。
+					</p>
+				</li> <li>
+					<p>
+結果ファイルを各種ビューアで表示。
+					</p> <p>
+各種ビューアは <a href="https://github.com/rust-lang/measureme">measureme</a> の紹介ページに掲載されている。例えば、SVG でインタラクティブなフレームグラフを表示する flamegraph や Web ブラウザ Chrome の開発者ツールを流用する crox などがある。
+					</p>
+				</li>
+			</ol>
+			<section>
+				<h2>flamegraph</h2>
+				<p>
+flamegraph の導入と使用のためのコマンド一覧。
+				</p>
+				<dl class="normal">
+					<dt>インストール</dt>
+					<dd>
+<pre><code>
+cargo install --git https://github.com/rust-lang/measureme --branch stable flamegraph
+</code></pre>
+					</dd>
+					<dt>SVG への変換</dt>
+					<dd>
+<pre><code>
+flamegraph <var>dir_name</var>/<var>file_name</var>.mm_profdata
+</code></pre>
+						<p>
+これにより <code>rustc.svg</code> ファイルが出力される。
+						</p>
+						<figure class="normal"> <img src="img/flamegraph.svg"/> </figure>
+					</dd>
+				</dl>
+			</section>
+		</section>
+	</body>
+</html>
