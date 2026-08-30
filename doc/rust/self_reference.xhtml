@@ -103,16 +103,16 @@ fn main() {
 }
 
 fn child_with_parent() -&gt; Pin&lt;Box&lt;ChildWithParent&gt;&gt; {
-    let parent = Parent { name: "MAMA" };
-    ChildWithParent::new(parent, "ME")
+    let parent = Parent { name: "MAMA".to_string() };
+    ChildWithParent::new(parent, "ME".to_string())
 }
 
 struct Parent {
-    name: &amp;'static str,
+    name: String,
 }
 
 struct Child&lt;'a&gt; {
-    name: &amp;'static str,
+    name: String,
     parent: &amp;'a Parent,
 }
 
@@ -123,7 +123,7 @@ struct ChildWithParent {
 }
 
 impl ChildWithParent {
-    pub fn new(parent: Parent, name: &amp;'static str) -&gt; Pin&lt;Box&lt;Self&gt;&gt; {
+    pub fn new(parent: Parent, name: String) -&gt; Pin&lt;Box&lt;Self&gt;&gt; {
         let mut ret = Box::pin(Self {
             child: None,
             _parent: parent,
