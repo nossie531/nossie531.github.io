@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: クロージャの戻り値</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+クロージャを戻り値とするパターンのサンプル。
+		</p>
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+クロージャを関数の引数にするパターンと比べ、戻り値にするパターンはややサンプルが不足している気がしたのでメモしておく。
+			</p>
+		</aside>
+		<section>
+			<h1>サンプル</h1>
+			<p>
+以下では、イテレータから連続する重複値を除去している。(同じ作業はクレート <a href="https://crates.io/crates/itertools/0.15.0"><code>itertools</code></a> の関数 <a href="https://docs.rs/itertools/0.15.0/itertools/trait.Itertools.html#method.dedup"><code>Itertools::dedup</code></a> を使うとより簡単にできるが、このように標準の <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html"><code>Iterator</code></a> に <time>2026 年現在</time>ある機能のみでも、そこそこ簡単にできる。)
+			</p>
+<pre><code class="language-rust">
+fn main() {
+    let inputs = vec![1, 2, 2, 3, 2];
+    let outputs = inputs.iter().filter(create_dedup_filter());
+    assert!(outputs.eq([1, 2, 3, 2].iter()));
+}
+
+fn create_dedup_filter&lt;'a, T&gt;() -&gt; impl FnMut(&amp;T) -&gt; bool
+where 
+    T: Clone + PartialEq + 'a,
+{
+    let mut prev = None;
+    move |x| {
+        let ret = prev.as_ref() != Some(x);
+        prev = Some(x.clone());
+        ret
+    }
+}
+</code></pre>
+		</section>
+	</body>
+</html>
