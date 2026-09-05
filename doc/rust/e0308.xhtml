@@ -253,17 +253,17 @@ fn with_static(s: &amp;'static str) {
 			</section> <section>
 				<hgroup>
 					<h1 id="hrtbTypeInference">パターン F</h1>
-					<div class="subTitle">HRTB を期待する型推論</div>
+					<div class="subTitle">HRTB を期待した型推論</div>
 				</hgroup>
 				<p>
-『<a href="hrtb.xhtml">HRTB</a> - <a href="hrtb.xhtml#typeInference">型推論</a>』で紹介する通り、HRTB を含んだ型は型推論できない。
+『<a href="hrtb.xhtml">HRTB</a> - <a href="hrtb.xhtml#typeInference">型推論</a>』で紹介する通り、型推論の結果に HRTB は含まれない。
 				</p> <p>
 そのため、関連型にそれらを含んだ型を期待していてもエラーになる。
 				</p>
-				<aside class="normal moan">
+				<aside class="normal">
 					<p id="next-solver">エラーの内容について。</p>
 					<p>
-よく見るとエラーメッセージの内容が不自然である。また、他の <a href="e0308.xhtml">E0308</a> のエラーとは原因が明らかに異なる。なお、<time>2025 年現在</time>、開発中のトレイトソルバ <a href="nightly_unstable.xhtml#next-solver">next-solver</a> を試用すると、エラーメッセージは『<a href="e0271.xhtml">E0271 - 関連型の不一致</a>』へと修正されていた。
+<time>2025 年現在</time>、開発中のトレイトソルバ <a href="nightly_unstable.xhtml#next-solver">next-solver</a> を試用すると、エラーメッセージは『<a href="e0271.xhtml">E0271 - 関連型の不一致</a>』として出力されている。
 					</p>
 				</aside>
 				<section>

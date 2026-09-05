@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
 	<head>
-		<title>Rust メモ: error - 汎用的でない呼出可能型</title>
+		<title>Rust メモ: error - HRTB を期待した呼出可能型の型推論</title>
 		<link rel="stylesheet" href="style/base.css"/>
 		<script src="../../lib/doc.js"></script>
 		<script src="lib/base.js"></script>
@@ -15,13 +15,14 @@
 <mark class="error">error</mark><mark class="title">: implementation of `FnOnce` is not general enough</mark>
 </samp></pre>
 		<p>
-呼出可能型 (<a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnMut.html"><code>FnMut</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnOnce.html"><code>FnOnce</code></a> の実装型) の引数に汎用性が足りない。
+呼出可能型 (<a href="https://doc.rust-lang.org/std/ops/trait.Fn.html"><code>Fn</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnMut.html"><code>FnMut</code></a>, <a href="https://doc.rust-lang.org/std/ops/trait.FnOnce.html"><code>FnOnce</code></a> の実装型) に <a href="hrtb.xhtml">HRTB</a> が含まれ、その箇所を型推論している。
 		</p>
 		<section>
 			<h1>背景</h1>
 			<p>
-呼出可能型の指定において、<a href="hrtb.xhtml">HRTB</a> に対応すべき箇所がそうでないと、このエラーになる。<br/>
-(注: ライフタイム省略により <code>for&lt;...&gt;</code> 構文を使わない HRTB もありうる)。
+『<a href="hrtb.xhtml">HRTB</a> - <a href="hrtb.xhtml#typeInference">型推論</a>』で紹介する通り、型推論の結果に HRTB は含まれない。
+			</p> <p>
+これは呼出可能型に限った話ではないが、呼出可能型では専用のメッセージになる。
 			</p>
 		</section> <section>
 			<h1>パターン</h1>
@@ -32,7 +33,7 @@
 					<div class="subTitle">クロージャ</div>
 				</hgroup>
 				<p>
-呼出可能型にクロージャを指定しているパターン。クロージャの引数型を省略した場合、型推論は HRTB を候補にしない。そのため、このエラーの一因になる事がある。
+呼出可能型にクロージャが指定され、その引数が問題になるパターン。
 				</p>
 				<section>
 					<h2>サンプル</h2>
@@ -82,7 +83,7 @@ fn callback(f: impl FnOnce(&amp;i32), x: &amp;i32) {
 					<div class="subTitle">メソッド</div>
 				</hgroup>
 				<p>
-呼出可能型にメソッドを指定しているパターン。メソッドは引数だけでなく型そのものが持つライフタイムがあり、それは HRTB として扱えない。
+呼出可能型にメソッドが指定され、その <code>self</code> 引数が問題になるパターン。
 				</p>
 				<section>
 					<h2>サンプル</h2>
