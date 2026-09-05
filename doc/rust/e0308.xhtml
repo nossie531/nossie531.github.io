@@ -316,8 +316,7 @@ fn identity(x: &amp;i32) -&gt; &amp;i32 {
 use std::fmt::Display;
 
 fn main() {
-    let input = &amp;42;
-    callback(identity, input);
+    callback(identity, &amp;42);
 }
 
 fn callback&lt;F, I&gt;(f: F, input: &amp;I)
@@ -356,8 +355,7 @@ where
 use std::fmt::Display;
 
 fn main() {
-    let input = &amp;42;
-    callback(identity, input);
+    callback(identity, &amp;42);
 }
 
 fn callback&lt;F, I&gt;(f: F, input: &amp;I)
