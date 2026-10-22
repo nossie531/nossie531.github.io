@@ -18,7 +18,7 @@
 			<p>
 メモした理由。
 			</p> <p>
-やや非効率な方法しか見つからなかった。
+あまり良い方法が見つからなかった。
 			</p>
 		</aside>
 		<section>
@@ -59,14 +59,29 @@ where
 </samp></pre>
 		</section>
 		<section>
-			<h1>サンプル</h1>
+			<h1>解決策</h1>
 			<p>
-以下では、ハッシュを経由して制限を回避している (少し遅い)。
+マップで型ごとの既定値を管理する。
+			</p> <p>
+ただし、以下の問題が残る。
 			</p>
+			<ul>
+				<li>
+動的なメモリ確保が必要になる。
+				</li> <li>
+動作速度が少しだけ遅い。
+				</li>
+			</ul>
+			<section>
+				<h2>サンプル</h2>
+				<p>
+以下では、ハッシュマップを使っている。
+				</p>
 <pre><code class="language-rust">
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
-use std::sync::{LazyLock, RwLock};
+use std::hash::{BuildHasherDefault, DefaultHasher};
+use std::sync::RwLock;
 
 fn main() {
     assert_eq!(default::&lt;i32&gt;(), &amp;0);
@@ -77,8 +92,9 @@ fn default&lt;T&gt;() -&gt; &amp;'static T
 where
     T: Default + Any + Sync + Send,
 {
-    static MAP: LazyLock&lt;RwLock&lt;Map&gt;&gt; = LazyLock::new(Default::default);
-    type Map = HashMap&lt;TypeId, Box&lt;dyn Any + Sync + Send&gt;&gt;;
+    type HashBuilder = BuildHasherDefault&lt;DefaultHasher&gt;;
+    type Map = HashMap&lt;TypeId, Box&lt;dyn Any + Sync + Send&gt;, HashBuilder&gt;;
+    static MAP: RwLock&lt;Map&gt; = RwLock::new(HashMap::with_hasher(BuildHasherDefault::new()));
 
     let map = MAP.read().unwrap();
     if let Some(val) = map.get(&amp;TypeId::of::&lt;T&gt;()) {
@@ -94,6 +110,8 @@ where
     unsafe { &amp;*(val as *const _) }
 }
 </code></pre>
+			</section>
 		</section>
 	</body>
 </html>
+
