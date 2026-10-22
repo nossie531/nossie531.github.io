@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+	<head>
+		<title>Rust メモ: Default への参照</title>
+		<link rel="stylesheet" href="style/base.css"/>
+		<script src="../../lib/doc.js"></script>
+		<script src="lib/base.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1><doc-title/></h1>
+		</header>
+		<p>
+<a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> トレイトでジェネリクス型の既定値を参照する方法について。
+		</p>
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+やや非効率な方法しか見つからなかった。
+			</p>
+		</aside>
+		<section>
+			<h1>失敗例</h1>
+			<p>
+以下では、内部アイテムが外側アイテムのジェネリクス型を使えない制限に引っかかる。
+			</p>
+<pre><code class="language-rust">
+use std::any::Any;
+
+fn main() {
+    assert_eq!(default::&lt;i32&gt;(), &amp;0);
+    assert_eq!(default::&lt;bool&gt;(), &amp;false);
+}
+
+fn default&lt;T&gt;() -&gt; &amp;'static T
+where
+    T: Default + Any + Sync + Send,
+{
+    static VAL: <mark class="error">T</mark> = Default::default();
+    &amp;VAL
+}
+</code></pre>
+<pre><samp class="console-rustc">
+<mark class="error">error[E0401]</mark><mark class="title">: can't use generic parameters from outer item</mark>
+<mark class="info">  --&gt;</mark> src\main.rs:12:17
+<mark class="info">   |</mark>
+<mark class="info"> 8 |</mark> fn default&lt;T&gt;() -&gt; &amp;'static T
+<mark class="info">   |</mark>            <mark class="info">- type parameter from outer item</mark>
+<mark class="info">... </mark>
+<mark class="info">12 |</mark>     static VAL: T = T::default();
+<mark class="info">   |</mark>            <mark class="info">---</mark>  <mark class="error">^ use of generic parameter from outer item</mark>
+<mark class="info">   |</mark>            <mark class="info">|</mark>
+<mark class="info">   |</mark>            <mark class="info">generic parameter used in this inner static item</mark>
+<mark class="info">   |</mark>
+<mark class="info">   =</mark> note: nested items are independent from their parent item for everything except for privacy and name resolution
+<mark class="info">   =</mark> note: a `static` is a separate item from the item that contains it
+</samp></pre>
+		</section>
+		<section>
+			<h1>サンプル</h1>
+			<p>
+以下では、ハッシュを経由して制限を回避している (少し遅い)。
+			</p>
+<pre><code class="language-rust">
+use std::any::{Any, TypeId};
+use std::collections::HashMap;
+use std::sync::{LazyLock, RwLock};
+
+fn main() {
+    assert_eq!(default::&lt;i32&gt;(), &amp;0);
+    assert_eq!(default::&lt;bool&gt;(), &amp;false);
+}
+
+fn default&lt;T&gt;() -&gt; &amp;'static T
+where
+    T: Default + Any + Sync + Send,
+{
+    static MAP: LazyLock&lt;RwLock&lt;Map&gt;&gt; = LazyLock::new(Default::default);
+    type Map = HashMap&lt;TypeId, Box&lt;dyn Any + Sync + Send&gt;&gt;;
+
+    let map = MAP.read().unwrap();
+    if let Some(val) = map.get(&amp;TypeId::of::&lt;T&gt;()) {
+        let val = val.downcast_ref::&lt;T&gt;().unwrap();
+        return unsafe { &amp;*(val as *const _) };
+    }
+
+    drop(map);
+    let mut map = MAP.write().unwrap();
+    let bx = Box::new(T::default());
+    let entry = map.entry(TypeId::of::&lt;T&gt;()).insert_entry(bx);
+    let val = entry.get().downcast_ref::&lt;T&gt;().unwrap();
+    unsafe { &amp;*(val as *const _) }
+}
+</code></pre>
+		</section>
+	</body>
+</html>
