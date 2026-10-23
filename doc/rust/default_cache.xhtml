@@ -14,20 +14,18 @@
 		<p>
 <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> トレイトでジェネリクス型の既定値を参照する方法について。
 		</p>
+		<aside class="normal">
+			<p>
+メモした理由。
+			</p> <p>
+あまり良い方法が見つからなかった。
+			</p>
+		</aside>
 		<section>
-			<h1>解決策</h1>
-			<doc-nav-sub/>
-			<div>
-<time>2026 年現在</time>では、解決策 B がお勧めになる。ただし、将来的には解決策 A が不安定な機能なしでも使えるようになるか、なんらかの別の改善がされるだろう。一方、解決策 C は使いどころが難しい気がする。
-			</div>
-			<section>
-				<hgroup>
-					<h1>失敗例</h1>
-					<div class="subTitle">ジェネリクスの誤用</div>
-				</hgroup>
-				<p>
+			<h1>失敗例</h1>
+			<p>
 一見すると、この問題はジェネリクスを普通に使うだけでも解決できそうに思える。しかし、ジェネリクスはその単層化ごとに内部アイテムを作るわけではない。そのため、以下のコードはうまくいかない。
-				</p>
+			</p>
 <pre><code class="language-rust">
 use std::any::Any;
 
@@ -59,77 +57,25 @@ where
 <mark class="info">   =</mark> note: nested items are independent from their parent item for everything except for privacy and name resolution
 <mark class="info">   =</mark> note: a `static` is a separate item from the item that contains it
 </samp></pre>
-			</section> <section>
-				<hgroup>
-					<h1 id="unstableSolution">解決策 A</h1>
-					<div class="subTitle">不安定な機能</div>
-				</hgroup>
-				<p>
-<a href="nightly_unstable.xhtml">不安定な機能</a>を使うと簡単にできる。
-				</p>
-				<section>
-					<h2>サンプル</h2>
-					<p>
-以下では、定数の初期化に <code><a href="https://doc.rust-lang.org/std/default/trait.Default.html">Default</a>::<a href="https://doc.rust-lang.org/std/default/trait.Default.html#tymethod.default">default</a></code> 関数を使っているため、まだ不安定な機能、<a href="https://doc.rust-lang.org/beta/unstable-book/library-features/const-default.html"><code>const_default</code></a> と <a href="https://doc.rust-lang.org/beta/unstable-book/language-features/const-trait-impl.html"><code>const_trait_impl</code></a> が必要になっている。
-					</p>
-<pre><code class="language-rust">
-#![feature(const_default)]
-#![feature(const_trait_impl)]
-
-fn main() {
-    assert_eq!(&amp;i32::DEFAULT, &amp;0);
-    assert_eq!(&amp;bool::DEFAULT, &amp;false);
-}
-
-trait ConstDefault {
-    const DEFAULT: Self;
-}
-
-impl&lt;T: const Default&gt; ConstDefault for T {
-    const DEFAULT: Self = T::default();
-}
-</code></pre>
-				</section>
-			</section> <section>
-				<hgroup>
-					<h1>解決策 B</h1>
-					<div class="subTitle">有名クレート</div>
-				</hgroup>
-				<p>
-<a href="https://crates.io/crates/const-default"><code>const-default</code></a> クレートが使える。このクレートではトレイト <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> の代わりに別のトレイト <a href="https://docs.rs/const-default/1.0.0/const_default/trait.ConstDefault.html"><code>ConstDefault</code></a> を用意している。そして、初期化はブランケット実装を使わず型ごとに行う方針をとっている (不安定な機能が不要)。そして、標準の型は予めそれぞれ実装、それ以外は <code>derive</code> マクロで関数 <code><a href="https://doc.rust-lang.org/std/default/trait.Default.html">Default</a>::<a href="https://doc.rust-lang.org/std/default/trait.Default.html#tymethod.default">default</a></code> に処理を転送するようにしている。
-				</p> <p>
-なお、このクレートはかなり有名であり、それゆえこの問題に適している。なぜなら、たとえ一部でも <a href="https://doc.rust-lang.org/std/default/trait.Default.html"><code>Default</code></a> トレイトの代わりを果たすトレイトを導入するには、それなりの知名度が求められる。無名のクレートがそうしたトレイトを乱立させるより、こうした有名クレートが一つあるほうが助かる。
-				</p>
-<pre><code class="language-rust">
-use const_default::ConstDefault;
-
-fn main() {
-    assert_eq!(&amp;i32::DEFAULT, &amp;0);
-    assert_eq!(&amp;bool::DEFAULT, &amp;false);
-}
-</code></pre>
-			</section> <section>
-				<hgroup>
-					<h1>解決策 C</h1>
-					<div class="subTitle">動的キャッシュ</div>
-				</hgroup>
-				<p>
+		</section> <section>
+			<h1>解決策</h1>
+			<p>
 マップで型ごとの既定値をキャッシュする。
-				</p> <p>
+			</p> <p>
 この方法には以下の欠点がある。
-				</p>
-				<ul>
-					<li>
+			</p>
+			<ul>
+				<li>
 動的なメモリ確保が必要になる。
-					</li> <li>
+				</li> <li>
 動作がほんの少しだけ遅い。
-					</li>
-				</ul>
-				<section>
-					<h2>サンプル</h2>
-					<p>
+				</li>
+			</ul>
+			<section>
+				<h2>サンプル</h2>
+				<p>
 以下では、ハッシュマップを使っている。
-					</p>
+				</p>
 <pre><code class="language-rust">
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
@@ -163,7 +109,6 @@ where
     unsafe { &amp;*(val as *const _) }
 }
 </code></pre>
-				</section>
 			</section>
 		</section>
 	</body>
